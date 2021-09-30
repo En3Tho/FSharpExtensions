@@ -1,4 +1,4 @@
-﻿module En3Tho.FSharp.ComputationExpressions.CollectionBuilder
+﻿namespace En3Tho.FSharp.ComputationExpressions
 
 open System.Collections.Generic
 open System.Runtime.CompilerServices
