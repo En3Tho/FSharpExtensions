@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <AssemblyVersion>1.0.0</AssemblyVersion>
+        <FileVersion>1.0.0</FileVersion>
+        <Description>A set of extensions for F# base library</Description>
+        <Copyright>Copyright (c) 2021 Igor Bagdamyan</Copyright>
+        <PackageProjectUrl>https://github.com/En3Tho/FSharpExtensions</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/En3Tho/FSharpExtensions/blob/main/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/En3Tho/FSharpExtensions</RepositoryUrl>
+        <Authors> Igor Bagdamyan</Authors>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Compile Include="Disposables.fs" />
+      <Compile Include="Modules.fs" />
+      <Compile Include="Extensions.fs" />
+      <Compile Include="ActivePatterns.fs" />
+    </ItemGroup>
+
+</Project>
