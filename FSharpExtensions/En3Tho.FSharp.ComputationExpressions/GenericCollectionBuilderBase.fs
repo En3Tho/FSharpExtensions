@@ -1,5 +1,4 @@
-﻿[<AutoOpen>]
-module En3Tho.FSharp.Extensions.GenericCollectionBuilderBase
+﻿module En3Tho.FSharp.Extensions.GenericCollectionBuilderBase
 
 open System
 open System.Runtime.CompilerServices

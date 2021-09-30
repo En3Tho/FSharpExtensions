@@ -9,10 +9,10 @@
         <PackageProjectUrl>https://github.com/En3Tho/FSharpExtensions</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/En3Tho/FSharpExtensions/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/En3Tho/FSharpExtensions</RepositoryUrl>
-        <AssemblyVersion>1.0.1</AssemblyVersion>
-        <FileVersion>1.0.1</FileVersion>
+        <AssemblyVersion>1.0.2</AssemblyVersion>
+        <FileVersion>1.0.2</FileVersion>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageVersion>1.0.1</PackageVersion>
+        <PackageVersion>1.0.2</PackageVersion>
     </PropertyGroup>
 
     <ItemGroup>
