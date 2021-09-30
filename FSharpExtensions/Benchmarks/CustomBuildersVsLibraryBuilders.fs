@@ -1,7 +1,7 @@
 module Benchmarks.CustomBuildersVsLibraryBuilders
 
 open BenchmarkDotNet.Attributes
-open En3Tho.FSharp.Extensions
+open En3Tho.FSharp.Extensions.GenericCollectionBuilderBase
 open En3Tho.FSharp.ComputationExpressions.ArrayPoolBasedBuilders
 
 [<

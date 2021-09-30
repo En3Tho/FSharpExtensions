@@ -2,7 +2,6 @@
 
 open System.Collections.Generic
 open System.Runtime.CompilerServices
-open En3Tho.FSharp.Extensions
 
 module SCollectionBuilder =
     type SCollection< ^a, ^b, ^c when ^a: (member Add: ^b -> ^c)> = ^a
