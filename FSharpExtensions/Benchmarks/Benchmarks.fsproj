@@ -8,6 +8,7 @@
     <ItemGroup>
         <Compile Include="BenchmarkConfig.fs" />
         <Compile Include="CustomBuildersVsLibraryBuilders.fs" />
+        <Compile Include="CollectionsBuildersAllocations.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 

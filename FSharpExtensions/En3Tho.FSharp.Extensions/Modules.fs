@@ -1173,10 +1173,10 @@ module Seq =
 
         moveNext()
 
-    let identicalBy valueEqualsTo (seq2: 'a seq) (seq1: 'a seq) =
+    let identicalBy comparer (seq2: 'a seq) (seq1: 'a seq) =
         use enum1 = seq1.GetEnumerator()
         use enum2 = seq2.GetEnumerator()
-        let optimized = OptimizedClosures.FSharpFunc<_,_,_>.Adapt valueEqualsTo
+        let optimized = OptimizedClosures.FSharpFunc<_,_,_>.Adapt comparer
         let rec moveNext() =
             match enum1.MoveNext(), enum2.MoveNext() with
             | true, true ->

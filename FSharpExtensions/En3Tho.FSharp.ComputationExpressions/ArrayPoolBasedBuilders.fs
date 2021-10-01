@@ -50,7 +50,6 @@ module ArrayPoolList =
         interface IDisposable with
             member this.Dispose() = this.Dispose()
     
-    
 open ArrayPoolList
 
 // This is needed to set ResizeArray to initial count and get span from it
@@ -96,7 +95,7 @@ type [<NoEquality; NoComparison; Struct>] BlockBuilder<'a>(builder: ArrayPoolLis
     member inline this.YieldFrom (values: 'a seq) =
         for value in values do this.Builder.Add value
 
-    member inline this.Run runExpr =
+    member inline this.Run ([<InlineIfLambda>] runExpr) =
         try
             runExpr()
             this.Builder.ToImmutableArray()
@@ -111,7 +110,7 @@ type [<NoEquality; NoComparison; Struct>] ResizeArrayBuilder<'a>(builder: ArrayP
     member inline this.YieldFrom (values: 'a seq) =
         for value in values do this.Builder.Add value
 
-    member inline this.Run runExpr =
+    member inline this.Run ([<InlineIfLambda>] runExpr) =
         try
             runExpr()
             this.Builder.ToResizeArray()
@@ -125,7 +124,7 @@ type [<NoEquality; NoComparison; Struct>] ArrayBuilder<'a>(builder: ArrayPoolLis
     member inline this.YieldFrom (values: 'a seq) =
         for value in values do this.Builder.Add value
 
-    member inline this.Run runExpr =
+    member inline this.Run ([<InlineIfLambda>] runExpr) =
         try
             runExpr()
             this.Builder.ToArray()
