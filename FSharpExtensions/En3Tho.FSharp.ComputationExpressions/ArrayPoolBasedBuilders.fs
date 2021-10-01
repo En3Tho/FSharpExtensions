@@ -7,6 +7,7 @@ open System.Collections.Generic
 open System.Collections.Immutable
 open System.Linq
 open System.Runtime.InteropServices
+open En3Tho.FSharp.Extensions
 
 module ArrayPoolList =
     type ArrayPool<'a> with
@@ -90,10 +91,12 @@ type ArrayPoolList<'a> with
 
 type [<NoEquality; NoComparison; Struct>] BlockBuilder<'a>(builder: ArrayPoolList<'a>) =
     member this.Builder = builder
-    member inline this.Yield (value: 'a) =
-        this.Builder.Add value
-    member inline this.YieldFrom (values: 'a seq) =
-        for value in values do this.Builder.Add value
+    member inline this.Yield (value: 'a) : CollectionCode =
+        let this = this
+        fun() -> this.Builder.Add value
+    member inline this.YieldFrom (values: 'a seq) : CollectionCode =
+        let this = this
+        fun() -> for value in values do this.Builder.Add value
 
     member inline this.Run ([<InlineIfLambda>] runExpr) =
         try
@@ -104,11 +107,12 @@ type [<NoEquality; NoComparison; Struct>] BlockBuilder<'a>(builder: ArrayPoolLis
 
 type [<NoEquality; NoComparison; Struct>] ResizeArrayBuilder<'a>(builder: ArrayPoolList<'a>) =
     member this.Builder = builder
-    member inline this.Yield (value: 'a) =
-        this.Builder.Add value
-
-    member inline this.YieldFrom (values: 'a seq) =
-        for value in values do this.Builder.Add value
+    member inline this.Yield (value: 'a) : CollectionCode =
+        let this = this
+        fun() -> this.Builder.Add value
+    member inline this.YieldFrom (values: 'a seq) : CollectionCode =
+        let this = this
+        fun() -> for value in values do this.Builder.Add value
 
     member inline this.Run ([<InlineIfLambda>] runExpr) =
         try
@@ -119,10 +123,12 @@ type [<NoEquality; NoComparison; Struct>] ResizeArrayBuilder<'a>(builder: ArrayP
 
 type [<NoEquality; NoComparison; Struct>] ArrayBuilder<'a>(builder: ArrayPoolList<'a>) =
     member this.Builder = builder
-    member inline this.Yield (value: 'a) =
-        this.Builder.Add value
-    member inline this.YieldFrom (values: 'a seq) =
-        for value in values do this.Builder.Add value
+    member inline this.Yield (value: 'a) : CollectionCode =
+        let this = this
+        fun() -> this.Builder.Add value
+    member inline this.YieldFrom (values: 'a seq) : CollectionCode =
+        let this = this
+        fun() -> for value in values do this.Builder.Add value
 
     member inline this.Run ([<InlineIfLambda>] runExpr) =
         try
