@@ -11,7 +11,6 @@ type ForExpression<'a> = 'a -> CollectionCode
 type RunExpression = unit -> unit
 
 
-
 [<AbstractClass;Extension>]
 type GenericTypeExtensions() =
     [<Extension>]
@@ -26,15 +25,11 @@ type GenericTypeExtensions() =
 
     [<Extension>]
     static member inline TryFinally(_, [<InlineIfLambda>] tryExpr: CollectionCode, [<InlineIfLambda>] compensation: CollectionCode) =
-        (fun() ->
-            let res =
-                try
-                    tryExpr()
-                with e ->
-                    compensation()
-                    reraise()
-            compensation()
-            res)
+        fun() ->
+            try
+                tryExpr()
+            finally
+                compensation()
 
     [<Extension>]
     static member inline TryWith(_, [<InlineIfLambda>] tryExpr, [<InlineIfLambda>] compensation: exn -> CollectionCode) : CollectionCode =
