@@ -19,6 +19,8 @@
       <Compile Include="GenericCollectionBuilderBase.fs" />
       <Compile Include="ArrayPoolBasedBuilders.fs" />
       <Compile Include="CollectionBuilder.fs" />
+      <Compile Include="OptionBuilder.fs" />
+      <Compile Include="ResultBuilder.fs" />
     </ItemGroup>
 
 </Project>

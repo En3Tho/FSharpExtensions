@@ -51,7 +51,7 @@ type GenericTypeExtensions() =
     static member inline Using(this, resource: #IDisposable, [<InlineIfLambda>] tryExpr: #IDisposable -> CollectionCode) : CollectionCode =
         this.TryFinally(
             (fun() -> (tryExpr(resource)())),
-            (fun() -> resource.Dispose()))
+            (fun() -> if not (isNull (box resource)) then resource.Dispose()))
 
 
     [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
@@ -67,3 +67,5 @@ type GenericTypeExtensions() =
     [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
     static member inline Delay(_, [<InlineIfLambda>] delay: unit -> CollectionCode) =
         fun () -> (delay())()
+        // Note, not "f()()" - the F# compiler optimizer likes arguments to match lambdas in order to preserve
+        // argument evaluation order, so for "(f())()" the optimizer reduces one lambda then another, while "f()()" doesn't
