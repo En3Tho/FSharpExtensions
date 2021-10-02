@@ -7,18 +7,21 @@ open En3Tho.FSharp.ComputationExpressions.ICollectionBuilder
 
 [<
     MemoryDiagnoser;
+    DisassemblyDiagnoser;
     SimpleJob(RuntimeMoniker.Net60)
 >]
 type Benchmark() =
 
     member val Count = 10 with get, set
 
+    member val Items = [ for i = 0 to 10 do i ] :> seq<_>
+
     [<Benchmark>]
     member this.RunResizeArrayBuilder() = ResizeArray() {
         1
         2
         3
-        for i = 0 to this.Count do
+        for i in this.Items do
             i
         let mutable i = this.Count
         while i > 0 do
@@ -42,7 +45,7 @@ type Benchmark() =
         rsz.Add 2
         rsz.Add 3
 
-        for i = 0 to this.Count do
+        for i in this.Items do
             rsz.Add i
         let mutable i = this.Count
         while i > 0 do
@@ -56,3 +59,4 @@ type Benchmark() =
             rsz.Add i
         finally
             ()
+        rsz

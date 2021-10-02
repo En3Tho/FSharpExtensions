@@ -3,5 +3,5 @@ open Benchmarks
 
 [<EntryPoint>]
 let main argv =
-    BenchmarkRunner.Run<CollectionsBuildersAllocations.Benchmark>() |> ignore
+    BenchmarkRunner.Run<CustomBuildersVsLibraryBuilders.Benchmark>() |> ignore
     0 // return an integer exit code
