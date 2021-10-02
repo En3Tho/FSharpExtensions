@@ -66,4 +66,4 @@ type GenericTypeExtensions() =
 
     [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
     static member inline Delay(_, [<InlineIfLambda>] delay: unit -> CollectionCode) =
-        (fun () -> (delay())())
+        fun () -> (delay())()
