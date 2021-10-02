@@ -8,8 +8,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="ComputationExpressionTests.fs" />
+        <Compile Include="ComputationExpressionBuildTests.fs" />
         <Compile Include="ArrayPoolBasedBuilderTests.fs" />
+        <Compile Include="StringBuilderBuilderTests.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 

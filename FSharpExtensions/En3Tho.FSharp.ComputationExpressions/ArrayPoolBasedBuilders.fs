@@ -6,6 +6,7 @@ open System.Collections
 open System.Collections.Generic
 open System.Collections.Immutable
 open System.Linq
+open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
 open En3Tho.FSharp.Extensions
 
@@ -26,11 +27,12 @@ module ArrayPoolList =
         new () = new ArrayPoolList<'a>(InitialSize)
 
         member inline private this.UnsafeAdd value =
-            array.[count] <- value
+            let ref = &Unsafe.Add(&MemoryMarshal.GetArrayDataReference(array), count)
+            ref <- value
             count <- count + 1
         
         member private this.EnsureArray() =
-            if count = array.Length then              
+            if count = array.Length then
                 ArrayPool.Shared.ReRent(&array, array.Length * 2)
         
         member this.Count = count

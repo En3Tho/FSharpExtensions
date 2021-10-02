@@ -1,17 +1,19 @@
 module Benchmarks.CustomBuildersVsLibraryBuilders
 
 open BenchmarkDotNet.Attributes
+open BenchmarkDotNet.Jobs
 open En3Tho.FSharp.Extensions
 open En3Tho.FSharp.ComputationExpressions.ArrayPoolBasedBuilders
 
 [<
   MemoryDiagnoser;
   Config(typeof<BenchmarkConfig.``Net 5, Net 6, Pgo``>)
+  //SimpleJob(RuntimeMoniker.Net60)
 >]
 type Benchmark() =
     
     [<Params(10, 100, 1000, 10000)>]
-    member val Count = 10 with get, set
+    member val Count = 100 with get, set
     
     [<Benchmark>]
     member this.LibraryArray() = [|

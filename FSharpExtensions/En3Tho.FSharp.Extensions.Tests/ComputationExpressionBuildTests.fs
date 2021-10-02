@@ -1,6 +1,7 @@
-module ComputationExpressionTests
+module ComputationExpressionBuildTests
 
 open System.Collections.Generic
+open System.ComponentModel
 open System.Threading.Tasks
 open En3Tho.FSharp.ComputationExpressions.SCollectionBuilder
 open En3Tho.FSharp.ComputationExpressions.ICollectionBuilder
@@ -70,7 +71,8 @@ type MyAdder() =
     member this.Add _ = this.AddCount <- this.AddCount + 1
 
 type MyAdder with
-    member inline this.Run(expr: RunExpression) = expr(); this
+    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    member inline this.Run([<InlineIfLambda>] expr: RunExpression) = expr(); this
 
 [<Fact>]
 let ``Test that custom types are supported and builders are not conflicting with each other`` () =
