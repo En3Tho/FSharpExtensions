@@ -1,5 +1,6 @@
 module ComputationExpressionBuildTests
 
+open System.Collections.Concurrent
 open System.Collections.Generic
 open System.ComponentModel
 open System.Threading.Tasks
@@ -47,10 +48,18 @@ let ``Test that async computation expression compiles`` () =
 let ``Test that dictionary is supported as builder`` () =
     let genericDict key value = Dictionary() {
         struct (key, value)
+
+        let mutable x = 0
+        while x < 10 do
+            x <- x + 1
     }
 
-    let intIntDict1 = Dictionary() {
+    let intIntDict1 = ConcurrentDictionary() {
         struct (1, 10)
+
+        let mutable x = 0
+        while x < 10 do
+            x <- x + 1
     }
 
     let intIntDict2 = genericDict 1 10
@@ -73,6 +82,8 @@ type MyAdder() =
 type MyAdder with
     [<EditorBrowsable(EditorBrowsableState.Never)>]
     member inline this.Run([<InlineIfLambda>] expr: RunExpression) = expr(); this
+    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    member inline this.Zero _ : CollectionCode = fun() -> ()
 
 [<Fact>]
 let ``Test that custom types are supported and builders are not conflicting with each other`` () =

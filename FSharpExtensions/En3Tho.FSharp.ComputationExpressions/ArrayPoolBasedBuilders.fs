@@ -100,6 +100,8 @@ type [<NoEquality; NoComparison; Struct>] BlockBuilder<'a>(builder: ArrayPoolLis
         let this = this
         fun() -> for value in values do this.Builder.Add value
 
+    member inline this.Zero _ : CollectionCode = fun() -> ()
+
     member inline this.Run ([<InlineIfLambda>] runExpr) =
         try
             runExpr()
@@ -116,6 +118,8 @@ type [<NoEquality; NoComparison; Struct>] ResizeArrayBuilder<'a>(builder: ArrayP
         let this = this
         fun() -> for value in values do this.Builder.Add value
 
+    member inline this.Zero _ : CollectionCode = fun() -> ()
+
     member inline this.Run ([<InlineIfLambda>] runExpr) =
         try
             runExpr()
@@ -131,6 +135,8 @@ type [<NoEquality; NoComparison; Struct>] ArrayBuilder<'a>(builder: ArrayPoolLis
     member inline this.YieldFrom (values: 'a seq) : CollectionCode =
         let this = this
         fun() -> for value in values do this.Builder.Add value
+
+    member inline this.Zero _ : CollectionCode = fun() -> ()
 
     member inline this.Run ([<InlineIfLambda>] runExpr) =
         try

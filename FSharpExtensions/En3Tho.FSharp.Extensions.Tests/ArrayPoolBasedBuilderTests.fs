@@ -1,6 +1,7 @@
 ﻿module En3Tho.FSharp.Extensions.Tests.ArrayPoolBasedBuilderTests
 
 open System
+open System.Collections.Generic
 open Xunit
 open En3Tho.FSharp.Extensions
 open En3Tho.FSharp.ComputationExpressions.ArrayPoolBasedBuilders
@@ -70,7 +71,20 @@ let ``Test that array pool based builders build effectively the same collection`
             i <- i - 1
     }
 
+    let customLinkedList = LinkedList() {
+        1
+        2
+        3
+        for i = 0 to count do
+            i
+        let mutable i = count
+        while i > 0 do
+            i
+            i <- i - 1
+    }
+
     Assert.True(libraryArray |> Seq.identical customArray)
     Assert.True(libraryArray |> Seq.identical customBlock)
     Assert.True(libraryArray |> Seq.identical customResizeArray)
     Assert.True(libraryArray |> Seq.identical customResizeArray2)
+    Assert.True(libraryArray |> Seq.identical customLinkedList)

@@ -8,42 +8,43 @@ type ResultCode<'a, 'b> = unit -> Result<'a, 'b>
 
 type ResultBuilderUsingInlineIfLambdaBase() =
 
-    member inline _.Zero _ : ResultCode<unit, 'b> = fun() -> Ok ()
+    member inline _.Zero _ : ResultCode<unit, 'b> =
+        fun() -> Ok ()
 
-    member inline _.Delay([<InlineIfLambda>] f : unit -> ResultCode<'a, 'b>) : ResultCode<'a, 'b> =
-        (fun () -> (f())())
+    member inline _.Delay([<InlineIfLambda>] f: unit -> ResultCode<'a, 'b>) : ResultCode<'a, 'b> =
+        fun () -> (f())()
         // Note, not "f()()" - the F# compiler optimizer likes arguments to match lambdas in order to preserve
         // argument evaluation order, so for "(f())()" the optimizer reduces one lambda then another, while "f()()" doesn't
 
     member inline _.Combine([<InlineIfLambda>] task1: ResultCode<unit, 'b>, [<InlineIfLambda>] task2: ResultCode<'a, 'b>) : ResultCode<'a, 'b> =
-        (fun () ->
+        fun () ->
             match task1() with
             | Error error -> Error error
-            | Ok () -> task2())
+            | Ok () -> task2()
 
-    member inline _.Bind(res1: Result<'a, 'b>, [<InlineIfLambda>] task2: ('a -> ResultCode<'a, 'b>)) : ResultCode<'a, 'b> =
-        (fun () ->
+    member inline _.Bind(res1: Result<'a, 'b>, [<InlineIfLambda>] task2: 'a -> ResultCode<'c, 'b>) : ResultCode<'c, 'b> =
+        fun () ->
             match res1 with
             | Error error -> Error error
-            | Ok v -> (task2 v)())
+            | Ok v -> (task2 v)()
 
-    member inline _.While([<InlineIfLambda>] condition : unit -> bool, [<InlineIfLambda>] body : ResultCode<unit, 'b>) : ResultCode<unit, 'b> =
-        (fun () ->
+    member inline _.While([<InlineIfLambda>] condition : unit -> bool, [<InlineIfLambda>] body : ResultCode<'a, 'b>) : ResultCode<unit, 'b> =
+        fun () ->
             let mutable proceed = true
             while proceed && condition() do
                 match body() with
-                | Error error -> proceed <- false
-                | Ok () -> ()
-            Ok(()))
+                | Error _ -> proceed <- false
+                | Ok _ -> ()
+            Ok(())
 
-    member inline _.TryWith([<InlineIfLambda>] body : ResultCode<'a, 'b>, [<InlineIfLambda>] catch : exn -> ResultCode<'a, 'b>) : ResultCode<'a, 'b> =
-        (fun () ->
+    member inline _.TryWith([<InlineIfLambda>] body: ResultCode<'a, 'b>, [<InlineIfLambda>] catch: exn -> ResultCode<'a, 'b>) : ResultCode<'a, 'b> =
+        fun () ->
             try
                 body()
             with exn ->
-                (catch exn)())
+                (catch exn)()
 
-    member inline _.TryFinally([<InlineIfLambda>] body: ResultCode<'a, 'b>, [<InlineIfLambda>] compensation : unit -> unit) : ResultCode<'a, 'b> =
+    member inline _.TryFinally([<InlineIfLambda>] body: ResultCode<'a, 'b>, [<InlineIfLambda>] compensation: unit -> unit) : ResultCode<'a, 'b> =
         fun () ->
             try
                 body()
@@ -56,19 +57,19 @@ type ResultBuilderUsingInlineIfLambdaBase() =
             (fun () -> (body disp)()),
             (fun () -> if not (isNull (box disp)) then disp.Dispose()))
 
-    member inline this.For(sequence : seq<'TElement>, [<InlineIfLambda>] body : 'TElement -> ResultCode<unit, 'b>) : ResultCode<unit, 'b> =
+    member inline this.For(sequence: seq<'a>, [<InlineIfLambda>] body: 'a -> ResultCode<unit, 'b>) : ResultCode<unit, 'b> =
         this.Using (
             sequence.GetEnumerator(),
             (fun e -> this.While((fun () -> e.MoveNext()),
             (fun () -> (body e.Current)()))))
 
     member inline _.Return (value: 'a) : ResultCode<'a, 'b> =
-        (fun () ->
-            Ok value)
+        fun () ->
+            Ok value
 
     member inline this.ReturnFrom (source: Result<'a, 'b>) : ResultCode<'a, 'b> =
-        (fun () ->
-            match source with Ok x -> Ok x | Error error -> Error error)
+        fun () ->
+            source
 
 type ResultBuilder() =
     inherit ResultBuilderUsingInlineIfLambdaBase()
@@ -77,6 +78,15 @@ type ResultBuilder() =
 type EResultBuilder() =
     inherit ResultBuilderUsingInlineIfLambdaBase()
     member inline this.Run([<InlineIfLambda>] code : ResultCode<'a, exn>) = code()
+    member inline _.Return (value: 'a) : ResultCode<'a, exn> =
+        fun () ->
+            Ok value
+    member inline _.Return (value: #Exception) : ResultCode<'a, exn> =
+        fun () ->
+            Error (value :> exn)
+    member inline _.ReturnFrom (value: #Exception) : ResultCode<'a, exn> =
+        fun () ->
+            Error (value :> exn)
 
 let result = ResultBuilder()
 let eresult = EResultBuilder()

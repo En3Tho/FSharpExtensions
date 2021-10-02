@@ -19,10 +19,6 @@ module SCollectionBuilder =
         [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
         static member inline YieldFrom(collection, values: 'b seq) : CollectionCode = fun() -> for value in values do (add value collection)()
 
-// Breaks existing builders in F# 6 because of overload resolution design
-//        [<Extension>]
-//        static member inline Run(collection: ^a when ^a: (member Add: ^b -> ^c), runExpr: RunExpression) = runExpr(); collection
-
 module ICollectionBuilder =
 
     [<AbstractClass;Extension>]
@@ -35,30 +31,26 @@ module ICollectionBuilder =
     type ICollection<'a> with
         [<EditorBrowsable(EditorBrowsableState.Value)>]
         member inline this.Run([<InlineIfLambda>] runExpr: RunExpression) = runExpr(); this
+        [<EditorBrowsable(EditorBrowsableState.Value)>]
+        member inline this.Zero() : CollectionCode = fun() -> ()
 
     type List<'a> with
         [<EditorBrowsable(EditorBrowsableState.Value)>]
         member inline this.Run([<InlineIfLambda>] runExpr: RunExpression) = runExpr(); this
+        [<EditorBrowsable(EditorBrowsableState.Value)>]
+        member inline this.Zero() : CollectionCode = fun() -> ()
 
     type HashSet<'a> with
         [<EditorBrowsable(EditorBrowsableState.Value)>]
         member inline this.Run([<InlineIfLambda>] runExpr: RunExpression) = runExpr(); this
-
-    type Queue<'a> with
         [<EditorBrowsable(EditorBrowsableState.Value)>]
-        member inline this.Run([<InlineIfLambda>] runExpr: RunExpression) = runExpr(); this
-
-    type Stack<'a> with
-        [<EditorBrowsable(EditorBrowsableState.Value)>]
-        member inline this.Run([<InlineIfLambda>] runExpr: RunExpression) = runExpr(); this
+        member inline this.Zero() : CollectionCode = fun() -> ()
 
     type LinkedList<'a> with
         [<EditorBrowsable(EditorBrowsableState.Value)>]
         member inline this.Run([<InlineIfLambda>] runExpr: RunExpression) = runExpr(); this
-
-// Breaks existing builders in F# 6 because of overload resolution design
-//        [<Extension>]
-//        static member inline Run(collection: #ICollection<'a>, runExpr: RunExpression) = runExpr(); collection
+        [<EditorBrowsable(EditorBrowsableState.Value)>]
+        member inline this.Zero() : CollectionCode = fun() -> ()
 
 module IDictionaryBuilder =
     [<AbstractClass;Extension>]
@@ -79,18 +71,20 @@ module IDictionaryBuilder =
     type IDictionary<'a, 'b> with
         [<EditorBrowsable(EditorBrowsableState.Value)>]
         member inline this.Run([<InlineIfLambda>] runExpr: RunExpression) = runExpr(); this
+        [<EditorBrowsable(EditorBrowsableState.Value)>]
+        member inline this.Zero() : CollectionCode = fun() -> ()
 
     type Dictionary<'a, 'b> with
         [<EditorBrowsable(EditorBrowsableState.Value)>]
         member inline this.Run([<InlineIfLambda>] runExpr: RunExpression) = runExpr(); this
+        [<EditorBrowsable(EditorBrowsableState.Value)>]
+        member inline this.Zero() : CollectionCode = fun() -> ()
 
     type ConcurrentDictionary<'a, 'b> with
         [<EditorBrowsable(EditorBrowsableState.Value)>]
         member inline this.Run([<InlineIfLambda>] runExpr: RunExpression) = runExpr(); this
-
-// Breaks existing builders in F# 6 because of overload resolution design
-//        [<Extension>]
-//        static member inline Run(dictionary: #IDictionary<_,_>, runExpr: RunExpression) = runExpr(); dictionary
+        [<EditorBrowsable(EditorBrowsableState.Value)>]
+        member inline this.Zero() : CollectionCode = fun() -> ()
 
 module SStringBuilderBuilder =
 
@@ -107,3 +101,5 @@ module SStringBuilderBuilder =
     type StringBuilder with
         [<EditorBrowsable(EditorBrowsableState.Value)>]
         member inline this.Run([<InlineIfLambda>] runExpr: RunExpression) = runExpr(); this
+        [<EditorBrowsable(EditorBrowsableState.Value)>]
+        member inline this.Zero _ : CollectionCode = fun() -> ()
