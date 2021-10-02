@@ -15,9 +15,9 @@ module SCollectionBuilder =
     [<AbstractClass;Extension>]
     type SCollectionExtensions() =
         [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
-        static member inline Yield(collection, value: 'b) = add value collection
+        static member inline Yield(collection, value: 'b) : CollectionCode = fun() -> add value collection
         [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
-        static member inline YieldFrom(collection, values: 'b seq) = for value in values do add value collection
+        static member inline YieldFrom(collection, values: 'b seq) : CollectionCode = fun() -> for value in values do (add value collection)()
 
 // Breaks existing builders in F# 6 because of overload resolution design
 //        [<Extension>]
@@ -28,9 +28,9 @@ module ICollectionBuilder =
     [<AbstractClass;Extension>]
     type ICollectionExtensions() =
         [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
-        static member inline Yield(collection: #ICollection<'a>, value: 'a) = collection.Add value
+        static member inline Yield(collection: #ICollection<'a>, value: 'a) : CollectionCode = fun() -> collection.Add value
         [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
-        static member inline YieldFrom(collection: #ICollection<'a>, values: 'a seq) = for value in values do  collection.Add value
+        static member inline YieldFrom(collection: #ICollection<'a>, values: 'a seq) : CollectionCode = fun() -> for value in values do collection.Add value
 
     type ICollection<'a> with
         [<EditorBrowsable(EditorBrowsableState.Value)>]
@@ -64,17 +64,17 @@ module IDictionaryBuilder =
     [<AbstractClass;Extension>]
     type IDictionaryExtensions() =
         [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
-        static member inline Yield(dictionary: #IDictionary<_,_>, (key, value): struct ('a * 'b)) = dictionary.Add(key, value)
+        static member inline Yield(dictionary: #IDictionary<_,_>, (key, value): struct ('a * 'b)) : CollectionCode = fun() -> dictionary.Add(key, value)
         [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
-        static member inline Yield(dictionary: #IDictionary<_,_>, kvp: KeyValuePair<_,_>) = dictionary.Add(kvp.Key, kvp.Value)
+        static member inline Yield(dictionary: #IDictionary<_,_>, kvp: KeyValuePair<_,_>) : CollectionCode = fun() -> dictionary.Add(kvp.Key, kvp.Value)
         [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
-        static member inline Yield(dictionary: #IDictionary<_,_>, (key, value): 'a * 'b) = dictionary.Add(key, value)
+        static member inline Yield(dictionary: #IDictionary<_,_>, (key, value): 'a * 'b) : CollectionCode = fun() -> dictionary.Add(key, value)
         [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
-        static member inline YieldFrom(dictionary: #IDictionary<_,_>, seq: ('a * 'b) seq) = for key, value in seq do dictionary.Add(key, value)
+        static member inline YieldFrom(dictionary: #IDictionary<_,_>, seq: ('a * 'b) seq) : CollectionCode = fun() -> for key, value in seq do dictionary.Add(key, value)
         [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
-        static member inline YieldFrom(dictionary: #IDictionary<_,_>, seq: KeyValuePair<_,_> seq) = for value in seq do dictionary.Add(value.Key, value.Value)
+        static member inline YieldFrom(dictionary: #IDictionary<_,_>, seq: KeyValuePair<_,_> seq) : CollectionCode = fun() -> for value in seq do dictionary.Add(value.Key, value.Value)
         [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
-        static member inline YieldFrom(dictionary: #IDictionary<_,_>, seq: struct ('a * 'b) seq) = for key, value in seq do dictionary.Add(key, value)
+        static member inline YieldFrom(dictionary: #IDictionary<_,_>, seq: struct ('a * 'b) seq) : CollectionCode = fun() -> for key, value in seq do dictionary.Add(key, value)
 
     type IDictionary<'a, 'b> with
         [<EditorBrowsable(EditorBrowsableState.Value)>]
@@ -100,9 +100,9 @@ module SStringBuilderBuilder =
     [<AbstractClass;Extension>]
     type StringBuilderExtensions() =
         [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
-        static member inline Yield(builder, value: 'b) = append value builder
+        static member inline Yield(builder, value: 'b) : CollectionCode = fun() -> append value builder
         [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
-        static member inline YieldFrom(builder, values: 'b seq) = for value in values do append value builder
+        static member inline YieldFrom(builder, values: 'b seq) : CollectionCode = fun() -> for value in values do append value builder
 
     type StringBuilder with
         [<EditorBrowsable(EditorBrowsableState.Value)>]
