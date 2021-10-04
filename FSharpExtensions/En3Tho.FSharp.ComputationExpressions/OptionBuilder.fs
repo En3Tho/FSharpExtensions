@@ -8,7 +8,7 @@ type OptionCode<'T> = unit -> 'T voption
 
 type OptionBuilderUsingInlineIfLambdaBase() =
 
-    member inline _.Zero _ : OptionCode<unit> =
+    member inline _.Zero() : OptionCode<unit> =
         fun() -> ValueSome ()
 
     member inline _.Delay([<InlineIfLambda>] f: unit -> OptionCode<'T>) : OptionCode<'T> =

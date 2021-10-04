@@ -62,6 +62,9 @@ type GenericTypeExtensions() =
             (fun () -> (forExpr e.Current)()))))
 
     [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
+    static member inline Zero _ : CollectionCode = fun() -> ()
+
+    [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
     static member inline Delay(_, [<InlineIfLambda>] delay: unit -> CollectionCode) =
         fun () -> (delay())()
         // Note, not "f()()" - the F# compiler optimizer likes arguments to match lambdas in order to preserve

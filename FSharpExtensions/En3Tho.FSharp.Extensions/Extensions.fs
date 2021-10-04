@@ -1,6 +1,7 @@
 ﻿[<AutoOpen>]
 module En3Tho.FSharp.Extensions.Extensions
 
+open System
 open System.Threading.Tasks
 
 type Task with
@@ -27,3 +28,20 @@ type Async<'a> with
     static member inline AwaitValueTask (valueTask: ValueTask<_>) =
         if valueTask.IsCompletedSuccessfully then valueTask.Result |> Async.ofObj
         else valueTask.AsTask() |> Async.AwaitTask
+
+type Exception with
+    member this.IsOrContains<'a when 'a :> exn>() =
+        match this with
+        | :? 'a as result -> ValueSome result
+        | :? AggregateException as exn ->
+            let mutable result = ValueNone
+            let enum = exn.InnerExceptions.GetEnumerator()
+            while result.IsNone && enum.MoveNext() do
+                result <- enum.Current.IsOrContains<'a>()
+            match result with
+            | ValueSome _ -> result
+            | _ -> exn.InnerException.IsOrContains<'a>()
+        | _ ->
+            match this.InnerException with
+            | null -> ValueNone
+            | exn -> exn.IsOrContains<'a>()

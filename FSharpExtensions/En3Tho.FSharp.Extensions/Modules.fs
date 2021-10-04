@@ -9,6 +9,7 @@ open System.Linq
 open System.Reflection
 open System.Reflection.Emit
 open System.Runtime.ExceptionServices
+open System.Threading.Tasks
 open FSharp.NativeInterop
 open Microsoft.FSharp.Reflection
 open En3Tho.FSharp.Extensions.Disposables
@@ -640,6 +641,47 @@ module Result =
         match result with
         | Ok v -> v
         | Error _ -> value
+
+type EResult<'a, 'b when 'b :> exn> = Result<'a, 'b>
+type AsyncEResult<'a, 'b when 'b :> exn> = Result<'a, 'b> ValueTask
+
+type ExnResult<'a> = EResult<'a, exn>
+type AsyncExnResult<'a> = EResult<'a, exn> ValueTask
+
+module EResult =
+    let inline unwrap (result: EResult<'a, 'b>) =
+        match result with
+        | Ok value -> value
+        | Error err ->
+            ExceptionDispatchInfo.Throw err
+            Unchecked.defaultof<_>
+
+    let inline unwrapWithStackTrace (result: EResult<'a, 'b>) =
+        match result with
+        | Ok value -> value
+        | Error err ->
+            ExceptionDispatchInfo.Throw ^
+                if err.StackTrace = null then
+                    err |> ExceptionDispatchInfo.SetCurrentStackTrace
+                else
+                    err :> exn
+            Unchecked.defaultof<_>
+
+    let inline defaultValue defaultValue (result: EResult<'a, 'b>) =
+        match result with
+        | Ok value -> value
+        | _ -> defaultValue
+
+    let inline defaultWith defThunk (result: EResult<'a, 'b>) =
+        match result with
+        | Ok value -> value
+        | Error exn -> defThunk exn
+
+    let inline trySetCurrentStackTrace (result: EResult<'a, 'b>) =
+        match result with
+        | Error exn when String.IsNullOrEmpty exn.StackTrace ->
+            exn |> ExceptionDispatchInfo.SetCurrentStackTrace :?> 'b |> Error
+        | _ -> result
 
 module Async =
     let rec retryWhile condition retries work = async {

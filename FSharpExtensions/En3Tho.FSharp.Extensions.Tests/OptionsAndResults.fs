@@ -99,9 +99,9 @@ let ``Test that result builder is working properly`` () =
     let res3 = result {
 
         for i = 0 to 10 do
-           let! x = Ok i // Bind?
-           let! y = Error "" // Bind
-           ignore (x + y) // Zero
+           let! x = Ok i
+           let! y = Error "" // will exit a for loop
+           ignore (x + y)
 
         let! x = Ok first
         let! y = Ok second
@@ -120,8 +120,26 @@ let ``Test that eresult builder is working properly`` () =
 
     let exn = Exception()
     let res2 = eresult {
-        return! exn
+        return exn
     }
 
     Assert.Equal(res2, Error exn)
 
+[<Fact>]
+let ``Test that eresult builder is can process multiple errors`` () =
+    let exn = Exception()
+    let res1 = eresult {
+        let! a = Error exn
+        and! b = Error exn
+        and! c = Error exn
+        return a + b + c + 10
+    }
+
+    Assert.Equal(res1, Error (AggregateException([exn; exn; exn])))
+
+    let exn = Exception()
+    let res2 = eresult {
+        return exn
+    }
+
+    Assert.Equal(res2, Error exn)

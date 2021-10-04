@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Authors> Igor Bagdamyan</Authors>
+        <Copyright>Copyright (c) 2021 Igor Bagdamyan</Copyright>
+        <PackageProjectUrl>https://github.com/En3Tho/FSharpExtensions</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/En3Tho/FSharpExtensions/blob/main/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/En3Tho/FSharpExtensions</RepositoryUrl>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+        <AssemblyVersion>1.0.0</AssemblyVersion>
+        <FileVersion>1.0.0</FileVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="BasicTypes.fs" />
+        <Compile Include="MultiValidators.fs" />
+        <Compile Include="AsyncMultiValidators.fs" />
+        <Compile Include="Validated.fs" />
+        <Compile Include="AsyncValidated.fs" />
+        <Compile Include="Modules.fs" />
+        <Compile Include="CommonTypes.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="En3Tho.FSharp.ComputationExpressions" Version="1.0.3" />
+      <PackageReference Include="En3Tho.FSharp.Extensions" Version="1.0.1" />
+      <PackageReference Include="Ply" Version="0.3.1" />
+    </ItemGroup>
+
+</Project>

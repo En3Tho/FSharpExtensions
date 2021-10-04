@@ -100,8 +100,6 @@ type [<NoEquality; NoComparison; Struct>] BlockBuilder<'a>(builder: ArrayPoolLis
         let this = this
         fun() -> for value in values do this.Builder.Add value
 
-    member inline this.Zero _ : CollectionCode = fun() -> ()
-
     member inline this.Run ([<InlineIfLambda>] runExpr) =
         try
             runExpr()
@@ -117,8 +115,6 @@ type [<NoEquality; NoComparison; Struct>] ResizeArrayBuilder<'a>(builder: ArrayP
     member inline this.YieldFrom (values: 'a seq) : CollectionCode =
         let this = this
         fun() -> for value in values do this.Builder.Add value
-
-    member inline this.Zero _ : CollectionCode = fun() -> ()
 
     member inline this.Run ([<InlineIfLambda>] runExpr) =
         try
@@ -136,17 +132,66 @@ type [<NoEquality; NoComparison; Struct>] ArrayBuilder<'a>(builder: ArrayPoolLis
         let this = this
         fun() -> for value in values do this.Builder.Add value
 
-    member inline this.Zero _ : CollectionCode = fun() -> ()
-
     member inline this.Run ([<InlineIfLambda>] runExpr) =
         try
             runExpr()
             this.Builder.ToArray()
         finally
             this.Builder.Dispose()
-           
+
+type [<NoEquality; NoComparison; Struct>] UnsafeBlockBuilder<'a>(builder: ArrayPoolList<'a>) =
+    member this.Builder = builder
+    member inline this.Yield (value: 'a) : CollectionCode =
+        let this = this
+        fun() -> this.Builder.Add value
+    member inline this.YieldFrom (values: 'a seq) : CollectionCode =
+        let this = this
+        fun() -> for value in values do this.Builder.Add value
+
+    member inline this.Run ([<InlineIfLambda>] runExpr) =
+        runExpr()
+        let result = this.Builder.ToImmutableArray()
+        this.Builder.Dispose()
+        result
+
+type [<NoEquality; NoComparison; Struct>] UnsafeResizeArrayBuilder<'a>(builder: ArrayPoolList<'a>) =
+    member this.Builder = builder
+    member inline this.Yield (value: 'a) : CollectionCode =
+        let this = this
+        fun() -> this.Builder.Add value
+    member inline this.YieldFrom (values: 'a seq) : CollectionCode =
+        let this = this
+        fun() -> for value in values do this.Builder.Add value
+
+    member inline this.Run ([<InlineIfLambda>] runExpr) =
+        runExpr()
+        let result = this.Builder.ToResizeArray()
+        this.Builder.Dispose()
+        result
+
+type [<NoEquality; NoComparison; Struct>] UnsafeArrayBuilder<'a>(builder: ArrayPoolList<'a>) =
+    member this.Builder = builder
+    member inline this.Yield (value: 'a) : CollectionCode =
+        let this = this
+        fun() -> this.Builder.Add value
+    member inline this.YieldFrom (values: 'a seq) : CollectionCode =
+        let this = this
+        fun() -> for value in values do this.Builder.Add value
+
+    member inline this.Run ([<InlineIfLambda>] runExpr) =
+        runExpr()
+        let result = this.Builder.ToArray()
+        this.Builder.Dispose()
+        result
+
 let rsz<'a> = ResizeArrayBuilder<'a>(new ArrayPoolList<'a>())
 
 let block<'a> = BlockBuilder<'a>(new ArrayPoolList<'a>())
 
 let arr<'a> = ArrayBuilder<'a>(new ArrayPoolList<'a>())
+
+let ursz<'a> = UnsafeResizeArrayBuilder<'a>(new ArrayPoolList<'a>())
+
+let ublock<'a> = UnsafeBlockBuilder<'a>(new ArrayPoolList<'a>())
+
+let uarr<'a> = UnsafeArrayBuilder<'a>(new ArrayPoolList<'a>())

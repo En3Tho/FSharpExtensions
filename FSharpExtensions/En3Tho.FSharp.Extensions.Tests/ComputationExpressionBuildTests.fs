@@ -14,6 +14,12 @@ open En3Tho.FSharp.Extensions
 [<Fact>]
 let ``Test that task computation expression compiles`` () =
     let rec taskTest (job: Task<_>) = task {
+
+        let mutable i = 0
+        while i < 10 do
+            let _ = None
+            i <- i + 1
+
         return! job
     }
     let expected = 0
@@ -38,6 +44,12 @@ let ``Test that asyncSeq computation expression compiles`` () =
 let ``Test that async computation expression compiles`` () =
 
     let rec taskTest job = async {
+
+        let mutable i = 0
+        while i < 10 do
+            let _ = None
+            i <- i + 1
+
         return! job
     }
     let expected = 0

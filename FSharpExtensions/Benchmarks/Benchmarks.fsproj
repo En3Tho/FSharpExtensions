@@ -2,13 +2,15 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
+        <LangVersion>preview</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
         <Compile Include="BenchmarkConfig.fs" />
         <Compile Include="CustomBuildersVsLibraryBuilders.fs" />
         <Compile Include="CollectionsBuildersAllocations.fs" />
+        <Compile Include="EResultAllocationsBenchmark.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
