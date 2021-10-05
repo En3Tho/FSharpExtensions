@@ -32,14 +32,13 @@ type [<Struct; IsReadOnly>] Validated<'value, 'validator when 'validator :> IVal
 #if DEBUG
     private (value: 'value, wasValidated: bool) =
     private new(value) = Validated10(value, true)
-    member _.Value =
-        if not wasValidated then invalidOp "Value was not properly validated"
-        else value
 #else
     private (value: 'value, validator: 'validator) =
     member _.Value = value
 #endif
     member internal _.Validator = validator
+
+    override this.ToString() = value.ToString()
 
     static member Try<'validator2 when 'validator2: struct
                                    and 'validator2: (new: unit -> 'validator2)
