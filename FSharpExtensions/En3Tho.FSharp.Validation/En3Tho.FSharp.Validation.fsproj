@@ -18,10 +18,8 @@
         <Compile Include="BasicTypes.fs" />
         <Compile Include="MultiValidators.fs" />
         <Compile Include="AsyncMultiValidators.fs" />
-        <Compile Include="Validated.fs" />
-        <Compile Include="AsyncValidated.fs" />
+        <Compile Include="CommonValidatedTypes.fs" />
         <Compile Include="Modules.fs" />
-        <Compile Include="CommonTypes.fs" />
     </ItemGroup>
 
     <ItemGroup>

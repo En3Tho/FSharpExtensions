@@ -2,7 +2,6 @@
 
 open System
 open System.Runtime.CompilerServices
-open System.Runtime.InteropServices
 open System.Threading.Tasks
 open En3Tho.FSharp.Extensions
 
@@ -20,12 +19,6 @@ type ProcessingException(message, innerException: Exception) =
     inherit Exception(message, innerException)
     new (message) = ProcessingException(message, null)
 
-/// Indicates an error which didn't come from domain. Maps to InternalServerError in REST.
-type InternalException(message, innerException: Exception) =
-    inherit Exception(message, innerException)
-    new (message) = InternalException(message, null)
-    new (innerException) = InternalException("Fatal exception occured", innerException)
-
 type IAsyncValidator<'value> =
     abstract member Validate: 'value -> ExnResult<'value> ValueTask
     abstract member ValidateAggregate: 'value -> EResult<'value, AggregateException> ValueTask
@@ -35,99 +28,123 @@ type IValidator<'value> =
     abstract member Validate: 'value -> ExnResult<'value>
     abstract member ValidateAggregate: 'value -> EResult<'value, AggregateException>
 
-//type [<Struct>] MultiValidator20<'value, 'validator, 'validator2 when 'validator: struct
-//                                                                  and 'validator: (new: unit -> 'validator)
-//                                                                  and 'validator :> IValidator<'value>
-//                                                                  and 'validator2: struct
-//                                                                  and 'validator2: (new: unit -> 'validator2)
-//                                                                  and 'validator2 :> IValidator<'value>> =
-//    member this.Validate(value: 'value): ExnResult<'value> =
-//            match (new 'validator()).Validate value with
-//            | Ok value ->
-//                match (new 'validator2()).Validate value with
-//                | Ok value ->
-//                    value |> Ok
-//                | Error err -> Error err
-//            | Error err -> Error err
-//
-//    member this.ValidateAggregate value : EResult<'value, AggregateException> =
-//        match (new 'validator()).Validate value, (new 'validator2()).Validate value with
-//        | Ok _, Ok _ ->
-//            value |> Ok
-//        | Error exn1, Error exn2 ->
-//            Error (AggregateException(exn1, exn2))
-//        | Error exn, _
-//        | _, Error exn ->
-//            Error (AggregateException(exn))
-//
-//    interface IValidator<'value> with
-//        member this.Validate(value: 'value): ExnResult<'value> = this.Validate value
-//        member this.Validate(value: 'value): ValueTask<ExnResult<'value>> = this.Validate value |> ValueTask.FromResult
-//        member this.ValidateAggregate(value: 'value): EResult<'value, AggregateException> = this.ValidateAggregate value
-//        member this.ValidateAggregate(value: 'value): ValueTask<EResult<'value,AggregateException>> = this.ValidateAggregate value |> ValueTask.FromResult
-//
-//type [<Struct>] MultiValidator30<'value, 'validator, 'validator2, 'validator3 when 'validator: struct
-//                                                                               and 'validator: (new: unit -> 'validator)
-//                                                                               and 'validator :> IValidator<'value>
-//                                                                               and 'validator2: struct
-//                                                                               and 'validator2: (new: unit -> 'validator2)
-//                                                                               and 'validator2 :> IValidator<'value>
-//                                                                               and 'validator3: struct
-//                                                                               and 'validator3: (new: unit -> 'validator3)
-//                                                                               and 'validator3 :> IValidator<'value>> =
-//    member this.Validate(value: 'value): ExnResult<'value> =
-//            match (new 'validator()).Validate value with
-//            | Ok value ->
-//                match (new 'validator2()).Validate value with
-//                | Ok value ->
-//                    match (new 'validator3()).Validate value with
-//                    | Ok value -> value |> Ok
-//                    | Error err -> Error err
-//                | Error err -> Error err
-//            | Error err -> Error err
-//
-//    member this.ValidateAggregate value : EResult<'value, AggregateException> =
-//        match (new 'validator()).Validate value, (new 'validator2()).Validate value, (new 'validator3()).Validate value with
-//        | Ok _, Ok _, Ok _ ->
-//            value |> Ok
-//        | Error exn1, Error exn2, Error exn3 ->
-//            Error (AggregateException(exn1, exn2, exn3))
-//        | Error exn, Error exn2, _
-//        | Error exn, _, Error exn2
-//        | _, Error exn, Error exn2 ->
-//            Error (AggregateException(exn, exn2))
-//        | Error exn, _, _
-//        | _, Error exn, _
-//        | _, _, Error exn ->
-//            Error (AggregateException(exn))
-//
-//    interface IValidator<'value> with
-//        member this.Validate(value: 'value): ExnResult<'value> = this.Validate value
-//        member this.Validate(value: 'value): ValueTask<ExnResult<'value>> = this.Validate value |> ValueTask.FromResult
-//        member this.ValidateAggregate(value: 'value): EResult<'value, AggregateException> = this.ValidateAggregate value
-//        member this.ValidateAggregate(value: 'value): ValueTask<EResult<'value,AggregateException>> = this.ValidateAggregate value |> ValueTask.FromResult
+type [<Struct; IsReadOnly>] Validated<'value, 'validator when 'validator :> IValidator<'value>>
+#if DEBUG
+    private (value: 'value, wasValidated: bool) =
+    private new(value) = Validated10(value, true)
+    member _.Value =
+        if not wasValidated then invalidOp "Value was not properly validated"
+        else value
+#else
+    private (value: 'value, validator: 'validator) =
+    member _.Value = value
+#endif
+    member internal _.Validator = validator
 
-type [<Struct>] internal ExnBag7 =
-    val mutable private count: int
-    val mutable private exn1: exn
-    val mutable private exn2: exn
-    val mutable private exn3: exn
-    val mutable private exn4: exn
-    val mutable private exn5: exn
-    val mutable private exn6: exn
-    val mutable private exn7: exn
-    member this.Add(exn) =
-        match this.count with
-        | offset when offset < 7 ->
-            Unsafe.Add(&this.exn1, offset) <- exn
-            this.count <- this.count + 1
-        | _ -> ()
+    static member Try<'validator2 when 'validator2: struct
+                                   and 'validator2: (new: unit -> 'validator2)
+                                   and 'validator2 :> IValidator<'value>> value =
+        let validator = (new 'validator2())
+        match validator.Validate value with
+        | Ok value -> Validated(value, validator) |> Ok
+        | Error err -> Error err
 
-    member this.IsEmpty = this.count = 0
+    static member Try(value: 'value, validator: 'validator) =
+        match validator.Validate value with
+        | Ok value -> Validated(value, validator) |> Ok
+        | Error err -> Error err
 
-    member this.ToArray() =
-        match this.count with
-        | 0 -> [||]
-        | arrayLength ->
-            let span = MemoryMarshal.CreateSpan(&this.exn1, arrayLength)
-            span.ToArray()
+    static member Make<'validator2 when 'validator2: struct
+                                    and 'validator2: (new: unit -> 'validator2)
+                                    and 'validator2 :> IValidator<'value>> (value: 'value) =
+        Validated.Try<'validator2>(value) |> EResult.unwrap
+
+    static member Make(value: 'value, validator: 'validator) =
+        Validated<'value, 'validator>.Try(value, validator) |> EResult.unwrap
+
+    member this.MapTry (map: 'value -> 'value) =
+        Validated<'value, 'validator>.Try(map this.Value, this.Validator)
+
+    member this.MapMake (map: 'value -> 'value) =
+        Validated<'value, 'validator>.Make(map this.Value, this.Validator)
+
+    static member Try<'validator2 when 'validator2: struct
+                                   and 'validator2: (new: unit -> 'validator2)
+                                   and 'validator2 :> IValidator<'value>> (value: 'value voption) =
+        match value with
+        | ValueNone -> ValueNone |> Ok
+        | ValueSome value ->
+            match Validated.Try<'validator2> value with
+            | Ok value -> value |> ValueSome |> Ok
+            | Error err -> Error err
+
+    static member Make<'validator2 when 'validator2: struct
+                                    and 'validator2: (new: unit -> 'validator2)
+                                    and 'validator2 :> IValidator<'value>> (value: 'value voption) =
+        Validated.Try<'validator2>(value) |> EResult.unwrap
+
+    static member Try(value: 'value voption, validator: 'validator) =
+        match value with
+        | ValueNone -> ValueNone |> Ok
+        | ValueSome value ->
+            match Validated<'value, 'validator>.Try(value, validator) with
+            | Ok value -> value |> ValueSome |> Ok
+            | Error err -> Error err
+
+    static member Make(value: 'value voption, validator: 'validator) =
+        Validated<'value, 'validator>.Try(value, validator) |> EResult.unwrap
+
+    //
+
+    static member TryAggregate<'validator2 when 'validator2: struct
+                                            and 'validator2: (new: unit -> 'validator2)
+                                            and 'validator2 :> IValidator<'value>> value =
+        let validator = (new 'validator2())
+        match validator.ValidateAggregate value with
+        | Ok value -> Validated(value, validator) |> Ok
+        | Error err -> Error err
+
+    static member TryAggregate(value: 'value, validator: 'validator) =
+        match validator.ValidateAggregate value with
+        | Ok value -> Validated(value, validator) |> Ok
+        | Error err -> Error err
+
+    static member MakeAggregate<'validator2 when 'validator2: struct
+                                             and 'validator2: (new: unit -> 'validator2)
+                                             and 'validator2 :> IValidator<'value>> (value: 'value) =
+        Validated.TryAggregate<'validator2>(value) |> EResult.unwrap
+
+    static member MakeAggregate(value: 'value, validator: 'validator) =
+        Validated<'value, 'validator>.TryAggregate(value, validator) |> EResult.unwrap
+
+    member this.MapTryAggregate (map: 'value -> 'value) =
+        Validated<'value, 'validator>.TryAggregate(map this.Value, this.Validator)
+
+    member this.MapMakeAggregate (map: 'value -> 'value) =
+        Validated<'value, 'validator>.MakeAggregate(map this.Value, this.Validator)
+
+    static member TryAggregate<'validator2 when 'validator2: struct
+                                            and 'validator2: (new: unit -> 'validator2)
+                                            and 'validator2 :> IValidator<'value>> (value: 'value voption) =
+        match value with
+        | ValueNone -> ValueNone |> Ok
+        | ValueSome value ->
+            match Validated.TryAggregate<'validator2> value with
+            | Ok value -> value |> ValueSome |> Ok
+            | Error err -> Error err
+
+    static member MakeAggregate<'validator2 when 'validator2: struct
+                                             and 'validator2: (new: unit -> 'validator2)
+                                             and 'validator2 :> IValidator<'value>> (value: 'value voption) =
+        Validated.TryAggregate<'validator2>(value) |> EResult.unwrap
+
+    static member TryAggregate(value: 'value voption, validator: 'validator) =
+        match value with
+        | ValueNone -> ValueNone |> Ok
+        | ValueSome value ->
+            match Validated<'value, 'validator>.TryAggregate(value, validator) with
+            | Ok value -> value |> ValueSome |> Ok
+            | Error err -> Error err
+
+    static member MakeAggregate(value: 'value voption, validator: 'validator) =
+        Validated<'value, 'validator>.TryAggregate(value, validator) |> EResult.unwrap

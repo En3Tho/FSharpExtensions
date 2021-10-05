@@ -6,11 +6,11 @@ open System.Threading.Tasks
 open En3Tho.FSharp.Extensions
 
 type [<Struct; IsReadOnly>] MultiValidator20<'value, 'validator, 'validator2 when 'validator: struct
-                                                                         and 'validator: (new: unit -> 'validator)
-                                                                         and 'validator :> IValidator<'value>
-                                                                         and 'validator2: struct
-                                                                         and 'validator2: (new: unit -> 'validator2)
-                                                                         and 'validator2 :> IValidator<'value>> =
+                                                                              and 'validator: (new: unit -> 'validator)
+                                                                              and 'validator :> IValidator<'value>
+                                                                              and 'validator2: struct
+                                                                              and 'validator2: (new: unit -> 'validator2)
+                                                                              and 'validator2 :> IValidator<'value>> =
     member this.Validate value =
         match (new 'validator()).Validate value with
         | Ok value ->
@@ -63,9 +63,9 @@ type [<Struct; IsReadOnly>] MultiValidator02<'value, 'validator, 'validator2 whe
         member this.ValidateAggregate value : ValueTask<EResult<'value,AggregateException>> = this.ValidateAggregate value |> ValueTask.FromResult
 
 type [<Struct; IsReadOnly>] MultiValidator11<'value, 'validator, 'validator2 when 'validator: struct
-                                                                         and 'validator: (new: unit -> 'validator)
-                                                                         and 'validator :> IValidator<'value>
-                                                                         and 'validator2 :> IValidator<'value>>
+                                                                              and 'validator: (new: unit -> 'validator)
+                                                                              and 'validator :> IValidator<'value>
+                                                                              and 'validator2 :> IValidator<'value>>
     (validator: 'validator2) =
                                                                              
     member this.Validate(value) =
@@ -93,14 +93,14 @@ type [<Struct; IsReadOnly>] MultiValidator11<'value, 'validator, 'validator2 whe
         member this.ValidateAggregate value : ValueTask<EResult<'value,AggregateException>> = this.ValidateAggregate value |> ValueTask.FromResult
             
 type [<Struct; IsReadOnly>] MultiValidator30<'value, 'validator, 'validator2, 'validator3 when 'validator: struct
-                                                                                      and 'validator: (new: unit -> 'validator)
-                                                                                      and 'validator :> IValidator<'value>
-                                                                                      and 'validator2: struct
-                                                                                      and 'validator2: (new: unit -> 'validator2)
-                                                                                      and 'validator2 :> IValidator<'value>
-                                                                                      and 'validator3: struct
-                                                                                      and 'validator3: (new: unit -> 'validator3)
-                                                                                      and 'validator3 :> IValidator<'value>> =
+                                                                                           and 'validator: (new: unit -> 'validator)
+                                                                                           and 'validator :> IValidator<'value>
+                                                                                           and 'validator2: struct
+                                                                                           and 'validator2: (new: unit -> 'validator2)
+                                                                                           and 'validator2 :> IValidator<'value>
+                                                                                           and 'validator3: struct
+                                                                                           and 'validator3: (new: unit -> 'validator3)
+                                                                                           and 'validator3 :> IValidator<'value>> =
     member this.Validate value =
         match (new 'validator()).Validate value with
         | Ok value ->
@@ -134,12 +134,12 @@ type [<Struct; IsReadOnly>] MultiValidator30<'value, 'validator, 'validator2, 'v
         member this.ValidateAggregate value : ValueTask<EResult<'value,AggregateException>> = this.ValidateAggregate value |> ValueTask.FromResult
 
 type [<Struct; IsReadOnly>] MultiValidator21<'value, 'validator, 'validator2, 'validator3 when 'validator: struct
-                                                                                      and 'validator: (new: unit -> 'validator)
-                                                                                      and 'validator :> IValidator<'value>
-                                                                                      and 'validator2: struct
-                                                                                      and 'validator2: (new: unit -> 'validator2)
-                                                                                      and 'validator2 :> IValidator<'value>
-                                                                                      and 'validator3 :> IValidator<'value>>
+                                                                                           and 'validator: (new: unit -> 'validator)
+                                                                                           and 'validator :> IValidator<'value>
+                                                                                           and 'validator2: struct
+                                                                                           and 'validator2: (new: unit -> 'validator2)
+                                                                                           and 'validator2 :> IValidator<'value>
+                                                                                           and 'validator3 :> IValidator<'value>>
     (validator: 'validator3) =
     member this.Validate(value) =
         match (new 'validator()).Validate value with
@@ -174,10 +174,10 @@ type [<Struct; IsReadOnly>] MultiValidator21<'value, 'validator, 'validator2, 'v
         member this.ValidateAggregate value : ValueTask<EResult<'value,AggregateException>> = this.ValidateAggregate value |> ValueTask.FromResult
 
 type [<Struct; IsReadOnly>] MultiValidator12<'value, 'validator, 'validator2, 'validator3 when 'validator: struct
-                                                                                      and 'validator: (new: unit -> 'validator)
-                                                                                      and 'validator :> IValidator<'value>
-                                                                                      and 'validator2 :> IValidator<'value>
-                                                                                      and 'validator3 :> IValidator<'value>>
+                                                                                           and 'validator: (new: unit -> 'validator)
+                                                                                           and 'validator :> IValidator<'value>
+                                                                                           and 'validator2 :> IValidator<'value>
+                                                                                           and 'validator3 :> IValidator<'value>>
     (validator: 'validator2, validator2: 'validator3) =
 
     member this.Validate(value) =
