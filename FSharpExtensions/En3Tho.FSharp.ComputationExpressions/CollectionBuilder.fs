@@ -15,9 +15,9 @@ module SCollectionBuilder =
     [<AbstractClass;Extension>]
     type SCollectionExtensions() =
         [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
-        static member inline Yield(collection, value: 'b) : CollectionCode = fun() -> add value collection
+        static member inline Yield(collection, value: 'b) : CollectionCode = fun() -> add value collection |> ignore
         [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
-        static member inline YieldFrom(collection, values: 'b seq) : CollectionCode = fun() -> for value in values do (add value collection)()
+        static member inline YieldFrom(collection, values: 'b seq) : CollectionCode = fun() -> for value in values do add value collection |> ignore
 
 module ICollectionBuilder =
 

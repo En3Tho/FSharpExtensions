@@ -32,8 +32,8 @@ type [<Struct; IsReadOnly>] MultiValidator20<'value, 'validator, 'validator2 whe
     interface IValidator<'value> with
         member this.Validate value: ExnResult<'value> = this.Validate value
         member this.Validate value: ValueTask<ExnResult<'value>> = this.Validate value |> ValueTask.FromResult
-        member this.ValidateAggregate value : EResult<'value,AggregateException> = this.ValidateAggregate value
-        member this.ValidateAggregate value : ValueTask<EResult<'value,AggregateException>> = this.ValidateAggregate value |> ValueTask.FromResult
+        member this.ValidateAggregate value : EResult<'value, AggregateException> = this.ValidateAggregate value
+        member this.ValidateAggregate value : ValueTask<EResult<'value, AggregateException>> = this.ValidateAggregate value |> ValueTask.FromResult
 
 type [<Struct; IsReadOnly>] MultiValidator02<'value, 'validator, 'validator2 when 'validator :> IValidator<'value>
                                                                               and 'validator2 :> IValidator<'value>>
@@ -59,8 +59,8 @@ type [<Struct; IsReadOnly>] MultiValidator02<'value, 'validator, 'validator2 whe
     interface IValidator<'value> with
         member this.Validate value: ExnResult<'value> = this.Validate value
         member this.Validate value: ValueTask<ExnResult<'value>> = this.Validate value |> ValueTask.FromResult
-        member this.ValidateAggregate value : EResult<'value,AggregateException> = this.ValidateAggregate value
-        member this.ValidateAggregate value : ValueTask<EResult<'value,AggregateException>> = this.ValidateAggregate value |> ValueTask.FromResult
+        member this.ValidateAggregate value : EResult<'value, AggregateException> = this.ValidateAggregate value
+        member this.ValidateAggregate value : ValueTask<EResult<'value, AggregateException>> = this.ValidateAggregate value |> ValueTask.FromResult
 
 type [<Struct; IsReadOnly>] MultiValidator11<'value, 'validator, 'validator2 when 'validator: struct
                                                                               and 'validator: (new: unit -> 'validator)
@@ -89,8 +89,8 @@ type [<Struct; IsReadOnly>] MultiValidator11<'value, 'validator, 'validator2 whe
     interface IValidator<'value> with
         member this.Validate value: ExnResult<'value> = this.Validate value
         member this.Validate value: ValueTask<ExnResult<'value>> = this.Validate value |> ValueTask.FromResult
-        member this.ValidateAggregate value : EResult<'value,AggregateException> = this.ValidateAggregate value
-        member this.ValidateAggregate value : ValueTask<EResult<'value,AggregateException>> = this.ValidateAggregate value |> ValueTask.FromResult
+        member this.ValidateAggregate value : EResult<'value, AggregateException> = this.ValidateAggregate value
+        member this.ValidateAggregate value : ValueTask<EResult<'value, AggregateException>> = this.ValidateAggregate value |> ValueTask.FromResult
             
 type [<Struct; IsReadOnly>] MultiValidator30<'value, 'validator, 'validator2, 'validator3 when 'validator: struct
                                                                                            and 'validator: (new: unit -> 'validator)
@@ -130,8 +130,8 @@ type [<Struct; IsReadOnly>] MultiValidator30<'value, 'validator, 'validator2, 'v
     interface IValidator<'value> with
         member this.Validate value: ExnResult<'value> = this.Validate value
         member this.Validate value: ValueTask<ExnResult<'value>> = this.Validate value |> ValueTask.FromResult
-        member this.ValidateAggregate value : EResult<'value,AggregateException> = this.ValidateAggregate value
-        member this.ValidateAggregate value : ValueTask<EResult<'value,AggregateException>> = this.ValidateAggregate value |> ValueTask.FromResult
+        member this.ValidateAggregate value : EResult<'value, AggregateException> = this.ValidateAggregate value
+        member this.ValidateAggregate value : ValueTask<EResult<'value, AggregateException>> = this.ValidateAggregate value |> ValueTask.FromResult
 
 type [<Struct; IsReadOnly>] MultiValidator21<'value, 'validator, 'validator2, 'validator3 when 'validator: struct
                                                                                            and 'validator: (new: unit -> 'validator)
@@ -170,8 +170,8 @@ type [<Struct; IsReadOnly>] MultiValidator21<'value, 'validator, 'validator2, 'v
     interface IValidator<'value> with
         member this.Validate value: ExnResult<'value> = this.Validate value
         member this.Validate value: ValueTask<ExnResult<'value>> = this.Validate value |> ValueTask.FromResult
-        member this.ValidateAggregate value : EResult<'value,AggregateException> = this.ValidateAggregate value
-        member this.ValidateAggregate value : ValueTask<EResult<'value,AggregateException>> = this.ValidateAggregate value |> ValueTask.FromResult
+        member this.ValidateAggregate value : EResult<'value, AggregateException> = this.ValidateAggregate value
+        member this.ValidateAggregate value : ValueTask<EResult<'value, AggregateException>> = this.ValidateAggregate value |> ValueTask.FromResult
 
 type [<Struct; IsReadOnly>] MultiValidator12<'value, 'validator, 'validator2, 'validator3 when 'validator: struct
                                                                                            and 'validator: (new: unit -> 'validator)
@@ -209,8 +209,8 @@ type [<Struct; IsReadOnly>] MultiValidator12<'value, 'validator, 'validator2, 'v
     interface IValidator<'value> with
         member this.Validate value: ExnResult<'value> = this.Validate value
         member this.Validate value: ValueTask<ExnResult<'value>> = this.Validate value |> ValueTask.FromResult
-        member this.ValidateAggregate value : EResult<'value,AggregateException> = this.ValidateAggregate value
-        member this.ValidateAggregate value : ValueTask<EResult<'value,AggregateException>> = this.ValidateAggregate value |> ValueTask.FromResult
+        member this.ValidateAggregate value : EResult<'value, AggregateException> = this.ValidateAggregate value
+        member this.ValidateAggregate value : ValueTask<EResult<'value, AggregateException>> = this.ValidateAggregate value |> ValueTask.FromResult
 
 type [<Struct; IsReadOnly>] MultiValidator03<'value, 'validator, 'validator2, 'validator3 when 'validator :> IValidator<'value>
                                                                                            and 'validator2 :> IValidator<'value>
@@ -246,5 +246,5 @@ type [<Struct; IsReadOnly>] MultiValidator03<'value, 'validator, 'validator2, 'v
     interface IValidator<'value> with
         member this.Validate value: ExnResult<'value> = this.Validate value
         member this.Validate value: ValueTask<ExnResult<'value>> = this.Validate value |> ValueTask.FromResult
-        member this.ValidateAggregate value : EResult<'value,AggregateException> = this.ValidateAggregate value
-        member this.ValidateAggregate value : ValueTask<EResult<'value,AggregateException>> = this.ValidateAggregate value |> ValueTask.FromResult
+        member this.ValidateAggregate value : EResult<'value, AggregateException> = this.ValidateAggregate value
+        member this.ValidateAggregate value : ValueTask<EResult<'value, AggregateException>> = this.ValidateAggregate value |> ValueTask.FromResult
