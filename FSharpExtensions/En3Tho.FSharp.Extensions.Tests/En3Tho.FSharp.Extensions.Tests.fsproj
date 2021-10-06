@@ -12,6 +12,7 @@
         <Compile Include="ArrayPoolBasedBuilderTests.fs" />
         <Compile Include="StringBuilderBuilderTests.fs" />
         <Compile Include="OptionsAndResults.fs" />
+        <Compile Include="ScanfTest.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 

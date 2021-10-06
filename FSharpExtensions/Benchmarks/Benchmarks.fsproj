@@ -11,6 +11,7 @@
         <Compile Include="CustomBuildersVsLibraryBuilders.fs" />
         <Compile Include="CollectionsBuildersAllocations.fs" />
         <Compile Include="EResultAllocationsBenchmark.fs" />
+        <Compile Include="ScanfBenchmark.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
