@@ -16,7 +16,7 @@ module PlainValue =
              member this.ValidateAggregate value: EResult<'a, AggregateException> = this.Validate value
              member this.ValidateAggregate value: ValueTask<EResult<'a, AggregateException>> = this.Validate value |> ValueTask.FromResult
 
-type PlainValue<'a> = Validated<'a, PlainValue.Validator<'a>>
+type PlainValue<'a> = NewCtorValidatorValidated<'a, PlainValue.Validator<'a>>
 let inline (|PlainValue|) (value: PlainValue<'a>) = value.Value
 
 module NonNullValue =
@@ -33,7 +33,7 @@ module NonNullValue =
             member this.ValidateAggregate value: EResult<'a, AggregateException> = this.Validate value |> Result.mapError AggregateException
             member this.ValidateAggregate value: ValueTask<EResult<'a, AggregateException>> = this.Validate value |> Result.mapError AggregateException |> ValueTask.FromResult
 
-type NonNullValue<'a when 'a: not struct> = Validated<'a, NonNullValue.Validator<'a>>
+type NonNullValue<'a when 'a: not struct> = NewCtorValidatorValidated<'a, NonNullValue.Validator<'a>>
 let inline (|NonNullValue|) (value: NonNullValue<'a>) = value.Value
 
 module NonDefaultValue =
@@ -50,7 +50,7 @@ module NonDefaultValue =
             member this.ValidateAggregate value : EResult<'a, AggregateException> = this.Validate value |> Result.mapError AggregateException
             member this.ValidateAggregate value : ValueTask<EResult<'a, AggregateException>> = this.Validate value |> Result.mapError AggregateException |> ValueTask.FromResult
 
-type NonDefaultValue<'a when 'a: struct and 'a: equality> = Validated<'a, NonDefaultValue.Validator<'a>>
+type NonDefaultValue<'a when 'a: struct and 'a: equality> = NewCtorValidatorValidated<'a, NonDefaultValue.Validator<'a>>
 let inline (|NonDefaultValue|) (value: NonDefaultValue<'a>) = value.Value
 
 module NonNegativeValue =
@@ -66,7 +66,7 @@ module NonNegativeValue =
             member this.ValidateAggregate value : EResult<'a, AggregateException> = this.Validate value |> Result.mapError AggregateException
             member this.ValidateAggregate value : ValueTask<EResult<'a, AggregateException>> = this.Validate value |> Result.mapError AggregateException |> ValueTask.FromResult
 
-type NonNegativeValue<'a when 'a: comparison and 'a: struct> = Validated<'a, NonNegativeValue.Validator<'a>>
+type NonNegativeValue<'a when 'a: comparison and 'a: struct> = NewCtorValidatorValidated<'a, NonNegativeValue.Validator<'a>>
 let inline (|NonNegativeValue|) (value: NonNegativeValue<'a>) = value.Value
 
 module NegativeValue =
@@ -82,7 +82,7 @@ module NegativeValue =
             member this.ValidateAggregate value : EResult<'a, AggregateException> = this.Validate value |> Result.mapError AggregateException
             member this.ValidateAggregate value : ValueTask<EResult<'a, AggregateException>> = this.Validate value |> Result.mapError AggregateException |> ValueTask.FromResult
 
-type NegativeValue<'a when 'a: comparison and 'a: struct> = Validated<'a, NonNegativeValue.Validator<'a>>
+type NegativeValue<'a when 'a: comparison and 'a: struct> = NewCtorValidatorValidated<'a, NonNegativeValue.Validator<'a>>
 let inline (|NegativeValue|) (value: NonNegativeValue<'a>) = value.Value
 
 module NonEmptyString =
@@ -100,7 +100,7 @@ module NonEmptyString =
             member this.ValidateAggregate value : EResult<string, AggregateException> = this.Validate value |> Result.mapError AggregateException
             member this.ValidateAggregate value : ValueTask<EResult<string, AggregateException>> = this.Validate value |> Result.mapError AggregateException |> ValueTask.FromResult
 
-type NonEmptyString = Validated<string, NonEmptyString.Validator>
+type NonEmptyString = NewCtorValidatorValidated<string, NonEmptyString.Validator>
 let inline (|NonEmptyString|) (value: NonEmptyString) = value.Value
 
 module NonEmptyGuid =
@@ -117,7 +117,7 @@ module NonEmptyGuid =
             member this.ValidateAggregate value : EResult<Guid,AggregateException> = this.Validate value |> Result.mapError AggregateException
             member this.ValidateAggregate value : ValueTask<EResult<Guid,AggregateException>> = this.Validate value |> Result.mapError AggregateException |> ValueTask.FromResult
 
-type NonEmptyGuid = Validated<Guid, NonEmptyGuid.Validator>
+type NonEmptyGuid = NewCtorValidatorValidated<Guid, NonEmptyGuid.Validator>
 let inline (|NonEmptyGuid|) (value: NonEmptyGuid) = value.Value
 
 module NonEmptyArray =
@@ -136,7 +136,7 @@ module NonEmptyArray =
             member this.ValidateAggregate value : EResult<'a array,AggregateException> = this.Validate value |> Result.mapError AggregateException
             member this.ValidateAggregate value : ValueTask<EResult<'a array,AggregateException>> = this.Validate value |> Result.mapError AggregateException |> ValueTask.FromResult
 
-type NonEmptyArray<'a> = Validated<'a array, NonEmptyArray.Validator<'a>>
+type NonEmptyArray<'a> = NewCtorValidatorValidated<'a array, NonEmptyArray.Validator<'a>>
 let inline (|NonEmptyArray|) (value: NonEmptyArray<'a>) = value.Value
 
 module NonEmptyList =
@@ -155,7 +155,7 @@ module NonEmptyList =
             member this.ValidateAggregate value : EResult<'a list,AggregateException> = this.Validate value |> Result.mapError AggregateException
             member this.ValidateAggregate value : ValueTask<EResult<'a list,AggregateException>> = this.Validate value |> Result.mapError AggregateException |> ValueTask.FromResult
 
-type NonEmptyList<'a> = Validated<'a list, NonEmptyList.Validator<'a>>
+type NonEmptyList<'a> = NewCtorValidatorValidated<'a list, NonEmptyList.Validator<'a>>
 let inline (|NonEmptyList|) (value: NonEmptyList<'a>) = value.Value
 
 module NonEmptyCollection =
@@ -174,7 +174,7 @@ module NonEmptyCollection =
             member this.ValidateAggregate value : EResult<'a, AggregateException> = this.Validate value |> Result.mapError AggregateException
             member this.ValidateAggregate value : ValueTask<EResult<'a, AggregateException>> = this.Validate value |> Result.mapError AggregateException |> ValueTask.FromResult
 
-type NonEmptyCollection<'a, 'b when 'a :> ICollection<'b>> = Validated<'a, NonEmptyCollection.Validator<'a, 'b>>
+type NonEmptyCollection<'a, 'b when 'a :> ICollection<'b>> = NewCtorValidatorValidated<'a, NonEmptyCollection.Validator<'a, 'b>>
 let inline (|NonEmptyCollection|) (value: NonEmptyCollection<'a, 'b>) = value.Value
 
 module GuidString =
@@ -192,7 +192,7 @@ module GuidString =
             member this.ValidateAggregate value : EResult<string,AggregateException> = this.Validate value |> Result.mapError AggregateException
             member this.ValidateAggregate value : ValueTask<EResult<string,AggregateException>> = this.Validate value |> Result.mapError AggregateException |> ValueTask.FromResult
 
-type GuidString = Validated<string, MultiValidator20<string, NonEmptyString.Validator, GuidString.Validator>>
+type GuidString = NewCtorValidatorValidated<string, MultiValidator20<string, NonEmptyString.Validator, GuidString.Validator>>
 let inline (|GuidString|) (value: GuidString) = value.Value
 
 module ValidEnumValue =
@@ -209,5 +209,5 @@ module ValidEnumValue =
             member this.ValidateAggregate value : EResult<'a, AggregateException> = this.Validate value |> Result.mapError AggregateException
             member this.ValidateAggregate value : ValueTask<EResult<'a, AggregateException>> = this.Validate value |> Result.mapError AggregateException |> ValueTask.FromResult
 
-type ValidEnumValue<'a when 'a: struct and 'a :> Enum and 'a: (new: unit -> 'a)> = Validated<'a, ValidEnumValue.Validator<'a>>
+type ValidEnumValue<'a when 'a: struct and 'a :> Enum and 'a: (new: unit -> 'a)> = NewCtorValidatorValidated<'a, ValidEnumValue.Validator<'a>>
 let inline (|ValidEnum|) (value: ValidEnumValue<'a>) = value.Value

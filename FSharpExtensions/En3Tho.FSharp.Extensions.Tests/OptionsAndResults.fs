@@ -120,7 +120,7 @@ let ``Test that eresult builder is working properly`` () =
 
     let exn = Exception()
     let res2 = eresult {
-        return exn
+        return! exn
     }
 
     Assert.Equal(res2, Error exn)
@@ -135,11 +135,18 @@ let ``Test that eresult builder is can process multiple errors`` () =
         return a + b + c + 10
     }
 
-    Assert.Equal(res1, Error (AggregateException([exn; exn; exn])))
+    match res1 with
+    | Error aggExn ->
+        Assert.True(
+            aggExn.InnerExceptions
+            |> Seq.toArray
+            |> Seq.identical [| exn; exn; exn |])
+    | _ ->
+        Assert.True(false, "Result should not be OK here")
 
     let exn = Exception()
     let res2 = eresult {
-        return exn
+        return! exn
     }
 
     Assert.Equal(res2, Error exn)

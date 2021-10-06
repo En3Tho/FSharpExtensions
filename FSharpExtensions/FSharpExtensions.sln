@@ -17,6 +17,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.Extensions.Te
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.Validation", "En3Tho.FSharp.Validation\En3Tho.FSharp.Validation.fsproj", "{27A28D11-254F-4780-A992-CD032B053A1C}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.Validation.Tests", "En3Tho.FSharp.Validation.Tests\En3Tho.FSharp.Validation.Tests.fsproj", "{971B6FBC-D904-4816-ABB2-87D7D9442A1D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,5 +45,9 @@ Global
 		{27A28D11-254F-4780-A992-CD032B053A1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{27A28D11-254F-4780-A992-CD032B053A1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{27A28D11-254F-4780-A992-CD032B053A1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{971B6FBC-D904-4816-ABB2-87D7D9442A1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{971B6FBC-D904-4816-ABB2-87D7D9442A1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{971B6FBC-D904-4816-ABB2-87D7D9442A1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{971B6FBC-D904-4816-ABB2-87D7D9442A1D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
