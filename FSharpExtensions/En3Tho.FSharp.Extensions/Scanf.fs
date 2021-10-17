@@ -2,24 +2,20 @@
 
 open System
 
-type ReadOnlySpan<'t> with
-    member internal this.SliceForward value =
-        if value >= this.Length then
-            ReadOnlySpan<'t>()
-        else
-            this.Slice(value, this.Length - value)
+let [<Literal>] private InterpolationFormat = "%P()"
 
 // TODO: Investigate if it is possible to do via inline magic
-let private scanfInternal strict (value: string) (fmt: Printf.StringFormat<_>) =
+// TODO: Parse complex values via JSON
+let private scanfInternal strict (value: ReadOnlySpan<char>) (fmt: Printf.StringFormat<_>) =
 
     let mutable capturesSpan: ReadOnlySpan<_> = Span.op_Implicit(fmt.Captures.AsSpan())
-    let mutable valueSpan = value.AsSpan()
+    let mutable valueSpan = value
     let mutable formatSpan = fmt.Value.AsSpan()
 
     let mutable success = valueSpan.Length > 0 && formatSpan.Length > 0
 
     while success && capturesSpan.Length > 0 do
-        match formatSpan.IndexOf("%P()".AsSpan()) with
+        match formatSpan.IndexOf(InterpolationFormat.AsSpan()) with // interpolation format
         | -1 ->
             success <- false
         | index ->
@@ -27,7 +23,11 @@ let private scanfInternal strict (value: string) (fmt: Printf.StringFormat<_>) =
                 success <- false
             else
 
+            let currentCapture = capturesSpan.[0]
+
+            formatSpan <- formatSpan.SliceForward (index + 4)
             valueSpan <- valueSpan.SliceForward index
+            capturesSpan <- capturesSpan.SliceForward 1
 
             if valueSpan.Length = 0 then
                 success <- false
@@ -35,11 +35,11 @@ let private scanfInternal strict (value: string) (fmt: Printf.StringFormat<_>) =
 
             let mutable charCounter = 0
 
-            match capturesSpan.[0] with
+            match currentCapture with
             | :? Ref<char> as ref ->
                 ref.Value <- valueSpan.[0]
                 charCounter <- 1
-            | captureRef ->
+            | _ ->
                 charCounter <-
                     match valueSpan.IndexOf(' ') with
                     | -1 ->
@@ -47,10 +47,34 @@ let private scanfInternal strict (value: string) (fmt: Printf.StringFormat<_>) =
                     | index ->
                         index
 
-                let value = valueSpan.Slice(0, charCounter)
-                match captureRef with
+                if charCounter = 0 then
+                    success <- false
+                else
+
+                let mutable value = valueSpan.Slice(0, charCounter)
+
+                if formatSpan.Length > 0 && not (formatSpan.[0] = ' ') then
+                    let literalLength =
+                        match formatSpan.SliceForward(1).IndexOf(' ') with
+                        | 0 -> 1
+                        | -1 -> formatSpan.Length
+                        | index -> index
+
+                    let literalSpan = formatSpan.Slice(0, literalLength)
+                    if valueSpan.EndsWith(literalSpan) then
+                        value <- value.Slice(0, value.Length - literalLength)
+                        charCounter <- charCounter + literalLength
+                        formatSpan <- formatSpan.SliceForward(literalLength)
+                    else
+                        success <- false
+
+                match currentCapture with
                 | :? Ref<string> as ref ->
-                    ref.Value <- value.ToString()
+                    if formatSpan.Length = 0 && capturesSpan.Length = 0 then
+                        ref.Value <- valueSpan.ToString()
+                        charCounter <- valueSpan.Length
+                    else
+                        ref.Value <- value.ToString()
                 | :? Ref<DateTime> as ref ->
                     success <- DateTime.TryParse(value, ref)
                 | :? Ref<TimeSpan> as ref ->
@@ -81,8 +105,6 @@ let private scanfInternal strict (value: string) (fmt: Printf.StringFormat<_>) =
                     raise (NotImplementedException("Only Ref<PrimitiveType> is supported"))
 
             valueSpan <- valueSpan.SliceForward charCounter
-            capturesSpan <- capturesSpan.SliceForward 1
-            formatSpan <- formatSpan.SliceForward (index + 4)
 
     if success && strict then
         success <- formatSpan.Length = valueSpan.Length && formatSpan.SequenceEqual(valueSpan)
@@ -90,7 +112,13 @@ let private scanfInternal strict (value: string) (fmt: Printf.StringFormat<_>) =
     success
 
 /// Strict vesion of scanf which matches full string
-let scanf value fmt = scanfInternal true value fmt
+let scanf (value: string) fmt = scanfInternal true (value.AsSpan()) fmt
 
-/// Light version of scanf which stops matching when values are
-let scanfl value fmt = scanfInternal false value fmt
+/// Light version of scanf which stops matching when values are found
+let scanfl (value: string) fmt = scanfInternal false (value.AsSpan()) fmt
+
+/// Strict vesion of scanf which matches full string
+let scanfSpan value fmt = scanfInternal true value fmt
+
+/// Light version of scanf which stops matching when values are found
+let scanflSpan value fmt = scanfInternal false value fmt

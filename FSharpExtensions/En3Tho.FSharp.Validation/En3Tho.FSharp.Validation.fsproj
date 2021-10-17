@@ -24,7 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="En3Tho.FSharp.ComputationExpressions" Version="1.0.3" />
+      <PackageReference Include="En3Tho.FSharp.ComputationExpressions" Version="1.0.4" />
       <PackageReference Include="En3Tho.FSharp.Extensions" Version="1.0.1" />
       <PackageReference Include="Ply" Version="0.3.1" />
     </ItemGroup>

@@ -1,5 +1,6 @@
 ﻿module Benchmarks.ScanfBenchmark
 
+open System
 open BenchmarkDotNet.Attributes
 open BenchmarkDotNet.Jobs
 open En3Tho.FSharp.Extensions.Scanf
@@ -9,7 +10,8 @@ open En3Tho.FSharp.Extensions.Scanf
     DisassemblyDiagnoser;
     SimpleJob(RuntimeMoniker.Net60)
 >]
-type Benchmark() =
+
+module Assets = // for CSharp version of bench
 
     let value1 = ref "0"
     let value2 = ref 0
@@ -23,6 +25,18 @@ type Benchmark() =
     let manySmallValuesFmt : Printf.StringFormat<_> = $"{value1} {value2} {value3} {value4} {value5} {value6} {value7}"
 
     let realisticFmt : Printf.StringFormat<_> = $"/authorize {value1} {value2}"
+
+    let cmd = ref ""
+    let userName = ref ""
+    let userCode = ref 0
+    let realisticCommandFmt : Printf.StringFormat<_> = $"/{cmd} {userName} {userCode}"
+
+    let intRef = ref 0
+    let floatRef = ref 0.
+    let primitivesOnlyFmt : Printf.StringFormat<_> = $"{intRef} {floatRef}"
+
+open Assets
+type Benchmark() =
 
     [<Benchmark>]
     member _.ManySmallValues() =
@@ -54,3 +68,23 @@ type Benchmark() =
     [<Benchmark>]
     member _.RealisticPreallocated() =
         scanf "/authorize myText 123" realisticFmt
+
+    [<Benchmark>]
+    member _.RealisticCommand() =
+        scanf "/authorize myText 123" $"/{cmd} {userName} {userCode}"
+
+    [<Benchmark>]
+    member _.RealisticCommandPreallocated() =
+        scanf "/authorize myText 123" realisticCommandFmt
+
+    [<Benchmark>]
+    member _.RealisticCommandPreallocatedSpan() =
+        scanfSpan ("/authorize myText 123".AsSpan()) realisticCommandFmt
+
+    [<Benchmark>]
+    member _.PrimitivesOnlyPreallocated() =
+        scanf "123456 123456.123456" primitivesOnlyFmt
+
+    [<Benchmark>]
+    member _.PrimitivesOnlyPreallocatedSpan() =
+        scanfSpan ("123456 123456.123456".AsSpan()) primitivesOnlyFmt

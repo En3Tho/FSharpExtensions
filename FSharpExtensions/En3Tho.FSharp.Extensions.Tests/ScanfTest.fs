@@ -8,10 +8,26 @@ open En3Tho.FSharp.Extensions.Scanf
 let ``Test good cases of scanf`` () =
     let value1 = ref ""
     let value2 = ref 0
+
     Assert.True (scanf "/authorize myText 123 qwe" $"/authorize {value1} {value2} qwe")
+    Assert.Equal(value1.Value, "myText")
+    Assert.Equal(value2.Value, 123)
+
+    Assert.True (scanf "/authorize myText  123  qwe" $"/authorize {value1}  {value2}  qwe")
+    Assert.Equal(value1.Value, "myText")
+    Assert.Equal(value2.Value, 123)
+
     Assert.True (scanfl "/authorize myText 123 qwe" $"/authorize {value1} {value2} qwe")
+    Assert.Equal(value1.Value, "myText")
+    Assert.Equal(value2.Value, 123)
+
     Assert.True (scanfl "/authorize myText 123" $"/authorize {value1} {value2} qwe")
+    Assert.Equal(value1.Value, "myText")
+    Assert.Equal(value2.Value, 123)
+
     Assert.True (scanfl "/authorize myText 123 qwe" $"/authorize {value1} {value2}")
+    Assert.Equal(value1.Value, "myText")
+    Assert.Equal(value2.Value, 123)
 
 [<Fact>]
 let ``Test scanf supports basic types`` () =
@@ -25,15 +41,67 @@ let ``Test scanf supports basic types`` () =
 
     let text = $"{value1.Value} {value2.Value} {value3.Value} {value4.Value} {value5.Value} {value6.Value} {value7.Value}"
     Assert.True(scanf text $"{value1} {value2} {value3} {value4} {value5} {value6} {value7}")
+    Assert.Equal(value1.Value, "0")
+    Assert.Equal(value2.Value, 0)
+    Assert.Equal(value3.Value, 0.)
+    Assert.Equal(value4.Value, 0.f)
+    Assert.Equal(value5.Value, '0')
+    Assert.Equal(value6.Value, false)
+    Assert.Equal(value7.Value, 0u)
 
 [<Fact>]
 let ``Test bad cases of scanf`` () =
     let value1 = ref ""
     let value2 = ref 0
+
     Assert.False (scanf "/authorize myText 123 qwe1" $"/authorize {value1} {value2} qwe")
+    Assert.False (scanf "/authorize myText 123 qwe1" $"/authorize {value1}  {value2}  qwe")
+    Assert.False (scanf "/authorize myText 123 qwe" $"/authorize {value1}  {value2}  qwe")
     Assert.False (scanf "/authorize myText 123 qwe" $"/authorize {value1} {value2} qwe1")
     Assert.False (scanf "/authorize myText 123 qwe" $"/authorize {value1}1 {value2} qwe")
     Assert.False (scanf "/authorize myText 123 qwe" $"/authorize {value1}1 {value2}")
     Assert.False (scanfl "/authorize 123 qwe" $"/authorize {value1} {value2} qwe")
     Assert.False (scanfl "/authorize1 myText 123" $"/authorize {value1} {value2} qwe")
     Assert.False (scanfl "/authorize myText 123 qwe" $"/authorize {value1} 123 {value2}")
+
+[<Fact>]
+let ``Test complex cases of scanf`` () =
+    let cmd = ref ""
+    let login = ref ""
+    let password = ref 0
+
+    Assert.True(scanf "/authorize -login myLogin -password 1230" $"/{cmd} -login {login} -password {password}0")
+    Assert.Equal(cmd.Value, "authorize")
+    Assert.Equal(login.Value, "myLogin")
+    Assert.Equal(password.Value, 123)
+
+[<Fact>]
+let ``Test good split cases of scanf`` () =
+    let firstPart = ref ""
+    let secondPart = ref ""
+
+    Assert.True(scanf "/authorize -login myLogin -password 1230" $"/{firstPart} {secondPart}")
+    Assert.Equal(firstPart.Value, "authorize")
+    Assert.Equal(secondPart.Value, "-login myLogin -password 1230")
+
+    Assert.True(scanfl "/authorize -login myLogin -password 1230" $"/{firstPart} {secondPart} ")
+    Assert.Equal(firstPart.Value, "authorize")
+    Assert.Equal(secondPart.Value, "-login")
+
+[<Fact>]
+let ``Test single string case of scanf`` () =
+    let firstPart = ref ""
+
+    Assert.True(scanf "/authorize -login myLogin -password 1230" $"/{firstPart}")
+    Assert.Equal(firstPart.Value, "authorize -login myLogin -password 1230")
+
+    Assert.True(scanf "/authorize -login myLogin -password 1230" $"{firstPart}")
+    Assert.Equal(firstPart.Value, "/authorize -login myLogin -password 1230")
+
+
+[<Fact>]
+let ``Test bad split cases of scanf`` () =
+    let firstPart = ref ""
+    let secondPart = ref ""
+
+    Assert.False(scanf "/authorize -login myLogin -password 1230" $"/{firstPart} {secondPart} ")

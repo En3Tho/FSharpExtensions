@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <AssemblyName>En3Tho.Extensions.DependencyInjection.AspNetCore</AssemblyName>
+        <RootNamespace>En3Tho.Extensions.DependencyInjection.AspNetCore</RootNamespace>
+        <PackageId>En3Tho.Extensions.DependencyInjection.AspNetCore</PackageId>
+        <Authors> Igor Bagdamyan</Authors>
+        <Copyright>Copyright (c) 2021 Igor Bagdamyan</Copyright>
+        <PackageProjectUrl>https://github.com/En3Tho/FSharpExtensions</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/En3Tho/FSharpExtensions/blob/main/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/En3Tho/FSharpExtensions</RepositoryUrl>
+        <Company> Igor Bagdamyan</Company>
+        <Product>En3Tho.Extensions.DependencyInjection.AspNetCore</Product>
+        <AssemblyVersion>1.0.0</AssemblyVersion>
+        <FileVersion>1.0.0</FileVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="AllRegisteredRoutesController.fs" />
+        <Compile Include="Extensions.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="En3Tho.FSharp.Extensions" Version="1.0.2" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.2" />
+    </ItemGroup>
+
+</Project>

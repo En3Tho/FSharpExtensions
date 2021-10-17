@@ -45,3 +45,17 @@ type Exception with
             match this.InnerException with
             | null -> ValueNone
             | exn -> exn.IsOrContains<'a>()
+
+type Span<'a> with
+    member this.SliceForward value =
+        if value >= this.Length then
+            Span<'a>()
+        else
+            this.Slice(value, this.Length - value)
+
+type ReadOnlySpan<'a> with
+    member this.SliceForward value =
+        if value >= this.Length then
+            ReadOnlySpan<'a>()
+        else
+            this.Slice(value, this.Length - value)
