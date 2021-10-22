@@ -112,13 +112,13 @@ let private scanfInternal strict (value: ReadOnlySpan<char>) (fmt: Printf.String
     success
 
 /// Strict vesion of scanf which matches full string
-let scanf (value: string) fmt = scanfInternal true (value.AsSpan()) fmt
+let scanf fmt (value: string) = scanfInternal true (value.AsSpan()) fmt
 
 /// Light version of scanf which stops matching when values are found
-let scanfl (value: string) fmt = scanfInternal false (value.AsSpan()) fmt
+let scanfl fmt (value: string) = scanfInternal false (value.AsSpan()) fmt
 
 /// Strict vesion of scanf which matches full string
-let scanfSpan value fmt = scanfInternal true value fmt
+let scanfSpan fmt value = scanfInternal true value fmt
 
 /// Light version of scanf which stops matching when values are found
-let scanflSpan value fmt = scanfInternal false value fmt
+let scanflSpan fmt value = scanfInternal false value fmt
