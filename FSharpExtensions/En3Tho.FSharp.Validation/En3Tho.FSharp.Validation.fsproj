@@ -13,6 +13,11 @@
         <AssemblyVersion>1.0.3</AssemblyVersion>
         <FileVersion>1.0.3</FileVersion>
         <PackageVersion>1.0.3</PackageVersion>
+        <!-- Optional: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <!-- Optional: Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
 
     <ItemGroup>
@@ -26,6 +31,10 @@
     <ItemGroup>
       <PackageReference Include="En3Tho.FSharp.ComputationExpressions" Version="1.0.4" />
       <PackageReference Include="En3Tho.FSharp.Extensions" Version="1.0.1" />
+      <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
       <PackageReference Include="Ply" Version="0.3.1" />
     </ItemGroup>
 
