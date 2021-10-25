@@ -1,5 +1,6 @@
 ﻿module En3Tho.FSharp.Extensions.Tests.ScanfTest
 
+open System
 open Xunit
 
 open En3Tho.FSharp.Extensions.Scanf
@@ -22,10 +23,6 @@ let ``Test good cases of scanf`` () =
     Assert.Equal(value2.Value, 123)
 
     Assert.True ("/authorize myText 123" |> scanfl $"/authorize {value1} {value2} qwe")
-    Assert.Equal(value1.Value, "myText")
-    Assert.Equal(value2.Value, 123)
-
-    Assert.True ("/authorize myText 123 qwe" |> scanfl $"/authorize {value1} {value2}")
     Assert.Equal(value1.Value, "myText")
     Assert.Equal(value2.Value, 123)
 
@@ -63,6 +60,7 @@ let ``Test bad cases of scanf`` () =
     Assert.False ("/authorize 123 qwe" |> scanfl  $"/authorize {value1} {value2} qwe")
     Assert.False ("/authorize1 myText 123" |> scanfl $"/authorize {value1} {value2} qwe")
     Assert.False ("/authorize myText 123 qwe" |> scanfl $"/authorize {value1} 123 {value2}")
+    Assert.False ("/authorize myText 123 qwe" |> scanfl $"/authorize {value1} {value2}")
 
 [<Fact>]
 let ``Test complex cases of scanf`` () =
@@ -74,6 +72,13 @@ let ``Test complex cases of scanf`` () =
     Assert.Equal(cmd.Value, "authorize")
     Assert.Equal(login.Value, "myLogin")
     Assert.Equal(password.Value, 123)
+
+    let guid = Guid.NewGuid()
+    let token = ref Guid.Empty
+    Assert.True($"/authorizePass&token={guid}&password=1234" |> scanf $"/{cmd}&token={token}&password={password}")
+    Assert.Equal("authorizePass", cmd.Value)
+    Assert.Equal(guid, token.Value)
+    Assert.Equal(1234, password.Value)
 
 [<Fact>]
 let ``Test good split cases of scanf`` () =

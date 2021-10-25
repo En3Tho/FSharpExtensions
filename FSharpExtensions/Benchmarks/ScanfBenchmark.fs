@@ -49,15 +49,15 @@ type Benchmark() =
         let value7 = ref 0u
 
         let text = $"{value1.Value} {value2.Value} {value3.Value} {value4.Value} {value5.Value} {value6.Value} {value7.Value}"
-        scanf text $"{value1} {value2} {value3} {value4} {value5} {value6} {value7}"
+        scanf $"{value1} {value2} {value3} {value4} {value5} {value6} {value7}" text
 
     [<Benchmark>]
     member _.ManySmallValuesTextPreallocated() =
-        scanf manySmallValuesText $"{value1} {value2} {value3} {value4} {value5} {value6} {value7}"
+        scanf $"{value1} {value2} {value3} {value4} {value5} {value6} {value7}" manySmallValuesText
 
     [<Benchmark>]
     member _.ManySmallValuesFullyPreallocated() =
-        scanf manySmallValuesText manySmallValuesFmt
+        scanf manySmallValuesFmt manySmallValuesText
 
     [<Benchmark>]
     member _.Realistic() =
@@ -67,24 +67,24 @@ type Benchmark() =
 
     [<Benchmark>]
     member _.RealisticPreallocated() =
-        scanf "/authorize myText 123" realisticFmt
+        scanf realisticFmt "/authorize myText 123"
 
     [<Benchmark>]
     member _.RealisticCommand() =
         scanf "/authorize myText 123" $"/{cmd} {userName} {userCode}"
 
     [<Benchmark>]
-    member _.RealisticCommandPreallocated() =
-        scanf "/authorize myText 123" realisticCommandFmt
+    member _.RealisrealisticCommandFmtllocated() =
+        scanf realisticCommandFmt "realisticCommandFmt/authorize myText 123"
 
     [<Benchmark>]
     member _.RealisticCommandPreallocatedSpan() =
-        scanfSpan ("/authorize myText 123".AsSpan()) realisticCommandFmt
+        scanfSpan realisticCommandFmt ("/authorize myText 123".AsSpan())
 
     [<Benchmark>]
     member _.PrimitivesOnlyPreallocated() =
-        scanf "123456 123456.123456" primitivesOnlyFmt
+        scanf primitivesOnlyFmt "123456 123456.123456"
 
     [<Benchmark>]
     member _.PrimitivesOnlyPreallocatedSpan() =
-        scanfSpan ("123456 123456.123456".AsSpan()) primitivesOnlyFmt
+        scanfSpan primitivesOnlyFmt ("123456 123456.123456".AsSpan())

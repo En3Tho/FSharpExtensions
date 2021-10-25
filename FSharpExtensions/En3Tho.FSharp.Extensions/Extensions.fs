@@ -48,14 +48,14 @@ type Exception with
 
 type Span<'a> with
     member this.SliceForward value =
-        if value >= this.Length then
+        if uint value >= uint this.Length then
             Span<'a>()
         else
             this.Slice(value, this.Length - value)
 
 type ReadOnlySpan<'a> with
     member this.SliceForward value =
-        if value >= this.Length then
+        if uint value >= uint this.Length then
             ReadOnlySpan<'a>()
         else
             this.Slice(value, this.Length - value)
