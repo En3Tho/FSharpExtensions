@@ -64,7 +64,7 @@ type Benchmark() =
     member _.Realistic() =
         let value1 = ref "0"
         let value2 = ref 0
-        scanf "/authorize myText 123" $"/authorize {value1} {value2}"
+        scanf $"/authorize {value1} {value2}" "/authorize myText 123"
 
     [<Benchmark>]
     member _.RealisticPreallocated() =
@@ -72,7 +72,7 @@ type Benchmark() =
 
     [<Benchmark>]
     member _.RealisticCommand() =
-        scanf "/authorize myText 123" $"/{cmd} {userName} {userCode}"
+        scanf $"/{cmd} {userName} {userCode}" "/authorize myText 123"
 
     [<Benchmark>]
     member _.RealisticCommandPreallocated() =
