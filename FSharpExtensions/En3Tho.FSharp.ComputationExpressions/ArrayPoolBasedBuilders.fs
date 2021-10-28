@@ -57,12 +57,24 @@ open ArrayPoolList
 
 // This is needed to set ResizeArray to initial count and get span from it
 type private FakeCollection<'a>(count) =
+
+    member val Count = count with get, set
+
+    [<DefaultValue; ThreadStatic>]
+    static val mutable private threadStaticInstance: FakeCollection<'a>
+
+    static member GetInstance(count) =
+        if Object.ReferenceEquals(FakeCollection<'a>.threadStaticInstance, null) then
+            FakeCollection<'a>.threadStaticInstance <- FakeCollection(0)
+        FakeCollection<'a>.threadStaticInstance.Count <- count
+        FakeCollection<'a>.threadStaticInstance
+
     interface ICollection<'a> with
         member this.Add(item) = ()
         member this.Clear() = ()
         member this.Contains(item) = false
         member this.CopyTo(array, arrayIndex) = ()
-        member this.Count = count
+        member this.Count = this.Count
         member this.GetEnumerator(): IEnumerator<'a> = Enumerable.Empty<'a>().GetEnumerator()
         member this.GetEnumerator(): IEnumerator = Enumerable.Empty<'a>().GetEnumerator() :> IEnumerator
         member this.IsReadOnly = true
@@ -77,7 +89,7 @@ type ArrayPoolList<'a> with
         if count = 0 then ResizeArray()
         else
         let array = this.GetArray()
-        let fake = FakeCollection(count)
+        let fake = FakeCollection.GetInstance(count)
         let lst = ResizeArray(fake)
         array.AsSpan(0, count).CopyTo(CollectionsMarshal.AsSpan(lst))
         lst
