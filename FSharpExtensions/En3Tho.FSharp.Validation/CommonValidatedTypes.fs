@@ -2,6 +2,7 @@
 
 open System
 open System.Collections.Generic
+open System.Collections.Immutable
 open System.Threading.Tasks
 open En3Tho.FSharp.Extensions
 open En3Tho.FSharp.Validation
@@ -138,6 +139,25 @@ module NonEmptyArray =
 
 type NonEmptyArray<'a> = NewCtorValidatorValidated<'a array, NonEmptyArray.Validator<'a>>
 let inline (|NonEmptyArray|) (value: NonEmptyArray<'a>) = value.Value
+
+module NonEmptyBlock =
+    type ArrayIsNull() = inherit ValidationException(nameof(ArrayIsNull))
+    type ArrayIsEmpty() = inherit ValidationException(nameof(ArrayIsEmpty))
+
+    type [<Struct>] Validator<'a> =
+        member this.Validate (value: ImmutableArray<'a>) =
+            if value.IsDefault then Error (ArrayIsNull() :> exn)
+            elif value.IsEmpty then Error (ArrayIsEmpty() :> exn)
+            else Ok value
+
+        interface IValidator<'a ImmutableArray> with
+            member this.Validate value : ExnResult<'a ImmutableArray> = this.Validate value
+            member this.Validate value : AsyncExnResult<'a ImmutableArray> = this.Validate value |> ValueTask.FromResult
+            member this.ValidateAggregate value : EResult<'a ImmutableArray,AggregateException> = this.Validate value |> Result.mapError AggregateException
+            member this.ValidateAggregate value : ValueTask<EResult<'a ImmutableArray,AggregateException>> = this.Validate value |> Result.mapError AggregateException |> ValueTask.FromResult
+
+type NonEmptyBlock<'a> = NewCtorValidatorValidated<'a ImmutableArray, NonEmptyBlock.Validator<'a>>
+let inline (|NonEmptyBlock|) (value: NonEmptyArray<'a>) = value.Value
 
 module NonEmptyList =
     type ListIsNull() = inherit ValidationException(nameof(ListIsNull))

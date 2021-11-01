@@ -26,6 +26,7 @@
         <Compile Include="AsyncMultiValidators.fs" />
         <Compile Include="CommonValidatedTypes.fs" />
         <Compile Include="Modules.fs" />
+        <Compile Include="JsonConverter.fs" />
     </ItemGroup>
 
     <ItemGroup>

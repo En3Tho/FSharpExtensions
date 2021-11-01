@@ -94,6 +94,8 @@ type [<Struct; IsReadOnly>] NewCtorValidatorValidated<'value, 'validator when 'v
     static member MakeAggregate (valueOption: 'value voption) =
         NewCtorValidatorValidated<'value, 'validator>.TryAggregate(valueOption) |> EResult.unwrap
 
+    static member op_Implicit (validated: NewCtorValidatorValidated<'value, 'validator>) : 'value = validated.Value
+
 type [<Struct; IsReadOnly>] InstanceValidatorValidated<'value, 'validator when 'validator :> IValidator<'value>>
 #if DEBUG
     private (value: 'value, wasValidated: bool) =
@@ -155,6 +157,8 @@ type [<Struct; IsReadOnly>] InstanceValidatorValidated<'value, 'validator when '
 
     static member MakeAggregate(valueOption: 'value voption, validator: 'validator) =
         InstanceValidatorValidated<'value, 'validator>.TryAggregate(valueOption, validator) |> EResult.unwrap
+
+    static member op_Implicit (validated: InstanceValidatorValidated<'value, 'validator>) : 'value = validated.Value
 
 type [<Struct; IsReadOnly>] NewCtorAsyncValidatorValidated<'value, 'validator when 'validator: (new: unit -> 'validator)
                                                                                and 'validator :> IAsyncValidator<'value>>
@@ -233,6 +237,8 @@ type [<Struct; IsReadOnly>] NewCtorAsyncValidatorValidated<'value, 'validator wh
         return result |> EResult.unwrap
     }
 
+    static member op_Implicit (validated: NewCtorAsyncValidatorValidated<'value, 'validator>) : 'value = validated.Value
+
 type [<Struct; IsReadOnly>] InstanceAsyncValidatorValidated<'value, 'validator when 'validator :> IAsyncValidator<'value>>
 #if DEBUG
     private (value: 'value, wasValidated: bool) =
@@ -306,5 +312,7 @@ type [<Struct; IsReadOnly>] InstanceAsyncValidatorValidated<'value, 'validator w
         let! result = InstanceAsyncValidatorValidated<'value, 'validator>.TryAggregate(valueOption, validator)
         return result |> EResult.unwrap
     }
+
+    static member op_Implicit (validated: InstanceAsyncValidatorValidated<'value, 'validator>) : 'value = validated.Value
 
 #noward "0043"
