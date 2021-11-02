@@ -13,6 +13,8 @@ let private scanfInternal strict (value: ReadOnlySpan<char>) (fmt: Printf.String
     let mutable valueSpan = value
     let mutable formatSpan = fmt.Value.AsSpan()
 
+    // first, find the first occurence of %P() format substring and check if anything before it actually matches a corresponding part in a value string
+
     let mutable success =
         capturesSpan.Length > 0
         && valueSpan.Length > 0
@@ -27,6 +29,9 @@ let private scanfInternal strict (value: ReadOnlySpan<char>) (fmt: Printf.String
                    true
                else
                    false)
+
+    // then, in a loop, similarly repeat the process by finding next %P() occurence and searching for a  literal substring between those formats in a value string
+    // if success then process substring between value string start and a literal string that we've just found
 
     while success && capturesSpan.Length > 0 do
 
