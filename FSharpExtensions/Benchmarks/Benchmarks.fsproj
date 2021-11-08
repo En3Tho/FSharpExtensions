@@ -12,6 +12,7 @@
         <Compile Include="CollectionsBuildersAllocations.fs" />
         <Compile Include="EResultAllocationsBenchmark.fs" />
         <Compile Include="ScanfBenchmark.fs" />
+        <Compile Include="TaskBuildersBenchmarks.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 

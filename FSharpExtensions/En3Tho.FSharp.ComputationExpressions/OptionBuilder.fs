@@ -4,8 +4,6 @@ open System
 
 type OptionCode<'T> = unit -> 'T voption
 
-// TODO: /v/task/v/Option
-
 type OptionBuilderUsingInlineIfLambdaBase() =
 
     member inline _.Zero() : OptionCode<unit> =
