@@ -3,8 +3,8 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <AssemblyVersion>1.0.4</AssemblyVersion>
-        <FileVersion>1.0.4</FileVersion>
+        <AssemblyVersion>1.0.5</AssemblyVersion>
+        <FileVersion>1.0.5</FileVersion>
         <Description>A set of extensions for F# base library</Description>
         <Copyright>Copyright (c) 2021 Igor Bagdamyan</Copyright>
         <PackageProjectUrl>https://github.com/En3Tho/FSharpExtensions</PackageProjectUrl>
@@ -12,7 +12,7 @@
         <RepositoryUrl>https://github.com/En3Tho/FSharpExtensions</RepositoryUrl>
         <Authors> Igor Bagdamyan</Authors>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageVersion>1.0.4</PackageVersion>
+        <PackageVersion>1.0.5</PackageVersion>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <!-- Optional: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -30,6 +30,7 @@
     </ItemGroup>    
 
     <ItemGroup>
+      <PackageReference Include="En3Tho.FSharp.ComputationExpressions" Version="1.0.5" />
       <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

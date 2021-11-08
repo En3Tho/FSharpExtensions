@@ -3,22 +3,75 @@ module En3Tho.FSharp.Extensions.Extensions
 
 open System
 open System.Threading.Tasks
+open En3Tho.FSharp.ComputationExpressions.Tasks
 
 type Task with
     static member inline RunSynchronously (task: Task) =
         if task.IsCompletedSuccessfully then () else
         task.ConfigureAwait(false).GetAwaiter().GetResult()
+
     static member inline RunSynchronously (task: Task<'a>) =
         if task.IsCompletedSuccessfully then task.Result else
         task.ConfigureAwait(false).GetAwaiter().GetResult()
+
+    member this.AsResult() =
+        if
+            this.IsCompletedSuccessfully then ValueTask.FromResult(Ok())
+        else
+            vtask {
+                try
+                    do! this
+                    return Ok()
+                with e ->
+                    return Error e
+            }
+
+type Task<'a> with
+    member this.AsResult() =
+        if
+            this.IsCompletedSuccessfully then ValueTask.FromResult(Ok this.Result)
+        else
+            vtask {
+                try
+                    let! result = this
+                    return Ok result
+                with e ->
+                    return Error e
+            }
 
 type ValueTask with
     static member inline RunSynchronously (task: ValueTask) =
         if task.IsCompletedSuccessfully then () else
         task.ConfigureAwait(false).GetAwaiter().GetResult()
+
     static member inline RunSynchronously (task: ValueTask<'a>) =
         if task.IsCompletedSuccessfully then task.Result else
         task.ConfigureAwait(false).GetAwaiter().GetResult()
+
+    member this.AsResult() =
+        if
+            this.IsCompletedSuccessfully then ValueTask.FromResult(Ok())
+        else
+            vtask {
+                try
+                    do! this
+                    return Ok()
+                with e ->
+                    return Error e
+            }
+
+type ValueTask<'a> with
+    member this.AsResult() =
+        if
+            this.IsCompletedSuccessfully then ValueTask.FromResult(Ok this.Result)
+        else
+            vtask {
+                try
+                    let! result = this
+                    return Ok result
+                with e ->
+                    return Error e
+            }
 
 type Async<'a> with
     static member inline AwaitValueTask (valueTask: ValueTask) =
@@ -28,6 +81,15 @@ type Async<'a> with
     static member inline AwaitValueTask (valueTask: ValueTask<_>) =
         if valueTask.IsCompletedSuccessfully then valueTask.Result |> Async.ofObj
         else valueTask.AsTask() |> Async.AwaitTask
+
+    member this.AsResult() =
+        async {
+            try
+                let! result = this
+                return Ok result
+            with e ->
+                return Error e
+        }
 
 type Exception with
     member this.IsOrContains<'a when 'a :> exn>() =
