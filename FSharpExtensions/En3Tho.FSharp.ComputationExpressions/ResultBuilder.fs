@@ -79,7 +79,7 @@ type ResultBuilder() =
 
 type EResultBuilder() =
     inherit ResultBuilderUsingInlineIfLambdaBase()
-    member inline this.Run<'a, 'b when 'b :> exn>([<InlineIfLambda>] code : ResultCode<'a, 'b>) = code()
+    member inline this.Run<'a, 'b when 'b :> exn>([<InlineIfLambda>] code: ResultCode<'a, 'b>) = code()
 
     // TODO: A less allocating way
 
@@ -156,7 +156,7 @@ type EResultBuilder() =
 
 type ExnResultBuilder() =
     inherit ResultBuilderUsingInlineIfLambdaBase()
-    member inline this.Run<'a>([<InlineIfLambda>] code : ResultCode<'a, exn>) =
+    member inline this.Run<'a>([<InlineIfLambda>] code: ResultCode<'a, exn>) =
         try
             code()
         with e ->

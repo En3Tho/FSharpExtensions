@@ -1,6 +1,8 @@
 ﻿[<AutoOpen>]
 module En3Tho.FSharp.ComputationExpressions.Tasks.TaskBuilders
 
+[<assembly: AutoOpen("En3Tho.FSharp.ComputationExpressions.Tasks.TaskBuilderExtensions")>]
+
 [<assembly: AutoOpen("En3Tho.FSharp.ComputationExpressions.Tasks.UnitTaskBuilderExtensions.LowPriority")>]
 [<assembly: AutoOpen("En3Tho.FSharp.ComputationExpressions.Tasks.UnitTaskBuilderExtensions.MediumPriority")>]
 [<assembly: AutoOpen("En3Tho.FSharp.ComputationExpressions.Tasks.UnitTaskBuilderExtensions.HighPriority")>]

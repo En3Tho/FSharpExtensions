@@ -82,7 +82,7 @@ type OptionBuilderUsingInlineIfLambdaBase() =
 type OptionBuilderUsingInlineIfLambda() =
     inherit OptionBuilderUsingInlineIfLambdaBase()
 
-    member inline _.Run([<InlineIfLambda>] code : OptionCode<'T>) : 'T option =
+    member inline _.Run([<InlineIfLambda>] code: OptionCode<'T>) : 'T option =
          match code () with
          | ValueNone -> None
          | ValueSome v -> Some v
@@ -90,7 +90,7 @@ type OptionBuilderUsingInlineIfLambda() =
 type ValueOptionBuilderUsingInlineIfLambda() =
     inherit OptionBuilderUsingInlineIfLambdaBase()
 
-    member inline _.Run([<InlineIfLambda>] code : OptionCode<'T>) : 'T voption =
+    member inline _.Run([<InlineIfLambda>] code: OptionCode<'T>) : 'T voption =
         code()
 
 let option = OptionBuilderUsingInlineIfLambda()

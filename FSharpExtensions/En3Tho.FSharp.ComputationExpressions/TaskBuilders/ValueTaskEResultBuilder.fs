@@ -11,7 +11,7 @@
 // Updates:
 // Copyright (c) Microsoft Corporation.  All Rights Reserved.  See License.txt in the project root for license information.
 
-#nowarn "5313"
+#nowarn "3513"
 
 namespace En3Tho.FSharp.ComputationExpressions.Tasks
 
@@ -108,7 +108,7 @@ type ValueTaskEResultBuilderBase() =
             sm.Data.MethodBuilder.Start(&sm)
             sm.Data.MethodBuilder.Task
 
-        static member inline Run(code : ValueTaskEResultCode<'T, 'TError, 'T>) : ValueTask<Result<'T, 'TError>> =
+        static member inline Run(code: ValueTaskEResultCode<'T, 'TError, 'T>) : ValueTask<Result<'T, 'TError>> =
              if __useResumableCode then
                 __stateMachine<ValueTaskEResultStateMachineData<'T, 'TError>, ValueTask<Result<'T, 'TError>>>
                     (MoveNextMethodImpl<_>(fun sm ->
@@ -135,7 +135,7 @@ type ValueTaskEResultBuilderBase() =
              else
                 ValueTaskEResultBuilder.RunDynamic(code)
 
-        member inline _.Run(code : ValueTaskEResultCode<'T, 'TError, 'T>) : ValueTask<Result<'T, 'TError>> =
+        member inline _.Run(code: ValueTaskEResultCode<'T, 'TError, 'T>) : ValueTask<Result<'T, 'TError>> =
            ValueTaskEResultBuilder.Run(code)
 
 namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskEResultBuilderExtensions
@@ -227,7 +227,7 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskEResultBuilderExte
 
                 this.Bind(task, (fun v -> this.Return v))
 
-            member inline _.Using<'Resource, 'TOverall, 'T when 'Resource :> IDisposable> (resource: 'Resource, body: 'Resource -> ValueTaskEResultCode<'TOverall, 'TError, 'T>) =
+            member inline _.Using<'Resource, 'TOverall, 'TError, 'T when 'Resource :> IDisposable and 'TError :> exn> (resource: 'Resource, body: 'Resource -> ValueTaskEResultCode<'TOverall, 'TError, 'T>) =
                 ResumableCode.Using(resource, body)
 
             static member BindTaskDynamic (sm: byref<_>, task: Task<'TResult1>, continuation: ('TResult1 -> ValueTaskEResultCode<'TOverall, 'TError, 'TResult2>)) : bool =

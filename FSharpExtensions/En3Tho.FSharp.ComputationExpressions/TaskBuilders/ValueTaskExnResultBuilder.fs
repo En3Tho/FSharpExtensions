@@ -11,7 +11,7 @@
 // Updates:
 // Copyright (c) Microsoft Corporation.  All Rights Reserved.  See License.txt in the project root for license information.
 
-#nowarn "5313"
+#nowarn "3513"
 
 namespace En3Tho.FSharp.ComputationExpressions.Tasks
 
@@ -108,7 +108,7 @@ type ValueTaskExnResultBuilderBase() =
             sm.Data.MethodBuilder.Start(&sm)
             sm.Data.MethodBuilder.Task
 
-        static member inline Run(code : ValueTaskExnResultCode<'T, 'T>) : ValueTask<Result<'T, exn>> =
+        static member inline Run(code: ValueTaskExnResultCode<'T, 'T>) : ValueTask<Result<'T, exn>> =
              if __useResumableCode then
                 __stateMachine<ValueTaskExnResultStateMachineData<'T>, ValueTask<Result<'T, exn>>>
                     (MoveNextMethodImpl<_>(fun sm ->
@@ -135,7 +135,7 @@ type ValueTaskExnResultBuilderBase() =
              else
                 ValueTaskExnResultBuilder.RunDynamic(code)
 
-        member inline _.Run(code : ValueTaskExnResultCode<'T, 'T>) : ValueTask<Result<'T, exn>> =
+        member inline _.Run(code: ValueTaskExnResultCode<'T, 'T>) : ValueTask<Result<'T, exn>> =
            ValueTaskExnResultBuilder.Run(code)
 
 namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskExnResultBuilderExtensions

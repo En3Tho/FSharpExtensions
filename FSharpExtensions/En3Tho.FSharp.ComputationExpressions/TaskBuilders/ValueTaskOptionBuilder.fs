@@ -11,7 +11,7 @@
 // Updates:
 // Copyright (c) Microsoft Corporation.  All Rights Reserved.  See License.txt in the project root for license information.
 
-#nowarn "5313"
+#nowarn "3513"
 
 namespace En3Tho.FSharp.ComputationExpressions.Tasks
 
@@ -105,7 +105,7 @@ type ValueTaskValueOptionBuilderBase() =
             sm.Data.MethodBuilder.Start(&sm)
             sm.Data.MethodBuilder.Task
 
-        static member inline Run(code : ValueTaskValueOptionCode<'T, 'T>) : ValueTask<'T voption> =
+        static member inline Run(code: ValueTaskValueOptionCode<'T, 'T>) : ValueTask<'T voption> =
              if __useResumableCode then
                 __stateMachine<ValueTaskValueOptionStateMachineData<'T>, ValueTask<'T voption>>
                     (MoveNextMethodImpl<_>(fun sm ->
@@ -132,7 +132,7 @@ type ValueTaskValueOptionBuilderBase() =
              else
                 ValueTaskValueOptionBuilder.RunDynamic(code)
 
-        member inline _.Run(code : ValueTaskValueOptionCode<'T, 'T>) : ValueTask<'T voption> =
+        member inline _.Run(code: ValueTaskValueOptionCode<'T, 'T>) : ValueTask<'T voption> =
            ValueTaskValueOptionBuilder.Run(code)
 
 namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskValueOptionBuilderExtensions

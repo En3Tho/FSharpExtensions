@@ -11,7 +11,7 @@
 // Updates:
 // Copyright (c) Microsoft Corporation.  All Rights Reserved.  See License.txt in the project root for license information.
 
-#nowarn "5313"
+#nowarn "3513"
 
 namespace En3Tho.FSharp.ComputationExpressions.Tasks
 
@@ -105,7 +105,7 @@ type UnitValueTaskBuilderBase() =
             sm.Data.MethodBuilder.Start(&sm)
             sm.Data.MethodBuilder.Task
 
-        static member inline Run(code : UnitValueTaskCode<'T>) : ValueTask =
+        static member inline Run(code: UnitValueTaskCode<'T>) : ValueTask =
              if __useResumableCode then
                 __stateMachine<UnitValueTaskStateMachineData, ValueTask>
                     (MoveNextMethodImpl<_>(fun sm ->
@@ -132,7 +132,7 @@ type UnitValueTaskBuilderBase() =
              else
                 UnitValueTaskBuilder.RunDynamic(code)
 
-        member inline _.Run(code : UnitValueTaskCode<unit>) : ValueTask =
+        member inline _.Run(code: UnitValueTaskCode<unit>) : ValueTask =
            UnitValueTaskBuilder.Run(code)
 
 namespace En3Tho.FSharp.ComputationExpressions.Tasks.UnitValueTaskBuilderExtensions
@@ -263,6 +263,821 @@ module HighPriority =
         member inline this.ReturnFrom (task: ValueTask<'T>) : UnitValueTaskCode<'T> =
             this.Bind(task, (fun v -> this.Return v))
 
+        static member BindDynamic2 (sm: byref<_>, task: Task<'TResult1>, task2: Task<'TResult2>, continuation: ('TResult1 * 'TResult2 -> UnitValueTaskCode<'TResult3>)) : bool =
+            let mutable awaiter = task.GetAwaiter()
+            let mutable awaiter2 = task2.GetAwaiter()
+
+            let cont =
+                (UnitValueTaskResumptionFunc(fun sm ->
+                    let result = awaiter.GetResult()
+                    let result2 = awaiter2.GetResult()
+                    (continuation(result, result2).Invoke(&sm))))
+
+            // shortcut to continue immediately
+            if awaiter.IsCompleted && awaiter2.IsCompleted then
+                cont.Invoke(&sm)
+            else
+                let mutable taskAwaiter = TaskAwaiter7()
+                taskAwaiter.Add task
+                taskAwaiter.Add task2
+                let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                sm.ResumptionDynamicInfo.ResumptionData <- (combinedAwaiter :> ICriticalNotifyCompletion)
+                sm.ResumptionDynamicInfo.ResumptionFunc <- cont
+                false
+
+        static member BindDynamic3 (sm: byref<_>, task: Task<'TResult1>, task2: Task<'TResult2>, task3: Task<'TResult3>, continuation: ('TResult1 * 'TResult2 * 'TResult3 -> UnitValueTaskCode<'TResult4>)) : bool =
+            let mutable awaiter = task.GetAwaiter()
+            let mutable awaiter2 = task2.GetAwaiter()
+            let mutable awaiter3 = task3.GetAwaiter()
+
+            let cont =
+                (UnitValueTaskResumptionFunc(fun sm ->
+                    let result = awaiter.GetResult()
+                    let result2 = awaiter2.GetResult()
+                    let result3 = awaiter3.GetResult()
+                    (continuation(result, result2, result3).Invoke(&sm))))
+
+            // shortcut to continue immediately
+            if awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted then
+                cont.Invoke(&sm)
+            else
+                let mutable taskAwaiter = TaskAwaiter7()
+                taskAwaiter.Add task
+                taskAwaiter.Add task2
+                taskAwaiter.Add task3
+                let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                sm.ResumptionDynamicInfo.ResumptionData <- (combinedAwaiter :> ICriticalNotifyCompletion)
+                sm.ResumptionDynamicInfo.ResumptionFunc <- cont
+                false
+
+        static member BindDynamic4 (sm: byref<_>, task: Task<'TResult1>, task2: Task<'TResult2>, task3: Task<'TResult3>, task4: Task<'TResult4>, continuation: ('TResult1 * 'TResult2 * 'TResult3 * 'TResult4 -> UnitValueTaskCode<'TResult5>)) : bool =
+            let mutable awaiter = task.GetAwaiter()
+            let mutable awaiter2 = task2.GetAwaiter()
+            let mutable awaiter3 = task3.GetAwaiter()
+            let mutable awaiter4 = task4.GetAwaiter()
+
+            let cont =
+                (UnitValueTaskResumptionFunc(fun sm ->
+                    let result = awaiter.GetResult()
+                    let result2 = awaiter2.GetResult()
+                    let result3 = awaiter3.GetResult()
+                    let result4 = awaiter4.GetResult()
+                    (continuation(result, result2, result3, result4).Invoke(&sm))))
+
+            // shortcut to continue immediately
+            if awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted && awaiter4.IsCompleted then
+                cont.Invoke(&sm)
+            else
+                let mutable taskAwaiter = TaskAwaiter7()
+                taskAwaiter.Add task
+                taskAwaiter.Add task2
+                taskAwaiter.Add task3
+                taskAwaiter.Add task4
+                let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                sm.ResumptionDynamicInfo.ResumptionData <- (combinedAwaiter :> ICriticalNotifyCompletion)
+                sm.ResumptionDynamicInfo.ResumptionFunc <- cont
+                false
+
+        static member BindDynamic5 (sm: byref<_>, task: Task<'TResult1>, task2: Task<'TResult2>, task3: Task<'TResult3>, task4: Task<'TResult4>, task5: Task<'TResult5>, continuation: ('TResult1 * 'TResult2 * 'TResult3 * 'TResult4 * 'TResult5 -> UnitValueTaskCode<'TResult6>)) : bool =
+            let mutable awaiter = task.GetAwaiter()
+            let mutable awaiter2 = task2.GetAwaiter()
+            let mutable awaiter3 = task3.GetAwaiter()
+            let mutable awaiter4 = task4.GetAwaiter()
+            let mutable awaiter5 = task5.GetAwaiter()
+
+            let cont =
+                (UnitValueTaskResumptionFunc(fun sm ->
+                    let result = awaiter.GetResult()
+                    let result2 = awaiter2.GetResult()
+                    let result3 = awaiter3.GetResult()
+                    let result4 = awaiter4.GetResult()
+                    let result5 = awaiter5.GetResult()
+                    (continuation(result, result2, result3, result4, result5).Invoke(&sm))))
+
+            // shortcut to continue immediately
+            if awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted && awaiter4.IsCompleted && awaiter5.IsCompleted then
+                cont.Invoke(&sm)
+            else
+                let mutable taskAwaiter = TaskAwaiter7()
+                taskAwaiter.Add task
+                taskAwaiter.Add task2
+                taskAwaiter.Add task3
+                taskAwaiter.Add task4
+                taskAwaiter.Add task5
+                let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                sm.ResumptionDynamicInfo.ResumptionData <- (combinedAwaiter :> ICriticalNotifyCompletion)
+                sm.ResumptionDynamicInfo.ResumptionFunc <- cont
+                false
+
+        static member BindDynamic6 (sm: byref<_>, task: Task<'TResult1>, task2: Task<'TResult2>, task3: Task<'TResult3>, task4: Task<'TResult4>, task5: Task<'TResult5>, task6: Task<'TResult6>, continuation: ('TResult1 * 'TResult2 * 'TResult3 * 'TResult4 * 'TResult5 * 'TResult6 -> UnitValueTaskCode<'TResult7>)) : bool =
+            let mutable awaiter = task.GetAwaiter()
+            let mutable awaiter2 = task2.GetAwaiter()
+            let mutable awaiter3 = task3.GetAwaiter()
+            let mutable awaiter4 = task4.GetAwaiter()
+            let mutable awaiter5 = task5.GetAwaiter()
+            let mutable awaiter6 = task6.GetAwaiter()
+
+            let cont =
+                (UnitValueTaskResumptionFunc(fun sm ->
+                    let result = awaiter.GetResult()
+                    let result2 = awaiter2.GetResult()
+                    let result3 = awaiter3.GetResult()
+                    let result4 = awaiter4.GetResult()
+                    let result5 = awaiter5.GetResult()
+                    let result6 = awaiter6.GetResult()
+                    (continuation(result, result2, result3, result4, result5, result6).Invoke(&sm))))
+
+            // shortcut to continue immediately
+            if awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted && awaiter4.IsCompleted && awaiter5.IsCompleted && awaiter6.IsCompleted then
+                cont.Invoke(&sm)
+            else
+                let mutable taskAwaiter = TaskAwaiter7()
+                taskAwaiter.Add task
+                taskAwaiter.Add task2
+                taskAwaiter.Add task3
+                taskAwaiter.Add task4
+                taskAwaiter.Add task5
+                taskAwaiter.Add task6
+                let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                sm.ResumptionDynamicInfo.ResumptionData <- (combinedAwaiter :> ICriticalNotifyCompletion)
+                sm.ResumptionDynamicInfo.ResumptionFunc <- cont
+                false
+
+        static member BindDynamic7 (sm: byref<_>, task: Task<'TResult1>, task2: Task<'TResult2>, task3: Task<'TResult3>, task4: Task<'TResult4>, task5: Task<'TResult5>, task6: Task<'TResult6>, task7: Task<'TResult7>, continuation: ('TResult1 * 'TResult2 * 'TResult3 * 'TResult4 * 'TResult5 * 'TResult6 * 'TResult7 -> UnitValueTaskCode<'TResult8>)) : bool =
+            let mutable awaiter = task.GetAwaiter()
+            let mutable awaiter2 = task2.GetAwaiter()
+            let mutable awaiter3 = task3.GetAwaiter()
+            let mutable awaiter4 = task4.GetAwaiter()
+            let mutable awaiter5 = task5.GetAwaiter()
+            let mutable awaiter6 = task6.GetAwaiter()
+            let mutable awaiter7 = task7.GetAwaiter()
+
+            let cont =
+                (UnitValueTaskResumptionFunc(fun sm ->
+                    let result = awaiter.GetResult()
+                    let result2 = awaiter2.GetResult()
+                    let result3 = awaiter3.GetResult()
+                    let result4 = awaiter4.GetResult()
+                    let result5 = awaiter5.GetResult()
+                    let result6 = awaiter6.GetResult()
+                    let result7 = awaiter7.GetResult()
+                    (continuation(result, result2, result3, result4, result5, result6, result7).Invoke(&sm))))
+
+            // shortcut to continue immediately
+            if awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted && awaiter4.IsCompleted && awaiter5.IsCompleted && awaiter6.IsCompleted && awaiter7.IsCompleted then
+                cont.Invoke(&sm)
+            else
+                let mutable taskAwaiter = TaskAwaiter7()
+                taskAwaiter.Add task
+                taskAwaiter.Add task2
+                taskAwaiter.Add task3
+                taskAwaiter.Add task4
+                taskAwaiter.Add task5
+                taskAwaiter.Add task6
+                taskAwaiter.Add task7
+                let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                sm.ResumptionDynamicInfo.ResumptionData <- (combinedAwaiter :> ICriticalNotifyCompletion)
+                sm.ResumptionDynamicInfo.ResumptionFunc <- cont
+                false
+
+        static member BindDynamic2 (sm: byref<_>, task: ValueTask<'TResult1>, task2: ValueTask<'TResult2>, continuation: ('TResult1 * 'TResult2 -> UnitValueTaskCode<'TResult3>)) : bool =
+            let mutable awaiter = task.GetAwaiter()
+            let mutable awaiter2 = task2.GetAwaiter()
+
+            let cont =
+                (UnitValueTaskResumptionFunc(fun sm ->
+                    let result = awaiter.GetResult()
+                    let result2 = awaiter2.GetResult()
+                    (continuation(result, result2).Invoke(&sm))))
+
+            // shortcut to continue immediately
+            if awaiter.IsCompleted && awaiter2.IsCompleted then
+                cont.Invoke(&sm)
+            else
+                let mutable taskAwaiter = TaskAwaiter7()
+                taskAwaiter.Add task
+                taskAwaiter.Add task2
+                let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                sm.ResumptionDynamicInfo.ResumptionData <- (combinedAwaiter :> ICriticalNotifyCompletion)
+                sm.ResumptionDynamicInfo.ResumptionFunc <- cont
+                false
+
+        static member BindDynamic3 (sm: byref<_>, task: ValueTask<'TResult1>, task2: ValueTask<'TResult2>, task3: ValueTask<'TResult3>, continuation: ('TResult1 * 'TResult2 * 'TResult3 -> UnitValueTaskCode<'TResult4>)) : bool =
+            let mutable awaiter = task.GetAwaiter()
+            let mutable awaiter2 = task2.GetAwaiter()
+            let mutable awaiter3 = task3.GetAwaiter()
+
+            let cont =
+                (UnitValueTaskResumptionFunc(fun sm ->
+                    let result = awaiter.GetResult()
+                    let result2 = awaiter2.GetResult()
+                    let result3 = awaiter3.GetResult()
+                    (continuation(result, result2, result3).Invoke(&sm))))
+
+            // shortcut to continue immediately
+            if awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted then
+                cont.Invoke(&sm)
+            else
+                let mutable taskAwaiter = TaskAwaiter7()
+                taskAwaiter.Add task
+                taskAwaiter.Add task2
+                taskAwaiter.Add task3
+                let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                sm.ResumptionDynamicInfo.ResumptionData <- (combinedAwaiter :> ICriticalNotifyCompletion)
+                sm.ResumptionDynamicInfo.ResumptionFunc <- cont
+                false
+
+        static member BindDynamic4 (sm: byref<_>, task: ValueTask<'TResult1>, task2: ValueTask<'TResult2>, task3: ValueTask<'TResult3>, task4: ValueTask<'TResult4>, continuation: ('TResult1 * 'TResult2 * 'TResult3 * 'TResult4 -> UnitValueTaskCode<'TResult5>)) : bool =
+            let mutable awaiter = task.GetAwaiter()
+            let mutable awaiter2 = task2.GetAwaiter()
+            let mutable awaiter3 = task3.GetAwaiter()
+            let mutable awaiter4 = task4.GetAwaiter()
+
+            let cont =
+                (UnitValueTaskResumptionFunc(fun sm ->
+                    let result = awaiter.GetResult()
+                    let result2 = awaiter2.GetResult()
+                    let result3 = awaiter3.GetResult()
+                    let result4 = awaiter4.GetResult()
+                    (continuation(result, result2, result3, result4).Invoke(&sm))))
+
+            // shortcut to continue immediately
+            if awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted && awaiter4.IsCompleted then
+                cont.Invoke(&sm)
+            else
+                let mutable taskAwaiter = TaskAwaiter7()
+                taskAwaiter.Add task
+                taskAwaiter.Add task2
+                taskAwaiter.Add task3
+                taskAwaiter.Add task4
+                let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                sm.ResumptionDynamicInfo.ResumptionData <- (combinedAwaiter :> ICriticalNotifyCompletion)
+                sm.ResumptionDynamicInfo.ResumptionFunc <- cont
+                false
+
+        static member BindDynamic5 (sm: byref<_>, task: ValueTask<'TResult1>, task2: ValueTask<'TResult2>, task3: ValueTask<'TResult3>, task4: ValueTask<'TResult4>, task5: ValueTask<'TResult5>, continuation: ('TResult1 * 'TResult2 * 'TResult3 * 'TResult4 * 'TResult5 -> UnitValueTaskCode<'TResult6>)) : bool =
+            let mutable awaiter = task.GetAwaiter()
+            let mutable awaiter2 = task2.GetAwaiter()
+            let mutable awaiter3 = task3.GetAwaiter()
+            let mutable awaiter4 = task4.GetAwaiter()
+            let mutable awaiter5 = task5.GetAwaiter()
+
+            let cont =
+                (UnitValueTaskResumptionFunc(fun sm ->
+                    let result = awaiter.GetResult()
+                    let result2 = awaiter2.GetResult()
+                    let result3 = awaiter3.GetResult()
+                    let result4 = awaiter4.GetResult()
+                    let result5 = awaiter5.GetResult()
+                    (continuation(result, result2, result3, result4, result5).Invoke(&sm))))
+
+            // shortcut to continue immediately
+            if awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted && awaiter4.IsCompleted && awaiter5.IsCompleted then
+                cont.Invoke(&sm)
+            else
+                let mutable taskAwaiter = TaskAwaiter7()
+                taskAwaiter.Add task
+                taskAwaiter.Add task2
+                taskAwaiter.Add task3
+                taskAwaiter.Add task4
+                taskAwaiter.Add task5
+                let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                sm.ResumptionDynamicInfo.ResumptionData <- (combinedAwaiter :> ICriticalNotifyCompletion)
+                sm.ResumptionDynamicInfo.ResumptionFunc <- cont
+                false
+
+        static member BindDynamic6 (sm: byref<_>, task: ValueTask<'TResult1>, task2: ValueTask<'TResult2>, task3: ValueTask<'TResult3>, task4: ValueTask<'TResult4>, task5: ValueTask<'TResult5>, task6: ValueTask<'TResult6>, continuation: ('TResult1 * 'TResult2 * 'TResult3 * 'TResult4 * 'TResult5 * 'TResult6 -> UnitValueTaskCode<'TResult7>)) : bool =
+            let mutable awaiter = task.GetAwaiter()
+            let mutable awaiter2 = task2.GetAwaiter()
+            let mutable awaiter3 = task3.GetAwaiter()
+            let mutable awaiter4 = task4.GetAwaiter()
+            let mutable awaiter5 = task5.GetAwaiter()
+            let mutable awaiter6 = task6.GetAwaiter()
+
+            let cont =
+                (UnitValueTaskResumptionFunc(fun sm ->
+                    let result = awaiter.GetResult()
+                    let result2 = awaiter2.GetResult()
+                    let result3 = awaiter3.GetResult()
+                    let result4 = awaiter4.GetResult()
+                    let result5 = awaiter5.GetResult()
+                    let result6 = awaiter6.GetResult()
+                    (continuation(result, result2, result3, result4, result5, result6).Invoke(&sm))))
+
+            // shortcut to continue immediately
+            if awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted && awaiter4.IsCompleted && awaiter5.IsCompleted && awaiter6.IsCompleted then
+                cont.Invoke(&sm)
+            else
+                let mutable taskAwaiter = TaskAwaiter7()
+                taskAwaiter.Add task
+                taskAwaiter.Add task2
+                taskAwaiter.Add task3
+                taskAwaiter.Add task4
+                taskAwaiter.Add task5
+                taskAwaiter.Add task6
+                let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                sm.ResumptionDynamicInfo.ResumptionData <- (combinedAwaiter :> ICriticalNotifyCompletion)
+                sm.ResumptionDynamicInfo.ResumptionFunc <- cont
+                false
+
+        static member BindDynamic7 (sm: byref<_>, task: ValueTask<'TResult1>, task2: ValueTask<'TResult2>, task3: ValueTask<'TResult3>, task4: ValueTask<'TResult4>, task5: ValueTask<'TResult5>, task6: ValueTask<'TResult6>, task7: ValueTask<'TResult7>, continuation: ('TResult1 * 'TResult2 * 'TResult3 * 'TResult4 * 'TResult5 * 'TResult6 * 'TResult7 -> UnitValueTaskCode<'TResult8>)) : bool =
+            let mutable awaiter = task.GetAwaiter()
+            let mutable awaiter2 = task2.GetAwaiter()
+            let mutable awaiter3 = task3.GetAwaiter()
+            let mutable awaiter4 = task4.GetAwaiter()
+            let mutable awaiter5 = task5.GetAwaiter()
+            let mutable awaiter6 = task6.GetAwaiter()
+            let mutable awaiter7 = task7.GetAwaiter()
+
+            let cont =
+                (UnitValueTaskResumptionFunc(fun sm ->
+                    let result = awaiter.GetResult()
+                    let result2 = awaiter2.GetResult()
+                    let result3 = awaiter3.GetResult()
+                    let result4 = awaiter4.GetResult()
+                    let result5 = awaiter5.GetResult()
+                    let result6 = awaiter6.GetResult()
+                    let result7 = awaiter7.GetResult()
+                    (continuation(result, result2, result3, result4, result5, result6, result7).Invoke(&sm))))
+
+            // shortcut to continue immediately
+            if awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted && awaiter4.IsCompleted && awaiter5.IsCompleted && awaiter6.IsCompleted && awaiter7.IsCompleted then
+                cont.Invoke(&sm)
+            else
+                let mutable taskAwaiter = TaskAwaiter7()
+                taskAwaiter.Add task
+                taskAwaiter.Add task2
+                taskAwaiter.Add task3
+                taskAwaiter.Add task4
+                taskAwaiter.Add task5
+                taskAwaiter.Add task6
+                taskAwaiter.Add task7
+                let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                sm.ResumptionDynamicInfo.ResumptionData <- (combinedAwaiter :> ICriticalNotifyCompletion)
+                sm.ResumptionDynamicInfo.ResumptionFunc <- cont
+                false
+
+        member inline _.Bind2 (task: Task<'TResult1>, task2: Task<'TResult2>, continuation: ('TResult1 * 'TResult2 -> UnitValueTaskCode<'TResult3>)) : UnitValueTaskCode<'TResult3> =
+
+            UnitValueTaskCode<_>(fun sm ->
+                if __useResumableCode then
+                    //-- RESUMABLE CODE START
+                    // Get an awaiter from the task
+                    let mutable awaiter = task.GetAwaiter()
+                    let mutable awaiter2 = task2.GetAwaiter()
+
+                    let mutable __stack_fin = true
+                    if not (awaiter.IsCompleted && awaiter2.IsCompleted) then
+                        // This will yield with __stack_yield_fin = false
+                        // This will resume with __stack_yield_fin = true
+                        let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
+                        __stack_fin <- __stack_yield_fin
+                    if __stack_fin then
+                        let result = awaiter.GetResult()
+                        let result2 = awaiter2.GetResult()
+                        (continuation(result, result2).Invoke(&sm))
+                    else
+                        let mutable taskAwaiter = TaskAwaiter7()
+                        taskAwaiter.Add task
+                        taskAwaiter.Add task2
+                        let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                        sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&combinedAwaiter, &sm)
+                        false
+                else
+                    UnitValueTaskBuilderBase.BindDynamic2(&sm, task, task2, continuation)
+                //-- RESUMABLE CODE END
+            )
+
+        member inline _.Bind3 (task: Task<'TResult1>, task2: Task<'TResult2>, task3: Task<'TResult3>, continuation: ('TResult1 * 'TResult2 * 'TResult3 -> UnitValueTaskCode<'TResult4>)) : UnitValueTaskCode<'TResult4> =
+
+            UnitValueTaskCode<_>(fun sm ->
+                if __useResumableCode then
+                    //-- RESUMABLE CODE START
+                    // Get an awaiter from the task
+                    let mutable awaiter = task.GetAwaiter()
+                    let mutable awaiter2 = task2.GetAwaiter()
+                    let mutable awaiter3 = task3.GetAwaiter()
+
+                    let mutable __stack_fin = true
+                    if not (awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted) then
+                        // This will yield with __stack_yield_fin = false
+                        // This will resume with __stack_yield_fin = true
+                        let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
+                        __stack_fin <- __stack_yield_fin
+                    if __stack_fin then
+                        let result = awaiter.GetResult()
+                        let result2 = awaiter2.GetResult()
+                        let result3 = awaiter3.GetResult()
+                        (continuation(result, result2, result3).Invoke(&sm))
+                    else
+                        let mutable taskAwaiter = TaskAwaiter7()
+                        taskAwaiter.Add task
+                        taskAwaiter.Add task2
+                        taskAwaiter.Add task3
+                        let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                        sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&combinedAwaiter, &sm)
+                        false
+                else
+                    UnitValueTaskBuilderBase.BindDynamic3(&sm, task, task2, task3, continuation)
+                //-- RESUMABLE CODE END
+            )
+
+        member inline _.Bind4 (task: Task<'TResult1>, task2: Task<'TResult2>, task3: Task<'TResult3>, task4: Task<'TResult4>, continuation: ('TResult1 * 'TResult2 * 'TResult3 * 'TResult4 -> UnitValueTaskCode<'TResult5>)) : UnitValueTaskCode<'TResult5> =
+
+            UnitValueTaskCode<_>(fun sm ->
+                if __useResumableCode then
+                    //-- RESUMABLE CODE START
+                    // Get an awaiter from the task
+                    let mutable awaiter = task.GetAwaiter()
+                    let mutable awaiter2 = task2.GetAwaiter()
+                    let mutable awaiter3 = task3.GetAwaiter()
+                    let mutable awaiter4 = task4.GetAwaiter()
+
+                    let mutable __stack_fin = true
+                    if not (awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted && awaiter4.IsCompleted) then
+                        // This will yield with __stack_yield_fin = false
+                        // This will resume with __stack_yield_fin = true
+                        let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
+                        __stack_fin <- __stack_yield_fin
+                    if __stack_fin then
+                        let result = awaiter.GetResult()
+                        let result2 = awaiter2.GetResult()
+                        let result3 = awaiter3.GetResult()
+                        let result4 = awaiter4.GetResult()
+                        (continuation(result, result2, result3, result4).Invoke(&sm))
+                    else
+                        let mutable taskAwaiter = TaskAwaiter7()
+                        taskAwaiter.Add task
+                        taskAwaiter.Add task2
+                        taskAwaiter.Add task3
+                        taskAwaiter.Add task4
+                        let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                        sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&combinedAwaiter, &sm)
+                        false
+                else
+                    UnitValueTaskBuilderBase.BindDynamic4(&sm, task, task2, task3, task4, continuation)
+                //-- RESUMABLE CODE END
+            )
+
+        member inline _.Bind5 (task: Task<'TResult1>, task2: Task<'TResult2>, task3: Task<'TResult3>, task4: Task<'TResult4>, task5: Task<'TResult5>, continuation: ('TResult1 * 'TResult2 * 'TResult3 * 'TResult4 * 'TResult5 -> UnitValueTaskCode<'TResult6>)) : UnitValueTaskCode<'TResult6> =
+
+            UnitValueTaskCode<_>(fun sm ->
+                if __useResumableCode then
+                    //-- RESUMABLE CODE START
+                    // Get an awaiter from the task
+                    let mutable awaiter = task.GetAwaiter()
+                    let mutable awaiter2 = task2.GetAwaiter()
+                    let mutable awaiter3 = task3.GetAwaiter()
+                    let mutable awaiter4 = task4.GetAwaiter()
+                    let mutable awaiter5 = task5.GetAwaiter()
+
+                    let mutable __stack_fin = true
+                    if not (awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted && awaiter4.IsCompleted && awaiter5.IsCompleted) then
+                        // This will yield with __stack_yield_fin = false
+                        // This will resume with __stack_yield_fin = true
+                        let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
+                        __stack_fin <- __stack_yield_fin
+                    if __stack_fin then
+                        let result = awaiter.GetResult()
+                        let result2 = awaiter2.GetResult()
+                        let result3 = awaiter3.GetResult()
+                        let result4 = awaiter4.GetResult()
+                        let result5 = awaiter5.GetResult()
+                        (continuation(result, result2, result3, result4, result5).Invoke(&sm))
+                    else
+                        let mutable taskAwaiter = TaskAwaiter7()
+                        taskAwaiter.Add task
+                        taskAwaiter.Add task2
+                        taskAwaiter.Add task3
+                        taskAwaiter.Add task4
+                        taskAwaiter.Add task5
+                        let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                        sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&combinedAwaiter, &sm)
+                        false
+                else
+                    UnitValueTaskBuilderBase.BindDynamic5(&sm, task, task2, task3, task4, task5, continuation)
+                //-- RESUMABLE CODE END
+            )
+
+        member inline _.Bind6 (task: Task<'TResult1>, task2: Task<'TResult2>, task3: Task<'TResult3>, task4: Task<'TResult4>, task5: Task<'TResult5>, task6: Task<'TResult6>, continuation: ('TResult1 * 'TResult2 * 'TResult3 * 'TResult4 * 'TResult5 * 'TResult6 -> UnitValueTaskCode<'TResult7>)) : UnitValueTaskCode<'TResult7> =
+
+            UnitValueTaskCode<_>(fun sm ->
+                if __useResumableCode then
+                    //-- RESUMABLE CODE START
+                    // Get an awaiter from the task
+                    let mutable awaiter = task.GetAwaiter()
+                    let mutable awaiter2 = task2.GetAwaiter()
+                    let mutable awaiter3 = task3.GetAwaiter()
+                    let mutable awaiter4 = task4.GetAwaiter()
+                    let mutable awaiter5 = task5.GetAwaiter()
+                    let mutable awaiter6 = task6.GetAwaiter()
+
+                    let mutable __stack_fin = true
+                    if not (awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted && awaiter4.IsCompleted && awaiter5.IsCompleted && awaiter6.IsCompleted) then
+                        // This will yield with __stack_yield_fin = false
+                        // This will resume with __stack_yield_fin = true
+                        let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
+                        __stack_fin <- __stack_yield_fin
+                    if __stack_fin then
+                        let result = awaiter.GetResult()
+                        let result2 = awaiter2.GetResult()
+                        let result3 = awaiter3.GetResult()
+                        let result4 = awaiter4.GetResult()
+                        let result5 = awaiter5.GetResult()
+                        let result6 = awaiter6.GetResult()
+                        (continuation(result, result2, result3, result4, result5, result6).Invoke(&sm))
+                    else
+                        let mutable taskAwaiter = TaskAwaiter7()
+                        taskAwaiter.Add task
+                        taskAwaiter.Add task2
+                        taskAwaiter.Add task3
+                        taskAwaiter.Add task4
+                        taskAwaiter.Add task5
+                        taskAwaiter.Add task6
+                        let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                        sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&combinedAwaiter, &sm)
+                        false
+                else
+                    UnitValueTaskBuilderBase.BindDynamic6(&sm, task, task2, task3, task4, task5, task6, continuation)
+                //-- RESUMABLE CODE END
+            )
+
+        member inline _.Bind7 (task: Task<'TResult1>, task2: Task<'TResult2>, task3: Task<'TResult3>, task4: Task<'TResult4>, task5: Task<'TResult5>, task6: Task<'TResult6>, task7: Task<'TResult7>, continuation: ('TResult1 * 'TResult2 * 'TResult3 * 'TResult4 * 'TResult5 * 'TResult6 * 'TResult7 -> UnitValueTaskCode<'TResult8>)) : UnitValueTaskCode<'TResult8> =
+
+            UnitValueTaskCode<_>(fun sm ->
+                if __useResumableCode then
+                    //-- RESUMABLE CODE START
+                    // Get an awaiter from the task
+                    let mutable awaiter = task.GetAwaiter()
+                    let mutable awaiter2 = task2.GetAwaiter()
+                    let mutable awaiter3 = task3.GetAwaiter()
+                    let mutable awaiter4 = task4.GetAwaiter()
+                    let mutable awaiter5 = task5.GetAwaiter()
+                    let mutable awaiter6 = task6.GetAwaiter()
+                    let mutable awaiter7 = task7.GetAwaiter()
+
+                    let mutable __stack_fin = true
+                    if not (awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted && awaiter4.IsCompleted && awaiter5.IsCompleted && awaiter6.IsCompleted && awaiter7.IsCompleted) then
+                        // This will yield with __stack_yield_fin = false
+                        // This will resume with __stack_yield_fin = true
+                        let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
+                        __stack_fin <- __stack_yield_fin
+                    if __stack_fin then
+                        let result = awaiter.GetResult()
+                        let result2 = awaiter2.GetResult()
+                        let result3 = awaiter3.GetResult()
+                        let result4 = awaiter4.GetResult()
+                        let result5 = awaiter5.GetResult()
+                        let result6 = awaiter6.GetResult()
+                        let result7 = awaiter7.GetResult()
+                        (continuation(result, result2, result3, result4, result5, result6, result7).Invoke(&sm))
+                    else
+                        let mutable taskAwaiter = TaskAwaiter7()
+                        taskAwaiter.Add task
+                        taskAwaiter.Add task2
+                        taskAwaiter.Add task3
+                        taskAwaiter.Add task4
+                        taskAwaiter.Add task5
+                        taskAwaiter.Add task6
+                        taskAwaiter.Add task7
+                        let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                        sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&combinedAwaiter, &sm)
+                        false
+                else
+                    UnitValueTaskBuilderBase.BindDynamic7(&sm, task, task2, task3, task4, task5, task6, task7, continuation)
+                //-- RESUMABLE CODE END
+            )
+
+        member inline _.Bind2 (task: ValueTask<'TResult1>, task2: ValueTask<'TResult2>, continuation: ('TResult1 * 'TResult2 -> UnitValueTaskCode<'TResult3>)) : UnitValueTaskCode<'TResult3> =
+
+            UnitValueTaskCode<_>(fun sm ->
+                if __useResumableCode then
+                    //-- RESUMABLE CODE START
+                    // Get an awaiter from the task
+                    let mutable awaiter = task.GetAwaiter()
+                    let mutable awaiter2 = task2.GetAwaiter()
+
+                    let mutable __stack_fin = true
+                    if not (awaiter.IsCompleted && awaiter2.IsCompleted) then
+                        // This will yield with __stack_yield_fin = false
+                        // This will resume with __stack_yield_fin = true
+                        let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
+                        __stack_fin <- __stack_yield_fin
+                    if __stack_fin then
+                        let result = awaiter.GetResult()
+                        let result2 = awaiter2.GetResult()
+                        (continuation(result, result2).Invoke(&sm))
+                    else
+                        let mutable taskAwaiter = TaskAwaiter7()
+                        taskAwaiter.Add task
+                        taskAwaiter.Add task2
+                        let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                        sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&combinedAwaiter, &sm)
+                        false
+                else
+                    UnitValueTaskBuilderBase.BindDynamic2(&sm, task, task2, continuation)
+                //-- RESUMABLE CODE END
+            )
+
+        member inline _.Bind3 (task: ValueTask<'TResult1>, task2: ValueTask<'TResult2>, task3: ValueTask<'TResult3>, continuation: ('TResult1 * 'TResult2 * 'TResult3 -> UnitValueTaskCode<'TResult4>)) : UnitValueTaskCode<'TResult4> =
+
+            UnitValueTaskCode<_>(fun sm ->
+                if __useResumableCode then
+                    //-- RESUMABLE CODE START
+                    // Get an awaiter from the task
+                    let mutable awaiter = task.GetAwaiter()
+                    let mutable awaiter2 = task2.GetAwaiter()
+                    let mutable awaiter3 = task3.GetAwaiter()
+
+                    let mutable __stack_fin = true
+                    if not (awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted) then
+                        // This will yield with __stack_yield_fin = false
+                        // This will resume with __stack_yield_fin = true
+                        let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
+                        __stack_fin <- __stack_yield_fin
+                    if __stack_fin then
+                        let result = awaiter.GetResult()
+                        let result2 = awaiter2.GetResult()
+                        let result3 = awaiter3.GetResult()
+                        (continuation(result, result2, result3).Invoke(&sm))
+                    else
+                        let mutable taskAwaiter = TaskAwaiter7()
+                        taskAwaiter.Add task
+                        taskAwaiter.Add task2
+                        taskAwaiter.Add task3
+                        let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                        sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&combinedAwaiter, &sm)
+                        false
+                else
+                    UnitValueTaskBuilderBase.BindDynamic3(&sm, task, task2, task3, continuation)
+                //-- RESUMABLE CODE END
+            )
+
+        member inline _.Bind4 (task: ValueTask<'TResult1>, task2: ValueTask<'TResult2>, task3: ValueTask<'TResult3>, task4: ValueTask<'TResult4>, continuation: ('TResult1 * 'TResult2 * 'TResult3 * 'TResult4 -> UnitValueTaskCode<'TResult5>)) : UnitValueTaskCode<'TResult5> =
+
+            UnitValueTaskCode<_>(fun sm ->
+                if __useResumableCode then
+                    //-- RESUMABLE CODE START
+                    // Get an awaiter from the task
+                    let mutable awaiter = task.GetAwaiter()
+                    let mutable awaiter2 = task2.GetAwaiter()
+                    let mutable awaiter3 = task3.GetAwaiter()
+                    let mutable awaiter4 = task4.GetAwaiter()
+
+                    let mutable __stack_fin = true
+                    if not (awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted && awaiter4.IsCompleted) then
+                        // This will yield with __stack_yield_fin = false
+                        // This will resume with __stack_yield_fin = true
+                        let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
+                        __stack_fin <- __stack_yield_fin
+                    if __stack_fin then
+                        let result = awaiter.GetResult()
+                        let result2 = awaiter2.GetResult()
+                        let result3 = awaiter3.GetResult()
+                        let result4 = awaiter4.GetResult()
+                        (continuation(result, result2, result3, result4).Invoke(&sm))
+                    else
+                        let mutable taskAwaiter = TaskAwaiter7()
+                        taskAwaiter.Add task
+                        taskAwaiter.Add task2
+                        taskAwaiter.Add task3
+                        taskAwaiter.Add task4
+                        let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                        sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&combinedAwaiter, &sm)
+                        false
+                else
+                    UnitValueTaskBuilderBase.BindDynamic4(&sm, task, task2, task3, task4, continuation)
+                //-- RESUMABLE CODE END
+            )
+
+        member inline _.Bind5 (task: ValueTask<'TResult1>, task2: ValueTask<'TResult2>, task3: ValueTask<'TResult3>, task4: ValueTask<'TResult4>, task5: ValueTask<'TResult5>, continuation: ('TResult1 * 'TResult2 * 'TResult3 * 'TResult4 * 'TResult5 -> UnitValueTaskCode<'TResult6>)) : UnitValueTaskCode<'TResult6> =
+
+            UnitValueTaskCode<_>(fun sm ->
+                if __useResumableCode then
+                    //-- RESUMABLE CODE START
+                    // Get an awaiter from the task
+                    let mutable awaiter = task.GetAwaiter()
+                    let mutable awaiter2 = task2.GetAwaiter()
+                    let mutable awaiter3 = task3.GetAwaiter()
+                    let mutable awaiter4 = task4.GetAwaiter()
+                    let mutable awaiter5 = task5.GetAwaiter()
+
+                    let mutable __stack_fin = true
+                    if not (awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted && awaiter4.IsCompleted && awaiter5.IsCompleted) then
+                        // This will yield with __stack_yield_fin = false
+                        // This will resume with __stack_yield_fin = true
+                        let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
+                        __stack_fin <- __stack_yield_fin
+                    if __stack_fin then
+                        let result = awaiter.GetResult()
+                        let result2 = awaiter2.GetResult()
+                        let result3 = awaiter3.GetResult()
+                        let result4 = awaiter4.GetResult()
+                        let result5 = awaiter5.GetResult()
+                        (continuation(result, result2, result3, result4, result5).Invoke(&sm))
+                    else
+                        let mutable taskAwaiter = TaskAwaiter7()
+                        taskAwaiter.Add task
+                        taskAwaiter.Add task2
+                        taskAwaiter.Add task3
+                        taskAwaiter.Add task4
+                        taskAwaiter.Add task5
+                        let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                        sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&combinedAwaiter, &sm)
+                        false
+                else
+                    UnitValueTaskBuilderBase.BindDynamic5(&sm, task, task2, task3, task4, task5, continuation)
+                //-- RESUMABLE CODE END
+            )
+
+        member inline _.Bind6 (task: ValueTask<'TResult1>, task2: ValueTask<'TResult2>, task3: ValueTask<'TResult3>, task4: ValueTask<'TResult4>, task5: ValueTask<'TResult5>, task6: ValueTask<'TResult6>, continuation: ('TResult1 * 'TResult2 * 'TResult3 * 'TResult4 * 'TResult5 * 'TResult6 -> UnitValueTaskCode<'TResult7>)) : UnitValueTaskCode<'TResult7> =
+
+            UnitValueTaskCode<_>(fun sm ->
+                if __useResumableCode then
+                    //-- RESUMABLE CODE START
+                    // Get an awaiter from the task
+                    let mutable awaiter = task.GetAwaiter()
+                    let mutable awaiter2 = task2.GetAwaiter()
+                    let mutable awaiter3 = task3.GetAwaiter()
+                    let mutable awaiter4 = task4.GetAwaiter()
+                    let mutable awaiter5 = task5.GetAwaiter()
+                    let mutable awaiter6 = task6.GetAwaiter()
+
+                    let mutable __stack_fin = true
+                    if not (awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted && awaiter4.IsCompleted && awaiter5.IsCompleted && awaiter6.IsCompleted) then
+                        // This will yield with __stack_yield_fin = false
+                        // This will resume with __stack_yield_fin = true
+                        let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
+                        __stack_fin <- __stack_yield_fin
+                    if __stack_fin then
+                        let result = awaiter.GetResult()
+                        let result2 = awaiter2.GetResult()
+                        let result3 = awaiter3.GetResult()
+                        let result4 = awaiter4.GetResult()
+                        let result5 = awaiter5.GetResult()
+                        let result6 = awaiter6.GetResult()
+                        (continuation(result, result2, result3, result4, result5, result6).Invoke(&sm))
+                    else
+                        let mutable taskAwaiter = TaskAwaiter7()
+                        taskAwaiter.Add task
+                        taskAwaiter.Add task2
+                        taskAwaiter.Add task3
+                        taskAwaiter.Add task4
+                        taskAwaiter.Add task5
+                        taskAwaiter.Add task6
+                        let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                        sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&combinedAwaiter, &sm)
+                        false
+                else
+                    UnitValueTaskBuilderBase.BindDynamic6(&sm, task, task2, task3, task4, task5, task6, continuation)
+                //-- RESUMABLE CODE END
+            )
+
+        member inline _.Bind7 (task: ValueTask<'TResult1>, task2: ValueTask<'TResult2>, task3: ValueTask<'TResult3>, task4: ValueTask<'TResult4>, task5: ValueTask<'TResult5>, task6: ValueTask<'TResult6>, task7: ValueTask<'TResult7>, continuation: ('TResult1 * 'TResult2 * 'TResult3 * 'TResult4 * 'TResult5 * 'TResult6 * 'TResult7 -> UnitValueTaskCode<'TResult8>)) : UnitValueTaskCode<'TResult8> =
+
+            UnitValueTaskCode<_>(fun sm ->
+                if __useResumableCode then
+                    //-- RESUMABLE CODE START
+                    // Get an awaiter from the task
+                    let mutable awaiter = task.GetAwaiter()
+                    let mutable awaiter2 = task2.GetAwaiter()
+                    let mutable awaiter3 = task3.GetAwaiter()
+                    let mutable awaiter4 = task4.GetAwaiter()
+                    let mutable awaiter5 = task5.GetAwaiter()
+                    let mutable awaiter6 = task6.GetAwaiter()
+                    let mutable awaiter7 = task7.GetAwaiter()
+
+                    let mutable __stack_fin = true
+                    if not (awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted && awaiter4.IsCompleted && awaiter5.IsCompleted && awaiter6.IsCompleted && awaiter7.IsCompleted) then
+                        // This will yield with __stack_yield_fin = false
+                        // This will resume with __stack_yield_fin = true
+                        let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
+                        __stack_fin <- __stack_yield_fin
+                    if __stack_fin then
+                        let result = awaiter.GetResult()
+                        let result2 = awaiter2.GetResult()
+                        let result3 = awaiter3.GetResult()
+                        let result4 = awaiter4.GetResult()
+                        let result5 = awaiter5.GetResult()
+                        let result6 = awaiter6.GetResult()
+                        let result7 = awaiter7.GetResult()
+                        (continuation(result, result2, result3, result4, result5, result6, result7).Invoke(&sm))
+                    else
+                        let mutable taskAwaiter = TaskAwaiter7()
+                        taskAwaiter.Add task
+                        taskAwaiter.Add task2
+                        taskAwaiter.Add task3
+                        taskAwaiter.Add task4
+                        taskAwaiter.Add task5
+                        taskAwaiter.Add task6
+                        taskAwaiter.Add task7
+                        let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                        sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&combinedAwaiter, &sm)
+                        false
+                else
+                    UnitValueTaskBuilderBase.BindDynamic7(&sm, task, task2, task3, task4, task5, task6, task7, continuation)
+                //-- RESUMABLE CODE END
+            )
 module MediumPriority =
     open HighPriority
 
@@ -270,6 +1085,24 @@ module MediumPriority =
     type UnitValueTaskBuilderBase with
         member inline this.Bind (computation: Async<'TResult1>, continuation: ('TResult1 -> UnitValueTaskCode<'TResult2>)) : UnitValueTaskCode<'TResult2> =
             this.Bind (Async.StartAsTask computation, continuation)
+            
+        member inline this.Bind2 (computation: Async<'TResult1>, computation2: Async<'TResult2>, continuation: ('TResult1 * 'TResult2 -> UnitValueTaskCode<'TResult3>)) : UnitValueTaskCode<'TResult3> =
+            this.Bind2 (Async.StartAsTask computation, Async.StartAsTask computation2, continuation)
+
+        member inline this.Bind3 (computation: Async<'TResult1>, computation2: Async<'TResult2>, computation3: Async<'TResult3>, continuation: ('TResult1 * 'TResult2 * 'TResult3 -> UnitValueTaskCode<'TResult4>)) : UnitValueTaskCode<'TResult4> =
+            this.Bind3 (Async.StartAsTask computation, Async.StartAsTask computation2, Async.StartAsTask computation3, continuation)
+
+        member inline this.Bind4 (computation: Async<'TResult1>, computation2: Async<'TResult2>, computation3: Async<'TResult3>, computation4: Async<'TResult4>, continuation: ('TResult1 * 'TResult2 * 'TResult3 * 'TResult4 -> UnitValueTaskCode<'TResult5>)) : UnitValueTaskCode<'TResult5> =
+            this.Bind4 (Async.StartAsTask computation, Async.StartAsTask computation2, Async.StartAsTask computation3, Async.StartAsTask computation4, continuation)
+
+        member inline this.Bind5 (computation: Async<'TResult1>, computation2: Async<'TResult2>, computation3: Async<'TResult3>, computation4: Async<'TResult4>, computation5: Async<'TResult5>, continuation: ('TResult1 * 'TResult2 * 'TResult3 * 'TResult4 * 'TResult5 -> UnitValueTaskCode<'TResult6>)) : UnitValueTaskCode<'TResult6> =
+            this.Bind5 (Async.StartAsTask computation, Async.StartAsTask computation2, Async.StartAsTask computation3, Async.StartAsTask computation4, Async.StartAsTask computation5, continuation)
+
+        member inline this.Bind6 (computation: Async<'TResult1>, computation2: Async<'TResult2>, computation3: Async<'TResult3>, computation4: Async<'TResult4>, computation5: Async<'TResult5>, computation6: Async<'TResult6>, continuation: ('TResult1 * 'TResult2 * 'TResult3 * 'TResult4 * 'TResult5 * 'TResult6 -> UnitValueTaskCode<'TResult7>)) : UnitValueTaskCode<'TResult7> =
+            this.Bind6 (Async.StartAsTask computation, Async.StartAsTask computation2, Async.StartAsTask computation3, Async.StartAsTask computation4, Async.StartAsTask computation5, Async.StartAsTask computation6, continuation)
+
+        member inline this.Bind7 (computation: Async<'TResult1>, computation2: Async<'TResult2>, computation3: Async<'TResult3>, computation4: Async<'TResult4>, computation5: Async<'TResult5>, computation6: Async<'TResult6>, computation7: Async<'TResult7>, continuation: ('TResult1 * 'TResult2 * 'TResult3 * 'TResult4 * 'TResult5 * 'TResult6 * 'TResult7 -> UnitValueTaskCode<'TResult8>)) : UnitValueTaskCode<'TResult8> =
+            this.Bind7 (Async.StartAsTask computation, Async.StartAsTask computation2, Async.StartAsTask computation3, Async.StartAsTask computation4, Async.StartAsTask computation5, Async.StartAsTask computation6, Async.StartAsTask computation7, continuation)
 
         member inline this.ReturnFrom (computation: Async<'T>)  : UnitValueTaskCode<'T> =
             this.ReturnFrom (Async.StartAsTask computation)
