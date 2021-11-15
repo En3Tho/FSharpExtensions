@@ -1,0 +1,127 @@
+module En3Tho.FSharp.Extensions.Tests.TaskOptionAndResult
+
+open System
+open System.Threading.Tasks
+open En3Tho.FSharp.Extensions
+open Xunit
+open En3Tho.FSharp.ComputationExpressions.Tasks
+
+[<Fact>]
+let ``Test that option builder is working properly`` () = vtask {
+    let first = 10
+    let second = 10
+
+    let! opt = voptionvtask {
+        let! x = ValueSome first |> ValueTask.FromResult
+        let! y = ValueSome second |> ValueTask.FromResult
+        return x + y
+    }
+
+    Assert.Equal(opt, ValueSome (first + second))
+
+    let! opt2 = voptionvtask {
+        let! x = ValueSome first |> ValueTask.FromResult
+        let! y = ValueSome second |> ValueTask.FromResult
+        let! z = ValueNone |> ValueTask.FromResult
+        return x + y + z
+    }
+
+    Assert.Equal(opt2, ValueNone)
+
+//    let! opt3 = voptionvtask {
+//
+//        let mutable i = 0
+//        while i < 10 do
+//            let! _ = ValueNone |> ValueTask.FromResult
+//            i <- i + 1
+//
+//        let! x = ValueSome first |> ValueTask.FromResult
+//        let! y = ValueSome second |> ValueTask.FromResult
+//        return x + y + i
+//    }
+//
+//    Assert.Equal(opt3, ValueSome (first + second))
+
+    let! opt3 = voptionvtask {
+
+        let mutable i = 0
+
+        for i = 0 to 10 do
+            let! i = ValueSome i |> ValueTask.FromResult
+            ignore i
+
+        while i < 10 do
+            let! _ = ValueSome i |> ValueTask.FromResult
+            i <- i + 1
+
+        let! x = ValueSome first |> ValueTask.FromResult
+        let! y = ValueSome second |> ValueTask.FromResult
+        return x + y + i
+    }
+
+    Assert.Equal(opt3, ValueSome (first + second + 10))
+}
+
+[<Fact>]
+let ``Test that eresult builder is can process errors`` () = vtask {
+    let exn = Exception()
+
+    let! res1 = eresultvtask {
+        let! a = Error exn
+        let! b = Ok 10
+        let! c = Ok 15
+        return a + b + c + 10
+    }
+
+    match res1 with
+    | Error res1Exn ->
+        Assert.Equal(res1Exn, exn)
+    | _ ->
+        Assert.True(false, "Result should not be OK here")
+
+    let exn = Exception()
+    let! res2 = eresultvtask {
+        return! Error exn
+    }
+    Assert.Equal(res2, Error exn)
+}
+
+[<Fact>]
+let ``Test that exnresult properly catches exceptions`` () = vtask {
+    let exn = Exception()
+    let! res1 = exnresultvtask {
+        let! a = Error exn // exits here
+        let! b = Ok 10
+        let! c = Ok 15
+        failwith "Lol"
+        return a + b + c + 10
+    }
+
+    match res1 with
+    | Error lolExn ->
+        Assert.Equal(exn, lolExn)
+    | _ ->
+        Assert.True(false, "Result should not be OK here")
+
+    let! res2 = exnresultvtask {
+        failwith "Lol"
+        let! a = Error exn
+        let! b = Ok 10
+        let! c = Ok 15
+        return a + b + c + 10
+    }
+
+    match res2 with
+    | Error lolExn ->
+        Assert.Equal(exn, lolExn)
+    | _ ->
+        Assert.True(false, "Result should not be OK here")
+
+    let exn = Exception()
+    let! res3 = exnresultvtask {
+        return! Error exn
+    }
+
+    Assert.Equal(res3, Error exn)
+}
+

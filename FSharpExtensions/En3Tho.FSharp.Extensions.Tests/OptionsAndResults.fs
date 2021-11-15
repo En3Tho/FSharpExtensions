@@ -120,7 +120,7 @@ let ``Test that eresult builder is working properly`` () =
 
     let exn = Exception()
     let res2 = eresult {
-        return! exn
+        return! Error exn
     }
 
     Assert.Equal(res2, Error exn)
@@ -146,7 +146,49 @@ let ``Test that eresult builder is can process multiple errors`` () =
 
     let exn = Exception()
     let res2 = eresult {
-        return! exn
+        return! Error exn
     }
 
     Assert.Equal(res2, Error exn)
+
+[<Fact>]
+let ``Test that exnresult properly catches exceptions`` () =
+    let exn = Exception()
+    let res1 = exnresult {
+        let! a = Error exn
+        and! b = Error exn
+        and! c = Error exn
+        failwith "Lol"
+        return a + b + c + 10
+    }
+
+    match res1 with
+    | Error (:? AggregateException as aggExn) ->
+        Assert.True(
+            aggExn.InnerExceptions
+            |> Seq.toArray
+            |> Seq.identical [| exn; exn; exn |])
+    | _ ->
+        Assert.True(false, "Result should not be OK or not an AggregateException here")
+
+    let res2 = exnresult {
+        failwith "Lol"
+        let! a = Error exn
+        and! b = Error exn
+        and! c = Error exn
+
+        return a + b + c + 10
+    }
+
+    match res2 with
+    | Error lolExn ->
+        Assert.Equal("Lol", lolExn.Message)
+    | _ ->
+        Assert.True(false, "Result should not be OK here")
+
+    let exn = Exception()
+    let res3 = exnresult {
+        return! Error exn
+    }
+
+    Assert.Equal(res3, Error exn)

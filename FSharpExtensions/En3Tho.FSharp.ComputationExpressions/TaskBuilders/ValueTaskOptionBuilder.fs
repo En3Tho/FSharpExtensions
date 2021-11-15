@@ -15,8 +15,6 @@
 
 namespace En3Tho.FSharp.ComputationExpressions.Tasks
 
-#if VALUE_OPTION_BUILDER
-
 open System
 open System.Runtime.CompilerServices
 open System.Threading.Tasks
@@ -51,11 +49,12 @@ type ValueTaskValueOptionBuilderBase() =
     /// Note that this requires that the first step has no result.
     /// This prevents constructs like `task { return 1; return 2; }`.
     member inline _.Combine(task1: ValueTaskValueOptionCode<'TOverall, unit>, task2: ValueTaskValueOptionCode<'TOverall, 'T>) : ValueTaskValueOptionCode<'TOverall, 'T> =
-        ResumableCode.Combine(task1, task2)
+        ResumableCode.Combine(task1, ValueTaskValueOptionCode<_,_>(fun sm ->
+            if sm.Data.Result.IsNone then true else task2.Invoke(&sm)))
 
     /// Builds a step that executes the body while the condition predicate is true.
     member inline _.While ([<InlineIfLambda>] condition : unit -> bool, body : ValueTaskValueOptionCode<'TOverall, unit>) : ValueTaskValueOptionCode<'TOverall, unit> =
-        ResumableCode.While(condition, body)
+        ResumableCode.While(condition, body) // TODO: OptionResumableCode
 
     /// Wraps a step in a try/with. This catches exceptions both in the evaluation of the function
     /// to retrieve the step, and in the continuation of the step (if any).
@@ -156,15 +155,18 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskValueOptionBuilder
                                                 when  ^TaskLike: (member GetAwaiter:  unit ->  ^Awaiter)
                                                 and ^Awaiter :> ICriticalNotifyCompletion
                                                 and ^Awaiter: (member get_IsCompleted:  unit -> bool)
-                                                and ^Awaiter: (member GetResult:  unit ->  'TResult1)>
+                                                and ^Awaiter: (member GetResult:  unit ->  'TResult1 voption)>
                         (sm: byref<_>, task: ^TaskLike, continuation: ('TResult1 -> ValueTaskValueOptionCode<'TOverall, 'TResult2>)) : bool =
 
                     let mutable awaiter = (^TaskLike: (member GetAwaiter : unit -> ^Awaiter)(task))
 
                     let cont =
                         (ValueTaskValueOptionResumptionFunc<'TOverall>( fun sm ->
-                            let result = (^Awaiter : (member GetResult : unit -> 'TResult1)(awaiter))
-                            (continuation result).Invoke(&sm)))
+                            let result = (^Awaiter : (member GetResult : unit -> 'TResult1 voption)(awaiter))
+                            match result with
+                            | ValueSome result ->
+                                (continuation result).Invoke(&sm)
+                            | _ -> true))
 
                     // shortcut to continue immediately
                     if (^Awaiter : (member get_IsCompleted : unit -> bool)(awaiter)) then
@@ -179,7 +181,7 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskValueOptionBuilder
                                                 when  ^TaskLike: (member GetAwaiter:  unit ->  ^Awaiter)
                                                 and ^Awaiter :> ICriticalNotifyCompletion
                                                 and ^Awaiter: (member get_IsCompleted:  unit -> bool)
-                                                and ^Awaiter: (member GetResult:  unit ->  'TResult1)>
+                                                and ^Awaiter: (member GetResult:  unit ->  'TResult1 voption)>
                         (task: ^TaskLike, continuation: ('TResult1 -> ValueTaskValueOptionCode<'TOverall, 'TResult2>)) : ValueTaskValueOptionCode<'TOverall, 'TResult2> =
 
                 ValueTaskValueOptionCode<'TOverall, _>(fun sm ->
@@ -196,8 +198,11 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskValueOptionBuilder
                             __stack_fin <- __stack_yield_fin
 
                         if __stack_fin then
-                            let result = (^Awaiter : (member GetResult : unit -> 'TResult1)(awaiter))
-                            (continuation result).Invoke(&sm)
+                            let result = (^Awaiter : (member GetResult : unit -> 'TResult1 voption)(awaiter))
+                            match result with
+                            | ValueSome result ->
+                                (continuation result).Invoke(&sm)
+                            | _ -> true
                         else
                             sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &sm)
                             false
@@ -211,7 +216,7 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskValueOptionBuilder
                                                   when  ^TaskLike: (member GetAwaiter:  unit ->  ^Awaiter)
                                                   and ^Awaiter :> ICriticalNotifyCompletion
                                                   and ^Awaiter: (member get_IsCompleted: unit -> bool)
-                                                  and ^Awaiter: (member GetResult: unit ->  'T)>
+                                                  and ^Awaiter: (member GetResult: unit ->  'T voption)>
                     (task: ^TaskLike) : ValueTaskValueOptionCode< 'T,  'T> =
 
                 this.Bind(task, (fun v -> this.Return v))
@@ -219,17 +224,14 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskValueOptionBuilder
             member inline _.Using<'Resource, 'TOverall, 'T when 'Resource :> IDisposable> (resource: 'Resource, body: 'Resource -> ValueTaskValueOptionCode<'TOverall, 'T>) =
                 ResumableCode.Using(resource, body)
 
-    module HighPriority =
-        // High priority extensions
-
-        type ValueTaskValueOptionBuilderBase with
-            static member BindDynamic (sm: byref<_>, task: Task<'TResult1>, continuation: ('TResult1 -> ValueTaskValueOptionCode<'TOverall, 'TResult2>)) : bool =
+            static member BindTaskDynamic (sm: byref<_>, task: Task<'TResult1>, continuation: ('TResult1 -> ValueTaskValueOptionCode<'TOverall, 'TResult2>)) : bool =
                 let mutable awaiter = task.GetAwaiter()
 
                 let cont =
                     (ValueTaskValueOptionResumptionFunc<'TOverall>(fun sm ->
                         let result = awaiter.GetResult()
-                        (continuation result).Invoke(&sm)))
+                        (continuation result).Invoke(&sm)
+                        ))
 
                 // shortcut to continue immediately
                 if awaiter.IsCompleted then
@@ -245,7 +247,8 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskValueOptionBuilder
                 let cont =
                     (ValueTaskValueOptionResumptionFunc<'TOverall>(fun sm ->
                         let result = awaiter.GetResult()
-                        (continuation result).Invoke(&sm)))
+                        (continuation result).Invoke(&sm)
+                        ))
 
                 // shortcut to continue immediately
                 if awaiter.IsCompleted then
@@ -276,7 +279,7 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskValueOptionBuilder
                             sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &sm)
                             false
                     else
-                        ValueTaskValueOptionBuilderBase.BindDynamic(&sm, task, continuation)
+                        ValueTaskValueOptionBuilderBase.BindTaskDynamic(&sm, task, continuation)
                     //-- RESUMABLE CODE END
                 )
 
@@ -303,10 +306,222 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskValueOptionBuilder
                     //-- RESUMABLE CODE END
                 )
 
-            member inline this.ReturnFrom (task: Task<'T>) : ValueTaskValueOptionCode<'T, 'T> =
+            member inline this.Bind (task: Option<'TResult1>, continuation: ('TResult1 -> ValueTaskValueOptionCode<'TOverall, 'TResult2>)) : ValueTaskValueOptionCode<'TOverall, 'TResult2> =
+                this.Bind(ValueTask.FromResult (match task with Some x -> ValueSome x | _ -> ValueNone), continuation)
+
+            member inline this.Bind (task: ValueOption<'TResult1>, continuation: ('TResult1 -> ValueTaskValueOptionCode<'TOverall, 'TResult2>)) : ValueTaskValueOptionCode<'TOverall, 'TResult2> =
+                this.Bind(ValueTask.FromResult task, continuation)
+
+            member inline this.ReturnFrom (task: Option<'TResult1>) : ValueTaskValueOptionCode<'TResult1, 'TResult1> =
+                this.ReturnFrom(ValueTask.FromResult (match task with Some x -> ValueSome x | _ -> ValueNone))
+
+            member inline this.ReturnFrom (task: ValueOption<'TResult1>) : ValueTaskValueOptionCode<'TResult1, 'TResult1> =
+                this.ReturnFrom(ValueTask.FromResult task)
+
+    module HighPriority =
+        // High priority extensions
+
+        type ValueTaskValueOptionBuilderBase with
+            static member BindDynamic (sm: byref<_>, task: Task<'TResult1 voption>, continuation: ('TResult1 -> ValueTaskValueOptionCode<'TOverall, 'TResult2>)) : bool =
+                let mutable awaiter = task.GetAwaiter()
+
+                let cont =
+                    (ValueTaskValueOptionResumptionFunc<'TOverall>(fun sm ->
+                        let result = awaiter.GetResult()
+                        match result with
+                        | ValueSome result ->
+                            (continuation result).Invoke(&sm)
+                        | _ -> true
+                        ))
+
+                // shortcut to continue immediately
+                if awaiter.IsCompleted then
+                    cont.Invoke(&sm)
+                else
+                    sm.ResumptionDynamicInfo.ResumptionData <- (awaiter :> ICriticalNotifyCompletion)
+                    sm.ResumptionDynamicInfo.ResumptionFunc <- cont
+                    false
+
+            static member BindDynamic (sm: byref<_>, task: ValueTask<'TResult1 voption>, continuation: ('TResult1 -> ValueTaskValueOptionCode<'TOverall, 'TResult2>)) : bool =
+                let mutable awaiter = task.GetAwaiter()
+
+                let cont =
+                    (ValueTaskValueOptionResumptionFunc<'TOverall>(fun sm ->
+                        let result = awaiter.GetResult()
+                        match result with
+                        | ValueSome result ->
+                            (continuation result).Invoke(&sm)
+                        | _ -> true
+                        ))
+
+                // shortcut to continue immediately
+                if awaiter.IsCompleted then
+                    cont.Invoke(&sm)
+                else
+                    sm.ResumptionDynamicInfo.ResumptionData <- (awaiter :> ICriticalNotifyCompletion)
+                    sm.ResumptionDynamicInfo.ResumptionFunc <- cont
+                    false
+
+            member inline _.Bind (task: Task<'TResult1 voption>, continuation: ('TResult1 -> ValueTaskValueOptionCode<'TOverall, 'TResult2>)) : ValueTaskValueOptionCode<'TOverall, 'TResult2> =
+
+                ValueTaskValueOptionCode<'TOverall, _>(fun sm ->
+                    if __useResumableCode then
+                        //-- RESUMABLE CODE START
+                        // Get an awaiter from the task
+                        let mutable awaiter = task.GetAwaiter()
+
+                        let mutable __stack_fin = true
+                        if not awaiter.IsCompleted then
+                            // This will yield with __stack_yield_fin = false
+                            // This will resume with __stack_yield_fin = true
+                            let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
+                            __stack_fin <- __stack_yield_fin
+                        if __stack_fin then
+                            let result = awaiter.GetResult()
+                            match result with
+                            | ValueSome result ->
+                                (continuation result).Invoke(&sm)
+                            | _ -> true
+                        else
+                            sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &sm)
+                            false
+                    else
+                        ValueTaskValueOptionBuilderBase.BindDynamic(&sm, task, continuation)
+                    //-- RESUMABLE CODE END
+                )
+
+            member inline _.Bind (task: ValueTask<'TResult1 voption>, continuation: ('TResult1 -> ValueTaskValueOptionCode<'TOverall, 'TResult2>)) : ValueTaskValueOptionCode<'TOverall, 'TResult2> =
+                ValueTaskValueOptionCode<'TOverall, _>(fun sm ->
+                    if __useResumableCode then
+                        //-- RESUMABLE CODE START
+                        // Get an awaiter from the task
+                        let mutable awaiter = task.GetAwaiter()
+                        let mutable __stack_fin = true
+                        if not awaiter.IsCompleted then
+                            // This will yield with __stack_yield_fin = false
+                            // This will resume with __stack_yield_fin = true
+                            let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
+                            __stack_fin <- __stack_yield_fin
+                        if __stack_fin then
+                            let result = awaiter.GetResult()
+                            match result with
+                            | ValueSome result ->
+                                (continuation result).Invoke(&sm)
+                            | _ ->
+                                true
+                        else
+                            sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &sm)
+                            false
+                    else
+                        ValueTaskValueOptionBuilderBase.BindDynamic(&sm, task, continuation)
+                    //-- RESUMABLE CODE END
+                )
+
+            member inline this.ReturnFrom (task: Task<'T voption>) : ValueTaskValueOptionCode<'T, 'T> =
                 this.Bind(task, (fun v -> this.Return v))
 
-            member inline this.ReturnFrom (task: ValueTask<'T>) : ValueTaskValueOptionCode<'T, 'T> =
+            member inline this.ReturnFrom (task: ValueTask<'T voption>) : ValueTaskValueOptionCode<'T, 'T> =
+                this.Bind(task, (fun v -> this.Return v))
+
+            static member BindDynamic (sm: byref<_>, task: Task<'TResult1 option>, continuation: ('TResult1 -> ValueTaskValueOptionCode<'TOverall, 'TResult2>)) : bool =
+                let mutable awaiter = task.GetAwaiter()
+
+                let cont =
+                    (ValueTaskValueOptionResumptionFunc<'TOverall>(fun sm ->
+                        let result = awaiter.GetResult()
+                        match result with
+                        | Some result ->
+                            (continuation result).Invoke(&sm)
+                        | _ -> true
+                        ))
+
+                // shortcut to continue immediately
+                if awaiter.IsCompleted then
+                    cont.Invoke(&sm)
+                else
+                    sm.ResumptionDynamicInfo.ResumptionData <- (awaiter :> ICriticalNotifyCompletion)
+                    sm.ResumptionDynamicInfo.ResumptionFunc <- cont
+                    false
+
+            static member BindDynamic (sm: byref<_>, task: ValueTask<'TResult1 option>, continuation: ('TResult1 -> ValueTaskValueOptionCode<'TOverall, 'TResult2>)) : bool =
+                let mutable awaiter = task.GetAwaiter()
+
+                let cont =
+                    (ValueTaskValueOptionResumptionFunc<'TOverall>(fun sm ->
+                        let result = awaiter.GetResult()
+                        match result with
+                        | Some result ->
+                            (continuation result).Invoke(&sm)
+                        | _ -> true
+                        ))
+
+                // shortcut to continue immediately
+                if awaiter.IsCompleted then
+                    cont.Invoke(&sm)
+                else
+                    sm.ResumptionDynamicInfo.ResumptionData <- (awaiter :> ICriticalNotifyCompletion)
+                    sm.ResumptionDynamicInfo.ResumptionFunc <- cont
+                    false
+
+            member inline _.Bind (task: Task<'TResult1 option>, continuation: ('TResult1 -> ValueTaskValueOptionCode<'TOverall, 'TResult2>)) : ValueTaskValueOptionCode<'TOverall, 'TResult2> =
+
+                ValueTaskValueOptionCode<'TOverall, _>(fun sm ->
+                    if __useResumableCode then
+                        //-- RESUMABLE CODE START
+                        // Get an awaiter from the task
+                        let mutable awaiter = task.GetAwaiter()
+
+                        let mutable __stack_fin = true
+                        if not awaiter.IsCompleted then
+                            // This will yield with __stack_yield_fin = false
+                            // This will resume with __stack_yield_fin = true
+                            let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
+                            __stack_fin <- __stack_yield_fin
+                        if __stack_fin then
+                            let result = awaiter.GetResult()
+                            match result with
+                            | Some result ->
+                                (continuation result).Invoke(&sm)
+                            | _ -> true
+                        else
+                            sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &sm)
+                            false
+                    else
+                        ValueTaskValueOptionBuilderBase.BindDynamic(&sm, task, continuation)
+                    //-- RESUMABLE CODE END
+                )
+
+            member inline _.Bind (task: ValueTask<'TResult1 option>, continuation: ('TResult1 -> ValueTaskValueOptionCode<'TOverall, 'TResult2>)) : ValueTaskValueOptionCode<'TOverall, 'TResult2> =
+                ValueTaskValueOptionCode<'TOverall, _>(fun sm ->
+                    if __useResumableCode then
+                        //-- RESUMABLE CODE START
+                        // Get an awaiter from the task
+                        let mutable awaiter = task.GetAwaiter()
+                        let mutable __stack_fin = true
+                        if not awaiter.IsCompleted then
+                            // This will yield with __stack_yield_fin = false
+                            // This will resume with __stack_yield_fin = true
+                            let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
+                            __stack_fin <- __stack_yield_fin
+                        if __stack_fin then
+                            let result = awaiter.GetResult()
+                            match result with
+                            | Some result ->
+                                (continuation result).Invoke(&sm)
+                            | _ ->
+                                true
+                        else
+                            sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &sm)
+                            false
+                    else
+                        ValueTaskValueOptionBuilderBase.BindDynamic(&sm, task, continuation)
+                    //-- RESUMABLE CODE END
+                )
+
+            member inline this.ReturnFrom (task: Task<'T option>) : ValueTaskValueOptionCode<'T, 'T> =
+                this.Bind(task, (fun v -> this.Return v))
+
+            member inline this.ReturnFrom (task: ValueTask<'T option>) : ValueTaskValueOptionCode<'T, 'T> =
                 this.Bind(task, (fun v -> this.Return v))
 
     module MediumPriority =
@@ -314,10 +529,8 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskValueOptionBuilder
 
         // Medium priority extensions
         type ValueTaskValueOptionBuilderBase with
-            member inline this.Bind (computation: Async<'TResult1>, continuation: ('TResult1 -> ValueTaskValueOptionCode<'TOverall, 'TResult2>)) : ValueTaskValueOptionCode<'TOverall, 'TResult2> =
+            member inline this.Bind (computation: Async<'TResult1 voption>, continuation: ('TResult1 -> ValueTaskValueOptionCode<'TOverall, 'TResult2>)) : ValueTaskValueOptionCode<'TOverall, 'TResult2> =
                 this.Bind (Async.StartAsTask computation, continuation)
 
-            member inline this.ReturnFrom (computation: Async<'T>)  : ValueTaskValueOptionCode<'T, 'T> =
+            member inline this.ReturnFrom (computation: Async<'T voption>)  : ValueTaskValueOptionCode<'T, 'T> =
                 this.ReturnFrom (Async.StartAsTask computation)
-
-#endif

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net5.0</TargetFramework>
 
         <IsPackable>false</IsPackable>
         <GenerateProgramFile>false</GenerateProgramFile>
@@ -13,6 +13,7 @@
         <Compile Include="ArrayPoolBasedBuilderTests.fs" />
         <Compile Include="StringBuilderBuilderTests.fs" />
         <Compile Include="OptionsAndResults.fs" />
+        <Compile Include="TaskOptionAndResult.fs" />
         <Compile Include="ScanfTest.fs" />        
         <Compile Include="DependencyInjectionTests\RootNamespaceDependencyInjectionTest.fs" />
         <Compile Include="DependencyInjectionTests\ModuleDependencyInjectionTest.fs" />

@@ -32,8 +32,9 @@ type IValidator<'value> =
 type [<Struct; IsReadOnly>] NewCtorValidatorValidated<'value, 'validator when 'validator: (new: unit -> 'validator)
                                                                           and 'validator :> IValidator<'value>>
 #if DEBUG
-    private (value: 'value, wasValidated: bool) =
-    private new(value) = Validated10(value, true)
+    private (value: 'value, validator: 'validator, wasValidated: bool) =
+    private new(value, validator) = NewCtorValidatorValidated(value, validator, true)
+    member _.Value = if not wasValidated then invalidOp "Value was not properly validated" else value
 #else
     private (value: 'value, validator: 'validator) =
     member _.Value = value
@@ -98,8 +99,9 @@ type [<Struct; IsReadOnly>] NewCtorValidatorValidated<'value, 'validator when 'v
 
 type [<Struct; IsReadOnly>] InstanceValidatorValidated<'value, 'validator when 'validator :> IValidator<'value>>
 #if DEBUG
-    private (value: 'value, wasValidated: bool) =
-    private new(value) = Validated10(value, true)
+    private (value: 'value, validator: 'validator, wasValidated: bool) =
+    private new(value, validator) = InstanceValidatorValidated(value, validator, true)
+    member _.Value = if not wasValidated then invalidOp "Value was not properly validated" else value
 #else
     private (value: 'value, validator: 'validator) =
     member _.Value = value
@@ -163,8 +165,9 @@ type [<Struct; IsReadOnly>] InstanceValidatorValidated<'value, 'validator when '
 type [<Struct; IsReadOnly>] NewCtorAsyncValidatorValidated<'value, 'validator when 'validator: (new: unit -> 'validator)
                                                                                and 'validator :> IAsyncValidator<'value>>
 #if DEBUG
-    private (value: 'value, wasValidated: bool) =
-    private new(value) = Validated10(value, true)
+    private (value: 'value, validator: 'validator, wasValidated: bool) =
+    private new(value, validator) = NewCtorAsyncValidatorValidated(value, validator, true)
+    member _.Value = if not wasValidated then invalidOp "Value was not properly validated" else value
 #else
     private (value: 'value, validator: 'validator) =
     member _.Value = value
@@ -241,8 +244,9 @@ type [<Struct; IsReadOnly>] NewCtorAsyncValidatorValidated<'value, 'validator wh
 
 type [<Struct; IsReadOnly>] InstanceAsyncValidatorValidated<'value, 'validator when 'validator :> IAsyncValidator<'value>>
 #if DEBUG
-    private (value: 'value, wasValidated: bool) =
-    private new(value) = Validated10(value, true)
+    private (value: 'value, validator: 'validator, wasValidated: bool) =
+    private new(value, validator) = InstanceAsyncValidatorValidated(value, validator, true)
+    member _.Value = if not wasValidated then invalidOp "Value was not properly validated" else value
 #else
     private (value: 'value, validator: 'validator) =
     member _.Value = value

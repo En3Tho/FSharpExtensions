@@ -3,7 +3,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace En3Tho.Extensions.DependencyInjection.XUnit;
 
-public abstract class IXunitStartup
+public interface IXunitStartup
 {
     IHostBuilder? CreateHostBuilder() => null;
     void ConfigureHost(IHostBuilder hostBuilder) { }
