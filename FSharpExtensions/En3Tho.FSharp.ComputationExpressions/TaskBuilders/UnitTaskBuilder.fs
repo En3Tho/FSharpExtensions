@@ -1072,14 +1072,7 @@ module HighPriority =
                         let result7 = awaiter7.GetResult()
                         (continuation(result, result2, result3, result4, result5, result6, result7).Invoke(&sm))
                     else
-                        let mutable whenAllHelper = let mutable whenAllHelper = WhenAllHelper6()
-                    whenAllHelper.Add task
-                    whenAllHelper.Add task2
-                    whenAllHelper.Add task3
-                    whenAllHelper.Add task4
-                    whenAllHelper.Add task5
-                    whenAllHelper.Add task6
-                    let mutable combinedAwaiter = whenAllHelper.WhenAll().GetAwaiter()7()
+                        let mutable whenAllHelper = WhenAllHelper7()
                         whenAllHelper.Add task
                         whenAllHelper.Add task2
                         whenAllHelper.Add task3
