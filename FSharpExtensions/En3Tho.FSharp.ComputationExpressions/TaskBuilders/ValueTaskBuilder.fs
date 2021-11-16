@@ -259,10 +259,10 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions
                 if awaiter.IsCompleted && awaiter2.IsCompleted then
                     cont.Invoke(&sm)
                 else
-                    let mutable taskAwaiter = TaskAwaiter7()
-                    taskAwaiter.Add task
-                    taskAwaiter.Add task2
-                    let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                    let mutable whenAllHelper = WhenAllHelper2()
+                    whenAllHelper.Add task
+                    whenAllHelper.Add task2
+                    let mutable combinedAwaiter = whenAllHelper.WhenAll().GetAwaiter()
                     sm.ResumptionDynamicInfo.ResumptionData <- (combinedAwaiter :> ICriticalNotifyCompletion)
                     sm.ResumptionDynamicInfo.ResumptionFunc <- cont
                     false
@@ -283,11 +283,11 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions
                 if awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted then
                     cont.Invoke(&sm)
                 else
-                    let mutable taskAwaiter = TaskAwaiter7()
-                    taskAwaiter.Add task
-                    taskAwaiter.Add task2
-                    taskAwaiter.Add task3
-                    let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                    let mutable whenAllHelper = WhenAllHelper3()
+                    whenAllHelper.Add task
+                    whenAllHelper.Add task2
+                    whenAllHelper.Add task3
+                    let mutable combinedAwaiter = whenAllHelper.WhenAll().GetAwaiter()
                     sm.ResumptionDynamicInfo.ResumptionData <- (combinedAwaiter :> ICriticalNotifyCompletion)
                     sm.ResumptionDynamicInfo.ResumptionFunc <- cont
                     false
@@ -310,12 +310,12 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions
                 if awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted && awaiter4.IsCompleted then
                     cont.Invoke(&sm)
                 else
-                    let mutable taskAwaiter = TaskAwaiter7()
-                    taskAwaiter.Add task
-                    taskAwaiter.Add task2
-                    taskAwaiter.Add task3
-                    taskAwaiter.Add task4
-                    let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                    let mutable whenAllHelper = WhenAllHelper4()
+                    whenAllHelper.Add task
+                    whenAllHelper.Add task2
+                    whenAllHelper.Add task3
+                    whenAllHelper.Add task4
+                    let mutable combinedAwaiter = whenAllHelper.WhenAll().GetAwaiter()
                     sm.ResumptionDynamicInfo.ResumptionData <- (combinedAwaiter :> ICriticalNotifyCompletion)
                     sm.ResumptionDynamicInfo.ResumptionFunc <- cont
                     false
@@ -340,13 +340,13 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions
                 if awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted && awaiter4.IsCompleted && awaiter5.IsCompleted then
                     cont.Invoke(&sm)
                 else
-                    let mutable taskAwaiter = TaskAwaiter7()
-                    taskAwaiter.Add task
-                    taskAwaiter.Add task2
-                    taskAwaiter.Add task3
-                    taskAwaiter.Add task4
-                    taskAwaiter.Add task5
-                    let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                    let mutable whenAllHelper = WhenAllHelper5()
+                    whenAllHelper.Add task
+                    whenAllHelper.Add task2
+                    whenAllHelper.Add task3
+                    whenAllHelper.Add task4
+                    whenAllHelper.Add task5
+                    let mutable combinedAwaiter = whenAllHelper.WhenAll().GetAwaiter()
                     sm.ResumptionDynamicInfo.ResumptionData <- (combinedAwaiter :> ICriticalNotifyCompletion)
                     sm.ResumptionDynamicInfo.ResumptionFunc <- cont
                     false
@@ -373,14 +373,14 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions
                 if awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted && awaiter4.IsCompleted && awaiter5.IsCompleted && awaiter6.IsCompleted then
                     cont.Invoke(&sm)
                 else
-                    let mutable taskAwaiter = TaskAwaiter7()
-                    taskAwaiter.Add task
-                    taskAwaiter.Add task2
-                    taskAwaiter.Add task3
-                    taskAwaiter.Add task4
-                    taskAwaiter.Add task5
-                    taskAwaiter.Add task6
-                    let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                    let mutable whenAllHelper = WhenAllHelper6()
+                    whenAllHelper.Add task
+                    whenAllHelper.Add task2
+                    whenAllHelper.Add task3
+                    whenAllHelper.Add task4
+                    whenAllHelper.Add task5
+                    whenAllHelper.Add task6
+                    let mutable combinedAwaiter = whenAllHelper.WhenAll().GetAwaiter()
                     sm.ResumptionDynamicInfo.ResumptionData <- (combinedAwaiter :> ICriticalNotifyCompletion)
                     sm.ResumptionDynamicInfo.ResumptionFunc <- cont
                     false
@@ -409,15 +409,15 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions
                 if awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted && awaiter4.IsCompleted && awaiter5.IsCompleted && awaiter6.IsCompleted && awaiter7.IsCompleted then
                     cont.Invoke(&sm)
                 else
-                    let mutable taskAwaiter = TaskAwaiter7()
-                    taskAwaiter.Add task
-                    taskAwaiter.Add task2
-                    taskAwaiter.Add task3
-                    taskAwaiter.Add task4
-                    taskAwaiter.Add task5
-                    taskAwaiter.Add task6
-                    taskAwaiter.Add task7
-                    let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                    let mutable whenAllHelper = WhenAllHelper7()
+                    whenAllHelper.Add task
+                    whenAllHelper.Add task2
+                    whenAllHelper.Add task3
+                    whenAllHelper.Add task4
+                    whenAllHelper.Add task5
+                    whenAllHelper.Add task6
+                    whenAllHelper.Add task7
+                    let mutable combinedAwaiter = whenAllHelper.WhenAll().GetAwaiter()
                     sm.ResumptionDynamicInfo.ResumptionData <- (combinedAwaiter :> ICriticalNotifyCompletion)
                     sm.ResumptionDynamicInfo.ResumptionFunc <- cont
                     false
@@ -436,10 +436,10 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions
                 if awaiter.IsCompleted && awaiter2.IsCompleted then
                     cont.Invoke(&sm)
                 else
-                    let mutable taskAwaiter = TaskAwaiter7()
-                    taskAwaiter.Add task
-                    taskAwaiter.Add task2
-                    let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                    let mutable whenAllHelper = WhenAllHelper2()
+                    whenAllHelper.Add task
+                    whenAllHelper.Add task2
+                    let mutable combinedAwaiter = whenAllHelper.WhenAll().GetAwaiter()
                     sm.ResumptionDynamicInfo.ResumptionData <- (combinedAwaiter :> ICriticalNotifyCompletion)
                     sm.ResumptionDynamicInfo.ResumptionFunc <- cont
                     false
@@ -460,11 +460,11 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions
                 if awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted then
                     cont.Invoke(&sm)
                 else
-                    let mutable taskAwaiter = TaskAwaiter7()
-                    taskAwaiter.Add task
-                    taskAwaiter.Add task2
-                    taskAwaiter.Add task3
-                    let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                    let mutable whenAllHelper = WhenAllHelper3()
+                    whenAllHelper.Add task
+                    whenAllHelper.Add task2
+                    whenAllHelper.Add task3
+                    let mutable combinedAwaiter = whenAllHelper.WhenAll().GetAwaiter()
                     sm.ResumptionDynamicInfo.ResumptionData <- (combinedAwaiter :> ICriticalNotifyCompletion)
                     sm.ResumptionDynamicInfo.ResumptionFunc <- cont
                     false
@@ -487,12 +487,12 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions
                 if awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted && awaiter4.IsCompleted then
                     cont.Invoke(&sm)
                 else
-                    let mutable taskAwaiter = TaskAwaiter7()
-                    taskAwaiter.Add task
-                    taskAwaiter.Add task2
-                    taskAwaiter.Add task3
-                    taskAwaiter.Add task4
-                    let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                    let mutable whenAllHelper = WhenAllHelper4()
+                    whenAllHelper.Add task
+                    whenAllHelper.Add task2
+                    whenAllHelper.Add task3
+                    whenAllHelper.Add task4
+                    let mutable combinedAwaiter = whenAllHelper.WhenAll().GetAwaiter()
                     sm.ResumptionDynamicInfo.ResumptionData <- (combinedAwaiter :> ICriticalNotifyCompletion)
                     sm.ResumptionDynamicInfo.ResumptionFunc <- cont
                     false
@@ -517,13 +517,13 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions
                 if awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted && awaiter4.IsCompleted && awaiter5.IsCompleted then
                     cont.Invoke(&sm)
                 else
-                    let mutable taskAwaiter = TaskAwaiter7()
-                    taskAwaiter.Add task
-                    taskAwaiter.Add task2
-                    taskAwaiter.Add task3
-                    taskAwaiter.Add task4
-                    taskAwaiter.Add task5
-                    let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                    let mutable whenAllHelper = WhenAllHelper5()
+                    whenAllHelper.Add task
+                    whenAllHelper.Add task2
+                    whenAllHelper.Add task3
+                    whenAllHelper.Add task4
+                    whenAllHelper.Add task5
+                    let mutable combinedAwaiter = whenAllHelper.WhenAll().GetAwaiter()
                     sm.ResumptionDynamicInfo.ResumptionData <- (combinedAwaiter :> ICriticalNotifyCompletion)
                     sm.ResumptionDynamicInfo.ResumptionFunc <- cont
                     false
@@ -550,14 +550,14 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions
                 if awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted && awaiter4.IsCompleted && awaiter5.IsCompleted && awaiter6.IsCompleted then
                     cont.Invoke(&sm)
                 else
-                    let mutable taskAwaiter = TaskAwaiter7()
-                    taskAwaiter.Add task
-                    taskAwaiter.Add task2
-                    taskAwaiter.Add task3
-                    taskAwaiter.Add task4
-                    taskAwaiter.Add task5
-                    taskAwaiter.Add task6
-                    let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                    let mutable whenAllHelper = WhenAllHelper6()
+                    whenAllHelper.Add task
+                    whenAllHelper.Add task2
+                    whenAllHelper.Add task3
+                    whenAllHelper.Add task4
+                    whenAllHelper.Add task5
+                    whenAllHelper.Add task6
+                    let mutable combinedAwaiter = whenAllHelper.WhenAll().GetAwaiter()
                     sm.ResumptionDynamicInfo.ResumptionData <- (combinedAwaiter :> ICriticalNotifyCompletion)
                     sm.ResumptionDynamicInfo.ResumptionFunc <- cont
                     false
@@ -586,15 +586,15 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions
                 if awaiter.IsCompleted && awaiter2.IsCompleted && awaiter3.IsCompleted && awaiter4.IsCompleted && awaiter5.IsCompleted && awaiter6.IsCompleted && awaiter7.IsCompleted then
                     cont.Invoke(&sm)
                 else
-                    let mutable taskAwaiter = TaskAwaiter7()
-                    taskAwaiter.Add task
-                    taskAwaiter.Add task2
-                    taskAwaiter.Add task3
-                    taskAwaiter.Add task4
-                    taskAwaiter.Add task5
-                    taskAwaiter.Add task6
-                    taskAwaiter.Add task7
-                    let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                    let mutable whenAllHelper = WhenAllHelper7()
+                    whenAllHelper.Add task
+                    whenAllHelper.Add task2
+                    whenAllHelper.Add task3
+                    whenAllHelper.Add task4
+                    whenAllHelper.Add task5
+                    whenAllHelper.Add task6
+                    whenAllHelper.Add task7
+                    let mutable combinedAwaiter = whenAllHelper.WhenAll().GetAwaiter()
                     sm.ResumptionDynamicInfo.ResumptionData <- (combinedAwaiter :> ICriticalNotifyCompletion)
                     sm.ResumptionDynamicInfo.ResumptionFunc <- cont
                     false
@@ -644,10 +644,10 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions
                             let result2 = awaiter2.GetResult()
                             (continuation(result, result2).Invoke(&sm))
                         else
-                            let mutable taskAwaiter = TaskAwaiter7()
-                            taskAwaiter.Add task
-                            taskAwaiter.Add task2
-                            let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                            let mutable whenAllHelper = WhenAllHelper2()
+                            whenAllHelper.Add task
+                            whenAllHelper.Add task2
+                            let mutable combinedAwaiter = whenAllHelper.WhenAll().GetAwaiter()
                             sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&combinedAwaiter, &sm)
                             false
                     else
@@ -677,11 +677,11 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions
                             let result3 = awaiter3.GetResult()
                             (continuation(result, result2, result3).Invoke(&sm))
                         else
-                            let mutable taskAwaiter = TaskAwaiter7()
-                            taskAwaiter.Add task
-                            taskAwaiter.Add task2
-                            taskAwaiter.Add task3
-                            let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                            let mutable whenAllHelper = WhenAllHelper3()
+                            whenAllHelper.Add task
+                            whenAllHelper.Add task2
+                            whenAllHelper.Add task3
+                            let mutable combinedAwaiter = whenAllHelper.WhenAll().GetAwaiter()
                             sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&combinedAwaiter, &sm)
                             false
                     else
@@ -713,12 +713,12 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions
                             let result4 = awaiter4.GetResult()
                             (continuation(result, result2, result3, result4).Invoke(&sm))
                         else
-                            let mutable taskAwaiter = TaskAwaiter7()
-                            taskAwaiter.Add task
-                            taskAwaiter.Add task2
-                            taskAwaiter.Add task3
-                            taskAwaiter.Add task4
-                            let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                            let mutable whenAllHelper = WhenAllHelper4()
+                            whenAllHelper.Add task
+                            whenAllHelper.Add task2
+                            whenAllHelper.Add task3
+                            whenAllHelper.Add task4
+                            let mutable combinedAwaiter = whenAllHelper.WhenAll().GetAwaiter()
                             sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&combinedAwaiter, &sm)
                             false
                     else
@@ -752,13 +752,13 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions
                             let result5 = awaiter5.GetResult()
                             (continuation(result, result2, result3, result4, result5).Invoke(&sm))
                         else
-                            let mutable taskAwaiter = TaskAwaiter7()
-                            taskAwaiter.Add task
-                            taskAwaiter.Add task2
-                            taskAwaiter.Add task3
-                            taskAwaiter.Add task4
-                            taskAwaiter.Add task5
-                            let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                            let mutable whenAllHelper = WhenAllHelper5()
+                            whenAllHelper.Add task
+                            whenAllHelper.Add task2
+                            whenAllHelper.Add task3
+                            whenAllHelper.Add task4
+                            whenAllHelper.Add task5
+                            let mutable combinedAwaiter = whenAllHelper.WhenAll().GetAwaiter()
                             sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&combinedAwaiter, &sm)
                             false
                     else
@@ -794,14 +794,14 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions
                             let result6 = awaiter6.GetResult()
                             (continuation(result, result2, result3, result4, result5, result6).Invoke(&sm))
                         else
-                            let mutable taskAwaiter = TaskAwaiter7()
-                            taskAwaiter.Add task
-                            taskAwaiter.Add task2
-                            taskAwaiter.Add task3
-                            taskAwaiter.Add task4
-                            taskAwaiter.Add task5
-                            taskAwaiter.Add task6
-                            let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                            let mutable whenAllHelper = WhenAllHelper6()
+                            whenAllHelper.Add task
+                            whenAllHelper.Add task2
+                            whenAllHelper.Add task3
+                            whenAllHelper.Add task4
+                            whenAllHelper.Add task5
+                            whenAllHelper.Add task6
+                            let mutable combinedAwaiter = whenAllHelper.WhenAll().GetAwaiter()
                             sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&combinedAwaiter, &sm)
                             false
                     else
@@ -839,15 +839,15 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions
                             let result7 = awaiter7.GetResult()
                             (continuation(result, result2, result3, result4, result5, result6, result7).Invoke(&sm))
                         else
-                            let mutable taskAwaiter = TaskAwaiter7()
-                            taskAwaiter.Add task
-                            taskAwaiter.Add task2
-                            taskAwaiter.Add task3
-                            taskAwaiter.Add task4
-                            taskAwaiter.Add task5
-                            taskAwaiter.Add task6
-                            taskAwaiter.Add task7
-                            let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                            let mutable whenAllHelper = WhenAllHelper7()
+                            whenAllHelper.Add task
+                            whenAllHelper.Add task2
+                            whenAllHelper.Add task3
+                            whenAllHelper.Add task4
+                            whenAllHelper.Add task5
+                            whenAllHelper.Add task6
+                            whenAllHelper.Add task7
+                            let mutable combinedAwaiter = whenAllHelper.WhenAll().GetAwaiter()
                             sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&combinedAwaiter, &sm)
                             false
                     else
@@ -875,10 +875,10 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions
                             let result2 = awaiter2.GetResult()
                             (continuation(result, result2).Invoke(&sm))
                         else
-                            let mutable taskAwaiter = TaskAwaiter7()
-                            taskAwaiter.Add task
-                            taskAwaiter.Add task2
-                            let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                            let mutable whenAllHelper = WhenAllHelper2()
+                            whenAllHelper.Add task
+                            whenAllHelper.Add task2
+                            let mutable combinedAwaiter = whenAllHelper.WhenAll().GetAwaiter()
                             sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&combinedAwaiter, &sm)
                             false
                     else
@@ -908,11 +908,11 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions
                             let result3 = awaiter3.GetResult()
                             (continuation(result, result2, result3).Invoke(&sm))
                         else
-                            let mutable taskAwaiter = TaskAwaiter7()
-                            taskAwaiter.Add task
-                            taskAwaiter.Add task2
-                            taskAwaiter.Add task3
-                            let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                            let mutable whenAllHelper = WhenAllHelper3()
+                            whenAllHelper.Add task
+                            whenAllHelper.Add task2
+                            whenAllHelper.Add task3
+                            let mutable combinedAwaiter = whenAllHelper.WhenAll().GetAwaiter()
                             sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&combinedAwaiter, &sm)
                             false
                     else
@@ -944,12 +944,12 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions
                             let result4 = awaiter4.GetResult()
                             (continuation(result, result2, result3, result4).Invoke(&sm))
                         else
-                            let mutable taskAwaiter = TaskAwaiter7()
-                            taskAwaiter.Add task
-                            taskAwaiter.Add task2
-                            taskAwaiter.Add task3
-                            taskAwaiter.Add task4
-                            let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                            let mutable whenAllHelper = WhenAllHelper4()
+                            whenAllHelper.Add task
+                            whenAllHelper.Add task2
+                            whenAllHelper.Add task3
+                            whenAllHelper.Add task4
+                            let mutable combinedAwaiter = whenAllHelper.WhenAll().GetAwaiter()
                             sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&combinedAwaiter, &sm)
                             false
                     else
@@ -983,13 +983,13 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions
                             let result5 = awaiter5.GetResult()
                             (continuation(result, result2, result3, result4, result5).Invoke(&sm))
                         else
-                            let mutable taskAwaiter = TaskAwaiter7()
-                            taskAwaiter.Add task
-                            taskAwaiter.Add task2
-                            taskAwaiter.Add task3
-                            taskAwaiter.Add task4
-                            taskAwaiter.Add task5
-                            let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                            let mutable whenAllHelper = WhenAllHelper5()
+                            whenAllHelper.Add task
+                            whenAllHelper.Add task2
+                            whenAllHelper.Add task3
+                            whenAllHelper.Add task4
+                            whenAllHelper.Add task5
+                            let mutable combinedAwaiter = whenAllHelper.WhenAll().GetAwaiter()
                             sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&combinedAwaiter, &sm)
                             false
                     else
@@ -1025,14 +1025,14 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions
                             let result6 = awaiter6.GetResult()
                             (continuation(result, result2, result3, result4, result5, result6).Invoke(&sm))
                         else
-                            let mutable taskAwaiter = TaskAwaiter7()
-                            taskAwaiter.Add task
-                            taskAwaiter.Add task2
-                            taskAwaiter.Add task3
-                            taskAwaiter.Add task4
-                            taskAwaiter.Add task5
-                            taskAwaiter.Add task6
-                            let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                            let mutable whenAllHelper = WhenAllHelper6()
+                            whenAllHelper.Add task
+                            whenAllHelper.Add task2
+                            whenAllHelper.Add task3
+                            whenAllHelper.Add task4
+                            whenAllHelper.Add task5
+                            whenAllHelper.Add task6
+                            let mutable combinedAwaiter = whenAllHelper.WhenAll().GetAwaiter()
                             sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&combinedAwaiter, &sm)
                             false
                     else
@@ -1070,15 +1070,15 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions
                             let result7 = awaiter7.GetResult()
                             (continuation(result, result2, result3, result4, result5, result6, result7).Invoke(&sm))
                         else
-                            let mutable taskAwaiter = TaskAwaiter7()
-                            taskAwaiter.Add task
-                            taskAwaiter.Add task2
-                            taskAwaiter.Add task3
-                            taskAwaiter.Add task4
-                            taskAwaiter.Add task5
-                            taskAwaiter.Add task6
-                            taskAwaiter.Add task7
-                            let mutable combinedAwaiter = taskAwaiter.WhenAll().GetAwaiter()
+                            let mutable whenAllHelper = WhenAllHelper7()
+                            whenAllHelper.Add task
+                            whenAllHelper.Add task2
+                            whenAllHelper.Add task3
+                            whenAllHelper.Add task4
+                            whenAllHelper.Add task5
+                            whenAllHelper.Add task6
+                            whenAllHelper.Add task7
+                            let mutable combinedAwaiter = whenAllHelper.WhenAll().GetAwaiter()
                             sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&combinedAwaiter, &sm)
                             false
                     else
