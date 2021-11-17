@@ -23,9 +23,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="FSharp.Control.AsyncSeq" Version="3.1.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
         <PackageReference Include="Ply" Version="0.3.1" />
         <PackageReference Include="xunit" Version="2.4.1" />
         <PackageReference Include="Xunit.DependencyInjection" Version="8.1.0" />
@@ -33,7 +32,7 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="coverlet.collector" Version="3.0.2">
+        <PackageReference Include="coverlet.collector" Version="3.1.0">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
@@ -43,7 +42,6 @@
       <ProjectReference Include="..\En3Tho.Extensions.DependencyInjection.AspNetCore\En3Tho.Extensions.DependencyInjection.AspNetCore.fsproj" />
       <ProjectReference Include="..\En3Tho.Extensions.DependencyInjection.XUnit\En3Tho.Extensions.DependencyInjection.XUnit.csproj" />
       <ProjectReference Include="..\En3Tho.Extensions.DependencyInjection\En3Tho.Extensions.DependencyInjection.csproj" />
-      <ProjectReference Include="..\En3Tho.FSharp.ComputationExpressions\En3Tho.FSharp.ComputationExpressions.fsproj" />
       <ProjectReference Include="..\En3Tho.FSharp.Extensions\En3Tho.FSharp.Extensions.fsproj" />
     </ItemGroup>
 

@@ -13,10 +13,11 @@ open System.Threading.Tasks
 open FSharp.NativeInterop
 open Microsoft.FSharp.Reflection
 open En3Tho.FSharp.Extensions.Disposables
+open En3Tho.FSharp.ComputationExpressions.Tasks
 
 #nowarn "0077"
 #nowarn "0042"
-                
+
 type block<'a> = ImmutableArray<'a>
 
 [<AutoOpen>]
@@ -50,6 +51,16 @@ module Core =
 
     let inline (|Null|_|) value = if isNull value then someObj else None
     let inline (|NotNull|_|) value = if isNotNull value then someObj else None
+
+    let inline useAsync ([<InlineIfLambda>] work: 'a -> ValueTask<'b>) (resource: #IAsyncDisposable) = vtask {
+        try
+            let! result = work resource
+            do! resource.DisposeAsync()
+            return result
+        with e ->
+            do! resource.DisposeAsync()
+            return! ValueTask.FromException<_>(e)
+    }
 
 module Object =
     module Operators =
@@ -286,7 +297,6 @@ module String =
     let inline (|EqualsAnyNotInvariantCulture|_|) (patterns: string seq) (str: string) = str |> equalsAny patterns StringComparison.InvariantCulture |> not |> Option.ofBool
     let inline (|EqualsAnyNotInvariantCultureIgnoreCase|_|) (patterns: string seq) (str: string) = str |> equalsAny patterns StringComparison.InvariantCultureIgnoreCase |> not |> Option.ofBool
     let inline (|EqualsAnyNotChar|_|) (patterns: char[]) (str: string) = str |> equalsAnyChar patterns |> not |> Option.ofBool
-#if NET5_0_OR_GREATER
     let inline (|Contains|_|) (pattern: string) (str: string) = str.Contains(pattern, StringComparison.Ordinal) |> Option.ofBool
     let inline (|ContainsIgnoreCase|_|) (pattern: string) (str: string) = str.Contains(pattern, StringComparison.OrdinalIgnoreCase) |> Option.ofBool
     let inline (|ContainsCurrentCulture|_|) (pattern: string) (str: string) = str.Contains(pattern, StringComparison.CurrentCulture) |> Option.ofBool
@@ -601,7 +611,7 @@ module String =
     let inline (|EndsWithAnyNotInvariantCulture|_|) (patterns: string seq) (str: string) = str |> endsWithAny patterns StringComparison.InvariantCulture |> not |> Option.ofBool
     let inline (|EndsWithAnyNotInvariantCultureIgnoreCase|_|) (patterns: string seq) (str: string) = str |> endsWithAny patterns StringComparison.InvariantCultureIgnoreCase |> not |> Option.ofBool
     let inline (|EndsWithAnyNotChar|_|) (patterns: char[]) (str: string) = str |> endsWithAnyChar patterns |> not |> Option.ofBool
-#endif
+
 type EnumShape<'enum when 'enum: struct
                       and 'enum :> Enum
                       and 'enum: (static member (|||): 'enum -> 'enum -> 'enum )
@@ -1152,9 +1162,7 @@ module ReadOnlySpan =
     let inline sliceTo index (span: ReadOnlySpan<_>) = span.Slice(0, index)
     let inline fromPtr count (ptr: nativeptr<'a>) = ReadOnlySpan<'a>(ptr |> NativePtr.toVoidPtr, count)
     let inline fromVoidPtr<'a when 'a: unmanaged> count ptr = ReadOnlySpan<'a>(ptr, count)
-#if NET5_0_OR_GREATER
     let inline fromString (str: string): ReadOnlySpan<char> = String.op_Implicit str
-#endif
     let inline fromSpan (span: Span<_>): ReadOnlySpan<_> = Span.op_Implicit span
     let inline fromArray (array: 'a[]): ReadOnlySpan<_> = ReadOnlySpan.op_Implicit array
     let inline fromArraySegment (array: 'a ArraySegment): ReadOnlySpan<_> = ReadOnlySpan.op_Implicit array
@@ -1235,10 +1243,10 @@ module Dictionary =
 
     let inline tryGetValue key (d: #IDictionary<'key, 'value>) =
         d.TryGetValue key |> Option.ofTryPattern
-#if NET5_0_OR_GREATER
+
     let inline tryAddValue key value (d: #IDictionary<'key, 'value>) =
         d.TryAdd(key, value)
-#endif
+
     let inline addValue key value (d: #IDictionary<'key, 'value>) =
         d.Add(key, value)
 
@@ -1284,7 +1292,6 @@ module Action =
 module Tuple =
     let inline ofResVal f x = f x, x
 
-#if NET5_0_OR_GREATER
 /// Provides functions to get Union public fields which are not visible from F#
 module Union =
     [<AbstractClass; Sealed>]
@@ -1326,4 +1333,3 @@ module Union =
     let getTag unionObj = unionObj |> TagGetter.GetTag
     /// Gets the name of the union case of the underlying union object
     let getName unionObj = unionObj |> NameGetter<'a>.GetName
-#endif

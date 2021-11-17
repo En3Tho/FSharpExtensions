@@ -27,20 +27,6 @@ let ``Test that task computation expression compiles`` () =
     Assert.Equal(result, expected)
 
 [<Fact>]
-let ``Test that asyncSeq computation expression compiles`` () =
-    let asyncSeq1 job = asyncSeq {
-        let! result = job
-        yield result
-    }
-    let asyncSeq2 seq = asyncSeq {
-        yield! seq
-    }
-
-    let expected = 0
-    let result = expected |> Async.ofObj |> asyncSeq1 |> asyncSeq2 |> AsyncSeq.toArraySynchronously
-    Assert.True(result |> Seq.identical [| expected |])
-
-[<Fact>]
 let ``Test that async computation expression compiles`` () =
 
     let rec taskTest job = async {

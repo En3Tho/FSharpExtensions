@@ -7,8 +7,8 @@ open En3Tho.FSharp.ComputationExpressions.ArrayPoolBasedBuilders
 
 [<
   MemoryDiagnoser;
-  //Config(typeof<BenchmarkConfig.``Net 5, Net 6, Pgo``>)
-  SimpleJob(RuntimeMoniker.Net60)
+  Config(typeof<BenchmarkConfig.``Net 6, Pgo``>)
+  //SimpleJob(RuntimeMoniker.Net60)
 >]
 type Benchmark() =
     

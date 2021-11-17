@@ -5,6 +5,8 @@ open System
 open System.Threading.Tasks
 open En3Tho.FSharp.ComputationExpressions.Tasks
 
+let private unitTask = Task.FromResult()
+
 type Task with
     static member inline RunSynchronously (task: Task) =
         if task.IsCompletedSuccessfully then () else
@@ -13,6 +15,8 @@ type Task with
     static member inline RunSynchronously (task: Task<'a>) =
         if task.IsCompletedSuccessfully then task.Result else
         task.ConfigureAwait(false).GetAwaiter().GetResult()
+
+    static member CompletedUnitTask = unitTask
 
     member this.AsResult() =
         if
@@ -47,6 +51,11 @@ type ValueTask with
     static member inline RunSynchronously (task: ValueTask<'a>) =
         if task.IsCompletedSuccessfully then task.Result else
         task.ConfigureAwait(false).GetAwaiter().GetResult()
+
+    static member inline FromTask value = ValueTask<_>(task = value)
+    static member inline FromTask value = ValueTask(task = value)
+
+    static member CompletedUnitTask = ValueTask<unit>()
 
     member this.AsResult() =
         if
