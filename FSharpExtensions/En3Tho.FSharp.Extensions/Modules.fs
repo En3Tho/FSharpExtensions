@@ -186,6 +186,8 @@ module String =
     let inline ensureNotNullOrEmpty argName arg = if arg |> String.IsNullOrEmpty then nullArg argName else arg
     let inline defaultValue def str = if String.IsNullOrEmpty str then def else str
     let inline defaultValueW def str = if String.IsNullOrWhiteSpace str then def else str
+    let inline defaultWith defThunk str = if String.IsNullOrEmpty str then defThunk() else str
+    let inline defaultWithW defThunk str = if String.IsNullOrWhiteSpace str then defThunk() else str
     let inline truncate maxLength (str: string) = if str.Length <= maxLength then str else str.Substring(0, maxLength)
 
     let inline (|NullOrEmpty|_|) (str: string) = String.IsNullOrEmpty(str) |> Option.ofBool
@@ -1196,10 +1198,12 @@ module Seq =
     let inline isNotEmpty seq = Enumerable.Any seq
     let inline isNullOrEmpty seq = isNull seq || seq |> Enumerable.Any |> not
     let inline toLookup (keySelector: 'a -> 'b) (elementSelector: 'a -> 'c) seq = Enumerable.ToLookup(seq, keySelector, elementSelector)
+
     let inline ofGenericEnumerator enumerator =
         { new IEnumerable<'a> with
             member this.GetEnumerator(): IEnumerator<'a> = enumerator
             member this.GetEnumerator(): IEnumerator = enumerator :> IEnumerator }
+
     let inline ofEnumerator<'a> (enumerator: IEnumerator) =
         { new IEnumerator<'a> with
             member this.Current = enumerator.Current :?> 'a
@@ -1223,7 +1227,7 @@ module Seq =
 
         moveNext()
 
-    let identicalBy comparer (seq2: 'a seq) (seq1: 'a seq) =
+    let identicalBy (seq2: 'a seq) comparer (seq1: 'a seq) =
         use enum1 = seq1.GetEnumerator()
         use enum2 = seq2.GetEnumerator()
         let optimized = OptimizedClosures.FSharpFunc<_,_,_>.Adapt comparer
@@ -1333,3 +1337,21 @@ module Union =
     let getTag unionObj = unionObj |> TagGetter.GetTag
     /// Gets the name of the union case of the underlying union object
     let getName unionObj = unionObj |> NameGetter<'a>.GetName
+
+module Task =
+    let map mapper (job: Task<'a>) =
+        if job.IsCompleted then
+            Task.FromResult(mapper job.Result)
+        else task {
+            let! result = job
+            return mapper result
+        }
+
+module ValueTask =
+    let map mapper (job: ValueTask<'a>) =
+        if job.IsCompleted then
+            ValueTask.FromResult(mapper job.Result)
+        else vtask {
+            let! result = job
+            return mapper result
+        }

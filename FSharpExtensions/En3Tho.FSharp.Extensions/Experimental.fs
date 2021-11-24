@@ -2,12 +2,14 @@
 
 module PipeAndCompositionOperatorEx =
 
+    // TODO: InlineIfLambda
+
     type T = T with
         static member inline ($) (T, invokable: ^a) = fun value -> (^a: (member Invoke: 'b -> 'c) invokable, value)
         static member inline ($) (T, invokable: 'a -> 'b) = fun value -> invokable value
 
     let inline (|>) (value: 'b) invokable  =
-            (T $ invokable) value
+        (T $ invokable) value
 
     let inline (>>) f1 f2 =
         fun x ->

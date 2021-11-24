@@ -3,8 +3,8 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <AssemblyVersion>1.0.6</AssemblyVersion>
-        <FileVersion>1.0.6</FileVersion>
+        <AssemblyVersion>1.0.7</AssemblyVersion>
+        <FileVersion>1.0.7</FileVersion>
         <Description>A set of extensions for F# base library</Description>
         <Copyright>Copyright (c) 2021 Igor Bagdamyan</Copyright>
         <PackageProjectUrl>https://github.com/En3Tho/FSharpExtensions</PackageProjectUrl>
@@ -12,14 +12,14 @@
         <RepositoryUrl>https://github.com/En3Tho/FSharpExtensions</RepositoryUrl>
         <Authors> Igor Bagdamyan</Authors>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageVersion>1.0.6</PackageVersion>
+        <PackageVersion>1.0.7</PackageVersion>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <!-- Optional: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <!-- Optional: Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>        
-    </PropertyGroup>    
+    </PropertyGroup>
 
     <ItemGroup>
       <Compile Include="Disposables.fs" />
@@ -28,7 +28,7 @@
       <Compile Include="ActivePatterns.fs" />
       <Compile Include="Scanf.fs" />
       <Compile Include="Experimental.fs" />
-    </ItemGroup>    
+    </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="En3Tho.FSharp.ComputationExpressions" Version="1.0.7" />
