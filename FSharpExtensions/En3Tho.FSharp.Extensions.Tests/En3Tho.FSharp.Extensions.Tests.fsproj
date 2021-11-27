@@ -19,6 +19,7 @@
         <Compile Include="DependencyInjectionTests\ModuleDependencyInjectionTest.fs" />
         <Compile Include="DependencyInjectionTests\Module2DependencyInjectionTest.fs" />
         <Compile Include="DependencyInjectionTests\ServiceCollectionExtensionsTests.fs" />
+        <Compile Include="FunkyPipesTests.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
