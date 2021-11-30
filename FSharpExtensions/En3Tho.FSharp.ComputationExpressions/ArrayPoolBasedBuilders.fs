@@ -86,13 +86,14 @@ type ArrayPoolList<'a> with
 
     member this.ToResizeArray() =
         let count = this.Count
-        if count = 0 then ResizeArray()
+        if count = 0 then
+            ResizeArray()
         else
-        let array = this.GetArray()
-        let fake = FakeCollection.GetInstance(count)
-        let lst = ResizeArray(fake)
-        array.AsSpan(0, count).CopyTo(CollectionsMarshal.AsSpan(lst))
-        lst
+            let array = this.GetArray()
+            let fake = FakeCollection.GetInstance(count)
+            let result = ResizeArray(fake)
+            array.AsSpan(0, count).CopyTo(CollectionsMarshal.AsSpan(result))
+            result
 
     member this.ToArray() =
         match this.GetArray() with
@@ -207,3 +208,15 @@ let ursz<'a> = UnsafeResizeArrayBuilder<'a>(new ArrayPoolList<'a>())
 let ublock<'a> = UnsafeBlockBuilder<'a>(new ArrayPoolList<'a>())
 
 let uarr<'a> = UnsafeArrayBuilder<'a>(new ArrayPoolList<'a>())
+
+let rszOf<'a> initialLength = ResizeArrayBuilder<'a>(new ArrayPoolList<'a>(initialLength))
+
+let blockOf<'a> initialLength = BlockBuilder<'a>(new ArrayPoolList<'a>(initialLength))
+
+let arrOf<'a> initialLength = ArrayBuilder<'a>(new ArrayPoolList<'a>(initialLength))
+
+let urszOf<'a> initialLength = UnsafeResizeArrayBuilder<'a>(new ArrayPoolList<'a>(initialLength))
+
+let ublockOf<'a> initialLength = UnsafeBlockBuilder<'a>(new ArrayPoolList<'a>(initialLength))
+
+let uarrOf<'a> initialLength = UnsafeArrayBuilder<'a>(new ArrayPoolList<'a>(initialLength))
