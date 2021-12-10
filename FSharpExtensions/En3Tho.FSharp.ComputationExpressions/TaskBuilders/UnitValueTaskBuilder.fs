@@ -22,16 +22,16 @@ open Microsoft.FSharp.Core.CompilerServices
 open Microsoft.FSharp.Core.CompilerServices.StateMachineHelpers
 
 /// The extra data stored in ResumableStateMachine for tasks
-    [<Struct; NoComparison; NoEquality>]
-    type UnitValueTaskStateMachineData =
-       
-        [<DefaultValue(false)>]
-        val mutable MethodBuilder : AsyncValueTaskMethodBuilder
+[<Struct; NoComparison; NoEquality>]
+type UnitValueTaskStateMachineData =
 
-    and UnitValueTaskStateMachine = ResumableStateMachine<UnitValueTaskStateMachineData>
-    and UnitValueTaskResumptionFunc = ResumptionFunc<UnitValueTaskStateMachineData>
-    and UnitValueTaskResumptionDynamicInfo = ResumptionDynamicInfo<UnitValueTaskStateMachineData>
-    and UnitValueTaskCode<'T> = ResumableCode<UnitValueTaskStateMachineData, 'T>
+    [<DefaultValue(false)>]
+    val mutable MethodBuilder : AsyncValueTaskMethodBuilder
+
+and UnitValueTaskStateMachine = ResumableStateMachine<UnitValueTaskStateMachineData>
+and UnitValueTaskResumptionFunc = ResumptionFunc<UnitValueTaskStateMachineData>
+and UnitValueTaskResumptionDynamicInfo = ResumptionDynamicInfo<UnitValueTaskStateMachineData>
+and UnitValueTaskCode<'T> = ResumableCode<UnitValueTaskStateMachineData, 'T>
 
 type UnitValueTaskBuilderBase() =
 

@@ -2,35 +2,11 @@
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using static System.String;
 
 namespace En3Tho.Extensions.DependencyInjection;
 
-public static class IServiceCollectionExtensions
+public static partial class IServiceCollectionExtensions
 {
-    internal static void EnsureNotImplemented(this IServiceCollection collection, Type serviceType)
-    {
-        var descriptors = collection.Where(d => d.ServiceType == serviceType).ToArray();
-        if (descriptors is { Length: > 0 })
-        {
-            var message = $"Service type {serviceType.FullName} is already implemented by {Join(", ", descriptors.Select(d => (d.ImplementationType ?? serviceType).FullName))}";
-            throw new InvalidOperationException(message);
-        }
-    }
-
-    internal static void EnsureImplementedOnceAtMaxAndRemoveIfImplemented(this IServiceCollection collection, Type serviceType)
-    {
-        var descriptors = collection.Where(d => d.ServiceType == serviceType).ToArray();
-        if (descriptors is { Length: > 1 })
-        {
-            var message = $"Service type {serviceType.FullName} is already implemented by {Join(", ", descriptors.Select(d => (d.ImplementationType ?? serviceType).FullName))}";
-            throw new InvalidOperationException(message);
-        }
-
-        if (descriptors.Length == 0)
-            collection.Remove(descriptors[0]);
-    }
-
     public static IServiceCollection AddHttpClient<TClient>(this IServiceCollection collection, Uri uri)
         where TClient : class
     {

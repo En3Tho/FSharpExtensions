@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks.CSharp", "Benchm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "En3Tho.Extensions.DependencyInjection.XUnit", "En3Tho.Extensions.DependencyInjection.XUnit\En3Tho.Extensions.DependencyInjection.XUnit.csproj", "{3A742F60-CCFF-4F57-A40F-3446DFC35021}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.Extensions.DependencyInjection.Tests", "En3Tho.Extensions.DependencyInjection.Tests\En3Tho.Extensions.DependencyInjection.Tests.fsproj", "{73FE40B4-55FF-4758-AE4A-53709E398543}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,5 +75,9 @@ Global
 		{3A742F60-CCFF-4F57-A40F-3446DFC35021}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3A742F60-CCFF-4F57-A40F-3446DFC35021}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3A742F60-CCFF-4F57-A40F-3446DFC35021}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73FE40B4-55FF-4758-AE4A-53709E398543}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73FE40B4-55FF-4758-AE4A-53709E398543}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73FE40B4-55FF-4758-AE4A-53709E398543}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73FE40B4-55FF-4758-AE4A-53709E398543}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
