@@ -10,6 +10,7 @@ open En3Tho.FSharp.ComputationExpressions.IDictionaryBuilder
 open FSharp.Control
 open Xunit
 open En3Tho.FSharp.Extensions
+open System.Linq
 
 [<Fact>]
 let ``Test that task computation expression compiles`` () =
@@ -23,7 +24,7 @@ let ``Test that task computation expression compiles`` () =
         return! job
     }
     let expected = 0
-    let result = taskTest (Task.FromResult expected) |> Task.RunSynchronously
+    let result = (taskTest (Task.FromResult expected)).ConfigureAwait(false).GetAwaiter().GetResult()
     Assert.Equal(result, expected)
 
 [<Fact>]
@@ -39,7 +40,7 @@ let ``Test that async computation expression compiles`` () =
         return! job
     }
     let expected = 0
-    let result = taskTest (Async.ofObj expected) |> Async.RunSynchronously
+    let result = taskTest (async.Return expected) |> Async.RunSynchronously
     Assert.Equal(result, expected)
 
 [<Fact>]
@@ -62,7 +63,7 @@ let ``Test that dictionary is supported as builder`` () =
 
     let intIntDict2 = genericDict 1 10
 
-    Assert.True(intIntDict1.GetType().GenericTypeArguments |> Seq.identical (intIntDict2.GetType().GenericTypeArguments))
+    Assert.True(intIntDict1.GetType().GenericTypeArguments.SequenceEqual(intIntDict2.GetType().GenericTypeArguments))
 
 [<Fact>]
 let ``Test that generics are working properly and builders are not conflicting with each other`` () =
@@ -70,8 +71,8 @@ let ``Test that generics are working properly and builders are not conflicting w
     let list1 = genericList 10
     let list2 = genericList "10"
 
-    Assert.True(list1.GetType().GenericTypeArguments |> Seq.identical [| typeof<int> |])
-    Assert.True(list2.GetType().GenericTypeArguments |> Seq.identical [| typeof<string> |])
+    Assert.True(list1.GetType().GenericTypeArguments.SequenceEqual [| typeof<int> |])
+    Assert.True(list2.GetType().GenericTypeArguments.SequenceEqual [| typeof<string> |])
 
 type MyAdder() =
     member val AddCount = 0 with get, set
@@ -93,11 +94,11 @@ let ``Test that custom types are supported and builders are not conflicting with
     let adder1 = genericHashSet 10
     let adder2 = genericHashSet "10"
 
-    Assert.True(list1.GetType().GenericTypeArguments |> Seq.identical (adder1.GetType().GenericTypeArguments))
-    Assert.True(list2.GetType().GenericTypeArguments |> Seq.identical (adder2.GetType().GenericTypeArguments))
+    Assert.True(list1.GetType().GenericTypeArguments.SequenceEqual (adder1.GetType().GenericTypeArguments))
+    Assert.True(list2.GetType().GenericTypeArguments.SequenceEqual (adder2.GetType().GenericTypeArguments))
 
 [<Fact>]
-let ``Test that nested builders are supproted`` () =
+let ``Test that nested builders are supported`` () =
     let addCountInForLoop = 3
     let adder =
         MyAdder() {

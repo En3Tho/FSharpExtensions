@@ -7,22 +7,6 @@ open Xunit
 open En3Tho.FSharp.ComputationExpressions.Tasks
 
 [<Fact>]
-let ``Test array map with task CE``() = task {
-    let w = [| 1 |] |> Array.map (fun w -> w + 1) |> Array.head
-    let! x = task { return 3 }
-    let finalResult = w + x + 3
-    Assert.Equal(7, finalResult)
-}
-
-[<Fact>]
-let ``Test array map with value task CE``() = vtask {
-    let w = [| 1 |] |> Array.map (fun w -> w + 1) |> Array.head
-    let! x = task { return 3 }
-    let finalResult = w + x + 3
-    Assert.Equal(7, finalResult)
-}
-
-[<Fact>]
 let ``Test that option builder is working properly`` () = vtask {
     let first = 10
     let second = 10

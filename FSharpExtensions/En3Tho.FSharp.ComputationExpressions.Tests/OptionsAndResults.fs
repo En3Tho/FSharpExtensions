@@ -140,7 +140,7 @@ let ``Test that eresult builder is can process multiple errors`` () =
         Assert.True(
             aggExn.InnerExceptions
             |> Seq.toArray
-            |> Seq.identical [| exn; exn; exn |])
+            |> Seq.forall (fun x -> Object.ReferenceEquals(x, exn)))
     | _ ->
         Assert.True(false, "Result should not be OK here")
 
@@ -167,7 +167,7 @@ let ``Test that exnresult properly catches exceptions`` () =
         Assert.True(
             aggExn.InnerExceptions
             |> Seq.toArray
-            |> Seq.identical [| exn; exn; exn |])
+            |> Seq.forall (fun x -> Object.ReferenceEquals(x, exn)))
     | _ ->
         Assert.True(false, "Result should not be OK or not an AggregateException here")
 

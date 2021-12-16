@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "En3Tho.Extensions.Dependenc
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.Extensions.DependencyInjection.Tests", "En3Tho.Extensions.DependencyInjection.Tests\En3Tho.Extensions.DependencyInjection.Tests.fsproj", "{73FE40B4-55FF-4758-AE4A-53709E398543}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.ComputationExpressions.Tests", "En3Tho.FSharp.ComputationExpressions.Tests\En3Tho.FSharp.ComputationExpressions.Tests.fsproj", "{ED4D366B-0F29-4095-A8C8-EFED608A547B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -79,5 +81,9 @@ Global
 		{73FE40B4-55FF-4758-AE4A-53709E398543}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73FE40B4-55FF-4758-AE4A-53709E398543}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{73FE40B4-55FF-4758-AE4A-53709E398543}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED4D366B-0F29-4095-A8C8-EFED608A547B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED4D366B-0F29-4095-A8C8-EFED608A547B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED4D366B-0F29-4095-A8C8-EFED608A547B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED4D366B-0F29-4095-A8C8-EFED608A547B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -6,6 +6,7 @@ open Xunit
 open En3Tho.FSharp.Extensions
 open En3Tho.FSharp.ComputationExpressions.ArrayPoolBasedBuilders
 open En3Tho.FSharp.ComputationExpressions.ICollectionBuilder
+open System.Linq
 
 [<Fact>]
 let ``Test that array pool based builders build effectively the same collection`` () =
@@ -83,8 +84,8 @@ let ``Test that array pool based builders build effectively the same collection`
             i <- i - 1
     }
 
-    Assert.True(libraryArray |> Seq.identical customArray)
-    Assert.True(libraryArray |> Seq.identical customBlock)
-    Assert.True(libraryArray |> Seq.identical customResizeArray)
-    Assert.True(libraryArray |> Seq.identical customResizeArray2)
-    Assert.True(libraryArray |> Seq.identical customLinkedList)
+    Assert.True(libraryArray.SequenceEqual customArray)
+    Assert.True(libraryArray.SequenceEqual customBlock)
+    Assert.True(libraryArray.SequenceEqual customResizeArray)
+    Assert.True(libraryArray.SequenceEqual customResizeArray2)
+    Assert.True(libraryArray.SequenceEqual customLinkedList)
