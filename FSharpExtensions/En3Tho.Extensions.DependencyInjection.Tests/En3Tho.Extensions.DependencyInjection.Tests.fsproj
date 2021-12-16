@@ -8,7 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Tests.fs" />
+        <Compile Include="DecorationTests.fs" />
+        <Compile Include="RootNamespaceDependencyInjectionTest.fs" />
+        <Compile Include="ModuleDependencyInjectionTest.fs" />
+        <Compile Include="Module2DependencyInjectionTest.fs" />
+        <Compile Include="ServiceCollectionExtensionsTests.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
@@ -26,6 +30,8 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\En3Tho.Extensions.DependencyInjection.AspNetCore\En3Tho.Extensions.DependencyInjection.AspNetCore.fsproj" />
+      <ProjectReference Include="..\En3Tho.Extensions.DependencyInjection.XUnit\En3Tho.Extensions.DependencyInjection.XUnit.csproj" />
       <ProjectReference Include="..\En3Tho.Extensions.DependencyInjection\En3Tho.Extensions.DependencyInjection.csproj" />
     </ItemGroup>
 

@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <LangVersion>preview</LangVersion>
     </PropertyGroup>
 
@@ -13,6 +13,9 @@
         <Compile Include="EResultAllocationsBenchmark.fs" />
         <Compile Include="ScanfBenchmark.fs" />
         <Compile Include="TaskBuildersBenchmarks.fs" />
+        <Compile Include="FSharpOptimizerWithExperimentalPipe.fs" />
+        <Compile Include="FSharpOptimizer.fs" />
+        <Compile Include="PushStream.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 

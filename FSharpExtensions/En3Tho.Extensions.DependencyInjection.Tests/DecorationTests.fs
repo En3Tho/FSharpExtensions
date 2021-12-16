@@ -1,4 +1,4 @@
-module Tests
+module En3Tho.Extensions.DependencyInjection.Tests.DecorationTests
 
 open System
 open Microsoft.Extensions.DependencyInjection

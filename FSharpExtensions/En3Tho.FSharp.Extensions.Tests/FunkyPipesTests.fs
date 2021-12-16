@@ -52,3 +52,16 @@ let ``test that pipe3 works as expected``()  =
             Assert.Equal((x + y + z) * 3, result)
 
     computation 5 10 15
+
+[<Fact>]
+let ``test that composition works as expected``() =
+
+    let computation (x: int) =
+        x
+        |> (f1
+        >> q1
+        >> (f1 >> q1)
+        >> fun result ->
+            Assert.Equal(x, result))
+
+    computation 5

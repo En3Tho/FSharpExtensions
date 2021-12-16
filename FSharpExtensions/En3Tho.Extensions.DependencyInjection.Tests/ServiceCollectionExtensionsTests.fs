@@ -1,4 +1,4 @@
-﻿module En3Tho.FSharp.Extensions.Tests.DependencyInjectionTests.ServiceCollectionExtensionsTests
+﻿module En3Tho.Extensions.DependencyInjection.Tests.ServiceCollectionExtensionsTests
 
 open System
 open En3Tho.Extensions.DependencyInjection

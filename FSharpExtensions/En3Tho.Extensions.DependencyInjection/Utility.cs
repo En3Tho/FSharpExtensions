@@ -34,7 +34,7 @@ public static partial class IServiceCollectionExtensions
             throw new InvalidOperationException(message);
         }
 
-        if (descriptors.Length == 0)
+        if (descriptors.Length == 1)
             collection.Remove(descriptors[0]);
     }
 }

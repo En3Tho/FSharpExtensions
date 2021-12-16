@@ -1,4 +1,4 @@
-﻿namespace En3Tho.FSharp.Extensions.Tests
+﻿namespace En3Tho.Extensions.DependencyInjection.Tests
 
 open Microsoft.Extensions.DependencyInjection
 open Xunit

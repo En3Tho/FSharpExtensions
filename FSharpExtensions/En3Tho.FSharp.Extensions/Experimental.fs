@@ -6,16 +6,12 @@ module PipeAndCompositionOperatorEx =
     module Pipe1 =
 
         type T = T with
-            static member inline ($) (T, invokable: ^a) = fun value -> (^a: (member Invoke: 'b -> 'c) invokable, value)
-            static member inline ($) (T, [<InlineIfLambda>] invokable: 'a -> 'b) = fun value -> invokable value
+            static member inline ($) (_, invokable) = fun value -> (^a: (member Invoke: ^b -> ^c) invokable, value)
+            static member inline ($) (_, [<InlineIfLambda>] invokable: 'a -> 'b) = fun value -> invokable value
 
-        let inline (|>) (value: 'b) invokable =
-            (T $ invokable) value
-
-        let inline (>>) f1 f2 =
-            fun x ->
-                let y = (T $ f1) x
-                (T $ f2) y
+        let inline (|>) value invokable = (T $ invokable) value
+        let inline (>>) f1 f2 = fun value -> (T $ f2) ((T $ f1) value)
+        let inline (<<) f1 f2 = fun value -> (T $ f1) ((T $ f2) value)
 
     [<AutoOpen>]
     module Pipe2 =

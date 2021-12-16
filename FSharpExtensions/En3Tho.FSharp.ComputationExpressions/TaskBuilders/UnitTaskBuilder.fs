@@ -146,6 +146,7 @@ type UnitTaskBuilderBase() =
 
 namespace En3Tho.FSharp.ComputationExpressions.Tasks.UnitTaskBuilderExtensions
 
+open System
 open En3Tho.FSharp.ComputationExpressions.Tasks
 open System.Runtime.CompilerServices
 open System.Threading.Tasks
@@ -159,7 +160,7 @@ module LowPriority =
     type UnitTaskBuilderBase with
 
         [<NoEagerConstraintApplication>]
-        static member inline BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter , 'TOverall
+        static member inline BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter
                                             when  ^TaskLike: (member GetAwaiter:  unit ->  ^Awaiter)
                                             and ^Awaiter :> ICriticalNotifyCompletion
                                             and ^Awaiter: (member get_IsCompleted:  unit -> bool)
@@ -180,6 +181,41 @@ module LowPriority =
                     sm.ResumptionDynamicInfo.ResumptionData <- (awaiter :> ICriticalNotifyCompletion)
                     sm.ResumptionDynamicInfo.ResumptionFunc <- cont
                     false
+
+        [<NoEagerConstraintApplication>]
+        member inline _.Bind< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter
+                                            when  ^TaskLike: (member GetAwaiter:  unit ->  ^Awaiter)
+                                            and ^Awaiter :> ICriticalNotifyCompletion
+                                            and ^Awaiter: (member get_IsCompleted:  unit -> bool)
+                                            and ^Awaiter: (member GetResult:  unit ->  'TResult1)>
+                    (task: ^TaskLike, continuation: ('TResult1 -> UnitTaskCode<'TResult2>)) : UnitTaskCode<'TResult2> =
+
+            UnitTaskCode<_>(fun sm ->
+                if __useResumableCode then
+                    //-- RESUMABLE CODE START
+                    // Get an awaiter from the awaitable
+                    let mutable awaiter = (^TaskLike: (member GetAwaiter : unit -> ^Awaiter)(task))
+
+                    let mutable __stack_fin = true
+                    if not (^Awaiter : (member get_IsCompleted : unit -> bool)(awaiter)) then
+                        // This will yield with __stack_yield_fin = false
+                        // This will resume with __stack_yield_fin = true
+                        let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
+                        __stack_fin <- __stack_yield_fin
+
+                    if __stack_fin then
+                        let result = (^Awaiter : (member GetResult : unit -> 'TResult1)(awaiter))
+                        (continuation result).Invoke(&sm)
+                    else
+                        sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &sm)
+                        false
+                else
+                    UnitTaskBuilderBase.BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter>(&sm, task, continuation)
+                //-- RESUMABLE CODE END
+            )
+
+        member inline _.Using<'Resource, 'T when 'Resource :> IDisposable> (resource: 'Resource, body: 'Resource -> UnitTaskCode<'T>) =
+            ResumableCode.Using(resource, body)
 
 module HighPriority =
     // High priority extensions

@@ -6,19 +6,19 @@ open Core
 
 #nowarn "0077"
 
-let inline (|Eq|_|) with' what = what = with' |> Option.ofBool
-let inline (|Neq|_|) with' what = what <> with' |> Option.ofBool
-let inline (|Gt|_|) with' what = what > with' |> Option.ofBool
-let inline (|GtEq|_|) with' what = what >= with' |> Option.ofBool
-let inline (|Lt|_|) with' what = what < with' |> Option.ofBool
-let inline (|LtEq|_|) with' what = what <= with' |> Option.ofBool
-let inline (|RefEq|_|) with' what = referenceEquals with' what |> Option.ofBool
+let [<return: Struct>] inline (|Eq|_|) with' what = what = with' |> ValueOption.ofBool
+let [<return: Struct>] inline (|Neq|_|) with' what = what <> with' |> ValueOption.ofBool
+let [<return: Struct>] inline (|Gt|_|) with' what = what > with' |> ValueOption.ofBool
+let [<return: Struct>] inline (|GtEq|_|) with' what = what >= with' |> ValueOption.ofBool
+let [<return: Struct>] inline (|Lt|_|) with' what = what < with' |> ValueOption.ofBool
+let [<return: Struct>] inline (|LtEq|_|) with' what = what <= with' |> ValueOption.ofBool
+let [<return: Struct>] inline (|RefEq|_|) with' what = referenceEquals with' what |> ValueOption.ofBool
 
-let inline (|NullableSome|_|) (value: 'a Nullable) = // TODO: F# 6 ValueOption
-    if value.HasValue then Some value.Value else None
+let [<return: Struct>] inline (|NullableSome|_|) (value: 'a Nullable) = // TODO: F# 6 ValueOption
+    if value.HasValue then ValueSome value.Value else ValueNone
 
-let inline (|NullableNone|_|) (value: 'a Nullable) =
-    value.HasValue |> not |> Option.ofBool
+let [<return: Struct>] inline (|NullableNone|_|) (value: 'a Nullable) =
+    value.HasValue |> not |> ValueOption.ofBool
 
 module Requires =
     let inline (|NotNull|) (obj: 'a when 'a: not struct) = if Object.ReferenceEquals(obj, null) then nullArg "Value cannot be null" else obj

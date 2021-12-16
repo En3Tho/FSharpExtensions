@@ -9,10 +9,10 @@
         <PackageProjectUrl>https://github.com/En3Tho/FSharpExtensions</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/En3Tho/FSharpExtensions/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/En3Tho/FSharpExtensions</RepositoryUrl>
-        <AssemblyVersion>1.0.8</AssemblyVersion>
-        <FileVersion>1.0.8</FileVersion>
+        <AssemblyVersion>1.0.9</AssemblyVersion>
+        <FileVersion>1.0.9</FileVersion>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageVersion>1.0.8</PackageVersion>
+        <PackageVersion>1.0.9</PackageVersion>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <!-- Optional: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
