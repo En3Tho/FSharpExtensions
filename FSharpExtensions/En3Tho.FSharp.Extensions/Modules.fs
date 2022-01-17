@@ -22,8 +22,19 @@ type block<'a> = ImmutableArray<'a>
 
 [<AutoOpen>]
 module Core =
+
+    module DeferHelpers =
+        type T = T with
+            static member inline ($) (_, [<InlineIfLambda>] disposer) = UnitAsyncDisposable(disposer)
+            static member inline ($) (_, [<InlineIfLambda>] disposer) = new UnitDisposable(disposer)
+
+    module DefervHelpers =
+        type T = T with
+            static member inline ($) (_, [<InlineIfLambda>] disposer) = fun value -> ValueAsyncDisposable<_>(value, disposer)
+            static member inline ($) (_, [<InlineIfLambda>] disposer) = fun value -> new ValueDisposable<_>(value, disposer)
+
     let someObj = Some()
-    let inline (^) f x = f x
+    let inline (^) ([<InlineIfLambda>] f) x = f x
 
     /// cast via op_Implicit
     let inline icast< ^a, ^b when (^a or ^b): (static member op_Implicit: ^a -> ^b)> (value: ^a): ^b = ((^a or ^b): (static member op_Implicit: ^a -> ^b) value)
@@ -31,10 +42,10 @@ module Core =
     /// cast via op_Explicit
     let inline ecast< ^a, ^b when (^a or ^b): (static member op_Explicit: ^a -> ^b)> (value: ^a): ^b = ((^a or ^b): (static member op_Explicit: ^a -> ^b) value)
 
-    /// unsafe cast like in C#
+    /// unsafe cast
     let inline ucast<'a, 'b> (a: 'a): 'b = (# "" a: 'b #)
-    let inline defer f = new UnitDisposable(f)
-    let inline deferv f value = new ValueDisposable<'a>(value, f)
+    let inline defer f = (DeferHelpers.T $ f)
+    let inline deferv f value = (DefervHelpers.T $ f) value
     let ignore2 _ _ = ()
     let ignore3 _ _ _ = ()
     let inline referenceEquals< ^a when ^a : not struct> (obj1: ^a) (obj2: ^a) = Object.ReferenceEquals(obj1, obj2)
@@ -51,16 +62,6 @@ module Core =
 
     let inline (|Null|_|) value = if isNull value then someObj else None
     let inline (|NotNull|_|) value = if isNotNull value then someObj else None
-
-    let inline useAsync ([<InlineIfLambda>] work: 'a -> ValueTask<'b>) (resource: #IAsyncDisposable) = vtask {
-        try
-            let! result = work resource
-            do! resource.DisposeAsync()
-            return result
-        with e ->
-            do! resource.DisposeAsync()
-            return! ValueTask.FromException<_>(e)
-    }
 
 module Object =
     module Operators =
@@ -1339,7 +1340,7 @@ module Union =
     let getName unionObj = unionObj |> NameGetter<'a>.GetName
 
 module Task =
-    let map mapper (job: Task<'a>) =
+    let inline map ([<InlineIfLambda>] mapper) (job: Task<'a>) =
         if job.IsCompleted then
             Task.FromResult(mapper job.Result)
         else task {
@@ -1348,7 +1349,7 @@ module Task =
         }
 
 module ValueTask =
-    let map mapper (job: ValueTask<'a>) =
+    let inline map ([<InlineIfLambda>] mapper) (job: ValueTask<'a>) =
         if job.IsCompleted then
             ValueTask.FromResult(mapper job.Result)
         else vtask {

@@ -3,6 +3,7 @@ module En3Tho.FSharp.Extensions.Tests.FunkyPipesTests
 open System
 open En3Tho.FSharp.Extensions.Experimental
 open PipeAndCompositionOperatorEx
+open InvokeEx
 open Xunit
 
 let f1 x = x
@@ -19,6 +20,7 @@ let ``test that pipe1 works as expected``() =
     let computation (x: int) =
         x
         |> f1
+        |> fun x -> x
         |> q1
         |> (f1 >> q1)
         |> fun result ->
@@ -63,5 +65,14 @@ let ``test that composition works as expected``() =
         >> (f1 >> q1)
         >> fun result ->
             Assert.Equal(x, result))
+
+    computation 5
+
+[<Fact>]
+let ``test that invoke works as expected``() =
+
+    let computation (x: int) =
+        (q1 ^ x) + (f1 ^ x)
+        |> fun result -> Assert.Equal(x * 2, result)
 
     computation 5

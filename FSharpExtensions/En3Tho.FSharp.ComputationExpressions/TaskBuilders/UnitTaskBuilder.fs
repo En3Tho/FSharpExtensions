@@ -78,6 +78,47 @@ type UnitTaskBuilderBase() =
     member inline _.For (sequence : seq<'T>, body : 'T -> UnitTaskCode<unit>) : UnitTaskCode<unit> =
         ResumableCode.For(sequence, body)
 
+    member inline internal this.TryFinallyAsync(body: UnitTaskCode<'T>, compensation : unit -> ValueTask) : UnitTaskCode<'T> =
+        ResumableCode.TryFinallyAsync(body, UnitTaskCode<_>(fun sm ->
+            if __useResumableCode then
+                let mutable __stack_condition_fin = true
+                let __stack_vtask = compensation()
+                if not __stack_vtask.IsCompleted then
+                    let mutable awaiter = __stack_vtask.GetAwaiter()
+                    let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
+                    __stack_condition_fin <- __stack_yield_fin
+
+                    if not __stack_condition_fin then
+                        sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &sm)
+
+                __stack_condition_fin
+            else
+                let vtask = compensation()
+                let mutable awaiter = vtask.GetAwaiter()
+
+                let cont =
+                    UnitTaskResumptionFunc( fun sm ->
+                        awaiter.GetResult()
+                        true)
+
+                // shortcut to continue immediately
+                if awaiter.IsCompleted then
+                    true
+                else
+                    sm.ResumptionDynamicInfo.ResumptionData <- (awaiter :> ICriticalNotifyCompletion)
+                    sm.ResumptionDynamicInfo.ResumptionFunc <- cont
+                    false
+                ))
+
+    member inline this.Using<'Resource, 'TOverall, 'T when 'Resource :> IAsyncDisposable> (resource: 'Resource, body: 'Resource -> UnitTaskCode<'T>) : UnitTaskCode<'T> =
+        this.TryFinallyAsync(
+            (fun sm -> (body resource).Invoke(&sm)),
+            (fun () ->
+                if not (isNull (box resource)) then
+                    resource.DisposeAsync()
+                else
+                    ValueTask()))
+
     type UnitTaskBuilder() =
 
         inherit UnitTaskBuilderBase()
