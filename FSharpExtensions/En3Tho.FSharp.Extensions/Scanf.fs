@@ -1,16 +1,17 @@
 ﻿module En3Tho.FSharp.Extensions.Scanf
 
 open System
+open System.Runtime.InteropServices
 open En3Tho.FSharp.Extensions
 
 let [<Literal>] private InterpolationFormat = "%P()"
 
 // TODO: Investigate if it is possible to do via inline magic
 // TODO: Parse complex values via JSON
-let private scanfInternal strict (value: ReadOnlySpan<char>) (fmt: Printf.StringFormat<string>) =
+let private scanfInternal strict (memory: ReadOnlyMemory<char>) (fmt: Printf.StringFormat<string>) =
 
-    let mutable capturesSpan: ReadOnlySpan<_> = Span.op_Implicit(fmt.Captures.AsSpan())
-    let mutable valueSpan = value
+    let mutable capturesSpan = fmt.Captures.AsSpan()
+    let mutable valueSpan = memory.Span
     let mutable formatSpan = fmt.Value.AsSpan()
 
     // first, find the first occurence of %P() format substring and check if anything before it actually matches a corresponding part in a value string
@@ -19,7 +20,7 @@ let private scanfInternal strict (value: ReadOnlySpan<char>) (fmt: Printf.String
         capturesSpan.Length > 0
         && valueSpan.Length > 0
         && formatSpan.Length > 0
-        && (match formatSpan.IndexOf(InterpolationFormat.AsSpan()) with
+        && (match formatSpan.IndexOf(InterpolationFormat) with
            | -1 ->
                false
            | index ->
@@ -43,7 +44,7 @@ let private scanfInternal strict (value: ReadOnlySpan<char>) (fmt: Printf.String
         else
 
         let literalAfterFormat =
-            match formatSpan.IndexOf(InterpolationFormat.AsSpan()) with
+            match formatSpan.IndexOf(InterpolationFormat) with
             | -1 ->
                 formatSpan
             | index ->
@@ -73,6 +74,12 @@ let private scanfInternal strict (value: ReadOnlySpan<char>) (fmt: Printf.String
                 valueSpan <- ReadOnlySpan()
             else
                 ref.Value <- value.ToString()
+        | :? Ref<ReadOnlyMemory<char>> as ref ->
+            if formatSpan.Length = 0 && capturesSpan.Length = 0 then
+                ref.Value <- memory.Slice(memory.Length - valueSpan.Length, valueSpan.Length)
+                valueSpan <- ReadOnlySpan()
+            else
+                ref.Value <- memory.Slice(memory.Length - valueSpan.Length, valueSpan.Length).Slice(0, charCounter)
         | :? Ref<char> as ref ->
             if value.Length = 1 then
                 ref.Value <- value.[0]
@@ -119,13 +126,13 @@ let private scanfInternal strict (value: ReadOnlySpan<char>) (fmt: Printf.String
     success
 
 /// Strict vesion of scanf which matches full string
-let scanf fmt (value: string) = scanfInternal true (value.AsSpan()) fmt
+let scanf fmt (value: string) = scanfInternal true (value.AsMemory()) fmt
 
 /// Light version of scanf which stops matching when values are found
-let scanfl fmt (value: string) = scanfInternal false (value.AsSpan()) fmt
+let scanfl fmt (value: string) = scanfInternal false (value.AsMemory()) fmt
 
-/// Strict vesion of scanf which matches full string
-let scanfSpan fmt value = scanfInternal true value fmt
+/// Strict vesion of scanf which matches full memory
+let scanfMemory fmt (value: ReadOnlyMemory<char>) = scanfInternal true value fmt
 
 /// Light version of scanf which stops matching when values are found
-let scanflSpan fmt value = scanfInternal false value fmt
+let scanflMemory fmt (value: ReadOnlyMemory<char>) = scanfInternal true value fmt
