@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -419,5 +420,17 @@ public static partial class IServiceCollectionExtensions
     {
         collection.EnsureImplementedOnceAtMaxAndRemoveIfImplemented(typeof(TService));
         return collection.AddTransient<TService, TImpl>();
+    }
+
+    // try add from configuration or fail
+
+    public static IServiceCollection TryAddSingletonFromConfigurationOrFail<TService>(this IServiceCollection collection)
+        where TService : class
+    {
+        var name = typeof(TService).Name;
+        return collection.TryAddSingletonOrFail(services =>
+            services.GetRequiredService<IConfiguration>()
+                    .GetSection(name)
+                    .Get<TService>());
     }
 }

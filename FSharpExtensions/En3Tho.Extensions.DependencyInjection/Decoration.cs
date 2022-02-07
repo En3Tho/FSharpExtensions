@@ -52,7 +52,7 @@ public static partial class IServiceCollectionExtensions
                     return implementationFactory(serviceProvider, new[] { oldImplementationInstance });
                 };
 
-                newDescriptor = new ServiceDescriptor(typeof(TService), factoryFromFactory, oldDescriptor.Lifetime);
+                newDescriptor = new(typeof(TService), factoryFromFactory, oldDescriptor.Lifetime);
                 break;
 
             case { ImplementationInstance: { } instance }:
@@ -61,7 +61,7 @@ public static partial class IServiceCollectionExtensions
                 {
                     return implementationFactory(serviceProvider, new[] { instance });
                 };
-                newDescriptor = new ServiceDescriptor(typeof(TService), factoryFromInstance, oldDescriptor.Lifetime);
+                newDescriptor = new(typeof(TService), factoryFromInstance, oldDescriptor.Lifetime);
                 break;
 
             default:
@@ -88,7 +88,7 @@ public static partial class IServiceCollectionExtensions
                     return implementationFactory(serviceProvider, new[] { oldImplementationInstance });
                 };
 
-                newDescriptor = new ServiceDescriptor(typeof(TService), factoryFromServices, oldDescriptor.Lifetime);
+                newDescriptor = new(typeof(TService), factoryFromServices, oldDescriptor.Lifetime);
                 break;
         }
 

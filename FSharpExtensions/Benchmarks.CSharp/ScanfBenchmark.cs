@@ -16,10 +16,10 @@ namespace Benchmarks.CSharp
             return Scanf.scanf(Benchmarks.ScanfBenchmark.Assets.primitivesOnlyFmt, "123456 123456.123456");
         }
 
-        [Benchmark]
-        public bool PrimitivesOnlyPreallocatedSpan()
-        {
-            return Scanf.scanfSpan(Benchmarks.ScanfBenchmark.Assets.primitivesOnlyFmt, "123456 123456.123456".AsSpan());
-        }
+        // [Benchmark]
+        // public bool PrimitivesOnlyPreallocatedSpan()
+        // {
+        //     return Scanf.scanfSpan(Benchmarks.ScanfBenchmark.Assets.primitivesOnlyFmt, "123456 123456.123456".AsSpan());
+        // }
     }
 }
