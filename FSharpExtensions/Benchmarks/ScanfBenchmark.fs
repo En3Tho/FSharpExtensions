@@ -3,7 +3,25 @@
 open System
 open BenchmarkDotNet.Attributes
 open BenchmarkDotNet.Jobs
+open En3Tho.FSharp.Extensions
 open En3Tho.FSharp.Extensions.Scanf
+
+module CraftTalkLike =
+    type Command =
+        | Start
+        | Switch of Agent: string
+        | SwitchRedirect of Agent: string * Message: string
+
+    let memref<'a> = ref (ReadOnlyMemory<'a>())
+
+    type AgentCommandParser() =
+        let cmd = memref<char>
+        let rest = memref<char>
+
+        let commandFmt = $"{cmd} {rest}"
+        let parseCommand (cmd: ReadOnlyMemory<char>) =
+            if cmd.Span.Equals("/start".AsSpan(), StringComparison.OrdinalIgnoreCase) then Command.Start
+            elif Scanf.scanfSpan
 
 module Assets = // for CSharp version of bench
 

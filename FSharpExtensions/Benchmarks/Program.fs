@@ -1,8 +1,8 @@
 open System.Runtime.InteropServices
 open BenchmarkDotNet.Configs
 open BenchmarkDotNet.Running
+open Benchmarks
 open Benchmarks.FSharp
-open Benchmarks.FSharp.Lib
 
 type BenchmarkRunner with
     static member Run<'T1, 'T2>([<Optional; DefaultParameterValue(null: IConfig)>] config: IConfig) =
@@ -26,14 +26,10 @@ type BenchmarkRunner with
             BenchmarkConverter.TypeToBenchmarks(typeof<'T4>, config)
         |])
 
-[<EntryPoint>]
-let main argv =
-
-    BenchmarkRunner.Run<
-//                        FSharpOptimizer.Benchmark,
-//                        FSharpOptimizerWithExperimentalPipe.Benchmark,
-//                        PushStream.Benchmark,
-                        PushStream.Benchmark2,
-                        PushStream.Benchmark3
-                        >() |> ignore
-    0 // return an integer exit code
+BenchmarkRunner.Run<
+//    GenericEqualityBenchmark.Reference.Benchmark,
+//    GenericEqualityBenchmark.Value.Benchmark,
+    GenericEqualityObjectArrayBenchmark.Benchmark
+//    FSharpOptimizer.Benchmark,
+//    FSharpOptimizerWithExperimentalPipe.Benchmark
+    >() |> ignore

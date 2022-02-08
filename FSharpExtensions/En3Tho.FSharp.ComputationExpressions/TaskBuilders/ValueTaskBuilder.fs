@@ -45,7 +45,7 @@ type ValueTaskBuilderBase() =
         ValueTaskCode<'TOverall, 'T>(fun sm -> (generator()).Invoke(&sm))
 
     /// Used to represent no-ops like the implicit empty "else" branch of an "if" expression.
-    //[<DefaultValue]
+    [<DefaultValue>]
     member inline _.Zero() : ValueTaskCode<'TOverall, unit> = ResumableCode.Zero()
 
     member inline _.Return (value: 'T) : ValueTaskCode<'T, 'T> =

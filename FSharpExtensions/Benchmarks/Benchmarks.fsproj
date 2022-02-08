@@ -16,6 +16,8 @@
         <Compile Include="FSharpOptimizerWithExperimentalPipe.fs" />
         <Compile Include="FSharpOptimizer.fs" />
         <Compile Include="PushStream.fs" />
+        <Compile Include="GenericEqualityBenchmark.fs" />
+        <Compile Include="GenericEqualityObjectArrayBenchmark.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
