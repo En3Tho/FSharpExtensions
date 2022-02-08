@@ -9,6 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="DeferTests.fs" />
         <Compile Include="ScanfTest.fs" />
         <Compile Include="FunkyPipesTests.fs" />
         <Compile Include="Program.fs" />

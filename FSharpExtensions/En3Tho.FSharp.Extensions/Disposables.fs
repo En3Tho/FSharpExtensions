@@ -1,6 +1,7 @@
 ﻿namespace En3Tho.FSharp.Extensions.Disposables
 
 open System
+open System.Threading.Tasks
 
 [<Struct>]
 type ValueDisposable<'a>(value: 'a, dispose: 'a -> unit) =
@@ -12,6 +13,16 @@ type ValueDisposable<'a>(value: 'a, dispose: 'a -> unit) =
 type UnitDisposable(dispose: unit -> unit) =
     interface IDisposable with
         member this.Dispose() = dispose()
+
+[<Struct>]
+type UnitAsyncDisposable(dispose: unit -> ValueTask) =
+    interface IAsyncDisposable with
+        member this.DisposeAsync() = dispose()
+
+[<Struct>]
+type ValueAsyncDisposable<'a>(value: 'a, dispose: 'a -> ValueTask) =
+    interface IAsyncDisposable with
+        member this.DisposeAsync() = dispose value
 
 [<Struct>]
 type Rented<'a>(value: 'a) =

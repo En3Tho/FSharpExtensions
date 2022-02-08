@@ -96,14 +96,14 @@ type Benchmark() =
     member _.RealisticCommandPreallocated() =
         scanf realisticCommandFmt "/authorize myText 123"
 
-    [<Benchmark>]
-    member _.RealisticCommandPreallocatedSpan() =
-        scanfSpan realisticCommandFmt ("/authorize myText 123".AsSpan())
+//    [<Benchmark>]
+//    member _.RealisticCommandPreallocatedSpan() =
+//        scanfSpan realisticCommandFmt ("/authorize myText 123".AsSpan())
 
     [<Benchmark>]
     member _.PrimitivesOnlyPreallocated() =
         scanf primitivesOnlyFmt "123456 123456.123456"
 
-    [<Benchmark>]
-    member _.PrimitivesOnlyPreallocatedSpan() =
-        scanfSpan primitivesOnlyFmt ("123456 123456.123456".AsSpan())
+//    [<Benchmark>]
+//    member _.PrimitivesOnlyPreallocatedSpan() =
+//        scanfSpan primitivesOnlyFmt ("123456 123456.123456".AsSpan())

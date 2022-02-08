@@ -30,8 +30,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="En3Tho.FSharp.ComputationExpressions" Version="1.0.7" />
-      <PackageReference Include="En3Tho.FSharp.Extensions" Version="1.0.5" />
+      <PackageReference Include="En3Tho.FSharp.Extensions" Version="1.1.0" />
       <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

@@ -32,3 +32,11 @@ module PipeAndCompositionOperatorEx =
 
         let inline (|||>) (value1: 'b, value2: 'c, value3: 'd) invokable =
             (T $ invokable) (value1, value2, value3)
+
+module InvokeEx =
+
+    type T = T with
+            static member inline ($) (_, invokable) = fun value -> (^a: (member Invoke: ^b -> ^c) invokable, value)
+            static member inline ($) (_, [<InlineIfLambda>] invokable: 'a -> 'b) = fun value -> invokable value
+
+    let inline (^) invokable value = (T $ invokable) value

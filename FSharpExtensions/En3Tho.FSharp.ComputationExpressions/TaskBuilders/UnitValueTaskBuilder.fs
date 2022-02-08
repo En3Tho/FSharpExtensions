@@ -69,6 +69,47 @@ type UnitValueTaskBuilderBase() =
     member inline _.For (sequence : seq<'T>, body : 'T -> UnitValueTaskCode<unit>) : UnitValueTaskCode<unit> =
         ResumableCode.For(sequence, body)
 
+    member inline internal this.TryFinallyAsync(body: UnitValueTaskCode<'T>, compensation : unit -> ValueTask) : UnitValueTaskCode<'T> =
+        ResumableCode.TryFinallyAsync(body, UnitValueTaskCode<_>(fun sm ->
+            if __useResumableCode then
+                let mutable __stack_condition_fin = true
+                let __stack_vtask = compensation()
+                if not __stack_vtask.IsCompleted then
+                    let mutable awaiter = __stack_vtask.GetAwaiter()
+                    let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
+                    __stack_condition_fin <- __stack_yield_fin
+
+                    if not __stack_condition_fin then
+                        sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &sm)
+
+                __stack_condition_fin
+            else
+                let vtask = compensation()
+                let mutable awaiter = vtask.GetAwaiter()
+
+                let cont =
+                    UnitValueTaskResumptionFunc( fun sm ->
+                        awaiter.GetResult()
+                        true)
+
+                // shortcut to continue immediately
+                if awaiter.IsCompleted then
+                    true
+                else
+                    sm.ResumptionDynamicInfo.ResumptionData <- (awaiter :> ICriticalNotifyCompletion)
+                    sm.ResumptionDynamicInfo.ResumptionFunc <- cont
+                    false
+                ))
+
+    member inline this.Using<'Resource, 'TOverall, 'T when 'Resource :> IAsyncDisposable> (resource: 'Resource, body: 'Resource -> UnitValueTaskCode<'T>) : UnitValueTaskCode<'T> =
+        this.TryFinallyAsync(
+            (fun sm -> (body resource).Invoke(&sm)),
+            (fun () ->
+                if not (isNull (box resource)) then
+                    resource.DisposeAsync()
+                else
+                    ValueTask()))
+
     type UnitValueTaskBuilder() =
 
         inherit UnitValueTaskBuilderBase()
