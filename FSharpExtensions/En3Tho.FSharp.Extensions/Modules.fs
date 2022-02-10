@@ -73,7 +73,7 @@ module Object =
 
         let inline ( *<>) a b = not (a *== b)
 
-        let inline private callIEquatableEquals<'a when 'a:> IEquatable<'a>> (a: 'a) (b: 'a) = a.Equals(b)
+        let inline private callIEquatableEquals<'a when 'a :> IEquatable<'a>> (a: 'a) (b: 'a) = a.Equals(b)
 
         let inline (^==) a b = callIEquatableEquals a b
 

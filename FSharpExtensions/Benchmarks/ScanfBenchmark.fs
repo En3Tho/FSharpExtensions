@@ -3,6 +3,7 @@
 open System
 open BenchmarkDotNet.Attributes
 open BenchmarkDotNet.Jobs
+open En3Tho.FSharp.Extensions
 open En3Tho.FSharp.Extensions.Scanf
 
 module Assets = // for CSharp version of bench
