@@ -23,15 +23,12 @@ type block<'a> = ImmutableArray<'a>
 [<AutoOpen>]
 module Core =
 
-    module DeferHelpers =
-        type T = T with
-            static member inline ($) (_, [<InlineIfLambda>] disposer) = UnitAsyncDisposable(disposer)
-            static member inline ($) (_, [<InlineIfLambda>] disposer) = new UnitDisposable(disposer)
-
-    module DefervHelpers =
-        type T = T with
-            static member inline ($) (_, [<InlineIfLambda>] disposer) = fun value -> ValueAsyncDisposable<_>(value, disposer)
-            static member inline ($) (_, [<InlineIfLambda>] disposer) = fun value -> new ValueDisposable<_>(value, disposer)
+    [<AbstractClass; AutoOpen>]
+    type Defer =
+        static member inline defer ([<InlineIfLambda>] disposer) = UnitAsyncDisposable(disposer)
+        static member inline defer ([<InlineIfLambda>] disposer) = new UnitDisposable(disposer)
+        static member inline deferv ([<InlineIfLambda>] disposer) = fun value -> ValueAsyncDisposable<_>(value, disposer)
+        static member inline deferv ([<InlineIfLambda>] disposer) = fun value -> new ValueDisposable<_>(value, disposer)
 
     let someObj = Some()
     let inline (^) ([<InlineIfLambda>] f) x = f x
@@ -44,8 +41,7 @@ module Core =
 
     /// unsafe cast
     let inline ucast<'a, 'b> (a: 'a): 'b = (# "" a: 'b #)
-    let inline defer f = (DeferHelpers.T $ f)
-    let inline deferv f value = (DefervHelpers.T $ f) value
+
     let ignore2 _ _ = ()
     let ignore3 _ _ _ = ()
     let inline referenceEquals< ^a when ^a : not struct> (obj1: ^a) (obj2: ^a) = Object.ReferenceEquals(obj1, obj2)

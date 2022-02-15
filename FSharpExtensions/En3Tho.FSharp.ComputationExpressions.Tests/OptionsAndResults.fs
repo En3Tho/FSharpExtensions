@@ -1,6 +1,7 @@
 ﻿module En3Tho.FSharp.Extensions.Tests.OptionsAndResults
 
 open System
+open System.Threading.Tasks
 open Xunit
 open En3Tho.FSharp.ComputationExpressions.OptionBuilder
 open En3Tho.FSharp.ComputationExpressions.ResultBuilder
@@ -192,3 +193,10 @@ let ``Test that exnresult properly catches exceptions`` () =
     }
 
     Assert.Equal(res3, Error exn)
+
+let ``test that exnresult properly works with exceptions of different types``() = exnresult {
+
+    let! exn1 = Error (AggregateException())
+    let! exn2 = Error (ArgumentException())
+    return 0
+}

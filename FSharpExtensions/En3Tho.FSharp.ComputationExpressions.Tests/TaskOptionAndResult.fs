@@ -151,3 +151,19 @@ let ``Test that exnresult properly catches exceptions`` () = vtask {
     Assert.Equal(res3, Error exn)
 }
 
+let ``test that exnresultvtask properly works with exceptions of different types``() = exnresultvtask {
+    let exnTask = task { failwith "" }
+    let tryExnTask (t: Task<_>) = task {
+        try
+            let! result = t
+            return Ok t
+        with exn ->
+            return Error exn
+    }
+
+    let! exn0 = tryExnTask exnTask
+
+    let! exn1 = Error (AggregateException()) |> ValueTask.FromResult
+    let! exn2 = Error (ArgumentException()) |> ValueTask.FromResult
+    return 0
+}

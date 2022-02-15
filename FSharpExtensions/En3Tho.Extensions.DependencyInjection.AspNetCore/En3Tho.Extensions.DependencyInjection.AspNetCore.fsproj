@@ -30,13 +30,14 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="En3Tho.FSharp.Extensions" Version="1.0.5" />
+      <PackageReference Include="En3Tho.FSharp.Extensions" Version="1.1.0" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
       <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
+      <PackageReference Update="FSharp.Core" Version="6.0.3" />
     </ItemGroup>
 
 </Project>
