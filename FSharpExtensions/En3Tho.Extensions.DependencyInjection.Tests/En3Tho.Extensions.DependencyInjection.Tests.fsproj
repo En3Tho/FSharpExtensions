@@ -9,6 +9,7 @@
 
     <ItemGroup>
         <Compile Include="DecorationTests.fs" />
+        <Compile Include="UpdateTests.fs" />
         <Compile Include="RootNamespaceDependencyInjectionTest.fs" />
         <Compile Include="ModuleDependencyInjectionTest.fs" />
         <Compile Include="Module2DependencyInjectionTest.fs" />

@@ -8,6 +8,27 @@ public static partial class IServiceCollectionExtensions
 {
     internal record struct ServiceDescriptorEnvelope(ServiceDescriptor Descriptor, int Index);
 
+    internal static bool TryFindServiceDescriptor(this IServiceCollection collection, Type type,
+        out ServiceDescriptorEnvelope serviceDescriptor)
+    {
+        for (var i = 0; i < collection.Count; i++)
+        {
+            var descriptor = collection[i];
+            if (descriptor.ServiceType == type)
+            {
+                serviceDescriptor = new ServiceDescriptorEnvelope(descriptor, i);
+                return true;
+            }
+        }
+
+        serviceDescriptor = default;
+        return false;
+    }
+
+    internal static bool TryFindServiceDescriptor<TService>(this IServiceCollection collection,
+        out ServiceDescriptorEnvelope serviceDescriptor) =>
+        collection.TryFindServiceDescriptor(typeof(TService), out serviceDescriptor);
+
     internal static void EnsureNotImplementedNoMoreThan(this IServiceCollection collection, Type serviceType, int times)
     {
         var descriptors = collection.Where(d => d.ServiceType == serviceType).ToArray();

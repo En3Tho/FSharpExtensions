@@ -177,9 +177,9 @@ public static partial class IServiceCollectionExtensions
         return collection.AddTransient(serviceType, typeof(TImpl).GetGenericTypeDefinition());
     }
 
-    // AddOrUpdate
+    // AddOrReplace
 
-    public static IServiceCollection AddOrUpdateSingleton<TService>(this IServiceCollection collection)
+    public static IServiceCollection AddOrReplaceSingleton<TService>(this IServiceCollection collection)
         where TService : class
     {
         var descriptor = collection.FirstOrDefault(d => d.ServiceType == typeof(TService));
@@ -188,7 +188,7 @@ public static partial class IServiceCollectionExtensions
         return collection.AddSingleton<TService>();
     }
 
-    public static IServiceCollection AddOrUpdateSingleton<TService>(this IServiceCollection collection, Func<IServiceProvider, TService> implementationFactory)
+    public static IServiceCollection AddOrReplaceSingleton<TService>(this IServiceCollection collection, Func<IServiceProvider, TService> implementationFactory)
         where TService : class
     {
         var descriptor = collection.FirstOrDefault(d => d.ServiceType == typeof(TService));
@@ -197,7 +197,7 @@ public static partial class IServiceCollectionExtensions
         return collection.AddSingleton(implementationFactory);
     }
 
-    public static IServiceCollection AddOrUpdateSingleton<TService>(this IServiceCollection collection, TService implementationValue)
+    public static IServiceCollection AddOrReplaceSingleton<TService>(this IServiceCollection collection, TService implementationValue)
         where TService : class
     {
         var descriptor = collection.FirstOrDefault(d => d.ServiceType == typeof(TService));
@@ -206,7 +206,7 @@ public static partial class IServiceCollectionExtensions
         return collection.AddSingleton(implementationValue);
     }
 
-    public static IServiceCollection AddOrUpdateSingleton<TService, TImpl>(this IServiceCollection collection)
+    public static IServiceCollection AddOrReplaceSingleton<TService, TImpl>(this IServiceCollection collection)
         where TService : class
         where TImpl : class, TService
     {
@@ -216,7 +216,7 @@ public static partial class IServiceCollectionExtensions
         return collection.AddSingleton<TService, TImpl>();
     }
 
-    public static IServiceCollection AddOrUpdateScoped<TService>(this IServiceCollection collection)
+    public static IServiceCollection AddOrReplaceScoped<TService>(this IServiceCollection collection)
         where TService : class
     {
         var descriptor = collection.FirstOrDefault(d => d.ServiceType == typeof(TService));
@@ -225,7 +225,7 @@ public static partial class IServiceCollectionExtensions
         return collection.AddScoped<TService>();
     }
 
-    public static IServiceCollection AddOrUpdateScoped<TService>(this IServiceCollection collection, Func<IServiceProvider, TService> implementationFactory)
+    public static IServiceCollection AddOrReplaceScoped<TService>(this IServiceCollection collection, Func<IServiceProvider, TService> implementationFactory)
         where TService : class
     {
         var descriptor = collection.FirstOrDefault(d => d.ServiceType == typeof(TService));
@@ -234,7 +234,7 @@ public static partial class IServiceCollectionExtensions
         return collection.AddScoped(implementationFactory);
     }
 
-    public static IServiceCollection AddOrUpdateScoped<TService, TImpl>(this IServiceCollection collection)
+    public static IServiceCollection AddOrReplaceScoped<TService, TImpl>(this IServiceCollection collection)
         where TService : class
         where TImpl : class, TService
     {
@@ -244,7 +244,7 @@ public static partial class IServiceCollectionExtensions
         return collection.AddScoped<TService, TImpl>();
     }
 
-    public static IServiceCollection AddOrUpdateTransient<TService>(this IServiceCollection collection)
+    public static IServiceCollection AddOrReplaceTransient<TService>(this IServiceCollection collection)
         where TService : class
     {
         var descriptor = collection.FirstOrDefault(d => d.ServiceType == typeof(TService));
@@ -253,7 +253,7 @@ public static partial class IServiceCollectionExtensions
         return collection.AddTransient<TService>();
     }
 
-    public static IServiceCollection AddOrUpdateTransient<TService>(this IServiceCollection collection, Func<IServiceProvider, TService> implementationFactory)
+    public static IServiceCollection AddOrReplaceTransient<TService>(this IServiceCollection collection, Func<IServiceProvider, TService> implementationFactory)
         where TService : class
     {
         var descriptor = collection.FirstOrDefault(d => d.ServiceType == typeof(TService));
@@ -262,7 +262,7 @@ public static partial class IServiceCollectionExtensions
         return collection.AddTransient(implementationFactory);
     }
 
-    public static IServiceCollection AddOrUpdateTransient<TService, TImpl>(this IServiceCollection collection)
+    public static IServiceCollection AddOrReplaceTransient<TService, TImpl>(this IServiceCollection collection)
         where TService : class
         where TImpl : class, TService
     {
@@ -347,30 +347,38 @@ public static partial class IServiceCollectionExtensions
         return collection.AddTransient<TService, TImpl>();
     }
 
-    // TryAddOrUpdateOrFail
+    // TryAddOrReplaceOrFail
 
-    public static IServiceCollection TryAddOrUpdateSingletonOrFail<TService>(this IServiceCollection collection)
+    public static IServiceCollection TryAddOrReplaceSingletonOrFail<TService>(this IServiceCollection collection)
         where TService : class
     {
         collection.EnsureImplementedOnceAtMaxAndRemoveIfImplemented(typeof(TService));
         return collection.AddSingleton<TService>();
     }
 
-    public static IServiceCollection TryAddOrUpdateSingletonOrFail<TService>(this IServiceCollection collection, Func<IServiceProvider, TService> implementationFactory)
+    public static IServiceCollection TryAddOrReplaceSingletonOrFail<TService>(this IServiceCollection collection, Func<IServiceProvider, TService> implementationFactory)
         where TService : class
     {
         collection.EnsureImplementedOnceAtMaxAndRemoveIfImplemented(typeof(TService));
         return collection.AddSingleton(implementationFactory);
     }
 
-    public static IServiceCollection TryAddOrUpdateSingletonOrFail<TService>(this IServiceCollection collection, TService implementationValue)
+    public static IServiceCollection TryAddOrReplaceSingletonOrFail<TService, TImpl>(this IServiceCollection collection, Func<IServiceProvider, TImpl> implementationFactory)
+        where TService : class
+        where TImpl : class, TService
+    {
+        collection.EnsureImplementedOnceAtMaxAndRemoveIfImplemented(typeof(TService));
+        return collection.AddSingleton<TService, TImpl>(implementationFactory);
+    }
+
+    public static IServiceCollection TryAddOrReplaceSingletonOrFail<TService>(this IServiceCollection collection, TService implementationValue)
         where TService : class
     {
         collection.EnsureImplementedOnceAtMaxAndRemoveIfImplemented(typeof(TService));
         return collection.AddSingleton(implementationValue);
     }
 
-    public static IServiceCollection TryAddOrUpdateSingletonOrFail<TService, TImpl>(this IServiceCollection collection)
+    public static IServiceCollection TryAddOrReplaceSingletonOrFail<TService, TImpl>(this IServiceCollection collection)
         where TService : class
         where TImpl : class, TService
     {
@@ -378,21 +386,29 @@ public static partial class IServiceCollectionExtensions
         return collection.AddSingleton<TService, TImpl>();
     }
 
-    public static IServiceCollection TryAddOrUpdateScopedOrFail<TService>(this IServiceCollection collection)
+    public static IServiceCollection TryAddOrReplaceScopedOrFail<TService>(this IServiceCollection collection)
         where TService : class
     {
         collection.EnsureImplementedOnceAtMaxAndRemoveIfImplemented(typeof(TService));
         return collection.AddScoped<TService>();
     }
 
-    public static IServiceCollection TryAddOrUpdateScopedOrFail<TService>(this IServiceCollection collection, Func<IServiceProvider, TService> implementationFactory)
+    public static IServiceCollection TryAddOrReplaceScopedOrFail<TService>(this IServiceCollection collection, Func<IServiceProvider, TService> implementationFactory)
         where TService : class
     {
         collection.EnsureImplementedOnceAtMaxAndRemoveIfImplemented(typeof(TService));
         return collection.AddScoped(implementationFactory);
     }
 
-    public static IServiceCollection TryAddOrUpdateScopedOrFail<TService, TImpl>(this IServiceCollection collection)
+    public static IServiceCollection TryAddOrReplaceScopedOrFail<TService, TImpl>(this IServiceCollection collection, Func<IServiceProvider, TImpl> implementationFactory)
+        where TService : class
+        where TImpl : class, TService
+    {
+        collection.EnsureImplementedOnceAtMaxAndRemoveIfImplemented(typeof(TService));
+        return collection.AddScoped<TService, TImpl>(implementationFactory);
+    }
+
+    public static IServiceCollection TryAddOrReplaceScopedOrFail<TService, TImpl>(this IServiceCollection collection)
         where TService : class
         where TImpl : class, TService
     {
@@ -400,21 +416,29 @@ public static partial class IServiceCollectionExtensions
         return collection.AddScoped<TService, TImpl>();
     }
 
-    public static IServiceCollection TryAddOrUpdateTransientOrFail<TService>(this IServiceCollection collection)
+    public static IServiceCollection TryAddOrReplaceTransientOrFail<TService>(this IServiceCollection collection)
         where TService : class
     {
         collection.EnsureImplementedOnceAtMaxAndRemoveIfImplemented(typeof(TService));
         return collection.AddTransient<TService>();
     }
 
-    public static IServiceCollection TryAddOrUpdateTransientOrFail<TService>(this IServiceCollection collection, Func<IServiceProvider, TService> implementationFactory)
+    public static IServiceCollection TryAddOrReplaceTransientOrFail<TService>(this IServiceCollection collection, Func<IServiceProvider, TService> implementationFactory)
         where TService : class
     {
         collection.EnsureImplementedOnceAtMaxAndRemoveIfImplemented(typeof(TService));
         return collection.AddTransient(implementationFactory);
     }
 
-    public static IServiceCollection TryAddOrUpdateTransientOrFail<TService, TImpl>(this IServiceCollection collection)
+    public static IServiceCollection TryAddOrReplaceTransientOrFail<TService, TImpl>(this IServiceCollection collection, Func<IServiceProvider, TImpl> implementationFactory)
+        where TService : class
+        where TImpl : class, TService
+    {
+        collection.EnsureImplementedOnceAtMaxAndRemoveIfImplemented(typeof(TService));
+        return collection.AddTransient<TService, TImpl>(implementationFactory);
+    }
+
+    public static IServiceCollection TryAddOrReplaceTransientOrFail<TService, TImpl>(this IServiceCollection collection)
         where TService : class
         where TImpl : class, TService
     {

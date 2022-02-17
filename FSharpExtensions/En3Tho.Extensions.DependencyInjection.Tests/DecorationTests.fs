@@ -11,6 +11,8 @@ type IService =
 
 exception CustomObjectDisposedException
 
+type EmptyType() = class end
+
 [<AbstractClass>]
 type Service() =
     abstract member GetValue: unit -> int
@@ -40,11 +42,20 @@ type ServiceInterfaceDecorator2(service: IService) =
         member this.GetValue() = service.GetValue() + 12
         member this.Dispose() = service.Dispose()
 
+type ServiceInterfaceDecoratorWithAdditionalDependency(service: IService, empty: EmptyType) =
+    member _.IsActuallyEmpty = Object.ReferenceEquals(empty, null)
+    interface IService with
+        member this.GetValue() = service.GetValue() + 12
+        member this.Dispose() = service.Dispose()
+
 type ServiceWithValue(value: int) =
     member _.Value = value
     interface IService with
         member this.GetValue() = this.Value
         member this.Dispose() = raise (ObjectDisposedException("This is intentional"))
+
+type ServiceWithValueChild(value: int) =
+    inherit ServiceWithValue(value)
 
 module Basics =
 
@@ -81,6 +92,19 @@ module HappyCases =
         let service = serviceProvider.GetRequiredService<IService>()
         Assert.Equal(typeof<ServiceInterfaceDecorator1>, service.GetType())
         Assert.Equal(11, service.GetValue())
+
+    [<Fact>]
+    let ``Test that basic interface decoration works via types if decorator has additional dependencies`` () =
+        let serviceProvider =
+            ServiceCollection()
+                .AddSingleton<IService, Service1>()
+                .AddSingleton<EmptyType>()
+                .Decorate<IService, ServiceInterfaceDecoratorWithAdditionalDependency>()
+                .BuildServiceProvider()
+
+        let service = serviceProvider.GetRequiredService<IService>()
+        Assert.Equal(typeof<ServiceInterfaceDecoratorWithAdditionalDependency>, service.GetType())
+        Assert.Equal(12, service.GetValue())
 
     [<Fact>]
     let ``Test that basic interface decoration works via factory`` () =
@@ -142,6 +166,20 @@ module HappyCases =
         Assert.Equal(typeof<ServiceBaseDecorator2>, service.GetType())
         Assert.Equal(3, service.GetValue())
 
+    [<Fact>]
+    let ``Test that decoration wont substitute existing implementation if it is registered as interface`` () =
+        let serviceProvider =
+            ServiceCollection()
+                .AddSingleton<ServiceWithValue>(new ServiceWithValue(1))
+                .AddSingleton<IService, ServiceWithValue>() // this one won't get substituted
+                .Decorate<IService, ServiceInterfaceDecorator1>()
+                .BuildServiceProvider()
+        let service = serviceProvider.GetRequiredService<IService>()
+        Assert.Equal(typeof<ServiceInterfaceDecorator1>, service.GetType())
+        // It's 12, not 11 as we can't substitute a value
+        // It's not a problem as this kind of registration is uber fishy, Factory is better suited for this kinds of things
+        Assert.Equal(12, service.GetValue())
+
 module Disposing =
 
     [<Fact>]
@@ -175,20 +213,6 @@ module Disposing =
         ) |> ignore
 
 module UnhappyCases =
-
-    [<Fact>]
-    let ``Test that decoration wont substitute existing implementation registartion`` () =
-        let serviceProvider =
-            ServiceCollection()
-                .AddSingleton<ServiceWithValue>(new ServiceWithValue(1))
-                .AddSingleton<IService, ServiceWithValue>() // this one won't get substituted
-                .Decorate<IService, ServiceInterfaceDecorator1>()
-                .BuildServiceProvider()
-        let service = serviceProvider.GetRequiredService<IService>()
-        Assert.Equal(typeof<ServiceInterfaceDecorator1>, service.GetType())
-        // It's 12, not 11 as we can't substitute a value
-        // It's not a problem as this kind of registration is uber fishy, Factory is better suited for this kinds of things
-        Assert.Equal(12, service.GetValue())
 
     [<Fact>]
     let ``Test that decoration won't work if decorated service is not registered`` () =
