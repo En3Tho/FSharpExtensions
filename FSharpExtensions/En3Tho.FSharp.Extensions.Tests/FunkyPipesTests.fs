@@ -1,9 +1,7 @@
 module En3Tho.FSharp.Extensions.Tests.FunkyPipesTests
 
 open System
-open En3Tho.FSharp.Extensions.Experimental
-open PipeAndCompositionOperatorEx
-open InvokeEx
+open En3Tho.FSharp.Extensions
 open Xunit
 
 let f1 x = x

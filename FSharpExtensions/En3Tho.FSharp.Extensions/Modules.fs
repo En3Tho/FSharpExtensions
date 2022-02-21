@@ -9,6 +9,7 @@ open System.Linq
 open System.Reflection
 open System.Reflection.Emit
 open System.Runtime.ExceptionServices
+open System.Runtime.InteropServices
 open System.Threading.Tasks
 open FSharp.NativeInterop
 open Microsoft.FSharp.Reflection
@@ -20,7 +21,123 @@ open En3Tho.FSharp.ComputationExpressions.Tasks
 
 type block<'a> = ImmutableArray<'a>
 
-[<AutoOpen>]
+[<AutoOpen; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+module PipeAndCompositionOperatorEx =
+
+    [<AutoOpen; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    module Pipe1 =
+
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        type T = T with
+            static member inline ($) (_, invokable) = fun value -> (^a: (member Invoke: ^b -> ^c) invokable, value)
+            static member inline ($) (_, [<InlineIfLambda>] invokable: 'a -> 'b) = fun value -> invokable value
+
+        let inline (|>) value invokable = (T $ invokable) value
+        let inline (>>) f1 f2 = fun value -> (T $ f2) ((T $ f1) value)
+        let inline (<<) f1 f2 = fun value -> (T $ f1) ((T $ f2) value)
+
+[<AutoOpen; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+module Pipe2 =
+
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    type T = T with
+        static member inline ($) (T, invokable: ^a) = fun (value1, value2) -> (^a: (member Invoke: 'b * 'c -> 'd) invokable, value1, value2)
+        static member inline ($) (T, [<InlineIfLambda>] invokable: 'a -> 'b -> 'c) = fun (value1, value2) -> invokable value1 value2
+
+    let inline (||>) (value1: 'b, value2: 'c) invokable =
+        (T $ invokable) (value1, value2)
+
+[<AutoOpen; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+module Pipe3 =
+
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    type T = T with
+        static member inline ($) (T, invokable: ^a) = fun (value1, value2, value3) -> (^a: (member Invoke: 'b * 'c * 'd -> 'e) invokable, value1, value2, value3)
+        static member inline ($) (T, [<InlineIfLambda>] invokable: 'a -> 'b -> 'c -> 'd) = fun (value1, value2, value3) -> invokable value1 value2 value3
+
+    let inline (|||>) (value1: 'b, value2: 'c, value3: 'd) invokable =
+        (T $ invokable) (value1, value2, value3)
+
+[<AutoOpen; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+module InvokeEx =
+
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    type T = T with
+            static member inline ($) (_, invokable) = fun value -> (^a: (member Invoke: ^b -> ^c) invokable, value)
+            static member inline ($) (_, [<InlineIfLambda>] invokable: 'a -> 'b) = fun value -> invokable value
+
+    let inline (^) invokable value = (T $ invokable) value
+
+[<AutoOpen; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+module IEquatableEqualityOperatorEx =
+
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    let inline callIEquatableEqualsOnValues<'a when 'a :> IEquatable<'a>> (left: 'a) (right: 'a) = left.Equals(right)
+
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    let inline callIEquatableEqualsOnArrays<'a when 'a :> IEquatable<'a>> (left: 'a[]) (right: 'a[]) =
+        left.AsSpan().SequenceEqual(right)
+
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    let inline callIEquatableEqualsOnResizeArrays<'a when 'a :> IEquatable<'a>> (left: 'a ResizeArray) (right: 'a ResizeArray) =
+        CollectionsMarshal.AsSpan(left).SequenceEqual(Span.op_Implicit(CollectionsMarshal.AsSpan(right))) // for some reason implicit conversion didn't work. This is a bug I think.
+
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    let inline callIEquatableEqualsOnSeq<'a when 'a :> IEquatable<'a>> (left: 'a seq) (right: 'a seq) =
+        match left, right with
+        | :? IList<'a> as left, (:? IList<'a> as right) ->
+            left.Count = right.Count
+            && (
+                let count = left.Count
+                let rec go index = // TODO: validate that compiler rewrites this into a while loop
+                    if uint index >= uint count then
+                        true
+                    else
+                        callIEquatableEqualsOnValues left[index] right[index]
+                        && go (index + 1)
+                go 0)
+        | _ ->
+            use leftEnumerator = left.GetEnumerator()
+            use rightEnumerator = right.GetEnumerator()
+            let rec go() =
+                match leftEnumerator.MoveNext(), rightEnumerator.MoveNext() with
+                | true, true ->
+                    callIEquatableEqualsOnValues leftEnumerator.Current rightEnumerator.Current
+                    && go()
+                | false, false ->
+                    true
+                | _ ->
+                    false
+            go()
+
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    let inline callIEquatableEqualsOnLists<'a when 'a :> IEquatable<'a>> (left: 'a list) (right: 'a list) =
+        let rec go left right = // TODO: validate that compiler rewrites this into a while loop
+            match left, right with
+            | leftHead :: leftTail, (rightHead :: rightTail) ->
+                callIEquatableEqualsOnValues leftHead rightHead
+                && go leftTail rightTail
+            | [], [] ->
+                true
+            | [], _
+            | _, [] ->
+                false
+
+        go left right
+
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    type T = T with
+        static member inline ($) (T, value) = fun otherValue -> callIEquatableEqualsOnValues value otherValue
+        static member inline ($) (T, value) = fun otherValue -> callIEquatableEqualsOnArrays value otherValue
+        static member inline ($) (T, value) = fun otherValue -> callIEquatableEqualsOnResizeArrays value otherValue
+        static member inline ($) (T, value) = fun otherValue -> callIEquatableEqualsOnLists value otherValue
+        static member inline ($) (T, value) = fun otherValue -> callIEquatableEqualsOnSeq value otherValue
+
+    let inline (==) a b = (T $ a) b
+
+    let inline (!=) a b = not (a == b)
+
+[<AutoOpen; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 module Core =
 
     [<AbstractClass; AutoOpen>]
@@ -31,7 +148,6 @@ module Core =
         static member inline deferv ([<InlineIfLambda>] disposer) = fun value -> new ValueDisposable<_>(value, disposer)
 
     let someObj = Some()
-    let inline (^) ([<InlineIfLambda>] f) x = f x
 
     /// cast via op_Implicit
     let inline icast< ^a, ^b when (^a or ^b): (static member op_Implicit: ^a -> ^b)> (value: ^a): ^b = ((^a or ^b): (static member op_Implicit: ^a -> ^b) value)
@@ -56,24 +172,15 @@ module Core =
     [<Obsolete("This logic needs to be implemented")>]
     let inline TODO<'a> = raise ^ NotImplementedException()
 
-    let inline (|Null|_|) value = if isNull value then someObj else None
-    let inline (|NotNull|_|) value = if isNotNull value then someObj else None
+    let inline (&==) (a: 'a when 'a: not struct) (b: 'a) = Object.ReferenceEquals(a, b)
+    let inline (&!=) (a: 'a when 'a: not struct) (b: 'a) = not (Object.ReferenceEquals(a, b))
 
 module Object =
     module Operators =
-        let inline (&==) (a: ^a when ^a: not struct) b = Object.ReferenceEquals(a, b)
-        let inline (&<>) (a: ^a when ^a: not struct) b = not (Object.ReferenceEquals(a, b))
-
         let inline ( *==) a b =
           (^a: (static member op_Equality: 'a * 'a -> bool) (a, b))
 
-        let inline ( *<>) a b = not (a *== b)
-
-        let inline private callIEquatableEquals<'a when 'a :> IEquatable<'a>> (a: 'a) (b: 'a) = a.Equals(b)
-
-        let inline (^==) a b = callIEquatableEquals a b
-
-        let inline (^<>) a b = not (a ^== b)
+        let inline ( *!=) a b = not (a *== b)
 
     open Operators
     let inline defaultValue def arg = if arg &== null then def else arg

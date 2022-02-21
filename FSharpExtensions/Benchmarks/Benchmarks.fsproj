@@ -18,6 +18,7 @@
         <Compile Include="PushStream.fs" />
         <Compile Include="GenericEqualityBenchmark.fs" />
         <Compile Include="GenericEqualityObjectArrayBenchmark.fs" />
+        <Compile Include="IEquatableEqualityOperatorBenchmark.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 

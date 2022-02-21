@@ -2,7 +2,7 @@
 
 open System
 open BenchmarkDotNet.Attributes
-open En3Tho.FSharp.Extensions.Experimental.PipeAndCompositionOperatorEx
+open En3Tho.FSharp.Extensions
 
 module Printf =
     type T = T with

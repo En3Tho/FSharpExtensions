@@ -99,7 +99,7 @@ type Benchmark() =
         |>> map int64
         |>> fold (+) 0L
 
-open En3Tho.FSharp.Extensions.Experimental.PipeAndCompositionOperatorEx
+open En3Tho.FSharp.Extensions
 [<MemoryDiagnoser; DisassemblyDiagnoser>]
 type Benchmark2() =
 

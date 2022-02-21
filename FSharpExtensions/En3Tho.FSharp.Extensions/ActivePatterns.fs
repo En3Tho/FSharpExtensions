@@ -6,6 +6,8 @@ open Core
 
 #nowarn "0077"
 
+let inline (|Null|_|) value = if isNull value then someObj else None
+let inline (|NotNull|_|) value = if isNotNull value then someObj else None
 let [<return: Struct>] inline (|Eq|_|) with' what = what = with' |> ValueOption.ofBool
 let [<return: Struct>] inline (|Neq|_|) with' what = what <> with' |> ValueOption.ofBool
 let [<return: Struct>] inline (|Gt|_|) with' what = what > with' |> ValueOption.ofBool
@@ -13,6 +15,14 @@ let [<return: Struct>] inline (|GtEq|_|) with' what = what >= with' |> ValueOpti
 let [<return: Struct>] inline (|Lt|_|) with' what = what < with' |> ValueOption.ofBool
 let [<return: Struct>] inline (|LtEq|_|) with' what = what <= with' |> ValueOption.ofBool
 let [<return: Struct>] inline (|RefEq|_|) with' what = referenceEquals with' what |> ValueOption.ofBool
+
+let [<return: Struct>] inline (|Equals|_|) with' what = what = with' |> ValueOption.ofBool
+let [<return: Struct>] inline (|NotEquals|_|) with' what = what <> with' |> ValueOption.ofBool
+let [<return: Struct>] inline (|GreaterThan|_|) with' what = what > with' |> ValueOption.ofBool
+let [<return: Struct>] inline (|GreaterThanEquals|_|) with' what = what >= with' |> ValueOption.ofBool
+let [<return: Struct>] inline (|LessThan|_|) with' what = what < with' |> ValueOption.ofBool
+let [<return: Struct>] inline (|LessThanEquals|_|) with' what = what <= with' |> ValueOption.ofBool
+let [<return: Struct>] inline (|ReferenceEquals|_|) with' what = referenceEquals with' what |> ValueOption.ofBool
 
 let [<return: Struct>] inline (|NullableSome|_|) (value: 'a Nullable) = // TODO: F# 6 ValueOption
     if value.HasValue then ValueSome value.Value else ValueNone
