@@ -288,6 +288,14 @@ public static partial class IServiceCollectionExtensions
         return collection.AddSingleton(implementationFactory);
     }
 
+    public static IServiceCollection TryAddSingletonOrFail<TService, TImpl>(this IServiceCollection collection, Func<IServiceProvider, TImpl> implementationFactory)
+        where TService : class
+        where TImpl : class, TService
+    {
+        collection.EnsureNotImplemented(typeof(TService));
+        return collection.AddSingleton<TService, TImpl>(implementationFactory);
+    }
+
     public static IServiceCollection TryAddSingletonOrFail<TService>(this IServiceCollection collection, TService implementationInstance)
         where TService : class
     {
@@ -317,6 +325,14 @@ public static partial class IServiceCollectionExtensions
         return collection.AddScoped(implementationFactory);
     }
 
+    public static IServiceCollection TryAddScopedOrFail<TService, TImpl>(this IServiceCollection collection, Func<IServiceProvider, TImpl> implementationFactory)
+        where TService : class
+        where TImpl : class, TService
+    {
+        collection.EnsureNotImplemented(typeof(TService));
+        return collection.AddScoped<TService, TImpl>(implementationFactory);
+    }
+
     public static IServiceCollection TryAddScopedOrFail<TService, TImpl>(this IServiceCollection collection)
         where TService : class
         where TImpl : class, TService
@@ -337,6 +353,14 @@ public static partial class IServiceCollectionExtensions
     {
         collection.EnsureNotImplemented(typeof(TService));
         return collection.AddTransient(implementationFactory);
+    }
+
+    public static IServiceCollection TryAddTransientOrFail<TService, TImpl>(this IServiceCollection collection, Func<IServiceProvider, TImpl> implementationFactory)
+        where TService : class
+        where TImpl : class, TService
+    {
+        collection.EnsureNotImplemented(typeof(TService));
+        return collection.AddTransient<TService, TImpl>(implementationFactory);
     }
 
     public static IServiceCollection TryAddTransientOrFail<TService, TImpl>(this IServiceCollection collection)
