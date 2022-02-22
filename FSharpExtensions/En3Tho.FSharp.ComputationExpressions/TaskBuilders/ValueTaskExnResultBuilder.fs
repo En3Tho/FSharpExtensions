@@ -195,22 +195,25 @@ module LowPriority =
     type ValueTaskExnResultBuilderBase with
 
         [<NoEagerConstraintApplication>]
-        static member inline BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter , 'TOverall
+        static member inline BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter , 'TOverall, 'TExn
                                             when  ^TaskLike: (member GetAwaiter:  unit ->  ^Awaiter)
                                             and ^Awaiter :> ICriticalNotifyCompletion
                                             and ^Awaiter: (member get_IsCompleted:  unit -> bool)
-                                            and ^Awaiter: (member GetResult:  unit -> Result<'TResult1, exn>)>
+                                            and ^Awaiter: (member GetResult:  unit -> Result<'TResult1, 'TExn>)
+                                            and 'TExn :> exn>
                     (sm: byref<_>, task: ^TaskLike, continuation: ('TResult1 -> ValueTaskExnResultCode<'TOverall, 'TResult2>)) : bool =
 
                 let mutable awaiter = (^TaskLike: (member GetAwaiter : unit -> ^Awaiter)(task))
 
                 let cont =
                     (ValueTaskExnResultResumptionFunc<'TOverall>( fun sm ->
-                        let result = (^Awaiter : (member GetResult : unit -> Result<'TResult1, exn>)(awaiter))
+                        let result = (^Awaiter : (member GetResult : unit -> Result<'TResult1, 'TExn>)(awaiter))
                         match result with
                         | Ok result ->
                             (continuation result).Invoke(&sm)
-                        | _ -> true))
+                        | Error exn ->
+                            sm.Data.Result <- Error (exn :> exn)
+                            true))
 
                 // shortcut to continue immediately
                 if (^Awaiter : (member get_IsCompleted : unit -> bool)(awaiter)) then
@@ -221,11 +224,12 @@ module LowPriority =
                     false
 
         [<NoEagerConstraintApplication>]
-        member inline _.Bind< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter , 'TOverall
+        member inline _.Bind< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter , 'TOverall, 'TExn
                                             when  ^TaskLike: (member GetAwaiter:  unit ->  ^Awaiter)
                                             and ^Awaiter :> ICriticalNotifyCompletion
                                             and ^Awaiter: (member get_IsCompleted:  unit -> bool)
-                                            and ^Awaiter: (member GetResult:  unit -> Result<'TResult1, exn>)>
+                                            and ^Awaiter: (member GetResult:  unit -> Result<'TResult1, 'TExn>)
+                                            and 'TExn :> exn>
                     (task: ^TaskLike, continuation: ('TResult1 -> ValueTaskExnResultCode<'TOverall, 'TResult2>)) : ValueTaskExnResultCode<'TOverall, 'TResult2> =
 
             ValueTaskExnResultCode<'TOverall, _>(fun sm ->
@@ -242,25 +246,28 @@ module LowPriority =
                         __stack_fin <- __stack_yield_fin
 
                     if __stack_fin then
-                        let result = (^Awaiter : (member GetResult : unit -> Result<'TResult1, exn>)(awaiter))
+                        let result = (^Awaiter : (member GetResult : unit -> Result<'TResult1, 'TExn>)(awaiter))
                         match result with
                         | Ok result ->
                             (continuation result).Invoke(&sm)
-                        | _ -> true
+                        | Error exn ->
+                            sm.Data.Result <- Error (exn :> exn)
+                            true
                     else
                         sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &sm)
                         false
                 else
-                    ValueTaskExnResultBuilderBase.BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter , 'TOverall>(&sm, task, continuation)
+                    ValueTaskExnResultBuilderBase.BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter , 'TOverall, 'TExn>(&sm, task, continuation)
                 //-- RESUMABLE CODE END
             )
 
         [<NoEagerConstraintApplication>]
-        member inline this.ReturnFrom< ^TaskLike, ^Awaiter, 'T
+        member inline this.ReturnFrom< ^TaskLike, ^Awaiter, 'T, 'TExn
                                               when  ^TaskLike: (member GetAwaiter:  unit ->  ^Awaiter)
                                               and ^Awaiter :> ICriticalNotifyCompletion
                                               and ^Awaiter: (member get_IsCompleted: unit -> bool)
-                                              and ^Awaiter: (member GetResult: unit -> Result<'T, exn>)>
+                                              and ^Awaiter: (member GetResult: unit -> Result<'T, 'TExn>)
+                                              and 'TExn :> exn>
                 (task: ^TaskLike) : ValueTaskExnResultCode< 'T, 'T> =
 
             this.Bind(task, (fun v -> this.Return v))
@@ -350,17 +357,17 @@ module LowPriority =
                 //-- RESUMABLE CODE END
             )
 
-        member inline this.Bind (task: Result<'TResult1, exn>, continuation: ('TResult1 -> ValueTaskExnResultCode<'TOverall, 'TResult2>)) : ValueTaskExnResultCode<'TOverall, 'TResult2> =
+        member inline this.Bind (task: Result<'TResult1, #exn>, continuation: ('TResult1 -> ValueTaskExnResultCode<'TOverall, 'TResult2>)) : ValueTaskExnResultCode<'TOverall, 'TResult2> =
             this.Bind(ValueTask.FromResult task, continuation)
 
-        member inline this.ReturnFrom (value: Result<'T, exn>)  : ValueTaskExnResultCode<'T, 'T> =
+        member inline this.ReturnFrom (value: Result<'T, #exn>)  : ValueTaskExnResultCode<'T, 'T> =
             this.ReturnFrom (ValueTask.FromResult value)
 
 module HighPriority =
     // High priority extensions
 
     type ValueTaskExnResultBuilderBase with
-        static member BindDynamic (sm: byref<_>, task: Task<Result<'TResult1, exn>>, continuation: ('TResult1 -> ValueTaskExnResultCode<'TOverall, 'TResult2>)) : bool =
+        static member BindDynamic (sm: byref<_>, task: Task<Result<'TResult1, #exn>>, continuation: ('TResult1 -> ValueTaskExnResultCode<'TOverall, 'TResult2>)) : bool =
             let mutable awaiter = task.GetAwaiter()
 
             let cont =
@@ -369,7 +376,9 @@ module HighPriority =
                     match result with
                     | Ok result ->
                         (continuation result).Invoke(&sm)
-                    | _ -> true
+                    | Error exn ->
+                            sm.Data.Result <- Error (exn :> exn)
+                            true
                     ))
 
             // shortcut to continue immediately
@@ -380,7 +389,7 @@ module HighPriority =
                 sm.ResumptionDynamicInfo.ResumptionFunc <- cont
                 false
 
-        static member BindDynamic (sm: byref<_>, task: ValueTask<Result<'TResult1, exn>>, continuation: ('TResult1 -> ValueTaskExnResultCode<'TOverall, 'TResult2>)) : bool =
+        static member BindDynamic (sm: byref<_>, task: ValueTask<Result<'TResult1, #exn>>, continuation: ('TResult1 -> ValueTaskExnResultCode<'TOverall, 'TResult2>)) : bool =
             let mutable awaiter = task.GetAwaiter()
 
             let cont =
@@ -389,7 +398,9 @@ module HighPriority =
                     match result with
                     | Ok result ->
                         (continuation result).Invoke(&sm)
-                    | _ -> true
+                    | Error exn ->
+                            sm.Data.Result <- Error (exn :> exn)
+                            true
                     ))
 
             // shortcut to continue immediately
@@ -400,7 +411,7 @@ module HighPriority =
                 sm.ResumptionDynamicInfo.ResumptionFunc <- cont
                 false
 
-        member inline _.Bind (task: Task<Result<'TResult1, exn>>, continuation: ('TResult1 -> ValueTaskExnResultCode<'TOverall, 'TResult2>)) : ValueTaskExnResultCode<'TOverall, 'TResult2> =
+        member inline _.Bind (task: Task<Result<'TResult1, #exn>>, continuation: ('TResult1 -> ValueTaskExnResultCode<'TOverall, 'TResult2>)) : ValueTaskExnResultCode<'TOverall, 'TResult2> =
 
             ValueTaskExnResultCode<'TOverall, _>(fun sm ->
                 if __useResumableCode then
@@ -419,33 +430,8 @@ module HighPriority =
                         match result with
                         | Ok result ->
                             (continuation result).Invoke(&sm)
-                        | _ -> true
-                    else
-                        sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &sm)
-                        false
-                else
-                    ValueTaskExnResultBuilderBase.BindDynamic(&sm, task, continuation)
-                //-- RESUMABLE CODE END
-            )
-
-        member inline _.Bind (task: ValueTask<Result<'TResult1, exn>>, continuation: ('TResult1 -> ValueTaskExnResultCode<'TOverall, 'TResult2>)) : ValueTaskExnResultCode<'TOverall, 'TResult2> =
-            ValueTaskExnResultCode<'TOverall, _>(fun sm ->
-                if __useResumableCode then
-                    //-- RESUMABLE CODE START
-                    // Get an awaiter from the task
-                    let mutable awaiter = task.GetAwaiter()
-                    let mutable __stack_fin = true
-                    if not awaiter.IsCompleted then
-                        // This will yield with __stack_yield_fin = false
-                        // This will resume with __stack_yield_fin = true
-                        let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
-                        __stack_fin <- __stack_yield_fin
-                    if __stack_fin then
-                        let result = awaiter.GetResult()
-                        match result with
-                        | Ok result ->
-                            (continuation result).Invoke(&sm)
-                        | _ ->
+                        | Error exn ->
+                            sm.Data.Result <- Error (exn :> exn)
                             true
                     else
                         sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &sm)
@@ -455,10 +441,38 @@ module HighPriority =
                 //-- RESUMABLE CODE END
             )
 
-        member inline this.ReturnFrom (task: Task<Result<'T, exn>>) : ValueTaskExnResultCode<'T, 'T> =
+        member inline _.Bind (task: ValueTask<Result<'TResult1, #exn>>, continuation: ('TResult1 -> ValueTaskExnResultCode<'TOverall, 'TResult2>)) : ValueTaskExnResultCode<'TOverall, 'TResult2> =
+            ValueTaskExnResultCode<'TOverall, _>(fun sm ->
+                if __useResumableCode then
+                    //-- RESUMABLE CODE START
+                    // Get an awaiter from the task
+                    let mutable awaiter = task.GetAwaiter()
+                    let mutable __stack_fin = true
+                    if not awaiter.IsCompleted then
+                        // This will yield with __stack_yield_fin = false
+                        // This will resume with __stack_yield_fin = true
+                        let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
+                        __stack_fin <- __stack_yield_fin
+                    if __stack_fin then
+                        let result = awaiter.GetResult()
+                        match result with
+                        | Ok result ->
+                            (continuation result).Invoke(&sm)
+                        | Error exn ->
+                            sm.Data.Result <- Error (exn :> exn)
+                            true
+                    else
+                        sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &sm)
+                        false
+                else
+                    ValueTaskExnResultBuilderBase.BindDynamic(&sm, task, continuation)
+                //-- RESUMABLE CODE END
+            )
+
+        member inline this.ReturnFrom (task: Task<Result<'T, #exn>>) : ValueTaskExnResultCode<'T, 'T> =
             this.Bind(task, (fun v -> this.Return v))
 
-        member inline this.ReturnFrom (task: ValueTask<Result<'T, exn>>) : ValueTaskExnResultCode<'T, 'T> =
+        member inline this.ReturnFrom (task: ValueTask<Result<'T, #exn>>) : ValueTaskExnResultCode<'T, 'T> =
             this.Bind(task, (fun v -> this.Return v))
 
 module MediumPriority =
@@ -466,8 +480,8 @@ module MediumPriority =
 
     // Medium priority extensions
     type ValueTaskExnResultBuilderBase with
-        member inline this.Bind (computation: Async<Result<'TResult1, exn>>, continuation: ('TResult1 -> ValueTaskExnResultCode<'TOverall, 'TResult2>)) : ValueTaskExnResultCode<'TOverall, 'TResult2> =
+        member inline this.Bind (computation: Async<Result<'TResult1, #exn>>, continuation: ('TResult1 -> ValueTaskExnResultCode<'TOverall, 'TResult2>)) : ValueTaskExnResultCode<'TOverall, 'TResult2> =
             this.Bind (Async.StartAsTask computation, continuation)
 
-        member inline this.ReturnFrom (computation: Async<Result<'T, exn>>)  : ValueTaskExnResultCode<'T, 'T> =
+        member inline this.ReturnFrom (computation: Async<Result<'T, #exn>>)  : ValueTaskExnResultCode<'T, 'T> =
             this.ReturnFrom (Async.StartAsTask computation)

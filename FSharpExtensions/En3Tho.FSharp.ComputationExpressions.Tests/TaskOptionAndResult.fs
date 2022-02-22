@@ -89,7 +89,7 @@ let ``Test that async disposable works properly with eresultvtask CE``() = vtask
 }
 
 [<Fact>]
-let ``Test that eresult builder is can process errors`` () = vtask {
+let ``Test that eresult builder can process errors`` () = vtask {
     let exn = Exception()
 
     let! res1 = eresultvtask {
@@ -125,12 +125,12 @@ let ``Test that exnresult properly catches exceptions`` () = vtask {
 
     match res1 with
     | Error lolExn ->
-        Assert.Equal(exn, lolExn)
+        Assert.Same(exn, lolExn)
     | _ ->
         Assert.True(false, "Result should not be OK here")
 
     let! res2 = exnresultvtask {
-        failwith "Lol"
+        failwith "LolException"
         let! a = Error exn
         let! b = Ok 10
         let! c = Ok 15
@@ -139,7 +139,7 @@ let ``Test that exnresult properly catches exceptions`` () = vtask {
 
     match res2 with
     | Error lolExn ->
-        Assert.Equal(exn, lolExn)
+        Assert.Contains(lolExn.Message, "LolException", StringComparison.Ordinal)
     | _ ->
         Assert.True(false, "Result should not be OK here")
 

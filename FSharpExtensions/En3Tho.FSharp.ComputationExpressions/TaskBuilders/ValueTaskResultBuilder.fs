@@ -369,7 +369,9 @@ module HighPriority =
                     match result with
                     | Ok result ->
                         (continuation result).Invoke(&sm)
-                    | _ -> true
+                    | Error error ->
+                            sm.Data.Result <- Error error
+                            true
                     ))
 
             // shortcut to continue immediately
@@ -389,7 +391,9 @@ module HighPriority =
                     match result with
                     | Ok result ->
                         (continuation result).Invoke(&sm)
-                    | _ -> true
+                    | Error error ->
+                            sm.Data.Result <- Error error
+                            true
                     ))
 
             // shortcut to continue immediately
@@ -419,7 +423,9 @@ module HighPriority =
                         match result with
                         | Ok result ->
                             (continuation result).Invoke(&sm)
-                        | _ -> true
+                        | Error error ->
+                            sm.Data.Result <- Error error
+                            true
                     else
                         sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &sm)
                         false
@@ -445,7 +451,8 @@ module HighPriority =
                         match result with
                         | Ok result ->
                             (continuation result).Invoke(&sm)
-                        | _ ->
+                        | Error error ->
+                            sm.Data.Result <- Error error
                             true
                     else
                         sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &sm)
