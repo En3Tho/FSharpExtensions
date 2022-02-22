@@ -18,7 +18,6 @@ let private scanfInternal strict (memory: ReadOnlyMemory<char>) (fmt: Printf.Str
 
     let mutable success =
         capturesSpan.Length > 0
-        && valueSpan.Length > 0
         && formatSpan.Length > 0
         && (match formatSpan.IndexOf(InterpolationFormat) with
            | -1 ->
@@ -39,10 +38,6 @@ let private scanfInternal strict (memory: ReadOnlyMemory<char>) (fmt: Printf.Str
         let currentCapture = capturesSpan.[0]
         capturesSpan <- capturesSpan.SliceForward 1
 
-        if valueSpan.Length = 0 then
-            success <- false
-        else
-
         let literalAfterFormat =
             match formatSpan.IndexOf(InterpolationFormat) with
             | -1 ->
@@ -61,7 +56,7 @@ let private scanfInternal strict (memory: ReadOnlyMemory<char>) (fmt: Printf.Str
                 | index ->
                     index
 
-        if charCounter = 0 then
+        if strict && charCounter = 0 then
             success <- false
         else
 

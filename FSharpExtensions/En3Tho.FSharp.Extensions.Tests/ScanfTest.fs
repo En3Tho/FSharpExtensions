@@ -2,6 +2,7 @@
 
 open System
 
+open En3Tho.FSharp.Extensions
 open Xunit
 
 open En3Tho.FSharp.Extensions.Scanf
@@ -164,3 +165,46 @@ let ``Test bad split cases of scanf`` () =
     let secondPart = ref ""
 
     Assert.False("/authorize -login myLogin -password 1230" |> scanf $"/{firstPart} {secondPart} ")
+
+[<Fact>]
+let ``test that scanf won't allow empty string binding``() =
+    let firstPart = ref ""
+    Assert.False("" |> scanf $"{firstPart}")
+    let firstPart = ref (ReadOnlyMemory<char>())
+    Assert.False("" |> scanf $"{firstPart}")
+
+[<Fact>]
+let ``test that scanf won't allow empty string binding at the end``() =
+    let firstPart = ref ""
+    let secondPart = ref ""
+    Assert.False("30m" |> scanf $"{firstPart}m{secondPart}")
+
+    let firstPart = ref (ReadOnlyMemory<char>())
+    let secondPart = ref (ReadOnlyMemory<char>())
+    Assert.False("30m" |> scanf $"{firstPart}m{secondPart}")
+
+[<Fact>]
+let ``test that scanfl will allow empty string binding``() =
+    let firstPart = ref ""
+    Assert.True("" |> scanfl $"{firstPart}")
+    let firstPart = ref (ReadOnlyMemory<char>())
+    Assert.True("" |> scanfl $"{firstPart}")
+
+[<Fact>]
+let ``test that scanfl will allow empty string binding at the end``() =
+    let firstPart = ref ""
+    let secondPart = ref ""
+    Assert.True("30m" |> scanfl $"{firstPart}m{secondPart}")
+
+    let firstPart = ref (ReadOnlyMemory<char>())
+    let secondPart = ref (ReadOnlyMemory<char>())
+    Assert.True("30m" |> scanfl $"{firstPart}m{secondPart}")
+
+[<Fact>]
+let ``test that both scanf and scanfl won't allow empty int binding``() =
+    let firstPart = ref 0
+    Assert.False("" |> scanf $"{firstPart}")
+    Assert.False("" |> scanfl $"{firstPart}")
+    let firstPart = ref '0'
+    Assert.False("" |> scanf $"{firstPart}")
+    Assert.False("" |> scanfl $"{firstPart}")
