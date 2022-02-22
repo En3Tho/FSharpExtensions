@@ -39,7 +39,7 @@ let ``test that exnresultvtask can work with any kind of exception``() = task {
 }
 
 [<Fact>]
-let ``test that eresultvtask works exactly as exnresultvtask``() = task {
+let ``test that resultvtask works exactly as exnresultvtask``() = task {
     let getExn1() : ValueTask<Result<int, Exception>> =
         ValueTask.FromResult (Error (ArgumentNullException("test1")))
 
@@ -52,7 +52,7 @@ let ``test that eresultvtask works exactly as exnresultvtask``() = task {
     let getExn4() : Result<int, Exception> =
         (Error (InvalidOperationException("test4")))
 
-    let! result = eresultvtask {
+    let! result = resultvtask {
         match! getExn1() with
         | 0 ->
             match! getExn2() with
@@ -72,7 +72,7 @@ let ``test that eresultvtask works exactly as exnresultvtask``() = task {
 }
 
 [<Fact>]
-let ``test that resultvtask works exactly as exnresultvtask``() = task {
+let ``test that resulttask works exactly as exnresultvtask``() = task {
     let getExn1() : ValueTask<Result<int, Exception>> =
         ValueTask.FromResult (Error (ArgumentNullException("test1")))
 
@@ -85,7 +85,7 @@ let ``test that resultvtask works exactly as exnresultvtask``() = task {
     let getExn4() : Result<int, Exception> =
         (Error (InvalidOperationException("test4")))
 
-    let! result = resultvtask {
+    let! result = resulttask {
         match! getExn1() with
         | 0 ->
             match! getExn2() with

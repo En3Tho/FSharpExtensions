@@ -9,10 +9,10 @@
         <PackageProjectUrl>https://github.com/En3Tho/FSharpExtensions</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/En3Tho/FSharpExtensions/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/En3Tho/FSharpExtensions</RepositoryUrl>
-        <AssemblyVersion>1.1.1</AssemblyVersion>
-        <FileVersion>1.1.1</FileVersion>
+        <AssemblyVersion>1.1.2</AssemblyVersion>
+        <FileVersion>1.1.2</FileVersion>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageVersion>1.1.1</PackageVersion>
+        <PackageVersion>1.1.2</PackageVersion>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <!-- Optional: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -35,7 +35,6 @@
       <Compile Include="TaskBuilders\ValueTaskBuilder.fs" />
       <Compile Include="TaskBuilders\ValueTaskOptionBuilder.fs" />
       <Compile Include="TaskBuilders\ValueTaskResultBuilder.fs" />
-      <Compile Include="TaskBuilders\ValueTaskEResultBuilder.fs" />
       <Compile Include="TaskBuilders\ValueTaskExnResultBuilder.fs" />
       <Compile Include="TaskBuilders\TaskBuilders.fs" />
     </ItemGroup>

@@ -76,10 +76,10 @@ let ``Test that async disposable works properly with voptionvtask CE``() = vtask
 }
 
 [<Fact>]
-let ``Test that async disposable works properly with eresultvtask CE``() = vtask {
+let ``Test that async disposable works properly with resultvtask CE``() = vtask {
     let mutable disposalCounter = 0
     let inc() = disposalCounter <- disposalCounter + 1
-    let! x = eresultvtask {
+    let! x = resultvtask {
         use _ = { new IDisposable with member _.Dispose() = inc() }
         use _ = { new IAsyncDisposable with member _.DisposeAsync() = inc(); ValueTask() }
         return 1
@@ -89,10 +89,10 @@ let ``Test that async disposable works properly with eresultvtask CE``() = vtask
 }
 
 [<Fact>]
-let ``Test that eresult builder can process errors`` () = vtask {
+let ``Test that result builder can process errors`` () = vtask {
     let exn = Exception()
 
-    let! res1 = eresultvtask {
+    let! res1 = resultvtask {
         let! a = Error exn
         let! b = Ok 10
         let! c = Ok 15
@@ -106,7 +106,7 @@ let ``Test that eresult builder can process errors`` () = vtask {
         Assert.True(false, "Result should not be OK here")
 
     let exn = Exception()
-    let! res2 = eresultvtask {
+    let! res2 = resultvtask {
         return! Error exn
     }
     Assert.Equal(res2, Error exn)

@@ -83,19 +83,23 @@ module IEquatableEqualityOperatorEx =
         CollectionsMarshal.AsSpan(left).SequenceEqual(Span.op_Implicit(CollectionsMarshal.AsSpan(right))) // for some reason implicit conversion didn't work. This is a bug I think.
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    let inline callIEquatableEqualsOnILists<'a when 'a :> IEquatable<'a>> (left: 'a IList) (right: 'a IList) =
+        left.Count = right.Count
+        && (
+            let count = left.Count
+            let rec go index = // TODO: validate that compiler rewrites this into a while loop
+                if uint index >= uint count then
+                    true
+                else
+                    callIEquatableEqualsOnValues left[index] right[index]
+                    && go (index + 1)
+            go 0)
+
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     let inline callIEquatableEqualsOnSeq<'a when 'a :> IEquatable<'a>> (left: 'a seq) (right: 'a seq) =
         match left, right with
         | :? IList<'a> as left, (:? IList<'a> as right) ->
-            left.Count = right.Count
-            && (
-                let count = left.Count
-                let rec go index = // TODO: validate that compiler rewrites this into a while loop
-                    if uint index >= uint count then
-                        true
-                    else
-                        callIEquatableEqualsOnValues left[index] right[index]
-                        && go (index + 1)
-                go 0)
+            callIEquatableEqualsOnILists left right
         | _ ->
             use leftEnumerator = left.GetEnumerator()
             use rightEnumerator = right.GetEnumerator()
@@ -126,12 +130,52 @@ module IEquatableEqualityOperatorEx =
         go left right
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    let inline callIEquatableEqualsOnHashSets<'a when 'a :> IEquatable<'a>> (left: 'a HashSet) (right: 'a HashSet) =
+        left.Count = right.Count
+        && Object.ReferenceEquals(left.Comparer, right.Comparer)
+        && Object.ReferenceEquals(left.Comparer, EqualityComparer<'a>.Default)
+        && (let mutable leftEnumerator = left.GetEnumerator()
+            let rec go rightCount =
+                if leftEnumerator.MoveNext() then
+                    if rightCount = 0 then
+                        false
+                    else
+                        let mutable rightValue = Unchecked.defaultof<_>
+                        right.TryGetValue(leftEnumerator.Current, &rightValue)
+                        && go (rightCount - 1)
+                else
+                    rightCount = 0
+            go right.Count)
+
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    let inline callIEquatableEqualsOnDictionaries<'a, 'b when 'a :> IEquatable<'a> and 'b :> IEquatable<'b>> (left: Dictionary<'a, 'b>) (right: Dictionary<'a, 'b>) =
+        left.Count = right.Count
+        && Object.ReferenceEquals(left.Comparer, right.Comparer)
+        && Object.ReferenceEquals(left.Comparer, EqualityComparer<'a>.Default)
+        && (let mutable leftEnumerator = left.GetEnumerator()
+            let rec go rightCount =
+                if leftEnumerator.MoveNext() then
+                    if rightCount = 0 then
+                        false
+                    else
+                        let leftValue = leftEnumerator.Current
+                        let mutable rightValue = Unchecked.defaultof<_>
+                        right.TryGetValue(leftValue.Key, &rightValue)
+                        && callIEquatableEqualsOnValues leftValue.Value rightValue
+                        && go (rightCount - 1)
+                else
+                    rightCount = 0
+            go right.Count)
+
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     type T = T with
         static member inline ($) (T, value) = fun otherValue -> callIEquatableEqualsOnValues value otherValue
         static member inline ($) (T, value) = fun otherValue -> callIEquatableEqualsOnArrays value otherValue
         static member inline ($) (T, value) = fun otherValue -> callIEquatableEqualsOnResizeArrays value otherValue
         static member inline ($) (T, value) = fun otherValue -> callIEquatableEqualsOnLists value otherValue
         static member inline ($) (T, value) = fun otherValue -> callIEquatableEqualsOnSeq value otherValue
+        static member inline ($) (T, value) = fun otherValue -> callIEquatableEqualsOnHashSets value otherValue
+        static member inline ($) (T, value) = fun otherValue -> callIEquatableEqualsOnDictionaries value otherValue
 
     let inline (==) a b = (T $ a) b
 

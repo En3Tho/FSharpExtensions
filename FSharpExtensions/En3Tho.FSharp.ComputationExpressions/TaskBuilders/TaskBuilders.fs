@@ -23,10 +23,6 @@ module En3Tho.FSharp.ComputationExpressions.Tasks.TaskBuilders
 [<assembly: AutoOpen("En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskResultBuilderExtensions.MediumPriority")>]
 [<assembly: AutoOpen("En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskResultBuilderExtensions.HighPriority")>]
 
-[<assembly: AutoOpen("En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskEResultBuilderExtensions.LowPriority")>]
-[<assembly: AutoOpen("En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskEResultBuilderExtensions.MediumPriority")>]
-[<assembly: AutoOpen("En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskEResultBuilderExtensions.HighPriority")>]
-
 [<assembly: AutoOpen("En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskExnResultBuilderExtensions.LowPriority")>]
 [<assembly: AutoOpen("En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskExnResultBuilderExtensions.MediumPriority")>]
 [<assembly: AutoOpen("En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskExnResultBuilderExtensions.HighPriority")>]
@@ -37,6 +33,8 @@ let unittask = UnitTaskBuilder()
 let vtask = ValueTaskBuilder()
 let unitvtask = UnitValueTaskBuilder()
 let voptionvtask = ValueTaskValueOptionBuilder()
+let voptiontask = TaskValueOptionBuilder()
 let resultvtask = ValueTaskResultBuilder()
-let eresultvtask = ValueTaskEResultBuilder()
+let resulttask = TaskResultBuilder()
 let exnresultvtask = ValueTaskExnResultBuilder()
+let exnresulttask = TaskExnResultBuilder()

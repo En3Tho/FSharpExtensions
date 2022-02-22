@@ -179,6 +179,72 @@ type ValueTaskExnResultBuilderBase() =
         member inline _.Run(code: ValueTaskExnResultCode<'T, 'T>) : ValueTask<Result<'T, exn>> =
            ValueTaskExnResultBuilder.Run(code)
 
+    type TaskExnResultBuilder() =
+
+        inherit ValueTaskExnResultBuilderBase()
+
+        static member RunDynamic(code: ValueTaskExnResultCode<'T, 'T>) : ValueTask<Result<'T, exn>> =
+            let mutable sm = ValueTaskExnResultStateMachine<'T>()
+            let initialResumptionFunc = ValueTaskExnResultResumptionFunc<'T>(fun sm -> code.Invoke(&sm))
+            let resumptionInfo =
+                { new ValueTaskExnResultResumptionDynamicInfo<'T>(initialResumptionFunc) with
+                    member info.MoveNext(sm) =
+                        let mutable savedExn = null
+                        try
+                            sm.ResumptionDynamicInfo.ResumptionData <- null
+                            let step = info.ResumptionFunc.Invoke(&sm)
+                            if step then
+                                sm.Data.MethodBuilder.SetResult(sm.Data.Result)
+                            else
+                                let mutable awaiter = sm.ResumptionDynamicInfo.ResumptionData :?> ICriticalNotifyCompletion
+                                assert not (isNull awaiter)
+                                sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &sm)
+
+                        with exn ->
+                            savedExn <- exn
+                        // Run SetException outside the stack unwind, see https://github.com/dotnet/roslyn/issues/26567
+                        match savedExn with
+                        | null -> ()
+                        | exn -> sm.Data.MethodBuilder.SetResult (Error exn)
+
+                    member _.SetStateMachine(sm, state) =
+                        sm.Data.MethodBuilder.SetStateMachine(state)
+                    }
+            sm.ResumptionDynamicInfo <- resumptionInfo
+            sm.Data.MethodBuilder <- AsyncValueTaskExnResultMethodBuilder<'T>.Create()
+            sm.Data.MethodBuilder.Start(&sm)
+            sm.Data.MethodBuilder.Task
+
+        static member inline Run(code: ValueTaskExnResultCode<'T, 'T>) : Task<Result<'T, exn>> =
+             (if __useResumableCode then
+                (__stateMachine<ValueTaskExnResultStateMachineData<'T>, ValueTask<Result<'T, exn>>>
+                    (MoveNextMethodImpl<_>(fun sm ->
+                        //-- RESUMABLE CODE START
+                        __resumeAt sm.ResumptionPoint
+                        let mutable __stack_exn : Exception = null
+                        try
+                            let __stack_code_fin = code.Invoke(&sm)
+                            if __stack_code_fin then
+                                sm.Data.MethodBuilder.SetResult(sm.Data.Result)
+                        with exn ->
+                            __stack_exn <- exn
+                        // Run SetException outside the stack unwind, see https://github.com/dotnet/roslyn/issues/26567
+                        match __stack_exn with
+                        | null -> ()
+                        | exn -> sm.Data.MethodBuilder.SetResult (Error exn)
+                        //-- RESUMABLE CODE END
+                    ))
+                    (SetStateMachineMethodImpl<_>(fun sm state -> sm.Data.MethodBuilder.SetStateMachine(state)))
+                    (AfterCode<_,_>(fun sm ->
+                        sm.Data.MethodBuilder <- AsyncValueTaskExnResultMethodBuilder<'T>.Create()
+                        sm.Data.MethodBuilder.Start(&sm)
+                        sm.Data.MethodBuilder.Task)))
+             else
+                ValueTaskExnResultBuilder.RunDynamic(code)).AsTask()
+
+        member inline _.Run(code: ValueTaskExnResultCode<'T, 'T>) : ValueTask<Result<'T, exn>> =
+           ValueTaskExnResultBuilder.Run(code)
+
 namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskExnResultBuilderExtensions
 
 open En3Tho.FSharp.ComputationExpressions.Tasks
