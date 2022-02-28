@@ -120,14 +120,14 @@ let private scanfInternal strict (memory: ReadOnlyMemory<char>) (fmt: Printf.Str
 
     success
 
-/// Strict vesion of scanf which matches full string
+/// Strict vesion of scanf which matches full string, forbids empty strings
 let scanf fmt (value: string) = scanfInternal true (value.AsMemory()) fmt
 
-/// Light version of scanf which stops matching when values are found
+/// Light version of scanf which stops matching when values are found, can return empty strings
 let scanfl fmt (value: string) = scanfInternal false (value.AsMemory()) fmt
 
-/// Strict vesion of scanf which matches full memory
+/// Strict vesion of scanf which matches full memory, forbids empty strings
 let scanfMemory fmt (value: ReadOnlyMemory<char>) = scanfInternal true value fmt
 
-/// Light version of scanf which stops matching when values are found
-let scanflMemory fmt (value: ReadOnlyMemory<char>) = scanfInternal true value fmt
+/// Light version of scanf which stops matching when values are found, can return empty strings
+let scanflMemory fmt (value: ReadOnlyMemory<char>) = scanfInternal false value fmt

@@ -57,9 +57,12 @@ type GenericTypeExtensions() =
     [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
     static member inline For(this, values: 'a seq, [<InlineIfLambda>] forExpr: ForExpression<'a>) : CollectionCode =
         this.Using (
-            values.GetEnumerator(),
-            (fun e -> this.While((fun () -> e.MoveNext()),
-            (fun () -> (forExpr e.Current)()))))
+            values.GetEnumerator(), (fun e ->
+                this.While((fun () -> e.MoveNext()), (fun () ->
+                    (forExpr e.Current)())
+                )
+            )
+        )
 
     [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
     static member inline Zero _ : CollectionCode = fun() -> ()

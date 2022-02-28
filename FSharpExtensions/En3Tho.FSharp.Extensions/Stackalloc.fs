@@ -270,18 +270,19 @@ module Stackalloc =
 
     let inline allocAnyOrPool<'a> len = // TODO: check if those are optimized
         match len with
-        | LtEq 16 -> alloc16OrPool len
-        | LtEq 32 -> allocAnyOrPool32 len
-        | LtEq 64 -> allocAnyOrPool64 len
-        | LtEq 128 -> allocAnyOrPool128 len
-        | LtEq 256 -> allocAny256OrPool len
-        | _ -> allocAny512OrPool len
+        | LtEq 16 -> alloc16OrPool<'a> len
+        | LtEq 32 -> allocAnyOrPool32<'a> len
+        | LtEq 64 -> allocAnyOrPool64<'a> len
+        | LtEq 128 -> allocAnyOrPool128<'a> len
+        | LtEq 256 -> allocAny256OrPool<'a> len
+        | _ -> allocAny512OrPool<'a> len
 
-type [<Struct; IsByRefLike>] StackList<'a>(span: 'a Span) =
+type [<Struct; IsByRefLike>] StackHeapList<'a>(span: 'a Span) =
     [<DefaultValue(false)>] val mutable private count: int
     [<DefaultValue(false)>] val mutable private list: ResizeArray<'a>
 
-    member this.Span = span
+    member this.StackSpan = span.Slice(0, Math.Max(this.count, span.Length))
+    member this.HeapSpan = CollectionsMarshal.AsSpan(this.list)
     member this.Count = this.count
     
     member private this.AddToList value =
@@ -290,18 +291,31 @@ type [<Struct; IsByRefLike>] StackList<'a>(span: 'a Span) =
         this.list.Add value
 
     member this.Add value =
-        if this.count < 64 then
-            this.Span.[this.count] <- value
+        if this.count < span.Length then
+            this.StackSpan.[this.count] <- value
         else
             this.AddToList value
         this.count <- this.count + 1
 
-module StackList =
+type [<Struct; IsByRefLike>] StackList<'a>(span: 'a Span) =
+    [<DefaultValue(false)>] val mutable private count: int
+
+    member this.Span = span.Slice(0, Math.Max(this.count, span.Length))
+    member this.Count = this.count
+
+    member this.Add value =
+        if this.count < span.Length then
+            this.Span.[this.count] <- value
+        else
+            invalidOp "Items count is exceeded"
+        this.count <- this.count + 1
+
+module StackHeapList =
     open Stackalloc
 
     let inline make<'bag, 'a when 'bag: struct and 'bag: (new: unit -> 'bag) and 'bag :> IValueBag<'a>>() =
         let span = allocUsingValueBag<'bag, 'a>()
-        StackList<'a>(span)
+        StackHeapList<'a>(span)
 
     let inline of8<'a>() = make<ValueBag8<'a>,_>()
     let inline of16<'a>() = make<ValueBag16<'a>,_>()
@@ -310,3 +324,8 @@ module StackList =
     let inline of128<'a>() = make<ValueBag128<'a>,_>()
     let inline of256<'a>() = make<ValueBag256<'a>,_>()
     let inline of512<'a>() = make<ValueBag512<'a>,_>()
+
+
+// TODO: stack list CE attempt?
+// A delegate taking byref
+// Run -> let mutable z = ... Run z return z ... and check inlining

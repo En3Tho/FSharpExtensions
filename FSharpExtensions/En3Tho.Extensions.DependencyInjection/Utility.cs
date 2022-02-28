@@ -1,8 +1,40 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace En3Tho.Extensions.DependencyInjection;
+
+public static class ServiceDescriptorExtensions
+{
+    public static bool TryChangeLifetime(this ServiceDescriptor descriptor, ServiceLifetime newLifetime, [NotNullWhen(true)] out ServiceDescriptor? result)
+    {
+        if (descriptor.Lifetime.Equals(newLifetime))
+        {
+            result = descriptor;
+            return true;
+        }
+
+        switch (descriptor)
+        {
+            case { ImplementationFactory: {} factory }:
+                result = new(descriptor.ServiceType, factory, newLifetime);
+                return true;
+
+            case { ImplementationInstance: {} }:
+                result = null;
+                return false;
+
+            case { ImplementationType: {} implementationType }:
+                result = new(descriptor.ServiceType, descriptor.ImplementationType, newLifetime);
+                return true;
+
+            default:
+                result = new(descriptor.ServiceType, descriptor.ServiceType, newLifetime);
+                return true;
+        }
+    }
+}
 
 public static partial class IServiceCollectionExtensions
 {

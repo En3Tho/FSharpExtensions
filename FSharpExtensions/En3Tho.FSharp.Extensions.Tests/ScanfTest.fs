@@ -192,13 +192,24 @@ let ``test that scanfl will allow empty string binding``() =
 
 [<Fact>]
 let ``test that scanfl will allow empty string binding at the end``() =
-    let firstPart = ref ""
+    let firstPart = ref 0
     let secondPart = ref ""
     Assert.True("30m" |> scanfl $"{firstPart}m{secondPart}")
+    Assert.Equal(30, firstPart.Value)
+    Assert.Equal("", secondPart.Value)
 
-    let firstPart = ref (ReadOnlyMemory<char>())
+    let firstPart = ref 0
     let secondPart = ref (ReadOnlyMemory<char>())
     Assert.True("30m" |> scanfl $"{firstPart}m{secondPart}")
+    Assert.Equal(30, firstPart.Value)
+    Assert.Equal("", secondPart.Value.ToString())
+
+[<Fact>]
+let ``Test that scanf doesn't care about empty strings and scanf does``() =
+    let firstPart = ref ""
+    let secondPart = ref ""
+    Assert.True("" |> scanfl $"{firstPart}{secondPart}")
+    Assert.False("" |> scanf $"{firstPart}{secondPart}")
 
 [<Fact>]
 let ``test that both scanf and scanfl won't allow empty int binding``() =

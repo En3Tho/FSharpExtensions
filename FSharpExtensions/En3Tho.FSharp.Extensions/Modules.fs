@@ -1495,6 +1495,14 @@ module Task =
             return mapper result
         }
 
+    let inline bind ([<InlineIfLambda>] mapper) (job: Task<'a>) =
+        if job.IsCompleted then
+            mapper job.Result
+        else task {
+            let! result = job
+            return! mapper result
+        }
+
 module ValueTask =
     let inline map ([<InlineIfLambda>] mapper) (job: ValueTask<'a>) =
         if job.IsCompleted then
@@ -1502,4 +1510,12 @@ module ValueTask =
         else vtask {
             let! result = job
             return mapper result
+        }
+
+    let inline bind ([<InlineIfLambda>] mapper) (job: ValueTask<'a>) =
+        if job.IsCompleted then
+            mapper job.Result
+        else vtask {
+            let! result = job
+            return! mapper result
         }
