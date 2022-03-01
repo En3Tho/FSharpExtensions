@@ -46,7 +46,7 @@ let private scanfInternal strict (memory: ReadOnlyMemory<char>) (fmt: Printf.Str
                 formatSpan.Slice(0, index)
 
         let charCounter =
-            if literalAfterFormat.Length = 0 then
+            if literalAfterFormat.IsEmpty then
                 valueSpan.Length
             else
                 match valueSpan.IndexOf(literalAfterFormat) with
@@ -64,13 +64,13 @@ let private scanfInternal strict (memory: ReadOnlyMemory<char>) (fmt: Printf.Str
 
         match currentCapture with
         | :? Ref<string> as ref ->
-            if formatSpan.Length = 0 && capturesSpan.Length = 0 then
+            if formatSpan.IsEmpty && capturesSpan.IsEmpty then
                 ref.Value <- valueSpan.ToString()
                 valueSpan <- ReadOnlySpan()
             else
                 ref.Value <- value.ToString()
         | :? Ref<ReadOnlyMemory<char>> as ref ->
-            if formatSpan.Length = 0 && capturesSpan.Length = 0 then
+            if formatSpan.IsEmpty && capturesSpan.IsEmpty then
                 ref.Value <- memory.Slice(memory.Length - valueSpan.Length, valueSpan.Length)
                 valueSpan <- ReadOnlySpan()
             else

@@ -29,7 +29,6 @@
       <Compile Include="Scanf.fs" />
       <Compile Include="Experimental.fs" />
       <Compile Include="Stackalloc.fs" />
-      <Compile Include="StackListBuilder.fs" />
     </ItemGroup>
 
     <ItemGroup>

@@ -291,7 +291,7 @@ type [<Struct; IsByRefLike>] StackHeapList<'a>(span: 'a Span) =
         this.list.Add value
 
     member this.Add value =
-        if this.count < span.Length then
+        if uint this.count < uint span.Length then
             this.StackSpan.[this.count] <- value
         else
             this.AddToList value
@@ -304,7 +304,7 @@ type [<Struct; IsByRefLike>] StackList<'a>(span: 'a Span) =
     member this.Count = this.count
 
     member this.Add value =
-        if this.count < span.Length then
+        if uint this.count < uint span.Length then
             this.Span.[this.count] <- value
         else
             invalidOp "Items count is exceeded"
@@ -325,7 +325,17 @@ module StackHeapList =
     let inline of256<'a>() = make<ValueBag256<'a>,_>()
     let inline of512<'a>() = make<ValueBag512<'a>,_>()
 
+module StackList =
+    open Stackalloc
 
-// TODO: stack list CE attempt?
-// A delegate taking byref
-// Run -> let mutable z = ... Run z return z ... and check inlining
+    let inline make<'bag, 'a when 'bag: struct and 'bag: (new: unit -> 'bag) and 'bag :> IValueBag<'a>>() =
+        let span = allocUsingValueBag<'bag, 'a>()
+        StackList<'a>(span)
+
+    let inline of8<'a>() = make<ValueBag8<'a>,_>()
+    let inline of16<'a>() = make<ValueBag16<'a>,_>()
+    let inline of32<'a>() = make<ValueBag32<'a>,_>()
+    let inline of64<'a>() = make<ValueBag64<'a>,_>()
+    let inline of128<'a>() = make<ValueBag128<'a>,_>()
+    let inline of256<'a>() = make<ValueBag256<'a>,_>()
+    let inline of512<'a>() = make<ValueBag512<'a>,_>()
