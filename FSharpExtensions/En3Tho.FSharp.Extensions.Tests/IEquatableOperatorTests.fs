@@ -18,6 +18,10 @@ module Primitive =
     let list2 = [ 1; 2; 3; 4; 5 ]
     let list3 = [ 1; 2; 3; 4; 6 ]
 
+    let linkedList1 = LinkedList() {  1; 2; 3; 4; 5 }
+    let linkedList2 = LinkedList() {  1; 2; 3; 4; 5 }
+    let linkedList3 = LinkedList() {  1; 2; 3; 4; 6 }
+
     let sequence1 = seq { 1; 2; 3; 4; 5 }
     let sequence2 = seq { 1; 2; 3; 4; 5 }
     let sequence3 = seq { 1; 2; 3; 4; 6 }
@@ -39,12 +43,28 @@ module Primitive =
         Assert.Equal(true, value1 == value2)
         Assert.Equal(true, array1 == array2)
         Assert.Equal(true, list1 == list2)
+        Assert.Equal(true, linkedList1 == linkedList2)
         Assert.Equal(true, sequence1 == sequence2)
         Assert.Equal(true, resizeArray1 == resizeArray2)
+
+        Assert.Equal(true, array1 :> seq<_> == list2)
+        Assert.Equal(true, array1 :> seq<_> == linkedList2)
+        Assert.Equal(true, array1 :> seq<_> == sequence2)
+        Assert.Equal(true, array1 :> seq<_> == resizeArray2)
+        Assert.Equal(true, array1 :> seq<_> == hashSet2)
+
+        Assert.Equal(true, array1 :> IList<_> == list2)
+        Assert.Equal(true, array1 :> IList<_> == hashSet2)
+
+        Assert.Equal(true, sequence1 == array2)
+        Assert.Equal(true, sequence1 == list2)
+        Assert.Equal(true, sequence1 == resizeArray2)
+        Assert.Equal(true, sequence1 == hashSet2)
 
         Assert.Equal(false, value1 == value3)
         Assert.Equal(false, array1 == array3)
         Assert.Equal(false, list1 == list3)
+        Assert.Equal(false, linkedList1 == linkedList3)
         Assert.Equal(false, sequence1 == sequence3)
         Assert.Equal(false, resizeArray1 == resizeArray3)
 
@@ -86,6 +106,10 @@ module CustomStructRecord =
     let list2 = [ value1; value1; value1; value1; value2 ]
     let list3 = [ value1; value1; value1; value1; value3 ]
 
+    let linkedList1 = LinkedList() { value1; value1; value1; value1; value1 }
+    let linkedList2 = LinkedList() { value1; value1; value1; value1; value2 }
+    let linkedList3 = LinkedList() { value1; value1; value1; value1; value3 }
+
     let sequence1 = seq { value1; value1; value1; value1; value1 }
     let sequence2 = seq { value1; value1; value1; value1; value2 }
     let sequence3 = seq { value1; value1; value1; value1; value3 }
@@ -108,14 +132,25 @@ module CustomStructRecord =
         Assert.Equal(true, value1 == value2)
         Assert.Equal(true, array1 == array2)
         Assert.Equal(true, list1 == list2)
+        Assert.Equal(true, linkedList1 == linkedList2)
         Assert.Equal(true, sequence1 == sequence2)
         Assert.Equal(true, resizeArray1 == resizeArray2)
         Assert.Equal(true, hashSet1 == hashSet2)
         Assert.Equal(true, dictionary1 == dictionary2)
 
+        Assert.Equal(true, array1 :> seq<_> == list2)
+        Assert.Equal(true, array1 :> seq<_> == linkedList2)
+        Assert.Equal(true, array1 :> seq<_> == sequence2)
+        Assert.Equal(true, array1 :> seq<_> == resizeArray2)
+
+        Assert.Equal(true, sequence1 == array2)
+        Assert.Equal(true, sequence1 == list2)
+        Assert.Equal(true, sequence1 == resizeArray2)
+
         Assert.Equal(false, value1 == value3)
         Assert.Equal(false, array1 == array3)
         Assert.Equal(false, list1 == list3)
+        Assert.Equal(false, linkedList1 == linkedList3)
         Assert.Equal(false, sequence1 == sequence3)
         Assert.Equal(false, resizeArray1 == resizeArray3)
         Assert.Equal(false, hashSet1 == hashSet3)
@@ -159,6 +194,10 @@ module CustomRecord =
     let list2 = [ value1; value1; value1; value1; value2 ]
     let list3 = [ value1; value1; value1; value1; value3 ]
 
+    let linkedList1 = LinkedList() { value1; value1; value1; value1; value1 }
+    let linkedList2 = LinkedList() { value1; value1; value1; value1; value2 }
+    let linkedList3 = LinkedList() { value1; value1; value1; value1; value3 }
+
     let sequence1 = seq { value1; value1; value1; value1; value1 }
     let sequence2 = seq { value1; value1; value1; value1; value2 }
     let sequence3 = seq { value1; value1; value1; value1; value3 }
@@ -181,14 +220,25 @@ module CustomRecord =
         Assert.Equal(true, value1 == value2)
         Assert.Equal(true, array1 == array2)
         Assert.Equal(true, list1 == list2)
+        Assert.Equal(true, linkedList1 == linkedList2)
         Assert.Equal(true, sequence1 == sequence2)
         Assert.Equal(true, resizeArray1 == resizeArray2)
         Assert.Equal(true, hashSet1 == hashSet2)
         Assert.Equal(true, dictionary1 == dictionary2)
 
+        Assert.Equal(true, array1 :> seq<_> == list2)
+        Assert.Equal(true, array1 :> seq<_> == linkedList2)
+        Assert.Equal(true, array1 :> seq<_> == sequence2)
+        Assert.Equal(true, array1 :> seq<_> == resizeArray2)
+
+        Assert.Equal(true, sequence1 == array2)
+        Assert.Equal(true, sequence1 == list2)
+        Assert.Equal(true, sequence1 == resizeArray2)
+
         Assert.Equal(false, value1 == value3)
         Assert.Equal(false, array1 == array3)
         Assert.Equal(false, list1 == list3)
+        Assert.Equal(false, linkedList1 == linkedList3)
         Assert.Equal(false, sequence1 == sequence3)
         Assert.Equal(false, resizeArray1 == resizeArray3)
         Assert.Equal(false, hashSet1 == hashSet3)

@@ -23,7 +23,7 @@ let private scanfInternal strict (memory: ReadOnlyMemory<char>) (fmt: Printf.Str
            | -1 ->
                false
            | index ->
-               if formatSpan.Slice(0, index).SequenceEqual(valueSpan.Slice(0, index)) then
+               if valueSpan.StartsWith(formatSpan.Slice(0, index)) then
                    formatSpan <- formatSpan.SliceForward(index + 4)
                    valueSpan <- valueSpan.SliceForward index
                    true

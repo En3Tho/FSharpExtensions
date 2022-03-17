@@ -22,6 +22,44 @@ open En3Tho.FSharp.ComputationExpressions.Tasks
 type block<'a> = ImmutableArray<'a>
 
 [<AutoOpen; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+module Core =
+
+    [<AbstractClass; AutoOpen>]
+    type Defer =
+        static member inline defer ([<InlineIfLambda>] disposer) = UnitAsyncDisposable(disposer)
+        static member inline defer ([<InlineIfLambda>] disposer) = new UnitDisposable(disposer)
+        static member inline deferv ([<InlineIfLambda>] disposer) = fun value -> ValueAsyncDisposable<_>(value, disposer)
+        static member inline deferv ([<InlineIfLambda>] disposer) = fun value -> new ValueDisposable<_>(value, disposer)
+
+    let someObj = Some()
+
+    /// cast via op_Implicit
+    let inline icast< ^a, ^b when (^a or ^b): (static member op_Implicit: ^a -> ^b)> (value: ^a): ^b = ((^a or ^b): (static member op_Implicit: ^a -> ^b) value)
+
+    /// cast via op_Explicit
+    let inline ecast< ^a, ^b when (^a or ^b): (static member op_Explicit: ^a -> ^b)> (value: ^a): ^b = ((^a or ^b): (static member op_Explicit: ^a -> ^b) value)
+
+    /// unsafe cast
+    let inline ucast<'a, 'b> (a: 'a): 'b = (# "" a: 'b #)
+
+    let ignore2 _ _ = ()
+    let ignore3 _ _ _ = ()
+    let inline referenceEquals< ^a when ^a : not struct> (obj1: ^a) (obj2: ^a) = Object.ReferenceEquals(obj1, obj2)
+
+    let inline isNull< ^a when ^a : not struct> (obj: ^a) = Object.ReferenceEquals(obj, null)
+    let inline isNotNull< ^a when ^a : not struct> (obj: ^a) = not (Object.ReferenceEquals(obj, null))
+    let inline nullRef< ^a when ^a: not struct> = Unchecked.defaultof< ^a>
+    let inline nullVal< ^a when ^a: struct> = Unchecked.defaultof< ^a>
+
+    let inline toString (o: ^a) = o.ToString()
+
+    [<Obsolete("This logic needs to be implemented")>]
+    let inline TODO<'a> = raise (NotImplementedException())
+
+    let inline (&==) (a: 'a when 'a: not struct) (b: 'a) = Object.ReferenceEquals(a, b)
+    let inline (&!=) (a: 'a when 'a: not struct) (b: 'a) = not (Object.ReferenceEquals(a, b))
+
+[<AutoOpen; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 module PipeAndCompositionOperatorEx =
 
     [<AutoOpen; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
@@ -87,7 +125,7 @@ module IEquatableEqualityOperatorEx =
         left.Count = right.Count
         && (
             let count = left.Count
-            let rec go index = // TODO: validate that compiler rewrites this into a while loop
+            let rec go index =
                 if uint index >= uint count then
                     true
                 else
@@ -115,8 +153,22 @@ module IEquatableEqualityOperatorEx =
             go()
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    let inline callIEquatableEqualsOnLinkedLists<'a when 'a :> IEquatable<'a>> (left: 'a LinkedList) (right: 'a LinkedList) =
+        left.Count = right.Count
+        && (
+            let rec go (left: 'a LinkedListNode) (right: 'a LinkedListNode) =
+                isNull left && isNull right
+                || (isNotNull left
+                    && isNotNull right
+                    && callIEquatableEqualsOnValues left.Value right.Value
+                    && go left.Next right.Next)
+
+            go left.First right.First
+        )
+
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     let inline callIEquatableEqualsOnLists<'a when 'a :> IEquatable<'a>> (left: 'a list) (right: 'a list) =
-        let rec go left right = // TODO: validate that compiler rewrites this into a while loop
+        let rec go left right =
             match left, right with
             | leftHead :: leftTail, (rightHead :: rightTail) ->
                 callIEquatableEqualsOnValues leftHead rightHead
@@ -173,6 +225,7 @@ module IEquatableEqualityOperatorEx =
         static member inline ($) (T, value) = fun otherValue -> callIEquatableEqualsOnArrays value otherValue
         static member inline ($) (T, value) = fun otherValue -> callIEquatableEqualsOnResizeArrays value otherValue
         static member inline ($) (T, value) = fun otherValue -> callIEquatableEqualsOnLists value otherValue
+        static member inline ($) (T, value) = fun otherValue -> callIEquatableEqualsOnLinkedLists value otherValue
         static member inline ($) (T, value) = fun otherValue -> callIEquatableEqualsOnSeq value otherValue
         static member inline ($) (T, value) = fun otherValue -> callIEquatableEqualsOnHashSets value otherValue
         static member inline ($) (T, value) = fun otherValue -> callIEquatableEqualsOnDictionaries value otherValue
@@ -180,44 +233,6 @@ module IEquatableEqualityOperatorEx =
     let inline (==) a b = (T $ a) b
 
     let inline (!=) a b = not (a == b)
-
-[<AutoOpen; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-module Core =
-
-    [<AbstractClass; AutoOpen>]
-    type Defer =
-        static member inline defer ([<InlineIfLambda>] disposer) = UnitAsyncDisposable(disposer)
-        static member inline defer ([<InlineIfLambda>] disposer) = new UnitDisposable(disposer)
-        static member inline deferv ([<InlineIfLambda>] disposer) = fun value -> ValueAsyncDisposable<_>(value, disposer)
-        static member inline deferv ([<InlineIfLambda>] disposer) = fun value -> new ValueDisposable<_>(value, disposer)
-
-    let someObj = Some()
-
-    /// cast via op_Implicit
-    let inline icast< ^a, ^b when (^a or ^b): (static member op_Implicit: ^a -> ^b)> (value: ^a): ^b = ((^a or ^b): (static member op_Implicit: ^a -> ^b) value)
-
-    /// cast via op_Explicit
-    let inline ecast< ^a, ^b when (^a or ^b): (static member op_Explicit: ^a -> ^b)> (value: ^a): ^b = ((^a or ^b): (static member op_Explicit: ^a -> ^b) value)
-
-    /// unsafe cast
-    let inline ucast<'a, 'b> (a: 'a): 'b = (# "" a: 'b #)
-
-    let ignore2 _ _ = ()
-    let ignore3 _ _ _ = ()
-    let inline referenceEquals< ^a when ^a : not struct> (obj1: ^a) (obj2: ^a) = Object.ReferenceEquals(obj1, obj2)
-
-    let inline isNull< ^a when ^a : not struct> (obj: ^a) = Object.ReferenceEquals(obj, null)
-    let inline isNotNull< ^a when ^a : not struct> (obj: ^a) = not ^ Object.ReferenceEquals(obj, null)
-    let inline nullRef< ^a when ^a: not struct> = Unchecked.defaultof< ^a>
-    let inline nullVal< ^a when ^a: struct> = Unchecked.defaultof< ^a>
-
-    let inline toString (o: ^a) = o.ToString()
-
-    [<Obsolete("This logic needs to be implemented")>]
-    let inline TODO<'a> = raise ^ NotImplementedException()
-
-    let inline (&==) (a: 'a when 'a: not struct) (b: 'a) = Object.ReferenceEquals(a, b)
-    let inline (&!=) (a: 'a when 'a: not struct) (b: 'a) = not (Object.ReferenceEquals(a, b))
 
 module Object =
     module Operators =

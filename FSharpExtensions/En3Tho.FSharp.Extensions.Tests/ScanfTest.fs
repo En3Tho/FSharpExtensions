@@ -78,6 +78,18 @@ let ``Test bad cases of scanf`` () =
     Assert.False ("/authorize myText 123 qwe" |> scanfl $"/authorize {value1} {value2}")
 
 [<Fact>]
+let ``Test totally invalid cases of scanf`` () =
+    let value1 = ref ""
+    let value2 = ref 0
+
+    Assert.False ("" |> scanf $"/authorize {value1} {value2} qwe")
+    Assert.False ("123" |> scanf $"/authorize {value1} {value2} qwe")
+    Assert.False ("/auth" |> scanf $"/authorize {value1} {value2} qwe")
+    Assert.False ("/" |> scanf $"/authorize {value1} {value2} qwe")
+    Assert.False ("/a myText 123 qwe1" |> scanf $"/authorize {value1} {value2} qwe")
+
+
+[<Fact>]
 let ``Test complex cases of scanf`` () =
     let cmd = ref ""
     let login = ref ""
