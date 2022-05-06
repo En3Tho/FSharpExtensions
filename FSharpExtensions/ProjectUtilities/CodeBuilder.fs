@@ -1,7 +1,6 @@
 namespace ProjectUtilities.CodeBuilder
 
 open System
-open System.IO
 open System.Text
 open En3Tho.FSharp.Extensions
 open En3Tho.FSharp.Extensions.Byref.Operators
@@ -44,6 +43,11 @@ module CodeBuilderImpl =
                     sb.AppendLine() |> ignore
                 else
                     sb.Append(this.GetIndentation lineOfCode.Indentation).AppendLine(lineOfCode.Text) |> ignore
+
+            // Remove new line at the end
+            if sb.Length > 0 then
+                sb.Remove(sb.Length - 1, 1) |> ignore
+
             sb.ToString()
 
     type CodeBuilderCode = CodeBuilder -> unit
@@ -52,7 +56,7 @@ module CodeBuilderImpl =
         member inline _.While([<InlineIfLambda>] moveNext: unit -> bool, [<InlineIfLambda>] whileExpr: CodeBuilder -> unit) : CodeBuilderCode =
             fun builder -> while moveNext() do (whileExpr(builder))
 
-        member inline _.Combine(first: CodeBuilderCode, [<InlineIfLambda>] second: CodeBuilderCode) : CodeBuilderCode =
+        member inline _.Combine([<InlineIfLambda>] first: CodeBuilderCode, [<InlineIfLambda>] second: CodeBuilderCode) : CodeBuilderCode =
             fun(builder) ->
                 first(builder)
                 second(builder)
@@ -93,13 +97,15 @@ module CodeBuilderImpl =
             // Note, not "f()()" - the F# compiler optimizer likes arguments to match lambdas in order to preserve
             // argument evaluation order, so for "(f())()" the optimizer reduces one lambda then another, while "f()()" doesn't
 
-        member inline _.Yield(codeBuilderFunc: CodeBuilderCode) : CodeBuilderCode =
+        member inline _.Yield([<InlineIfLambda>] codeBuilderCode: CodeBuilderCode) : CodeBuilderCode =
             fun builder ->
-                codeBuilderFunc builder
+                codeBuilderCode builder
 
         member inline _.Yield(value: CodeBuilder) : CodeBuilderCode =
             fun builder ->
-                for lineOfCode in value.Lines do
+                let linesCount = value.Lines.Count
+                for lineIndex = 0 to linesCount - 1 do
+                    let lineOfCode = value.Lines[lineIndex]
                     builder.Lines.Add { lineOfCode with Indentation = lineOfCode.Indentation + builder.Indentation }
 
         member inline _.Yield(value: 'a) : CodeBuilderCode =

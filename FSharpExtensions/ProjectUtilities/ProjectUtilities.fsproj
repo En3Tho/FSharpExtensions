@@ -9,6 +9,7 @@
     <ItemGroup>
         <Compile Include="CodeBuilder.fs" />
         <Compile Include="ServiceCollectionCodeGen.fs" />
+        <Compile Include="ActivePatternsCodeGen.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
