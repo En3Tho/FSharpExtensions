@@ -19,6 +19,8 @@
         <Compile Include="GenericEqualityBenchmark.fs" />
         <Compile Include="GenericEqualityObjectArrayBenchmark.fs" />
         <Compile Include="IEquatableEqualityOperatorBenchmark.fs" />
+        <Compile Include="ComparisonOperatorBenchmark.fs" />
+        <Compile Include="MathematicalOperatorsBenchmarks.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 

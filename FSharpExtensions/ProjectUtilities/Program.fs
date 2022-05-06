@@ -1,0 +1,3 @@
+open ProjectUtilities
+
+ServiceCollectionCodeGen.generateAllLifetimeAndVerbs()
