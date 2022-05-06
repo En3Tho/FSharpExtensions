@@ -7,7 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Library.fs" />
+        <Compile Include="CodeBuilder.fs" />
+        <Compile Include="ServiceCollectionCodeGen.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
