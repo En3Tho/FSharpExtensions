@@ -1,1 +1,3 @@
+open ProjectUtilities
 
+ServiceCollectionCodeGen.dumpToConsole()

@@ -80,7 +80,7 @@ type MyAdder() =
 
 type MyAdder with
     [<EditorBrowsable(EditorBrowsableState.Never)>]
-    member inline this.Run([<InlineIfLambda>] expr: RunExpression) = expr(); this
+    member inline this.Run([<InlineIfLambda>] expr: CollectionCode) = expr(); this
     [<EditorBrowsable(EditorBrowsableState.Never)>]
     member inline this.Zero _ : CollectionCode = fun() -> ()
 

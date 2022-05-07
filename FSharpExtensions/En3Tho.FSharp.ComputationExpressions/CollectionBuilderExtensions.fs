@@ -30,19 +30,19 @@ module ICollectionBuilder =
 
     type ICollection<'a> with
         [<EditorBrowsable(EditorBrowsableState.Value)>]
-        member inline this.Run([<InlineIfLambda>] runExpr: RunExpression) = runExpr(); this
+        member inline this.Run([<InlineIfLambda>] runExpr: CollectionCode) = runExpr(); this
 
     type List<'a> with
         [<EditorBrowsable(EditorBrowsableState.Value)>]
-        member inline this.Run([<InlineIfLambda>] runExpr: RunExpression) = runExpr(); this
+        member inline this.Run([<InlineIfLambda>] runExpr: CollectionCode) = runExpr(); this
 
     type HashSet<'a> with
         [<EditorBrowsable(EditorBrowsableState.Value)>]
-        member inline this.Run([<InlineIfLambda>] runExpr: RunExpression) = runExpr(); this
+        member inline this.Run([<InlineIfLambda>] runExpr: CollectionCode) = runExpr(); this
 
     type LinkedList<'a> with
         [<EditorBrowsable(EditorBrowsableState.Value)>]
-        member inline this.Run([<InlineIfLambda>] runExpr: RunExpression) = runExpr(); this
+        member inline this.Run([<InlineIfLambda>] runExpr: CollectionCode) = runExpr(); this
 
 module IDictionaryBuilder =
     [<AbstractClass;Extension>]
@@ -62,15 +62,15 @@ module IDictionaryBuilder =
 
     type IDictionary<'a, 'b> with
         [<EditorBrowsable(EditorBrowsableState.Value)>]
-        member inline this.Run([<InlineIfLambda>] runExpr: RunExpression) = runExpr(); this
+        member inline this.Run([<InlineIfLambda>] runExpr: CollectionCode) = runExpr(); this
 
     type Dictionary<'a, 'b> with
         [<EditorBrowsable(EditorBrowsableState.Value)>]
-        member inline this.Run([<InlineIfLambda>] runExpr: RunExpression) = runExpr(); this
+        member inline this.Run([<InlineIfLambda>] runExpr: CollectionCode) = runExpr(); this
 
     type ConcurrentDictionary<'a, 'b> with
         [<EditorBrowsable(EditorBrowsableState.Value)>]
-        member inline this.Run([<InlineIfLambda>] runExpr: RunExpression) = runExpr(); this
+        member inline this.Run([<InlineIfLambda>] runExpr: CollectionCode) = runExpr(); this
 
 module SStringBuilderBuilder =
 
@@ -86,4 +86,4 @@ module SStringBuilderBuilder =
 
     type StringBuilder with
         [<EditorBrowsable(EditorBrowsableState.Value)>]
-        member inline this.Run([<InlineIfLambda>] runExpr: RunExpression) = runExpr(); this
+        member inline this.Run([<InlineIfLambda>] runExpr: CollectionCode) = runExpr(); this

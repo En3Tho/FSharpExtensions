@@ -3,6 +3,8 @@
 open System
 open System.ComponentModel
 open System.Runtime.CompilerServices
+open GenericBuilderBase
+
 
 module internal EditorBrowsableState =
 #if RELEASE
@@ -11,22 +13,18 @@ module internal EditorBrowsableState =
     let [<Literal>] Value = EditorBrowsableState.Always
 #endif
 
-type CollectionCode = unit -> unit
-
-type TryFinallyExpression = unit -> CollectionCode
-type WhileExpression = unit -> CollectionCode
-type ForExpression<'a> = 'a -> CollectionCode
-type RunExpression = unit -> unit
+type CollectionCode = UnitBuilderCode<unit>
 
 
 [<AbstractClass;Extension>]
-type GenericTypeExtensions() =
+type CollectionCodeExtensions() =
+
     [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
-    static member inline While(_, [<InlineIfLambda>] moveNext: unit -> bool, [<InlineIfLambda>] whileExpr: unit -> unit) : CollectionCode =
+    static member inline While(_, [<InlineIfLambda>] moveNext: unit -> bool, [<InlineIfLambda>] whileExpr: CollectionCode) : CollectionCode =
         fun () -> while moveNext() do (whileExpr())
 
     [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
-    static member inline Combine(_, first: CollectionCode, [<InlineIfLambda>] second) : CollectionCode =
+    static member inline Combine(_, [<InlineIfLambda>] first: CollectionCode, [<InlineIfLambda>] second) : CollectionCode =
         fun() ->
             first()
             second()
@@ -55,7 +53,7 @@ type GenericTypeExtensions() =
 
 
     [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
-    static member inline For(this, values: 'a seq, [<InlineIfLambda>] forExpr: ForExpression<'a>) : CollectionCode =
+    static member inline For(this, values: 'a seq, [<InlineIfLambda>] forExpr: 'a -> CollectionCode) : CollectionCode =
         this.Using (
             values.GetEnumerator(), (fun e ->
                 this.While((fun () -> e.MoveNext()), (fun () ->

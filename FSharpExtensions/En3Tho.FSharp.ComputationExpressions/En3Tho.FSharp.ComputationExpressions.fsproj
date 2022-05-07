@@ -23,9 +23,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Compile Include="GenericCollectionBuilderBase.fs" />
+      <Compile Include="GenericUnitBuilderBase.fs" />
+      <Compile Include="GenericCollectionCodeExtensions.fs" />
       <Compile Include="ArrayPoolBasedBuilders.fs" />
-      <Compile Include="CollectionBuilder.fs" />
+      <Compile Include="CollectionBuilderExtensions.fs" />
       <Compile Include="OptionBuilder.fs" />
       <Compile Include="ResultBuilder.fs" />
       <Compile Include="TaskBuilders\AwaiterHelper.fs" />

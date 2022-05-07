@@ -42,7 +42,7 @@ let generateFileForVerb dependenciesCount verb =
         "using System;"
         "using Microsoft.Extensions.DependencyInjection;"
         "namespace En3Tho.Extensions.DependencyInjection;"
-
+        ""
         "public static partial class IServiceCollectionExtensions"
         "{"
         indent {
@@ -53,7 +53,7 @@ let generateFileForVerb dependenciesCount verb =
         "}"
     }
 
-let generateAllLifetimeAndVerbs() =
+let generateAllLifetimesAndVerbs() = seq {
     let lifetimes = [| "Singleton"; "Scoped"; "Transient" |]
 
     for lifetime in lifetimes do
@@ -61,5 +61,18 @@ let generateAllLifetimeAndVerbs() =
         for verb in verbs do
             let count = 15
             let filePath = $"{verb}Func.cs"
-            let fileText = generateFileForVerb count verb |> toString
-            File.WriteAllText(filePath, fileText)
+            filePath, generateFileForVerb count verb
+}
+
+let makeFiles() =
+    generateAllLifetimesAndVerbs()
+    |> Seq.iter ^ fun (filePath, code) ->
+        let text = code |> toString
+        File.WriteAllText(filePath, text)
+
+let dumpToConsole() =
+    generateAllLifetimesAndVerbs()
+    |> Seq.iter ^ fun (_, code) ->
+        let text = code |> toString
+        Console.WriteLine(text)
+        Console.WriteLine()

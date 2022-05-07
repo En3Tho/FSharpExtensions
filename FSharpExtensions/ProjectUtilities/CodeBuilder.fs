@@ -5,6 +5,7 @@ open System.Text
 open En3Tho.FSharp.Extensions
 open En3Tho.FSharp.Extensions.Byref.Operators
 open En3Tho.FSharp.ComputationExpressions.ArrayPoolBasedBuilders
+open En3Tho.FSharp.Extensions.GenericBuilderBase
 
 module CodeBuilderImpl =
 
@@ -50,52 +51,10 @@ module CodeBuilderImpl =
 
             sb.ToString()
 
-    type CodeBuilderCode = CodeBuilder -> unit
+    type CodeBuilderCode = UnitBuilderCode<CodeBuilder>
 
     type CodeBlockBase() =
-        member inline _.While([<InlineIfLambda>] moveNext: unit -> bool, [<InlineIfLambda>] whileExpr: CodeBuilder -> unit) : CodeBuilderCode =
-            fun builder -> while moveNext() do (whileExpr(builder))
-
-        member inline _.Combine([<InlineIfLambda>] first: CodeBuilderCode, [<InlineIfLambda>] second: CodeBuilderCode) : CodeBuilderCode =
-            fun(builder) ->
-                first(builder)
-                second(builder)
-
-        member inline _.TryFinally([<InlineIfLambda>] tryExpr: CodeBuilderCode, [<InlineIfLambda>] compensation: CodeBuilderCode) =
-            fun (builder) ->
-                try
-                    tryExpr(builder)
-                finally
-                    compensation(builder)
-
-        member inline _.TryWith([<InlineIfLambda>] tryExpr, [<InlineIfLambda>] compensation: exn -> CodeBuilderCode) : CodeBuilderCode =
-            fun (builder) ->
-                try
-                    tryExpr()
-                with e ->
-                    (compensation e)(builder)
-
-        member inline this.Using(resource: #IDisposable, [<InlineIfLambda>] tryExpr: #IDisposable -> CodeBuilderCode) : CodeBuilderCode =
-            this.TryFinally(
-                (fun (builder) -> (tryExpr(resource)(builder))),
-                (fun (builder) -> if not (isNull (box resource)) then resource.Dispose()))
-
-
-        member inline this.For(values: 'a seq, [<InlineIfLambda>] forExpr: 'a -> CodeBuilder -> unit) : CodeBuilderCode =
-            this.Using (
-                values.GetEnumerator(), (fun e ->
-                    this.While((fun () -> e.MoveNext()), (fun (builder) ->
-                        (forExpr e.Current)(builder))
-                    )
-                )
-            )
-
-        member inline _.Zero() : CodeBuilderCode = fun (builder) -> ()
-
-        member inline _.Delay([<InlineIfLambda>] delay: unit -> CodeBuilderCode) =
-            fun (builder) -> (delay())(builder)
-            // Note, not "f()()" - the F# compiler optimizer likes arguments to match lambdas in order to preserve
-            // argument evaluation order, so for "(f())()" the optimizer reduces one lambda then another, while "f()()" doesn't
+        inherit UnitBuilderBase<CodeBuilder>()
 
         member inline _.Yield([<InlineIfLambda>] codeBuilderCode: CodeBuilderCode) : CodeBuilderCode =
             fun builder ->

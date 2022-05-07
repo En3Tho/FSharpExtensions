@@ -1,14 +1,12 @@
 ﻿module En3Tho.FSharp.ComputationExpressions.ResultBuilder
 
 open System
-open En3Tho.FSharp.Extensions
-open En3Tho.FSharp.ComputationExpressions
 
 type ResultCode<'a, 'b> = unit -> Result<'a, 'b>
 
 // TODO: /v/task/e/result
 
-type ResultBuilderUsingInlineIfLambdaBase() =
+type ResultBuilderBase() =
 
     member inline _.Zero() : ResultCode<unit, 'b> =
         fun() -> Ok ()
@@ -68,7 +66,7 @@ type ResultBuilderUsingInlineIfLambdaBase() =
             source
 
 type ResultBuilder() =
-    inherit ResultBuilderUsingInlineIfLambdaBase()
+    inherit ResultBuilderBase()
 
     member inline _.Bind(res1: Result<'a, 'b>, [<InlineIfLambda>] task2: 'a -> ResultCode<'c, 'b>) : ResultCode<'c, 'b> =
         fun () ->
@@ -79,7 +77,7 @@ type ResultBuilder() =
     member inline this.Run([<InlineIfLambda>] code: ResultCode<'a, 'b>) = code()
 
 type EResultBuilder() =
-    inherit ResultBuilderUsingInlineIfLambdaBase()
+    inherit ResultBuilderBase()
 
     member inline _.Bind(res1: Result<'a, #exn>, [<InlineIfLambda>] task2: 'a -> ResultCode<'c, #exn>) : ResultCode<'c, #exn> =
         fun () ->
@@ -163,7 +161,7 @@ type EResultBuilder() =
             ] |> AggregateException |> Error)
 
 type ExnResultBuilder() =
-    inherit ResultBuilderUsingInlineIfLambdaBase()
+    inherit ResultBuilderBase()
     member inline this.Run<'a>([<InlineIfLambda>] code: ResultCode<'a, exn>) =
         try
             code()
