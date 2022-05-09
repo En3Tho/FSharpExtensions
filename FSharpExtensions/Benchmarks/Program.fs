@@ -29,7 +29,7 @@ type BenchmarkRunner with
 BenchmarkRunner.Run<
 //    GenericEqualityBenchmark.Reference.Benchmark,
 //    GenericEqualityBenchmark.Value.Benchmark,
-    ComparisonOperatorBenchmark.Benchmark
+    NodeCode.ReturnBenchmark
 //    FSharpOptimizer.Benchmark,
 //    FSharpOptimizerWithExperimentalPipe.Benchmark
     >() |> ignore

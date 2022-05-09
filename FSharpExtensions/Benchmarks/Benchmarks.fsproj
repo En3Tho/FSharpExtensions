@@ -21,6 +21,7 @@
         <Compile Include="IEquatableEqualityOperatorBenchmark.fs" />
         <Compile Include="ComparisonOperatorBenchmark.fs" />
         <Compile Include="MathematicalOperatorsBenchmarks.fs" />
+        <Compile Include="NodeCode.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
