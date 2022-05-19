@@ -31,6 +31,9 @@ module CodeBuilderImpl =
         member _.IndentOnce() = &indentationCount +<- 1
         member _.UnIndentOnce() = &indentationCount -<- 1
 
+        member _.AddLine(value) = builder.Add({Indentation = indentationCount; Text = value.ToString()})
+        member _.AddLine(value: LineOfCode) = builder.Add({Indentation = value.Indentation + indentationCount; Text = value.Text})
+
         member private _.GetIndentation count =
             if commonIndentations.Length < count then
                 commonIndentations[count]
@@ -62,19 +65,17 @@ module CodeBuilderImpl =
 
         member inline _.Yield(value: CodeBuilder) : CodeBuilderCode =
             fun builder ->
-                let linesCount = value.Lines.Count
-                for lineIndex = 0 to linesCount - 1 do
-                    let lineOfCode = value.Lines[lineIndex]
-                    builder.Lines.Add { lineOfCode with Indentation = lineOfCode.Indentation + builder.Indentation }
+                for line in value.Lines do
+                    builder.AddLine line
 
         member inline _.Yield(value: 'a) : CodeBuilderCode =
             fun builder ->
-                builder.Lines.Add { Indentation = builder.Indentation; Text = value.ToString() }
+                builder.AddLine(value)
 
         member inline _.YieldFrom(values: 'b seq) : CodeBuilderCode =
             fun builder ->
                 for value in values do
-                    builder.Lines.Add { Indentation = builder.Indentation; Text = value.ToString() }
+                    builder.AddLine(value)
 
     [<Sealed>]
     type Indent() =
@@ -85,6 +86,18 @@ module CodeBuilderImpl =
                 builder.IndentOnce()
                 runExpr builder
                 builder.UnIndentOnce()
+
+    [<Sealed>]
+    type IndentBlock() =
+        inherit CodeBlockBase()
+
+        member inline this.Run([<InlineIfLambda>] runExpr: CodeBuilderCode) : CodeBuilderCode =
+            fun builder ->
+                builder.AddLine("{")
+                builder.IndentOnce()
+                runExpr builder
+                builder.UnIndentOnce()
+                builder.AddLine("}")
 
     [<Sealed>]
     type CodeBuilderRunner() =
@@ -100,3 +113,4 @@ module CodeBuilder =
 
     let code = CodeBuilderRunner()
     let indent = Indent()
+    let indentBlock = IndentBlock()

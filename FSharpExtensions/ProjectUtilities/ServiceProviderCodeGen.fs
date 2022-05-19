@@ -1,5 +1,6 @@
 namespace ProjectUtilities
 
+open System
 open System.IO
 open En3Tho.FSharp.Extensions
 open ProjectUtilities.CodeBuilder.CodeBuilder
@@ -18,8 +19,7 @@ module ServiceProviderCodeGen =
                 for i = 1 to genericArgsCount do
                     $"where T{i} : notnull"
             }
-            "{"
-            indent {
+            indentBlock {
                 "action("
                 indent {
                     for i = 1 to genericArgsCount - 1 do
@@ -28,7 +28,6 @@ module ServiceProviderCodeGen =
                 }
                 ");"
             }
-            "}"
         }
 
     let makeFuncTaskCode isValueTask genericArgsCount =
@@ -44,8 +43,7 @@ module ServiceProviderCodeGen =
                 for i = 1 to genericArgsCount do
                     $"where T{i} : notnull"
             }
-            "{"
-            indent {
+            indentBlock {
                 "return func("
                 indent {
                     for i = 1 to genericArgsCount - 1 do
@@ -54,7 +52,6 @@ module ServiceProviderCodeGen =
                 }
                 ");"
             }
-            "}"
         }
 
     let makeFuncGenericTaskCode isValueTask genericArgsCount =
@@ -70,8 +67,7 @@ module ServiceProviderCodeGen =
                for i = 1 to genericArgsCount do
                     $"where T{i} : notnull"
             }
-            "{"
-            indent {
+            indentBlock {
                 "return func("
                 indent {
                     for i = 1 to genericArgsCount - 1 do
@@ -80,7 +76,6 @@ module ServiceProviderCodeGen =
                 }
                 ");"
             }
-            "}"
         }
 
 module ServiceScopeCodeGen =
@@ -96,11 +91,9 @@ module ServiceScopeCodeGen =
                 for i = 1 to genericArgsCount do
                     $"where T{i} : notnull"
             }
-            "{"
-            indent {
+            indentBlock {
                 "scope.ServiceProvider.Run(action);"
             }
-            "}"
         }
 
     let makeFuncTaskCode isValueTask genericArgsCount =
@@ -116,11 +109,9 @@ module ServiceScopeCodeGen =
                 for i = 1 to genericArgsCount do
                     $"where T{i} : notnull"
             }
-            "{"
-            indent {
+            indentBlock {
                 "return scope.ServiceProvider.RunAsync(func);"
             }
-            "}"
         }
 
     let makeFuncGenericTaskCode isValueTask genericArgsCount =
@@ -136,11 +127,9 @@ module ServiceScopeCodeGen =
                 for i = 1 to genericArgsCount do
                     $"where T{i} : notnull"
             }
-            "{"
-            indent {
+            indentBlock {
                 "return scope.ServiceProvider.RunAsync(func);"
             }
-            "}"
         }
 
 module CodeGen =
@@ -157,14 +146,12 @@ module CodeGen =
 
         code {
             "public static partial class IServiceProviderExtensions"
-            "{"
-            indent {
+            indentBlock {
                 for generator in generators do
                     for i = 1 to 15 do
                         generator i
                         ""
             }
-            "}"
         }
 
     let serviceScopeCode =
@@ -179,14 +166,12 @@ module CodeGen =
 
         code {
             "public static partial class IServiceScopeExtensions"
-            "{"
-            indent {
+            indentBlock {
                 for generator in generators do
                     for i = 1 to 15 do
                         generator i
                         ""
             }
-            "}"
         }
 
     let generateFileForCodeBlock fileName (codeBlock: CodeBuilder.CodeBuilderImpl.CodeBuilder) =
