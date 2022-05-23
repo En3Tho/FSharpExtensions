@@ -237,7 +237,7 @@ type ValueTaskValueOptionBuilderBase() =
                         sm.Data.MethodBuilder.Start(&sm)
                         sm.Data.MethodBuilder.Task))
              else
-                ValueTaskValueOptionBuilder.RunDynamic(code)).AsTask()
+                TaskValueOptionBuilder.RunDynamic(code)).AsTask()
 
         member inline _.Run(code: ValueTaskValueOptionCode<'T, 'T>) : Task<'T voption> =
            TaskValueOptionBuilder.Run(code)
@@ -414,16 +414,17 @@ module LowPriority =
             )
 
         member inline this.Bind (task: Option<'TResult1>, continuation: ('TResult1 -> ValueTaskValueOptionCode<'TOverall, 'TResult2>)) : ValueTaskValueOptionCode<'TOverall, 'TResult2> =
-            this.Bind(ValueTask.FromResult (match task with Some x -> ValueSome x | _ -> ValueNone), continuation)
+
+            this.Bind(ValueTask<_>(result = match task with Some x -> ValueSome x | _ -> ValueNone), continuation)
 
         member inline this.Bind (task: ValueOption<'TResult1>, continuation: ('TResult1 -> ValueTaskValueOptionCode<'TOverall, 'TResult2>)) : ValueTaskValueOptionCode<'TOverall, 'TResult2> =
-            this.Bind(ValueTask.FromResult task, continuation)
+            this.Bind(ValueTask<_>(result = task), continuation)
 
         member inline this.ReturnFrom (task: Option<'TResult1>) : ValueTaskValueOptionCode<'TResult1, 'TResult1> =
-            this.ReturnFrom(ValueTask.FromResult (match task with Some x -> ValueSome x | _ -> ValueNone))
+            this.ReturnFrom(ValueTask<_>(result = match task with Some x -> ValueSome x | _ -> ValueNone))
 
         member inline this.ReturnFrom (task: ValueOption<'TResult1>) : ValueTaskValueOptionCode<'TResult1, 'TResult1> =
-            this.ReturnFrom(ValueTask.FromResult task)
+            this.ReturnFrom(ValueTask<_>(result = task))
 
 module HighPriority =
     // High priority extensions

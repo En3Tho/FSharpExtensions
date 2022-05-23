@@ -1,5 +1,7 @@
 namespace En3Tho.FSharp.Extensions.Unsafe
 
+#if !NETSTANDARD2_0
+
 open System
 open System.Buffers
 open System.Runtime.CompilerServices
@@ -339,3 +341,5 @@ module StackList =
     let inline of128<'a>() = make<ValueBag128<'a>,_>()
     let inline of256<'a>() = make<ValueBag256<'a>,_>()
     let inline of512<'a>() = make<ValueBag512<'a>,_>()
+
+#endif

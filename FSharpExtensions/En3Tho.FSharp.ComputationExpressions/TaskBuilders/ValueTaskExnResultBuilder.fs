@@ -242,8 +242,8 @@ type ValueTaskExnResultBuilderBase() =
              else
                 ValueTaskExnResultBuilder.RunDynamic(code)).AsTask()
 
-        member inline _.Run(code: ValueTaskExnResultCode<'T, 'T>) : ValueTask<Result<'T, exn>> =
-           ValueTaskExnResultBuilder.Run(code)
+        member inline _.Run(code: ValueTaskExnResultCode<'T, 'T>) : Task<Result<'T, exn>> =
+           TaskExnResultBuilder.Run(code)
 
 namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskExnResultBuilderExtensions
 
@@ -424,10 +424,10 @@ module LowPriority =
             )
 
         member inline this.Bind (task: Result<'TResult1, #exn>, continuation: ('TResult1 -> ValueTaskExnResultCode<'TOverall, 'TResult2>)) : ValueTaskExnResultCode<'TOverall, 'TResult2> =
-            this.Bind(ValueTask.FromResult task, continuation)
+            this.Bind(ValueTask<_>(result = task), continuation)
 
         member inline this.ReturnFrom (value: Result<'T, #exn>)  : ValueTaskExnResultCode<'T, 'T> =
-            this.ReturnFrom (ValueTask.FromResult value)
+            this.ReturnFrom (ValueTask<_>(result = value))
 
 module HighPriority =
     // High priority extensions

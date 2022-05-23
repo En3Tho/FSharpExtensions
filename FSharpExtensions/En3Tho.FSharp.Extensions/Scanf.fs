@@ -1,4 +1,7 @@
-﻿module En3Tho.FSharp.Extensions.Scanf
+﻿#if NETSTANDARD2_0
+namespace En3Tho.FSharp.Extensions
+#else
+module En3Tho.FSharp.Extensions.Scanf
 
 open System
 open System.Runtime.InteropServices
@@ -19,7 +22,7 @@ let private scanfInternal strict (memory: ReadOnlyMemory<char>) (fmt: Printf.Str
     let mutable success =
         capturesSpan.Length > 0
         && formatSpan.Length > 0
-        && (match formatSpan.IndexOf(InterpolationFormat) with
+        && (match formatSpan.IndexOf(InterpolationFormat, StringComparison.Ordinal) with
            | -1 ->
                false
            | index ->
@@ -131,3 +134,4 @@ let scanfMemory fmt (value: ReadOnlyMemory<char>) = scanfInternal true value fmt
 
 /// Light version of scanf which stops matching when values are found, can return empty strings
 let scanflMemory fmt (value: ReadOnlyMemory<char>) = scanfInternal false value fmt
+#endif

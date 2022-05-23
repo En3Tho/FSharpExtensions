@@ -11,9 +11,6 @@ type [<Struct>] ValueArray2<'a> =
     [<DefaultValue(false)>]
     val mutable Item2: 'a
 
-    [<DefaultValue(false)>]
-    val mutable Item3: 'a
-
 type [<Struct>] WhenAllHelper2 =
 
     [<DefaultValue>]
@@ -60,8 +57,17 @@ type [<Struct>] WhenAllHelper2 =
         | 1 ->
             this.tasks.Item1
         | taskCount ->
+#if NETSTANDARD2_0
+            let this = this
+            Task.WhenAll([|
+                if not (isNull this.tasks.Item1) then this.tasks.Item1
+                if not (isNull this.tasks.Item2) then this.tasks.Item2
+            |])
+#else
+
             let span = MemoryMarshal.CreateSpan(&this.tasks.Item1, taskCount)
             Task.WhenAll(span.ToArray())
+#endif
 
 type [<Struct>] ValueArray3<'a> =
     [<DefaultValue(false)>]
@@ -120,8 +126,18 @@ type [<Struct>] WhenAllHelper3 =
         | 1 ->
             this.tasks.Item1
         | taskCount ->
+#if NETSTANDARD2_0
+            let this = this
+            Task.WhenAll([|
+                if not (isNull this.tasks.Item1) then this.tasks.Item1
+                if not (isNull this.tasks.Item2) then this.tasks.Item2
+                if not (isNull this.tasks.Item3) then this.tasks.Item3
+            |])
+#else
+
             let span = MemoryMarshal.CreateSpan(&this.tasks.Item1, taskCount)
             Task.WhenAll(span.ToArray())
+#endif
 
 type [<Struct>] ValueArray4<'a> =
     [<DefaultValue(false)>]
@@ -184,8 +200,20 @@ type [<Struct>] WhenAllHelper4 =
         | 1 ->
             this.tasks.Item1
         | taskCount ->
+
+#if NETSTANDARD2_0
+            let this = this
+            Task.WhenAll([|
+                if not (isNull this.tasks.Item1) then this.tasks.Item1
+                if not (isNull this.tasks.Item2) then this.tasks.Item2
+                if not (isNull this.tasks.Item3) then this.tasks.Item3
+                if not (isNull this.tasks.Item4) then this.tasks.Item4
+            |])
+#else
+
             let span = MemoryMarshal.CreateSpan(&this.tasks.Item1, taskCount)
             Task.WhenAll(span.ToArray())
+#endif
 
 type [<Struct>] ValueArray5<'a> =
     [<DefaultValue(false)>]
@@ -252,8 +280,20 @@ type [<Struct>] WhenAllHelper5 =
         | 1 ->
             this.tasks.Item1
         | taskCount ->
+#if NETSTANDARD2_0
+            let this = this
+            Task.WhenAll([|
+                if not (isNull this.tasks.Item1) then this.tasks.Item1
+                if not (isNull this.tasks.Item2) then this.tasks.Item2
+                if not (isNull this.tasks.Item3) then this.tasks.Item3
+                if not (isNull this.tasks.Item4) then this.tasks.Item4
+                if not (isNull this.tasks.Item4) then this.tasks.Item5
+            |])
+#else
+
             let span = MemoryMarshal.CreateSpan(&this.tasks.Item1, taskCount)
             Task.WhenAll(span.ToArray())
+#endif
 
 type [<Struct>] ValueArray6<'a> =
     [<DefaultValue(false)>]
@@ -324,8 +364,21 @@ type [<Struct>] WhenAllHelper6 =
         | 1 ->
             this.tasks.Item1
         | taskCount ->
+#if NETSTANDARD2_0
+            let this = this
+            Task.WhenAll([|
+                if not (isNull this.tasks.Item1) then this.tasks.Item1
+                if not (isNull this.tasks.Item2) then this.tasks.Item2
+                if not (isNull this.tasks.Item3) then this.tasks.Item3
+                if not (isNull this.tasks.Item4) then this.tasks.Item4
+                if not (isNull this.tasks.Item4) then this.tasks.Item5
+                if not (isNull this.tasks.Item4) then this.tasks.Item6
+            |])
+#else
+
             let span = MemoryMarshal.CreateSpan(&this.tasks.Item1, taskCount)
             Task.WhenAll(span.ToArray())
+#endif
 
 type [<Struct>] ValueArray7<'a> =
     [<DefaultValue(false)>]
@@ -400,5 +453,19 @@ type [<Struct>] WhenAllHelper7 =
         | 1 ->
             this.tasks.Item1
         | taskCount ->
+#if NETSTANDARD2_0
+            let this = this
+            Task.WhenAll([|
+                if not (isNull this.tasks.Item1) then this.tasks.Item1
+                if not (isNull this.tasks.Item2) then this.tasks.Item2
+                if not (isNull this.tasks.Item3) then this.tasks.Item3
+                if not (isNull this.tasks.Item4) then this.tasks.Item4
+                if not (isNull this.tasks.Item4) then this.tasks.Item5
+                if not (isNull this.tasks.Item4) then this.tasks.Item6
+                if not (isNull this.tasks.Item4) then this.tasks.Item7
+            |])
+#else
+
             let span = MemoryMarshal.CreateSpan(&this.tasks.Item1, taskCount)
             Task.WhenAll(span.ToArray())
+#endif

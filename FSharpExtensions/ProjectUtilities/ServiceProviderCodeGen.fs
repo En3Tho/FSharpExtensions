@@ -3,8 +3,7 @@ namespace ProjectUtilities
 open System
 open System.IO
 open En3Tho.FSharp.Extensions
-open ProjectUtilities.CodeBuilder.CodeBuilder
-
+open En3Tho.FSharp.ComputationExpressions.CodeBuilder
 
 module ServiceProviderCodeGen =
 
@@ -174,7 +173,7 @@ module CodeGen =
             }
         }
 
-    let generateFileForCodeBlock fileName (codeBlock: CodeBuilder.CodeBuilderImpl.CodeBuilder) =
+    let generateFileForCodeBlock fileName (codeBlock: CodeBuilderImpl.CodeBuilder) =
         code {
             "using System;"
             "using System.Threading.Tasks;"

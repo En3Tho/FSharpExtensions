@@ -7,7 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="CodeBuilder.fs" />
         <Compile Include="ServiceCollectionCodeGen.fs" />
         <Compile Include="ServiceProviderCodeGen.fs" />
         <Compile Include="ActivePatternsCodeGen.fs" />

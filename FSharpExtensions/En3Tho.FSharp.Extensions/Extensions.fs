@@ -9,18 +9,29 @@ let private unitTask = Task.FromResult()
 
 type Task with
     static member inline RunSynchronously (task: Task) =
+#if NETSTANDARD2_0
+        if task.IsCompleted && not task.IsCanceled && not task.IsFaulted then () else
+#else
         if task.IsCompletedSuccessfully then () else
+#endif
         task.ConfigureAwait(false).GetAwaiter().GetResult()
 
     static member inline RunSynchronously (task: Task<'a>) =
+#if NETSTANDARD2_0
+        if task.IsCompleted && not task.IsCanceled && not task.IsFaulted then task.Result else
+#else
         if task.IsCompletedSuccessfully then task.Result else
+#endif
         task.ConfigureAwait(false).GetAwaiter().GetResult()
 
     static member CompletedUnitTask = unitTask
 
     member this.AsResult() =
-        if
-            this.IsCompletedSuccessfully then ValueTask.FromResult(Ok())
+#if NETSTANDARD2_0
+        if this.IsCompleted && not this.IsCanceled && not this.IsFaulted then ValueTask<_>(result = Ok())
+#else
+        if this.IsCompletedSuccessfully then ValueTask<_>(result = Ok())
+#endif
         else
             vtask {
                 try
@@ -32,8 +43,12 @@ type Task with
 
 type Task<'a> with
     member this.AsResult() =
-        if
-            this.IsCompletedSuccessfully then ValueTask.FromResult(Ok this.Result)
+#if NETSTANDARD2_0
+        if this.IsCompleted && not this.IsCanceled && not this.IsFaulted then ValueTask<_>(result = Ok this.Result)
+#else
+        if this.IsCompletedSuccessfully then ValueTask<_>(result = Ok this.Result)
+#endif
+
         else
             vtask {
                 try
@@ -59,7 +74,7 @@ type ValueTask with
 
     member this.AsResult() =
         if
-            this.IsCompletedSuccessfully then ValueTask.FromResult(Ok())
+            this.IsCompletedSuccessfully then ValueTask<_>(result = Ok())
         else
             vtask {
                 try
@@ -72,7 +87,7 @@ type ValueTask with
 type ValueTask<'a> with
     member this.AsResult() =
         if
-            this.IsCompletedSuccessfully then ValueTask.FromResult(Ok this.Result)
+            this.IsCompletedSuccessfully then ValueTask<_>(result = Ok this.Result)
         else
             vtask {
                 try
@@ -117,6 +132,7 @@ type Exception with
             | null -> ValueNone
             | exn -> exn.IsOrContains<'a>()
 
+// Move this to functions when byrefs are available as generics
 type Span<'a> with
     member this.SliceForward value =
         if uint value >= uint this.Length then

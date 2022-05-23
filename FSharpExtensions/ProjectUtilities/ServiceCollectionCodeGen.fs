@@ -3,7 +3,7 @@ module ProjectUtilities.ServiceCollectionCodeGen
 open System
 open System.IO
 open En3Tho.FSharp.Extensions
-open ProjectUtilities.CodeBuilder.CodeBuilder
+open En3Tho.FSharp.ComputationExpressions.CodeBuilder
 
 let getMethodCodeForVerb dependenciesCount (verb: string) =
 

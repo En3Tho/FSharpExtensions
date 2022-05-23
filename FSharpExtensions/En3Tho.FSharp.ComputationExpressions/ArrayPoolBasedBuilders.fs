@@ -27,8 +27,12 @@ module ArrayPoolList =
         new () = new ArrayPoolList<'a>(InitialSize)
 
         member inline private this.UnsafeAdd value =
+#if NETSTANDARD2_0
+            array[count] <- value
+#else
             let ref = &Unsafe.Add(&MemoryMarshal.GetArrayDataReference(array), count)
             ref <- value
+#endif
             count <- count + 1
         
         member private this.EnsureArray() =
@@ -92,7 +96,12 @@ type ArrayPoolList<'a> with
             let array = this.GetArray()
             let fake = FakeCollection.GetInstance(count)
             let result = ResizeArray(fake)
+#if NETSTANDARD2_0
+            for value in array do
+                result.Add value
+#else
             array.AsSpan(0, count).CopyTo(CollectionsMarshal.AsSpan(result))
+#endif
             result
 
     member this.ToArray() =

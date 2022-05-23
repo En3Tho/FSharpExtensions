@@ -6,8 +6,10 @@ open Core
 
 #nowarn "0077"
 
-let inline (|Null|_|) value = if isNull value then someObj else None
-let inline (|NotNull|_|) value = if isNotNull value then someObj else None
+let inline (|Null|_|) value = if isNull value then Option.someObj else None
+let inline (|NotNull|_|) value = if isNotNull value then Option.someObj else None
+
+// TODO: bench value option vs option on pattern check
 let [<return: Struct>] inline (|Eq|_|) with' what = what = with' |> ValueOption.ofBool
 let [<return: Struct>] inline (|Neq|_|) with' what = what <> with' |> ValueOption.ofBool
 let [<return: Struct>] inline (|Gt|_|) with' what = what > with' |> ValueOption.ofBool
@@ -16,7 +18,7 @@ let [<return: Struct>] inline (|Lt|_|) with' what = what < with' |> ValueOption.
 let [<return: Struct>] inline (|LtEq|_|) with' what = what <= with' |> ValueOption.ofBool
 let [<return: Struct>] inline (|RefEq|_|) with' what = referenceEquals with' what |> ValueOption.ofBool
 
-let [<return: Struct>] inline (|Equals|_|) with' what = what = with' |> ValueOption.ofBool
+let [<return: Struct>] inline (|Equals|_|) with' what = what == with' |> ValueOption.ofBool
 let [<return: Struct>] inline (|NotEquals|_|) with' what = what <> with' |> ValueOption.ofBool
 let [<return: Struct>] inline (|GreaterThan|_|) with' what = what > with' |> ValueOption.ofBool
 let [<return: Struct>] inline (|GreaterThanEquals|_|) with' what = what >= with' |> ValueOption.ofBool
@@ -24,7 +26,7 @@ let [<return: Struct>] inline (|LessThan|_|) with' what = what < with' |> ValueO
 let [<return: Struct>] inline (|LessThanEquals|_|) with' what = what <= with' |> ValueOption.ofBool
 let [<return: Struct>] inline (|ReferenceEquals|_|) with' what = referenceEquals with' what |> ValueOption.ofBool
 
-let [<return: Struct>] inline (|NullableSome|_|) (value: 'a Nullable) = // TODO: F# 6 ValueOption
+let [<return: Struct>] inline (|NullableSome|_|) (value: 'a Nullable) =
     if value.HasValue then ValueSome value.Value else ValueNone
 
 let [<return: Struct>] inline (|NullableNone|_|) (value: 'a Nullable) =
@@ -32,7 +34,7 @@ let [<return: Struct>] inline (|NullableNone|_|) (value: 'a Nullable) =
 
 module Requires =
     let inline (|NotNull|) (obj: 'a when 'a: not struct) = if Object.ReferenceEquals(obj, null) then nullArg "Value cannot be null" else obj
-    let inline (|Eq|) value obj = if obj = value then obj else invalidArg "" $"Value should be equal to {value}"
+    let inline (|Eq|) value obj = if obj == value then obj else invalidArg "" $"Value should be equal to {value}"
     let inline (|Neq|) value obj = if obj <> value then obj else invalidArg "" $"Value should not be equal to {value}"
     let inline (|Gt|) value obj = if obj > value then obj else invalidArg "" $"Value should be greater than {value}"
     let inline (|GtEq|) value obj = if obj >= value then obj else invalidArg "" $"Value should be greater than or equal to {value}"

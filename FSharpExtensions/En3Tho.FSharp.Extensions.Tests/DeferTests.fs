@@ -1,11 +1,8 @@
 module En3Tho.FSharp.Extensions.Tests.DeferTests
 
-open System
 open System.Threading.Tasks
-open En3Tho.FSharp.Extensions.Disposables
 open Xunit
 open En3Tho.FSharp.Extensions
-open En3Tho.FSharp.Extensions.Byref.Operators
 
 [<Fact>]
 let ``Test that defer properly works with both disposable and iasyncdisposable`` () = task {

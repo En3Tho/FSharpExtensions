@@ -6,11 +6,11 @@ open System.Runtime.CompilerServices
 open GenericBuilderBase
 
 
-module internal EditorBrowsableState =
-#if RELEASE
-    let [<Literal>] Value = EditorBrowsableState.Never
-#else
+module EditorBrowsableState =
+#if SHOW_COMPEXPR_EXTENSIONS
     let [<Literal>] Value = EditorBrowsableState.Always
+#else
+    let [<Literal>] Value = EditorBrowsableState.Never
 #endif
 
 type CollectionCode = UnitBuilderCode<unit>

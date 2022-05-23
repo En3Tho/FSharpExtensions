@@ -240,10 +240,10 @@ type ValueTaskResultBuilderBase() =
                         sm.Data.MethodBuilder.Start(&sm)
                         sm.Data.MethodBuilder.Task))
              else
-                ValueTaskResultBuilder.RunDynamic(code)).AsTask()
+                TaskResultBuilder.RunDynamic(code)).AsTask()
 
-        member inline _.Run(code: ValueTaskResultCode<'T, 'TError, 'T>) : ValueTask<Result<'T, 'TError>> =
-           ValueTaskResultBuilder.Run(code)
+        member inline _.Run(code: ValueTaskResultCode<'T, 'TError, 'T>) : Task<Result<'T, 'TError>> =
+           TaskResultBuilder.Run(code)
 
 namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskResultBuilderExtensions
 
@@ -417,10 +417,10 @@ module LowPriority =
             )
 
         member inline this.Bind (task: Result<'TResult1, 'TError>, continuation: ('TResult1 -> ValueTaskResultCode<'TOverall, 'TError, 'TResult2>)) : ValueTaskResultCode<'TOverall, 'TError, 'TResult2> =
-            this.Bind(ValueTask.FromResult task, continuation)
+            this.Bind(ValueTask<_>(result = task), continuation)
 
         member inline this.ReturnFrom (value: Result<'T, 'TError>)  : ValueTaskResultCode<'T, 'TError, 'T> =
-            this.ReturnFrom (ValueTask.FromResult value)
+            this.ReturnFrom (ValueTask<_>(result = value))
 
 module HighPriority =
     // High priority extensions

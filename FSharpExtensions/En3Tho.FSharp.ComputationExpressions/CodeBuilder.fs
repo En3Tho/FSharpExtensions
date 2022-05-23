@@ -1,10 +1,8 @@
-namespace ProjectUtilities.CodeBuilder
+namespace En3Tho.FSharp.ComputationExpressions.CodeBuilder
 
 open System
+open System.Collections.Immutable
 open System.Text
-open En3Tho.FSharp.Extensions
-open En3Tho.FSharp.Extensions.Byref.Operators
-open En3Tho.FSharp.ComputationExpressions.ArrayPoolBasedBuilders
 open En3Tho.FSharp.Extensions.GenericBuilderBase
 
 module CodeBuilderImpl =
@@ -16,10 +14,10 @@ module CodeBuilderImpl =
 
     type CodeBuilder(builder: ResizeArray<LineOfCode>) =
 
-        static let commonIndentations = block {
+        static let commonIndentations = ImmutableArray.Create<string> [|
             for i = 0 to 16 do
                 String.replicate (i * 4) " "
-        }
+        |]
 
         let mutable indentationCount = 0
 
@@ -28,8 +26,8 @@ module CodeBuilderImpl =
         member _.Lines = builder
         member _.Indentation = indentationCount
 
-        member _.IndentOnce() = &indentationCount +<- 1
-        member _.UnIndentOnce() = &indentationCount -<- 1
+        member _.IndentOnce() = indentationCount <- indentationCount + 1
+        member _.UnIndentOnce() = indentationCount <- indentationCount - 1
 
         member _.AddLine(value) = builder.Add({Indentation = indentationCount; Text = value.ToString()})
         member _.AddLine(value: LineOfCode) = builder.Add({Indentation = value.Indentation + indentationCount; Text = value.Text})
@@ -108,6 +106,7 @@ module CodeBuilderImpl =
             runExpr builder
             builder
 
+[<AutoOpen>]
 module CodeBuilder =
     open CodeBuilderImpl
 

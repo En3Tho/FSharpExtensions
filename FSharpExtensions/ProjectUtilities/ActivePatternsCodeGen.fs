@@ -2,7 +2,7 @@ module ProjectUtilities.ActivePatternsCodeGen
 
 open System
 open System.Reflection
-open ProjectUtilities.CodeBuilder.CodeBuilder
+open En3Tho.FSharp.ComputationExpressions.CodeBuilder
 
 let generatePropertyActivePatterns(type': Type) =
     match type'.Name with
