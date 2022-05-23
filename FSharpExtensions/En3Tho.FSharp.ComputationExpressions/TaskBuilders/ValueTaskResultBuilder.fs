@@ -240,10 +240,10 @@ type ValueTaskResultBuilderBase() =
                         sm.Data.MethodBuilder.Start(&sm)
                         sm.Data.MethodBuilder.Task))
              else
-                TaskResultBuilder.RunDynamic(code)).AsTask()
+                ValueTaskResultBuilder.RunDynamic(code)).AsTask()
 
-        member inline _.Run(code: ValueTaskResultCode<'T, 'TError, 'T>) : Task<Result<'T, 'TError>> =
-           TaskResultBuilder.Run(code)
+        member inline _.Run(code: ValueTaskResultCode<'T, 'TError, 'T>) : ValueTask<Result<'T, 'TError>> =
+           ValueTaskResultBuilder.Run(code)
 
 namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskResultBuilderExtensions
 

@@ -240,7 +240,7 @@ type ValueTaskExnResultBuilderBase() =
                         sm.Data.MethodBuilder.Start(&sm)
                         sm.Data.MethodBuilder.Task)))
              else
-                ValueTaskExnResultBuilder.RunDynamic(code)).AsTask()
+                TaskExnResultBuilder.RunDynamic(code)).AsTask()
 
         member inline _.Run(code: ValueTaskExnResultCode<'T, 'T>) : Task<Result<'T, exn>> =
            TaskExnResultBuilder.Run(code)
