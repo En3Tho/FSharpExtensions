@@ -18,7 +18,7 @@ module ServiceProviderCodeGen =
                 for i = 1 to genericArgsCount do
                     $"where T{i} : notnull"
             }
-            indentBlock {
+            braceBlock {
                 "action("
                 indent {
                     for i = 1 to genericArgsCount - 1 do
@@ -42,7 +42,7 @@ module ServiceProviderCodeGen =
                 for i = 1 to genericArgsCount do
                     $"where T{i} : notnull"
             }
-            indentBlock {
+            braceBlock {
                 "return func("
                 indent {
                     for i = 1 to genericArgsCount - 1 do
@@ -66,7 +66,7 @@ module ServiceProviderCodeGen =
                for i = 1 to genericArgsCount do
                     $"where T{i} : notnull"
             }
-            indentBlock {
+            braceBlock {
                 "return func("
                 indent {
                     for i = 1 to genericArgsCount - 1 do
@@ -90,7 +90,7 @@ module ServiceScopeCodeGen =
                 for i = 1 to genericArgsCount do
                     $"where T{i} : notnull"
             }
-            indentBlock {
+            braceBlock {
                 "scope.ServiceProvider.Run(action);"
             }
         }
@@ -108,7 +108,7 @@ module ServiceScopeCodeGen =
                 for i = 1 to genericArgsCount do
                     $"where T{i} : notnull"
             }
-            indentBlock {
+            braceBlock {
                 "return scope.ServiceProvider.RunAsync(func);"
             }
         }
@@ -126,7 +126,7 @@ module ServiceScopeCodeGen =
                 for i = 1 to genericArgsCount do
                     $"where T{i} : notnull"
             }
-            indentBlock {
+            braceBlock {
                 "return scope.ServiceProvider.RunAsync(func);"
             }
         }
@@ -145,7 +145,7 @@ module CodeGen =
 
         code {
             "public static partial class IServiceProviderExtensions"
-            indentBlock {
+            braceBlock {
                 for generator in generators do
                     for i = 1 to 15 do
                         generator i
@@ -165,7 +165,7 @@ module CodeGen =
 
         code {
             "public static partial class IServiceScopeExtensions"
-            indentBlock {
+            braceBlock {
                 for generator in generators do
                     for i = 1 to 15 do
                         generator i

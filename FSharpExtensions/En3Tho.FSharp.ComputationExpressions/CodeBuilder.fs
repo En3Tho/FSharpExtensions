@@ -86,7 +86,7 @@ module CodeBuilderImpl =
                 builder.UnIndentOnce()
 
     [<Sealed>]
-    type IndentBlock() =
+    type BraceBlock() =
         inherit CodeBlockBase()
 
         member inline this.Run([<InlineIfLambda>] runExpr: CodeBuilderCode) : CodeBuilderCode =
@@ -112,4 +112,4 @@ module CodeBuilder =
 
     let code = CodeBuilderRunner()
     let indent = Indent()
-    let indentBlock = IndentBlock()
+    let braceBlock = BraceBlock()

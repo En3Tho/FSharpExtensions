@@ -20,7 +20,7 @@ let getMethodCodeForVerb dependenciesCount (verb: string) =
             for i = 1 to dependenciesCount do
                 $"where TDependency{i} : notnull"
         }
-        indentBlock {
+        braceBlock {
             $"collection.{verb}("
             indent {
                 "serviceProvider => factory("
@@ -42,7 +42,7 @@ let generateFileForVerb dependenciesCount verb =
         "namespace En3Tho.Extensions.DependencyInjection;"
         ""
         "public static partial class IServiceCollectionExtensions"
-        indentBlock {
+        braceBlock {
             for i = 1 to dependenciesCount do
                 getMethodCodeForVerb i verb
                 ""
