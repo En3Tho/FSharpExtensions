@@ -11,6 +11,7 @@ ProjectSection(SolutionItems) = preProject
 	..\.gitignore = ..\.gitignore
 	..\LICENSE = ..\LICENSE
 	..\README.md = ..\README.md
+	global.json = global.json
 EndProjectSection
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.Extensions.Tests", "En3Tho.FSharp.Extensions.Tests\En3Tho.FSharp.Extensions.Tests.fsproj", "{355D7405-CE6D-41C9-B6EF-C573364DE503}"

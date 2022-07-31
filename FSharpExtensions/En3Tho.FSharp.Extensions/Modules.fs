@@ -62,7 +62,7 @@ module Printf =
         static member inline ($) (T, _: ^a -> ^b): ^a -> ^b = fun (_: ^a) -> T $ Unchecked.defaultof< ^b>
 
     /// conditional ksprintf, ignores format on false and does not create any string
-    let inline cksprintf runCondition stringFunc format: 'b =
+    let inline cksprintf runCondition ([<InlineIfLambda>] stringFunc) format: 'b =
         if runCondition then
            Printf.kprintf stringFunc format
         else
@@ -130,10 +130,11 @@ module String =
     let inline ensureNotNullOrEmpty argName arg = if arg |> String.IsNullOrEmpty then nullArg argName else arg
     let inline defaultValue def str = if String.IsNullOrEmpty str then def else str
     let inline defaultValueW def str = if String.IsNullOrWhiteSpace str then def else str
-    let inline defaultWith defThunk str = if String.IsNullOrEmpty str then defThunk() else str
-    let inline defaultWithW defThunk str = if String.IsNullOrWhiteSpace str then defThunk() else str
+    let inline defaultWith ([<InlineIfLambda>] defThunk) str = if String.IsNullOrEmpty str then defThunk() else str
+    let inline defaultWithW ([<InlineIfLambda>] defThunk) str = if String.IsNullOrWhiteSpace str then defThunk() else str
     let inline truncate maxLength (str: string) = if str.Length <= maxLength then str else str.Substring(0, maxLength)
 
+    // TODO: proper null handling ?
     let [<return: Struct>] inline (|NullOrEmpty|_|) (str: string) = String.IsNullOrEmpty(str) |> ValueOption.ofBool
     let [<return: Struct>] inline (|NotNullOrEmpty|_|) (str: string) = String.IsNullOrEmpty(str) |> not |> ValueOption.ofBool
     let [<return: Struct>] inline (|NullOrWhiteSpace|_|) (str: string) = String.IsNullOrWhiteSpace(str) |> ValueOption.ofBool

@@ -230,29 +230,29 @@ module IEquatableEqualityOperatorEx =
 
     let inline (!=) a b = not (a == b)
 
-    [<AutoOpen; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-    module ByRefOperators =
+[<AutoOpen; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+module ByRefOperators =
 
-        let inline inc (a: 'a byref) = a <- a + LanguagePrimitives.GenericOne
-        let inline dec (a: 'a byref) = a <- a - LanguagePrimitives.GenericOne
-        let inline neg (a: 'a byref) = a <- (~-)a
-        // like a default value
-        let inline (??<-) (a: 'a byref) v = if isNull a then a <- v
-        // like a default with
-        let inline (???<-) (a: 'a byref) ([<InlineIfLambda>] f) = if isNull a then a <- f()
-        let inline (+<-) (a: 'a byref) v = a <- a + v
-        let inline (-<-) (a: 'a byref) v = a <- a - v
-        let inline (/<-) (a: 'a byref) v = a <- a / v
-        let inline (%<-) (a: 'a byref) v = a <- a % v
-        let inline ( *<- ) (a: 'a byref) v = a <- a * v
-        let inline (~~~) (a: 'a byref) = a <- ~~~a
-        let inline (&&&<-) (a: 'a byref) v = a <- a &&& v
-        let inline (|||<-) (a: 'a byref) v = a <- a ||| v
-        let inline (^^^<-) (a: 'a byref) v = a <- a ^^^ v
-        let inline (<<<<-) (a: 'a byref) v = a <- a <<< v
-        let inline (>>><-) (a: 'a byref) v = a <- a >>> v
-        let inline (&&<-) (a: bool byref) v = a <- a && v
-        let inline (||<-) (a: bool byref) v = a <- a || v
-        let inline ( **<- ) (a: 'a byref) v = a <- a ** v
-        let inline (@<-) (a: 'a list byref) v = a <- a @ v
-        let inline (|><-) (a: 'a byref) v = a <- a |> v
+    let inline inc (a: 'a byref) = a <- a + LanguagePrimitives.GenericOne
+    let inline dec (a: 'a byref) = a <- a - LanguagePrimitives.GenericOne
+    let inline neg (a: 'a byref) = a <- (~-)a
+    // like a default value
+    let inline (??<-) (a: 'a byref) v = if isNull a then a <- v
+    // like a default with
+    let inline (???<-) (a: 'a byref) ([<InlineIfLambda>] f) = if isNull a then a <- f()
+    let inline (+<-) (a: 'a byref) v = a <- a + v
+    let inline (-<-) (a: 'a byref) v = a <- a - v
+    let inline (/<-) (a: 'a byref) v = a <- a / v
+    let inline (%<-) (a: 'a byref) v = a <- a % v
+    let inline ( *<- ) (a: 'a byref) v = a <- a * v
+    let inline (~~~) (a: 'a byref) = a <- ~~~a
+    let inline (&&&<-) (a: 'a byref) v = a <- a &&& v
+    let inline (|||<-) (a: 'a byref) v = a <- a ||| v
+    let inline (^^^<-) (a: 'a byref) v = a <- a ^^^ v
+    let inline (<<<<-) (a: 'a byref) v = a <- a <<< v
+    let inline (>>><-) (a: 'a byref) v = a <- a >>> v
+    let inline (&&<-) (a: bool byref) v = a <- a && v
+    let inline (||<-) (a: bool byref) v = a <- a || v
+    let inline ( **<- ) (a: 'a byref) v = a <- a ** v
+    let inline (@<-) (a: 'a list byref) v = a <- a @ v
+    let inline (|><-) (a: 'a byref) v = a <- a |> v
