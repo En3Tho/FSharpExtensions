@@ -2,17 +2,17 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <IsPackable>true</IsPackable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Authors> Igor Bagdamyan</Authors>
+        <AssemblyVersion>1.0.0</AssemblyVersion>
+        <FileVersion>1.0.0</FileVersion>
+        <Description>A set of extensions for Xunit Assert</Description>
         <Copyright>Copyright (c) 2022 Igor Bagdamyan</Copyright>
         <PackageProjectUrl>https://github.com/En3Tho/FSharpExtensions</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/En3Tho/FSharpExtensions/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/En3Tho/FSharpExtensions</RepositoryUrl>
+        <Authors> Igor Bagdamyan</Authors>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-        <AssemblyVersion>1.0.6</AssemblyVersion>
-        <FileVersion>1.0.6</FileVersion>
-        <PackageVersion>1.0.6</PackageVersion>
         <!-- Optional: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <!-- Optional: Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
@@ -21,22 +21,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="BasicTypes.fs" />
-        <Compile Include="MultiValidators.fs" />
-        <Compile Include="AsyncMultiValidators.fs" />
-        <Compile Include="Extensions.fs" />
-        <Compile Include="CommonValidatedTypes.fs" />
-        <Compile Include="JsonConverter.fs" />
+        <Compile Include="Extensions.fs" />        
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="En3Tho.FSharp.Extensions" Version="1.1.7" />
-      <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="Ply" Version="0.3.1" />
-      <PackageReference Update="FSharp.Core" Version="6.0.5" />
+        <PackageReference Include="xunit" Version="2.4.2" />
     </ItemGroup>
-
+            
 </Project>

@@ -9,29 +9,17 @@ let private unitTask = Task.FromResult()
 
 type Task with
     static member inline RunSynchronously (task: Task) =
-#if NETSTANDARD2_0
-        if task.IsCompleted && not task.IsCanceled && not task.IsFaulted then () else
-#else
         if task.IsCompletedSuccessfully then () else
-#endif
         task.ConfigureAwait(false).GetAwaiter().GetResult()
 
     static member inline RunSynchronously (task: Task<'a>) =
-#if NETSTANDARD2_0
-        if task.IsCompleted && not task.IsCanceled && not task.IsFaulted then task.Result else
-#else
         if task.IsCompletedSuccessfully then task.Result else
-#endif
         task.ConfigureAwait(false).GetAwaiter().GetResult()
 
     static member CompletedUnitTask = unitTask
 
     member this.AsResult() =
-#if NETSTANDARD2_0
-        if this.IsCompleted && not this.IsCanceled && not this.IsFaulted then ValueTask<_>(result = Ok())
-#else
         if this.IsCompletedSuccessfully then ValueTask<_>(result = Ok())
-#endif
         else
             vtask {
                 try
@@ -43,11 +31,7 @@ type Task with
 
 type Task<'a> with
     member this.AsResult() =
-#if NETSTANDARD2_0
-        if this.IsCompleted && not this.IsCanceled && not this.IsFaulted then ValueTask<_>(result = Ok this.Result)
-#else
         if this.IsCompletedSuccessfully then ValueTask<_>(result = Ok this.Result)
-#endif
 
         else
             vtask {

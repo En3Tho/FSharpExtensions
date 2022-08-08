@@ -103,20 +103,8 @@ module IEquatableEqualityOperatorEx =
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     let inline callIEquatableEqualsOnResizeArrays<'a when 'a :> IEquatable<'a>> (left: 'a ResizeArray) (right: 'a ResizeArray) =
-#if NETSTANDARD2_0
-        left.Count = right.Count
-        && (
-            let count = left.Count
-            let rec go index =
-                if uint index >= uint count then
-                    true
-                else
-                    callIEquatableEqualsOnValues left[index] right[index]
-                    && go (index + 1)
-            go 0)
-#else
         CollectionsMarshal.AsSpan(left).SequenceEqual(Span.op_Implicit(CollectionsMarshal.AsSpan(right))) // for some reason implicit conversion didn't work. This is a bug I think.
-#endif
+
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     let inline callIEquatableEqualsOnILists<'a when 'a :> IEquatable<'a>> (left: 'a IList) (right: 'a IList) =
         left.Count = right.Count

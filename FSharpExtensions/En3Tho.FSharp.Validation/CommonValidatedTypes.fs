@@ -97,8 +97,8 @@ module NonEmptyString =
 
     type [<Struct>] Validator =
         member this.Validate value =
-                if value = null then Error (StringIsNull() :> exn)
-                elif String.IsNullOrEmpty value then Error (StringIsNull() :> exn)
+                if Object.ReferenceEquals(value, null) then Error (StringIsNull() :> exn)
+                elif String.IsNullOrEmpty value then Error (StringIsEmpty() :> exn)
                 else Ok value
         interface IValidator<string> with
             member this.Validate value = this.Validate value

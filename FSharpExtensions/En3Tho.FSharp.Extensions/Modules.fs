@@ -50,10 +50,8 @@ module Functions =
     let inline revArgs2 ([<InlineIfLambda>] f: ^a -> ^b -> ^c) = fun (b: ^b) (a: ^a) -> f a b
     let inline revArgs3 ([<InlineIfLambda>] f: ^a -> ^b -> ^c -> ^d) = fun (c: ^c) (b: ^b) (a: ^a) -> f a b c
 
-#if NET5_0_OR_GREATER
 module Exception =
     let inline reraise ex = ExceptionDispatchInfo.Throw ex; Unchecked.defaultof<'a>
-#endif
 
 module Printf =
     type T = T with
@@ -251,11 +249,7 @@ module String =
     let [<return: Struct>] inline (|ContainsInvariantCulture|_|) (pattern: string) (str: string) = str.IndexOf(pattern, StringComparison.InvariantCulture) >= 0 |> ValueOption.ofBool
     let [<return: Struct>] inline (|ContainsInvariantCultureIgnoreCase|_|) (pattern: string) (str: string) = str.IndexOf(pattern, StringComparison.InvariantCultureIgnoreCase) >= 0 |> ValueOption.ofBool
     let [<return: Struct>] inline (|ContainsChar|_|) (pattern: char) (str: string) =
-#if NETSTANDARD2_0
-        str.IndexOf(pattern.ToString(), StringComparison.Ordinal) >= 0 |> ValueOption.ofBool
-#else
         str.IndexOf(pattern, StringComparison.Ordinal) >= 0 |> ValueOption.ofBool
-#endif
 
     let [<return: Struct>] inline (|ContainsNot|_|) (pattern: string) (str: string) = str.IndexOf(pattern, StringComparison.Ordinal) = -1 |> ValueOption.ofBool
     let [<return: Struct>] inline (|ContainsNotIgnoreCase|_|) (pattern: string) (str: string) = str.IndexOf(pattern, StringComparison.OrdinalIgnoreCase) = -1 |> ValueOption.ofBool
@@ -271,11 +265,7 @@ module String =
         let mutable found = false
         while not found && i < patterns.Length do
             let pattern = patterns[i]
-#if NETSTANDARD2_0
-            found <- str.IndexOf(pattern, comparison) <> -1
-#else
             found <- str.Contains(pattern, comparison)
-#endif
         found
 
     let private containsAnyList (patterns: string list) (comparison: StringComparison) (str: string) =
@@ -284,11 +274,7 @@ module String =
         while not found &&
             (match list with
              | pattern :: rest ->
-#if NETSTANDARD2_0
-                 found <- str.IndexOf(pattern, comparison) <> -1
-#else
                  found <- str.Contains(pattern, comparison)
-#endif
                  list <- rest
                  true
              | [] ->
@@ -300,11 +286,7 @@ module String =
         let mutable found = false
         while not found && enumerator.MoveNext() do
             let pattern = enumerator.Current
-#if NETSTANDARD2_0
-            found <- str.IndexOf(pattern, comparison) <> -1
-#else
             found <- str.Contains(pattern, comparison)
-#endif
         found
 
     let private containsAnyCharArray (patterns: char[]) (str: string) =
@@ -374,11 +356,7 @@ module String =
     let [<return: Struct>] inline (|StartsWithInvariantCulture|_|) (pattern: string) (str: string) = str.StartsWith(pattern, StringComparison.InvariantCulture) |> ValueOption.ofBool
     let [<return: Struct>] inline (|StartsWithInvariantCultureIgnoreCase|_|) (pattern: string) (str: string) = str.StartsWith(pattern, StringComparison.InvariantCultureIgnoreCase) |> ValueOption.ofBool
     let [<return: Struct>] inline (|StartsWithChar|_|) (pattern: char) (str: string) =
-#if NETSTANDARD2_0
-        str.StartsWith(pattern.ToString(), StringComparison.Ordinal) |> ValueOption.ofBool
-#else
         str.StartsWith(pattern) |> ValueOption.ofBool
-#endif
 
     let [<return: Struct>] inline (|StartsWithNot|_|) (pattern: string) (str: string) = str.StartsWith(pattern, StringComparison.Ordinal) |> not |> ValueOption.ofBool
     let [<return: Struct>] inline (|StartsWithNotIgnoreCase|_|) (pattern: string) (str: string) = str.StartsWith(pattern, StringComparison.OrdinalIgnoreCase) |> not |> ValueOption.ofBool
@@ -387,11 +365,7 @@ module String =
     let [<return: Struct>] inline (|StartsWithNotInvariantCulture|_|) (pattern: string) (str: string) = str.StartsWith(pattern, StringComparison.InvariantCulture) |> ValueOption.ofBool
     let [<return: Struct>] inline (|StartsWithNotInvariantCultureIgnoreCase|_|) (pattern: string) (str: string) = str.StartsWith(pattern, StringComparison.InvariantCultureIgnoreCase) |> not |> ValueOption.ofBool
     let [<return: Struct>] inline (|StartsWithNotChar|_|) (pattern: char) (str: string) =
-#if NETSTANDARD2_0
-        str.StartsWith(pattern.ToString(), StringComparison.Ordinal) |> not |> ValueOption.ofBool
-#else
         str.StartsWith(pattern) |> not |> ValueOption.ofBool
-#endif
 
     let private startsWithAnyArray (patterns: string[]) (comparison: StringComparison) (str: string) =
         let mutable i = 0
@@ -428,11 +402,7 @@ module String =
         let mutable found = false
         while not found && i < patterns.Length do
             let pattern = patterns[i]
-#if NETSTANDARD2_0
-            found <- str.StartsWith(pattern.ToString(), StringComparison.Ordinal)
-#else
             found <- str.StartsWith(pattern)
-#endif
         found
 
     let private startsWithAnyCharList (patterns: char list) (str: string) =
@@ -442,11 +412,7 @@ module String =
         while not found &&
             (match list with
              | pattern :: rest ->
-#if NETSTANDARD2_0
-                 found <- str.StartsWith(pattern.ToString(), StringComparison.Ordinal)
-#else
                  found <- str.StartsWith(pattern)
-#endif
                  list <- rest
                  true
              | [] ->
@@ -459,11 +425,7 @@ module String =
         let mutable found = false
         while not found && enumerator.MoveNext() do
             let pattern = enumerator.Current
-#if NETSTANDARD2_0
-            found <- str.StartsWith(pattern.ToString(), StringComparison.Ordinal)
-#else
             found <- str.StartsWith(pattern)
-#endif
         found
 
     let startsWithAny (patterns: string seq) (comparison: StringComparison) (str: string) =
@@ -501,11 +463,7 @@ module String =
     let [<return: Struct>] inline (|EndsWithInvariantCulture|_|) (pattern: string) (str: string) = str.EndsWith(pattern, StringComparison.InvariantCulture) |> ValueOption.ofBool
     let [<return: Struct>] inline (|EndsWithInvariantCultureIgnoreCase|_|) (pattern: string) (str: string) = str.EndsWith(pattern, StringComparison.InvariantCultureIgnoreCase) |> ValueOption.ofBool
     let [<return: Struct>] inline (|EndsWithChar|_|) (pattern: char) (str: string) =
-#if NETSTANDARD2_0
-        str.EndsWith(pattern.ToString(), StringComparison.Ordinal) |> ValueOption.ofBool
-#else
         str.EndsWith(pattern) |> ValueOption.ofBool
-#endif
 
     let [<return: Struct>] inline (|EndsWithNot|_|) (pattern: string) (str: string) = str.EndsWith(pattern, StringComparison.Ordinal) |> not |> ValueOption.ofBool
     let [<return: Struct>] inline (|EndsWithNotIgnoreCase|_|) (pattern: string) (str: string) = str.EndsWith(pattern, StringComparison.OrdinalIgnoreCase) |> not |> ValueOption.ofBool
@@ -514,12 +472,7 @@ module String =
     let [<return: Struct>] inline (|EndsWithNotInvariantCulture|_|) (pattern: string) (str: string) = str.EndsWith(pattern, StringComparison.InvariantCulture) |> not |> ValueOption.ofBool
     let [<return: Struct>] inline (|EndsWithNotInvariantCultureIgnoreCase|_|) (pattern: string) (str: string) = str.EndsWith(pattern, StringComparison.InvariantCultureIgnoreCase) |> not |> ValueOption.ofBool
     let [<return: Struct>] inline (|EndsWithNotChar|_|) (pattern: char) (str: string) =
-#if NETSTANDARD2_0
-        str.EndsWith(pattern.ToString(), StringComparison.Ordinal)  |> not |> ValueOption.ofBool
-#else
         str.EndsWith(pattern) |> not |> ValueOption.ofBool
-#endif
-
 
     let private endsWithAnyArray (patterns: string[]) (comparison: StringComparison) (str: string) =
         let mutable i = 0
@@ -556,11 +509,7 @@ module String =
         let mutable found = false
         while not found && i < patterns.Length do
             let pattern = patterns[i]
-#if NETSTANDARD2_0
-            found <- str.EndsWith(pattern.ToString(), StringComparison.Ordinal)
-#else
             found <- str.EndsWith(pattern)
-#endif
         found
 
     let private endsWithAnyCharList (patterns: char list) (str: string) =
@@ -570,11 +519,7 @@ module String =
         while not found &&
             (match list with
              | pattern :: rest ->
-#if NETSTANDARD2_0
-                 found <- str.EndsWith(pattern.ToString(), StringComparison.Ordinal)
-#else
                  found <- str.EndsWith(pattern)
-#endif
                  list <- rest
                  true
              | [] ->
@@ -587,11 +532,7 @@ module String =
         let mutable found = false
         while not found && enumerator.MoveNext() do
              let pattern = enumerator.Current
-#if NETSTANDARD2_0
-             found <- str.EndsWith(pattern.ToString(), StringComparison.Ordinal)
-#else
              found <- str.EndsWith(pattern)
-#endif
         found
 
     let endsWithAny (patterns: string seq) (comparison: StringComparison) (str: string) =
@@ -634,12 +575,7 @@ module Enum =
     let inline removeFlagWhen condition (flag: EnumShape<_>) (value: EnumShape<_>) = if condition then (flag ||| value) ^^^ flag else value
     let inline hasFlag (flag: EnumShape<_>) (value: EnumShape<_>) = value &&& flag = flag
     let inline isValid (value: EnumShape<'a>) =
-
-#if NETSTANDARD2_0
-        (Enum.GetValues(typeof<'a>) :?> 'a[]) |> Array.contains value
-#else
         Enum.GetValues<'a>().AsSpan().Contains value
-#endif
 
     let [<return: Struct>] inline (|HasFlag|_|) flag value = hasFlag flag value |> ValueOption.ofBool
     let [<return: Struct>] inline (|HasFlagNot|_|) flag value = hasFlag flag value |> not |> ValueOption.ofBool
@@ -687,8 +623,6 @@ module EResult =
         | Ok value -> value
         | Error exn -> defThunk exn
 
-#if !NETSTANDARD2_0
-
     let inline unwrap (result: EResult<'a, 'b>) =
         match result with
         | Ok value -> value
@@ -712,7 +646,6 @@ module EResult =
         | Error exn when String.IsNullOrEmpty exn.StackTrace ->
             exn |> ExceptionDispatchInfo.SetCurrentStackTrace :?> 'b |> Error
         | _ -> result
-#endif
 
 module Async =
     let rec retryWhile condition retries work = async {
@@ -1232,10 +1165,8 @@ module Dictionary =
 
     let inline tryGetValue key (d: #IDictionary<'key, 'value>) =
         d.TryGetValue key |> Option.ofTryPattern
-#if !NETSTANDARD2_0
     let inline tryAddValue key value (d: #IDictionary<'key, 'value>) =
         d.TryAdd(key, value)
-#endif
     let inline addValue key value (d: #IDictionary<'key, 'value>) =
         d.Add(key, value)
 
@@ -1281,7 +1212,6 @@ module Action =
 module Tuple =
     let inline ofResVal ([<InlineIfLambda>] f) x = f x, x
 
-#if !NETSTANDARD2_0
 /// Provides functions to get Union public fields which are not visible from F#
 module Union =
     [<AbstractClass; Sealed>]
@@ -1323,8 +1253,6 @@ module Union =
     let getTag unionObj = unionObj |> TagGetter.GetTag
     /// Gets the name of the union case of the underlying union object
     let getName unionObj = unionObj |> NameGetter<'a>.GetName
-
-#endif
 
 module Task =
     let inline map ([<InlineIfLambda>] mapper) (job: Task<'a>) =

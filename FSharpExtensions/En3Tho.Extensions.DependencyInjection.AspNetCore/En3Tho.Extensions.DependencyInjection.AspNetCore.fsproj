@@ -7,7 +7,7 @@
         <RootNamespace>En3Tho.Extensions.DependencyInjection.AspNetCore</RootNamespace>
         <PackageId>En3Tho.Extensions.DependencyInjection.AspNetCore</PackageId>
         <Authors> Igor Bagdamyan</Authors>
-        <Copyright>Copyright (c) 2021 Igor Bagdamyan</Copyright>
+        <Copyright>Copyright (c) 2022 Igor Bagdamyan</Copyright>
         <PackageProjectUrl>https://github.com/En3Tho/FSharpExtensions</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/En3Tho/FSharpExtensions/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/En3Tho/FSharpExtensions</RepositoryUrl>
@@ -30,14 +30,14 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="En3Tho.FSharp.Extensions" Version="1.1.0" />
+      <PackageReference Include="En3Tho.FSharp.Extensions" Version="1.1.7" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
       <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Update="FSharp.Core" Version="6.0.3" />
+      <PackageReference Update="FSharp.Core" Version="6.0.5" />
     </ItemGroup>
 
 </Project>

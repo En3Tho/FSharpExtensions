@@ -34,6 +34,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.ComputationEx
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ProjectUtilities", "ProjectUtilities\ProjectUtilities.fsproj", "{600E3DE8-B214-48DD-A25A-8BA167BCB49F}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.XUnitExtensions", "En3Tho.FSharp.XUnitExtensions\En3Tho.FSharp.XUnitExtensions.fsproj", "{EAD3C4E0-6961-4D74-9747-6B870C7060CE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -92,5 +94,9 @@ Global
 		{600E3DE8-B214-48DD-A25A-8BA167BCB49F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{600E3DE8-B214-48DD-A25A-8BA167BCB49F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{600E3DE8-B214-48DD-A25A-8BA167BCB49F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EAD3C4E0-6961-4D74-9747-6B870C7060CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAD3C4E0-6961-4D74-9747-6B870C7060CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAD3C4E0-6961-4D74-9747-6B870C7060CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAD3C4E0-6961-4D74-9747-6B870C7060CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

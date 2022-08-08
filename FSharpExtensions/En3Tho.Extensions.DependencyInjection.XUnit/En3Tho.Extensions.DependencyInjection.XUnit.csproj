@@ -8,7 +8,7 @@
         <RootNamespace>En3Tho.Extensions.DependencyInjection.XUnit</RootNamespace>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Authors> Igor Bagdamyan</Authors>
-        <Copyright>Copyright (c) 2021 Igor Bagdamyan</Copyright>
+        <Copyright>Copyright (c) 2022 Igor Bagdamyan</Copyright>
         <PackageProjectUrl>https://github.com/En3Tho/FSharpExtensions</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/En3Tho/FSharpExtensions/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/En3Tho/FSharpExtensions</RepositoryUrl>
@@ -28,8 +28,8 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Include="Moq" Version="4.16.1" />
-      <PackageReference Include="Xunit.DependencyInjection" Version="8.3.0" />
+      <PackageReference Include="Moq" Version="4.18.2" />
+      <PackageReference Include="Xunit.DependencyInjection" Version="8.5.0" />
     </ItemGroup>
 
 </Project>

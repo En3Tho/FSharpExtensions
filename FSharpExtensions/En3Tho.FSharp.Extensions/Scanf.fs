@@ -1,7 +1,4 @@
-﻿#if NETSTANDARD2_0
-namespace En3Tho.FSharp.Extensions
-#else
-module En3Tho.FSharp.Extensions.Scanf
+﻿module En3Tho.FSharp.Extensions.Scanf
 
 open System
 open System.Runtime.InteropServices
@@ -134,4 +131,3 @@ let scanfMemory fmt (value: ReadOnlyMemory<char>) = scanfInternal true value fmt
 
 /// Light version of scanf which stops matching when values are found, can return empty strings
 let scanflMemory fmt (value: ReadOnlyMemory<char>) = scanfInternal false value fmt
-#endif
