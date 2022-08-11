@@ -10,7 +10,7 @@ let inline (|Null|_|) value = if isNull value then Option.someObj else None
 let inline (|NotNull|_|) value = if isNotNull value then Option.someObj else None
 
 // TODO: bench value option vs option on pattern check
-let [<return: Struct>] inline (|Eq|_|) with' what = what = with' |> ValueOption.ofBool
+let [<return: Struct>] inline (|Eq|_|) with' what = what == with' |> ValueOption.ofBool
 let [<return: Struct>] inline (|Neq|_|) with' what = what <> with' |> ValueOption.ofBool
 let [<return: Struct>] inline (|Gt|_|) with' what = what > with' |> ValueOption.ofBool
 let [<return: Struct>] inline (|GtEq|_|) with' what = what >= with' |> ValueOption.ofBool

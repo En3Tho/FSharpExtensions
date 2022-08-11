@@ -37,12 +37,23 @@ module Core =
     let inline nullVal< ^a when ^a: struct> = Unchecked.defaultof< ^a>
 
     let inline toString (o: ^a) = o.ToString()
+    let inline getHashCode (o: ^a) = o.GetHashCode()
 
     [<Obsolete("This logic needs to be implemented")>]
     let inline TODO<'a> = raise (NotImplementedException())
 
     let inline (&==) (a: 'a when 'a: not struct) (b: 'a) = Object.ReferenceEquals(a, b)
     let inline (&!=) (a: 'a when 'a: not struct) (b: 'a) = not (Object.ReferenceEquals(a, b))
+
+    [<AbstractClass; AutoOpen>]
+    type ActionFuncConverter =
+        static member inline func<'a, 'b> ([<InlineIfLambda>] f: 'a -> 'b) = Func<'a, 'b>(f)
+        static member inline func<'a, 'b, 'c> ([<InlineIfLambda>] f: 'a -> 'b -> 'c) = Func<'a, 'b, 'c>(f)
+        static member inline func<'a, 'b, 'c, 'd> ([<InlineIfLambda>] f: 'a -> 'b -> 'c -> 'd) = Func<'a, 'b, 'c, 'd>(f)
+
+        static member inline action<'a, 'b> ([<InlineIfLambda>] f: 'a -> unit) = Action<'a>(f)
+        static member inline action<'a, 'b> ([<InlineIfLambda>] f: 'a -> 'b -> unit) = Action<'a, 'b>(f)
+        static member inline action<'a, 'b, 'c, 'd> ([<InlineIfLambda>] f: 'a -> 'b -> 'c -> unit) = Action<'a, 'b, 'c>(f)
 
 [<AutoOpen; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 module PipeAndCompositionOperatorEx =
