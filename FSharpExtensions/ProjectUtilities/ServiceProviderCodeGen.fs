@@ -132,7 +132,7 @@ module ServiceScopeCodeGen =
                     $"where T{i} : notnull"
             }
             braceBlock {
-                "scope.ServiceProvider.Run(func);"
+                "return scope.ServiceProvider.Run(func);"
             }
         }
 

@@ -336,6 +336,336 @@ public static partial class IServiceProviderExtensions
         );
     }
 
+    public static TOut Run<T1, TOut>(this IServiceProvider provider, Func<T1, TOut> func)
+        where T1 : notnull
+    {
+        return func(
+            provider.GetRequiredService<T1>()
+        );
+    }
+
+    public static TOut Run<T1, T2, TOut>(this IServiceProvider provider, Func<T1, T2, TOut> func)
+        where T1 : notnull
+        where T2 : notnull
+    {
+        return func(
+            provider.GetRequiredService<T1>(),
+            provider.GetRequiredService<T2>()
+        );
+    }
+
+    public static TOut Run<T1, T2, T3, TOut>(this IServiceProvider provider, Func<T1, T2, T3, TOut> func)
+        where T1 : notnull
+        where T2 : notnull
+        where T3 : notnull
+    {
+        return func(
+            provider.GetRequiredService<T1>(),
+            provider.GetRequiredService<T2>(),
+            provider.GetRequiredService<T3>()
+        );
+    }
+
+    public static TOut Run<T1, T2, T3, T4, TOut>(this IServiceProvider provider, Func<T1, T2, T3, T4, TOut> func)
+        where T1 : notnull
+        where T2 : notnull
+        where T3 : notnull
+        where T4 : notnull
+    {
+        return func(
+            provider.GetRequiredService<T1>(),
+            provider.GetRequiredService<T2>(),
+            provider.GetRequiredService<T3>(),
+            provider.GetRequiredService<T4>()
+        );
+    }
+
+    public static TOut Run<T1, T2, T3, T4, T5, TOut>(this IServiceProvider provider, Func<T1, T2, T3, T4, T5, TOut> func)
+        where T1 : notnull
+        where T2 : notnull
+        where T3 : notnull
+        where T4 : notnull
+        where T5 : notnull
+    {
+        return func(
+            provider.GetRequiredService<T1>(),
+            provider.GetRequiredService<T2>(),
+            provider.GetRequiredService<T3>(),
+            provider.GetRequiredService<T4>(),
+            provider.GetRequiredService<T5>()
+        );
+    }
+
+    public static TOut Run<T1, T2, T3, T4, T5, T6, TOut>(this IServiceProvider provider, Func<T1, T2, T3, T4, T5, T6, TOut> func)
+        where T1 : notnull
+        where T2 : notnull
+        where T3 : notnull
+        where T4 : notnull
+        where T5 : notnull
+        where T6 : notnull
+    {
+        return func(
+            provider.GetRequiredService<T1>(),
+            provider.GetRequiredService<T2>(),
+            provider.GetRequiredService<T3>(),
+            provider.GetRequiredService<T4>(),
+            provider.GetRequiredService<T5>(),
+            provider.GetRequiredService<T6>()
+        );
+    }
+
+    public static TOut Run<T1, T2, T3, T4, T5, T6, T7, TOut>(this IServiceProvider provider, Func<T1, T2, T3, T4, T5, T6, T7, TOut> func)
+        where T1 : notnull
+        where T2 : notnull
+        where T3 : notnull
+        where T4 : notnull
+        where T5 : notnull
+        where T6 : notnull
+        where T7 : notnull
+    {
+        return func(
+            provider.GetRequiredService<T1>(),
+            provider.GetRequiredService<T2>(),
+            provider.GetRequiredService<T3>(),
+            provider.GetRequiredService<T4>(),
+            provider.GetRequiredService<T5>(),
+            provider.GetRequiredService<T6>(),
+            provider.GetRequiredService<T7>()
+        );
+    }
+
+    public static TOut Run<T1, T2, T3, T4, T5, T6, T7, T8, TOut>(this IServiceProvider provider, Func<T1, T2, T3, T4, T5, T6, T7, T8, TOut> func)
+        where T1 : notnull
+        where T2 : notnull
+        where T3 : notnull
+        where T4 : notnull
+        where T5 : notnull
+        where T6 : notnull
+        where T7 : notnull
+        where T8 : notnull
+    {
+        return func(
+            provider.GetRequiredService<T1>(),
+            provider.GetRequiredService<T2>(),
+            provider.GetRequiredService<T3>(),
+            provider.GetRequiredService<T4>(),
+            provider.GetRequiredService<T5>(),
+            provider.GetRequiredService<T6>(),
+            provider.GetRequiredService<T7>(),
+            provider.GetRequiredService<T8>()
+        );
+    }
+
+    public static TOut Run<T1, T2, T3, T4, T5, T6, T7, T8, T9, TOut>(this IServiceProvider provider, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, TOut> func)
+        where T1 : notnull
+        where T2 : notnull
+        where T3 : notnull
+        where T4 : notnull
+        where T5 : notnull
+        where T6 : notnull
+        where T7 : notnull
+        where T8 : notnull
+        where T9 : notnull
+    {
+        return func(
+            provider.GetRequiredService<T1>(),
+            provider.GetRequiredService<T2>(),
+            provider.GetRequiredService<T3>(),
+            provider.GetRequiredService<T4>(),
+            provider.GetRequiredService<T5>(),
+            provider.GetRequiredService<T6>(),
+            provider.GetRequiredService<T7>(),
+            provider.GetRequiredService<T8>(),
+            provider.GetRequiredService<T9>()
+        );
+    }
+
+    public static TOut Run<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TOut>(this IServiceProvider provider, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TOut> func)
+        where T1 : notnull
+        where T2 : notnull
+        where T3 : notnull
+        where T4 : notnull
+        where T5 : notnull
+        where T6 : notnull
+        where T7 : notnull
+        where T8 : notnull
+        where T9 : notnull
+        where T10 : notnull
+    {
+        return func(
+            provider.GetRequiredService<T1>(),
+            provider.GetRequiredService<T2>(),
+            provider.GetRequiredService<T3>(),
+            provider.GetRequiredService<T4>(),
+            provider.GetRequiredService<T5>(),
+            provider.GetRequiredService<T6>(),
+            provider.GetRequiredService<T7>(),
+            provider.GetRequiredService<T8>(),
+            provider.GetRequiredService<T9>(),
+            provider.GetRequiredService<T10>()
+        );
+    }
+
+    public static TOut Run<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TOut>(this IServiceProvider provider, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TOut> func)
+        where T1 : notnull
+        where T2 : notnull
+        where T3 : notnull
+        where T4 : notnull
+        where T5 : notnull
+        where T6 : notnull
+        where T7 : notnull
+        where T8 : notnull
+        where T9 : notnull
+        where T10 : notnull
+        where T11 : notnull
+    {
+        return func(
+            provider.GetRequiredService<T1>(),
+            provider.GetRequiredService<T2>(),
+            provider.GetRequiredService<T3>(),
+            provider.GetRequiredService<T4>(),
+            provider.GetRequiredService<T5>(),
+            provider.GetRequiredService<T6>(),
+            provider.GetRequiredService<T7>(),
+            provider.GetRequiredService<T8>(),
+            provider.GetRequiredService<T9>(),
+            provider.GetRequiredService<T10>(),
+            provider.GetRequiredService<T11>()
+        );
+    }
+
+    public static TOut Run<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TOut>(this IServiceProvider provider, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TOut> func)
+        where T1 : notnull
+        where T2 : notnull
+        where T3 : notnull
+        where T4 : notnull
+        where T5 : notnull
+        where T6 : notnull
+        where T7 : notnull
+        where T8 : notnull
+        where T9 : notnull
+        where T10 : notnull
+        where T11 : notnull
+        where T12 : notnull
+    {
+        return func(
+            provider.GetRequiredService<T1>(),
+            provider.GetRequiredService<T2>(),
+            provider.GetRequiredService<T3>(),
+            provider.GetRequiredService<T4>(),
+            provider.GetRequiredService<T5>(),
+            provider.GetRequiredService<T6>(),
+            provider.GetRequiredService<T7>(),
+            provider.GetRequiredService<T8>(),
+            provider.GetRequiredService<T9>(),
+            provider.GetRequiredService<T10>(),
+            provider.GetRequiredService<T11>(),
+            provider.GetRequiredService<T12>()
+        );
+    }
+
+    public static TOut Run<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, TOut>(this IServiceProvider provider, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, TOut> func)
+        where T1 : notnull
+        where T2 : notnull
+        where T3 : notnull
+        where T4 : notnull
+        where T5 : notnull
+        where T6 : notnull
+        where T7 : notnull
+        where T8 : notnull
+        where T9 : notnull
+        where T10 : notnull
+        where T11 : notnull
+        where T12 : notnull
+        where T13 : notnull
+    {
+        return func(
+            provider.GetRequiredService<T1>(),
+            provider.GetRequiredService<T2>(),
+            provider.GetRequiredService<T3>(),
+            provider.GetRequiredService<T4>(),
+            provider.GetRequiredService<T5>(),
+            provider.GetRequiredService<T6>(),
+            provider.GetRequiredService<T7>(),
+            provider.GetRequiredService<T8>(),
+            provider.GetRequiredService<T9>(),
+            provider.GetRequiredService<T10>(),
+            provider.GetRequiredService<T11>(),
+            provider.GetRequiredService<T12>(),
+            provider.GetRequiredService<T13>()
+        );
+    }
+
+    public static TOut Run<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, TOut>(this IServiceProvider provider, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, TOut> func)
+        where T1 : notnull
+        where T2 : notnull
+        where T3 : notnull
+        where T4 : notnull
+        where T5 : notnull
+        where T6 : notnull
+        where T7 : notnull
+        where T8 : notnull
+        where T9 : notnull
+        where T10 : notnull
+        where T11 : notnull
+        where T12 : notnull
+        where T13 : notnull
+        where T14 : notnull
+    {
+        return func(
+            provider.GetRequiredService<T1>(),
+            provider.GetRequiredService<T2>(),
+            provider.GetRequiredService<T3>(),
+            provider.GetRequiredService<T4>(),
+            provider.GetRequiredService<T5>(),
+            provider.GetRequiredService<T6>(),
+            provider.GetRequiredService<T7>(),
+            provider.GetRequiredService<T8>(),
+            provider.GetRequiredService<T9>(),
+            provider.GetRequiredService<T10>(),
+            provider.GetRequiredService<T11>(),
+            provider.GetRequiredService<T12>(),
+            provider.GetRequiredService<T13>(),
+            provider.GetRequiredService<T14>()
+        );
+    }
+
+    public static TOut Run<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, TOut>(this IServiceProvider provider, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, TOut> func)
+        where T1 : notnull
+        where T2 : notnull
+        where T3 : notnull
+        where T4 : notnull
+        where T5 : notnull
+        where T6 : notnull
+        where T7 : notnull
+        where T8 : notnull
+        where T9 : notnull
+        where T10 : notnull
+        where T11 : notnull
+        where T12 : notnull
+        where T13 : notnull
+        where T14 : notnull
+        where T15 : notnull
+    {
+        return func(
+            provider.GetRequiredService<T1>(),
+            provider.GetRequiredService<T2>(),
+            provider.GetRequiredService<T3>(),
+            provider.GetRequiredService<T4>(),
+            provider.GetRequiredService<T5>(),
+            provider.GetRequiredService<T6>(),
+            provider.GetRequiredService<T7>(),
+            provider.GetRequiredService<T8>(),
+            provider.GetRequiredService<T9>(),
+            provider.GetRequiredService<T10>(),
+            provider.GetRequiredService<T11>(),
+            provider.GetRequiredService<T12>(),
+            provider.GetRequiredService<T13>(),
+            provider.GetRequiredService<T14>(),
+            provider.GetRequiredService<T15>()
+        );
+    }
+
     public static Task RunAsync<T1>(this IServiceProvider provider, Func<T1, Task> func)
         where T1 : notnull
     {
