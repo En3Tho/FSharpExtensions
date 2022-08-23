@@ -1,13 +1,12 @@
 namespace ProjectUtilities
 
-open System
 open System.IO
 open En3Tho.FSharp.Extensions
 open En3Tho.FSharp.ComputationExpressions.CodeBuilder
 
 module ServiceProviderCodeGen =
 
-    let makeActionOfTCode genericArgsCount =
+    let makeActionCode genericArgsCount =
         let typeArgs =
             Array.init genericArgsCount ^ fun index -> $"T{index + 1}"
             |> String.concat ", "
@@ -20,6 +19,30 @@ module ServiceProviderCodeGen =
             }
             braceBlock {
                 "action("
+                indent {
+                    for i = 1 to genericArgsCount - 1 do
+                        $"provider.GetRequiredService<T{i}>(),"
+                    $"provider.GetRequiredService<T{genericArgsCount}>()"
+                }
+                ");"
+            }
+        }
+
+    let makeFuncCode genericArgsCount =
+        let typeArgs =
+            Array.init genericArgsCount ^ fun index -> $"T{index + 1}"
+            |> String.concat ", "
+
+        let returnType = "TOut"
+
+        code {
+            $"public static {returnType} Run<{typeArgs}, {returnType}>(this IServiceProvider provider, Func<{typeArgs}, {returnType}> func)"
+            indent {
+                for i = 1 to genericArgsCount do
+                    $"where T{i} : notnull"
+            }
+            braceBlock {
+                "return func("
                 indent {
                     for i = 1 to genericArgsCount - 1 do
                         $"provider.GetRequiredService<T{i}>(),"
@@ -58,10 +81,10 @@ module ServiceProviderCodeGen =
             Array.init genericArgsCount ^ fun index -> $"T{index + 1}"
             |> String.concat ", "
 
-        let returnType = if isValueTask then "ValueTask" else "Task"
+        let returnType = if isValueTask then "ValueTask<TOut>" else "Task<TOut>"
 
         code {
-            $"public static {returnType}<TOut> RunAsync<{typeArgs}, TOut>(this IServiceProvider provider, Func<{typeArgs}, {returnType}<TOut>> func)"
+            $"public static {returnType} RunAsync<{typeArgs}, TOut>(this IServiceProvider provider, Func<{typeArgs}, {returnType}> func)"
             indent {
                for i = 1 to genericArgsCount do
                     $"where T{i} : notnull"
@@ -79,7 +102,7 @@ module ServiceProviderCodeGen =
 
 module ServiceScopeCodeGen =
 
-    let makeActionOfTCode genericArgsCount =
+    let makeActionCode genericArgsCount =
         let typeArgs =
             Array.init genericArgsCount ^ fun index -> $"T{index + 1}"
             |> String.concat ", "
@@ -95,6 +118,24 @@ module ServiceScopeCodeGen =
             }
         }
 
+    let makeFuncCode genericArgsCount =
+        let typeArgs =
+            Array.init genericArgsCount ^ fun index -> $"T{index + 1}"
+            |> String.concat ", "
+
+        let returnType = "TOut"
+
+        code {
+            $"public static {returnType} Run<{typeArgs}, {returnType}>(this IServiceScope scope, Func<{typeArgs}, {returnType}> func)"
+            indent {
+                for i = 1 to genericArgsCount do
+                    $"where T{i} : notnull"
+            }
+            braceBlock {
+                "scope.ServiceProvider.Run(func);"
+            }
+        }
+
     let makeFuncTaskCode isValueTask genericArgsCount =
         let typeArgs =
             Array.init genericArgsCount ^ fun index -> $"T{index + 1}"
@@ -103,7 +144,7 @@ module ServiceScopeCodeGen =
         let returnType = if isValueTask then "ValueTask" else "Task"
 
         code {
-            $"public static {returnType} Run<{typeArgs}>(this IServiceScope scope, Func<{typeArgs}, {returnType}> func)"
+            $"public static {returnType} RunAsync<{typeArgs}>(this IServiceScope scope, Func<{typeArgs}, {returnType}> func)"
             indent {
                 for i = 1 to genericArgsCount do
                     $"where T{i} : notnull"
@@ -118,10 +159,10 @@ module ServiceScopeCodeGen =
             Array.init genericArgsCount ^ fun index -> $"T{index + 1}"
             |> String.concat ", "
 
-        let returnType = if isValueTask then "ValueTask" else "Task"
+        let returnType = if isValueTask then "ValueTask<TOut>" else "Task<TOut>"
 
         code {
-            $"public static {returnType}<TOut> Run<{typeArgs}, TOut>(this IServiceScope scope, Func<{typeArgs}, {returnType}<TOut>> func)"
+            $"public static {returnType} RunAsync<{typeArgs}, TOut>(this IServiceScope scope, Func<{typeArgs}, {returnType}> func)"
             indent {
                 for i = 1 to genericArgsCount do
                     $"where T{i} : notnull"
@@ -136,9 +177,12 @@ module CodeGen =
     let serviceProviderCode =
 
         let generators = [|
-            ServiceProviderCodeGen.makeActionOfTCode
+            ServiceProviderCodeGen.makeActionCode
+            ServiceProviderCodeGen.makeFuncCode
+
             ServiceProviderCodeGen.makeFuncTaskCode false
             ServiceProviderCodeGen.makeFuncGenericTaskCode false
+
             ServiceProviderCodeGen.makeFuncTaskCode true
             ServiceProviderCodeGen.makeFuncGenericTaskCode true
         |]
@@ -156,9 +200,12 @@ module CodeGen =
     let serviceScopeCode =
 
         let generators = [|
-            ServiceScopeCodeGen.makeActionOfTCode
+            ServiceScopeCodeGen.makeActionCode
+            ServiceScopeCodeGen.makeFuncCode
+
             ServiceScopeCodeGen.makeFuncTaskCode false
             ServiceScopeCodeGen.makeFuncGenericTaskCode false
+
             ServiceScopeCodeGen.makeFuncTaskCode true
             ServiceScopeCodeGen.makeFuncGenericTaskCode true
         |]

@@ -13,6 +13,7 @@
         <Compile Include="ScanfTest.fs" />
         <Compile Include="FunkyPipesTests.fs" />
         <Compile Include="IEquatableOperatorTests.fs" />
+        <Compile Include="Byrefs.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 

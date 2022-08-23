@@ -235,23 +235,35 @@ module ByRefOperators =
     let inline inc (a: 'a byref) = a <- a + LanguagePrimitives.GenericOne
     let inline dec (a: 'a byref) = a <- a - LanguagePrimitives.GenericOne
     let inline neg (a: 'a byref) = a <- (~-)a
-    // like a default value
+    /// like a default value ( or ?? value in C#)
     let inline (??<-) (a: 'a byref) v = if isNull a then a <- v
-    // like a default with
+    /// like a default with (or ?? expr in C#)
     let inline (???<-) (a: 'a byref) ([<InlineIfLambda>] f) = if isNull a then a <- f()
+    /// like +=
     let inline (+<-) (a: 'a byref) v = a <- a + v
+    /// like -=
     let inline (-<-) (a: 'a byref) v = a <- a - v
+    /// like /=
     let inline (/<-) (a: 'a byref) v = a <- a / v
+    /// like %=
     let inline (%<-) (a: 'a byref) v = a <- a % v
+    /// like *=
     let inline ( *<- ) (a: 'a byref) v = a <- a * v
     let inline (~~~) (a: 'a byref) = a <- ~~~a
+    /// like &&=
     let inline (&&&<-) (a: 'a byref) v = a <- a &&& v
+    /// like ||=
     let inline (|||<-) (a: 'a byref) v = a <- a ||| v
     let inline (^^^<-) (a: 'a byref) v = a <- a ^^^ v
+    /// like <<=
     let inline (<<<<-) (a: 'a byref) v = a <- a <<< v
+    /// like >>=
     let inline (>>><-) (a: 'a byref) v = a <- a >>> v
+    /// like &&=
     let inline (&&<-) (a: bool byref) v = a <- a && v
+    /// like ||=
     let inline (||<-) (a: bool byref) v = a <- a || v
+    /// like *= self
     let inline ( **<- ) (a: 'a byref) v = a <- a ** v
     let inline (@<-) (a: 'a list byref) v = a <- a @ v
     let inline (|><-) (a: 'a byref) v = a <- a |> v
