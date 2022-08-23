@@ -234,5 +234,7 @@ module CodeGen =
         |> fun text -> File.WriteAllText(fileName, text)
 
     let generateFiles() =
-        generateFileForCodeBlock "IServiceProviderExtensions.cs" serviceProviderCode
-        generateFileForCodeBlock "IServiceScopeExtensions.cs" serviceScopeCode
+        let dirName = ".artifacts"
+        if not ^ Directory.Exists dirName then Directory.CreateDirectory(dirName) |> ignore
+        generateFileForCodeBlock $"{dirName}/IServiceProviderExtensions.cs" serviceProviderCode
+        generateFileForCodeBlock $"{dirName}/IServiceScopeExtensions.cs" serviceScopeCode
