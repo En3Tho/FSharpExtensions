@@ -19,7 +19,7 @@ module PlainValue =
 
 type PlainValue<'a> = NewCtorValidatorValidated<'a, PlainValue.Validator<'a>>
 let inline (|PlainValue|) (value: PlainValue<'a>) = value.Value
-let [<return: Struct>] inline (|IsPlainValue|_|) (value: 'a) = PlainValue<'a>.TryV value
+let [<return: Struct>] inline (|IsPlainValue|_|) (value: 'a) = PlainValue<'a>.Try value
 
 module NonNullValue =
     type ValueIsNull() = inherit ValidationException(nameof(ValueIsNull))
@@ -37,14 +37,14 @@ module NonNullValue =
 
 type NonNullValue<'a when 'a: not struct> = NewCtorValidatorValidated<'a, NonNullValue.Validator<'a>>
 let inline (|NonNullValue|) (value: NonNullValue<'a>) = value.Value
-let [<return: Struct>] inline (|IsNonNullValue|_|) (value: 'a) = NonNullValue<'a>.TryV value
+let [<return: Struct>] inline (|IsNonNullValue|_|) (value: 'a) = NonNullValue<'a>.Try value
 
 module NonDefaultValue =
     type ValueIsDefault() = inherit ValidationException(nameof(ValueIsDefault))
 
-    type [<Struct>] Validator<'a when 'a: struct and 'a: equality> =
-        member this.Validate value =
-            if value = Unchecked.defaultof<'a> then Error (ValueIsDefault() :> exn)
+    type [<Struct>] Validator<'a when 'a: struct and 'a :> IEquatable<'a>> =
+        member this.Validate (value: 'a) =
+            if value.Equals(Unchecked.defaultof<'a>) then Error (ValueIsDefault() :> exn)
             else Ok value
 
         interface IValidator<'a> with
@@ -53,16 +53,16 @@ module NonDefaultValue =
             member this.ValidateAggregate value : EResult<'a, AggregateException> = this.Validate value |> Result.mapError AggregateException
             member this.ValidateAggregate value : ValueTask<EResult<'a, AggregateException>> = this.Validate value |> Result.mapError AggregateException |> ValueTask.FromResult
 
-type NonDefaultValue<'a when 'a: struct and 'a: equality> = NewCtorValidatorValidated<'a, NonDefaultValue.Validator<'a>>
+type NonDefaultValue<'a when 'a: struct and 'a :> IEquatable<'a>> = NewCtorValidatorValidated<'a, NonDefaultValue.Validator<'a>>
 let inline (|NonDefaultValue|) (value: NonDefaultValue<'a>) = value.Value
-let [<return: Struct>] inline (|IsNonDefaultValue|_|) (value: 'a) = NonDefaultValue<'a>.TryV value
+let [<return: Struct>] inline (|IsNonDefaultValue|_|) (value: 'a) = NonDefaultValue<'a>.Try value
 
 module NonNegativeValue =
     type ValueIsNegative() = inherit ValidationException(nameof(ValueIsNegative))
         
-    type [<Struct>] Validator<'a when 'a: comparison and 'a: struct> =
-        member this.Validate value =
-            if value < Unchecked.defaultof<_> then Error (ValueIsNegative() :> exn)
+    type [<Struct>] Validator<'a when 'a :> IComparable<'a> and 'a: struct> =
+        member this.Validate (value: 'a) =
+            if value.CompareTo(Unchecked.defaultof<'a>) == -1 then Error (ValueIsNegative() :> exn)
             else Ok value
         interface IValidator<'a> with
             member this.Validate value : ExnResult<'a> = this.Validate value
@@ -70,16 +70,16 @@ module NonNegativeValue =
             member this.ValidateAggregate value : EResult<'a, AggregateException> = this.Validate value |> Result.mapError AggregateException
             member this.ValidateAggregate value : ValueTask<EResult<'a, AggregateException>> = this.Validate value |> Result.mapError AggregateException |> ValueTask.FromResult
 
-type NonNegativeValue<'a when 'a: comparison and 'a: struct> = NewCtorValidatorValidated<'a, NonNegativeValue.Validator<'a>>
+type NonNegativeValue<'a when 'a :> IComparable<'a> and 'a: struct> = NewCtorValidatorValidated<'a, NonNegativeValue.Validator<'a>>
 let inline (|NonNegativeValue|) (value: NonNegativeValue<'a>) = value.Value
-let [<return: Struct>] inline (|IsNonNegativeValue|_|) (value: 'a) = NonNegativeValue<'a>.TryV value
+let [<return: Struct>] inline (|IsNonNegativeValue|_|) (value: 'a) = NonNegativeValue<'a>.Try value
 
 module NegativeValue =
     type ValueIsNotNegative() = inherit ValidationException(nameof(ValueIsNotNegative))
 
-    type [<Struct>] Validator<'a when 'a: comparison and 'a: struct> =
-        member this.Validate value =
-            if value < Unchecked.defaultof<_> then Ok value
+    type [<Struct>] Validator<'a when 'a :> IComparable<'a> and 'a: struct> =
+        member this.Validate (value: 'a) =
+            if value.CompareTo(Unchecked.defaultof<'a>) == 1 then Ok value
             else Error (ValueIsNotNegative() :> exn)
         interface IValidator<'a> with
             member this.Validate value : ExnResult<'a> = this.Validate value
@@ -87,9 +87,9 @@ module NegativeValue =
             member this.ValidateAggregate value : EResult<'a, AggregateException> = this.Validate value |> Result.mapError AggregateException
             member this.ValidateAggregate value : ValueTask<EResult<'a, AggregateException>> = this.Validate value |> Result.mapError AggregateException |> ValueTask.FromResult
 
-type NegativeValue<'a when 'a: comparison and 'a: struct> = NewCtorValidatorValidated<'a, NonNegativeValue.Validator<'a>>
+type NegativeValue<'a when 'a :> IComparable<'a> and 'a: struct> = NewCtorValidatorValidated<'a, NonNegativeValue.Validator<'a>>
 let inline (|NegativeValue|) (value: NonNegativeValue<'a>) = value.Value
-let [<return: Struct>] inline (|IsNegativeValue|_|) (value: 'a) = NegativeValue<'a>.TryV value
+let [<return: Struct>] inline (|IsNegativeValue|_|) (value: 'a) = NegativeValue<'a>.Try value
 
 module NonEmptyString =
     type StringIsNull() = inherit ValidationException(nameof(StringIsNull))
@@ -108,7 +108,7 @@ module NonEmptyString =
 
 type NonEmptyString = NewCtorValidatorValidated<string, NonEmptyString.Validator>
 let inline (|NonEmptyString|) (value: NonEmptyString) = value.Value
-let [<return: Struct>] inline (|IsNonEmptyString|_|) (value: 'a) = NonEmptyString.TryV value
+let [<return: Struct>] inline (|IsNonEmptyString|_|) (value: 'a) = NonEmptyString.Try value
 
 module NonEmptyGuid =
     type IsEmpty() = inherit ValidationException(nameof(IsEmpty))
@@ -126,7 +126,7 @@ module NonEmptyGuid =
 
 type NonEmptyGuid = NewCtorValidatorValidated<Guid, NonEmptyGuid.Validator>
 let inline (|NonEmptyGuid|) (value: NonEmptyGuid) = value.Value
-let [<return: Struct>] inline (|IsNonEmptyGuid|_|) (value: 'a) = NonEmptyGuid.TryV value
+let [<return: Struct>] inline (|IsNonEmptyGuid|_|) (value: 'a) = NonEmptyGuid.Try value
 
 module NonEmptyArray =
     type ArrayIsNull() = inherit ValidationException(nameof(ArrayIsNull))
@@ -146,7 +146,7 @@ module NonEmptyArray =
 
 type NonEmptyArray<'a> = NewCtorValidatorValidated<'a array, NonEmptyArray.Validator<'a>>
 let inline (|NonEmptyArray|) (value: NonEmptyArray<'a>) = value.Value
-let [<return: Struct>] inline (|IsNonEmptyArray|_|) (value: 'a) = NonEmptyArray<'a>.TryV value
+let [<return: Struct>] inline (|IsNonEmptyArray|_|) (value: 'a) = NonEmptyArray<'a>.Try value
 
 module NonEmptyBlock =
     type ArrayIsNull() = inherit ValidationException(nameof(ArrayIsNull))
@@ -166,7 +166,7 @@ module NonEmptyBlock =
 
 type NonEmptyBlock<'a> = NewCtorValidatorValidated<'a ImmutableArray, NonEmptyBlock.Validator<'a>>
 let inline (|NonEmptyBlock|) (value: NonEmptyArray<'a>) = value.Value
-let [<return: Struct>] inline (|IsNonEmptyBlocky|_|) (value: 'a) = NonEmptyBlock<'a>.TryV value
+let [<return: Struct>] inline (|IsNonEmptyBlock|_|) (value: 'a) = NonEmptyBlock<'a>.Try value
 
 module NonEmptyList =
     type ListIsNull() = inherit ValidationException(nameof(ListIsNull))
@@ -186,7 +186,7 @@ module NonEmptyList =
 
 type NonEmptyList<'a> = NewCtorValidatorValidated<'a list, NonEmptyList.Validator<'a>>
 let inline (|NonEmptyList|) (value: NonEmptyList<'a>) = value.Value
-let [<return: Struct>] inline (|IsNonEmptyList|_|) (value: 'a) = NonEmptyList<'a>.TryV value
+let [<return: Struct>] inline (|IsNonEmptyList|_|) (value: 'a) = NonEmptyList<'a>.Try value
 
 module NonEmptyCollection =
     type CollectionIsNull() = inherit ValidationException(nameof(CollectionIsNull))
@@ -206,7 +206,7 @@ module NonEmptyCollection =
 
 type NonEmptyCollection<'a, 'b when 'a :> ICollection<'b>> = NewCtorValidatorValidated<'a, NonEmptyCollection.Validator<'a, 'b>>
 let inline (|NonEmptyCollection|) (value: NonEmptyCollection<'a, 'b>) = value.Value
-let [<return: Struct>] inline (|IsNonEmptyCollection|_|) (value: 'a) = NonEmptyCollection<'a, 'b>.TryV value
+let [<return: Struct>] inline (|IsNonEmptyCollection|_|) (value: 'a) = NonEmptyCollection<'a, 'b>.Try value
 
 module GuidString =
     type StringIsNotGuidParseable() = inherit ValidationException(nameof(StringIsNotGuidParseable))
@@ -225,7 +225,7 @@ module GuidString =
 
 type GuidString = NewCtorValidatorValidated<string, MultiValidator20<string, NonEmptyString.Validator, GuidString.Validator>>
 let inline (|GuidString|) (value: GuidString) = value.Value
-let [<return: Struct>] inline (|IsGuidString|_|) (value: 'a) = GuidString.TryV value
+let [<return: Struct>] inline (|IsGuidString|_|) (value: 'a) = GuidString.Try value
 
 module ValidEnumValue =
     type ValueIsNotDefined() = inherit ValidationException(nameof(ValueIsNotDefined))
@@ -243,4 +243,4 @@ module ValidEnumValue =
 
 type ValidEnum<'a when 'a: struct and 'a :> Enum and 'a: (new: unit -> 'a)> = NewCtorValidatorValidated<'a, ValidEnumValue.Validator<'a>>
 let inline (|ValidEnum|) (value: ValidEnum<'a>) = value.Value
-let [<return: Struct>] inline (|IsValidEnum|_|) (value: 'a) = ValidEnum<'a>.TryV value
+let [<return: Struct>] inline (|IsValidEnum|_|) (value: 'a) = ValidEnum<'a>.Try value

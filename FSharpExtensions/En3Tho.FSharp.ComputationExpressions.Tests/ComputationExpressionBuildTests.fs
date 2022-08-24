@@ -47,6 +47,7 @@ let ``Test that async computation expression compiles`` () =
 let ``Test that dictionary is supported as builder`` () =
     let genericDict key value = Dictionary() {
         struct (key, value)
+        key, value
 
         let mutable x = 0
         while x < 10 do
@@ -55,7 +56,7 @@ let ``Test that dictionary is supported as builder`` () =
 
     let intIntDict1 = ConcurrentDictionary() {
         struct (1, 10)
-
+        1, 10
         let mutable x = 0
         while x < 10 do
             x <- x + 1
@@ -73,16 +74,8 @@ let ``Test that generics are working properly and builders are not conflicting w
 
     Assert.True(list1.GetType().GenericTypeArguments.SequenceEqual [| typeof<int> |])
     Assert.True(list2.GetType().GenericTypeArguments.SequenceEqual [| typeof<string> |])
-
-type MyAdder() =
-    member val AddCount = 0 with get, set
-    member this.Add _ = this.AddCount <- this.AddCount + 1
-
-type MyAdder with
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
-    member inline this.Run([<InlineIfLambda>] expr: CollectionCode) = expr(); this
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
-    member inline this.Zero _ : CollectionCode = fun() -> ()
+    Assert.Equal(list1[0], 10)
+    Assert.Equal(list2[0], "10")
 
 [<Fact>]
 let ``Test that custom types are supported and builders are not conflicting with each other`` () =
@@ -97,6 +90,16 @@ let ``Test that custom types are supported and builders are not conflicting with
     Assert.True(list1.GetType().GenericTypeArguments.SequenceEqual (adder1.GetType().GenericTypeArguments))
     Assert.True(list2.GetType().GenericTypeArguments.SequenceEqual (adder2.GetType().GenericTypeArguments))
 
+type MyAdder() =
+    member val AddCount = 0 with get, set
+    member this.Add _ = this.AddCount <- this.AddCount + 1
+
+type MyAdder with
+    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    member inline this.Run([<InlineIfLambda>] expr: CollectionCode) = expr(); this
+    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    member inline this.Zero _ : CollectionCode = fun() -> ()
+
 [<Fact>]
 let ``Test that nested builders are supported`` () =
     let addCountInForLoop = 3
@@ -108,10 +111,12 @@ let ``Test that nested builders are supported`` () =
                 }
         }
     let manualAddCount = 1
+
     adder {
         MyAdder() {
              MyAdder()
         }
     } |> ignore
+
     let expectedAddCount = addCountInForLoop + manualAddCount
     Assert.Equal(adder.AddCount, expectedAddCount)

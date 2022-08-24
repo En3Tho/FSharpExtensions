@@ -745,7 +745,7 @@ module EResult =
         | Error exn ->
             defThunk exn
 
-    let inline unwrap (result: EResult<'a, 'b>) =
+    let inline get (result: EResult<'a, 'b>) =
         match result with
         | Ok value -> value
         | Error err ->

@@ -53,7 +53,15 @@ type Name = NonEmptyString
 type Person = {
     Age: Age
     Name: Name
-}
+} with
+    static member Of (age, name) = exnresult {
+        let! age = Age.Of age // would be good if "age" could be passed implicitly
+        and! name = Name.Of name // would be good if "age" could be passed implicitly
+        return {
+            Age = age
+            Name = name
+        }
+    }
 
 [<Fact>]
 let ``Test that multivalidation works for successful case``() =
@@ -61,8 +69,8 @@ let ``Test that multivalidation works for successful case``() =
     let name = "Bob"
 
     let person = exnresult {
-        let! age = Age.Try age
-        and! name = Name.Try name
+        let! age = Age.Of age
+        and! name = Name.Of name
         return {
             Age = age
             Name = name
@@ -77,8 +85,8 @@ let ``Test that multivalidation works for unsuccessful case``() =
     let name = ""
 
     let person = exnresult {
-        let! age = Age.Try age
-        and! name = Name.Try name
+        let! age = Age.Of age
+        and! name = Name.Of name
         return {
             Age = age
             Name = name
