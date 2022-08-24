@@ -13,8 +13,8 @@ type AllRegisteredRoutesController(actionDescriptorCollectionProvider: IActionDe
     member _.GetAllRoutes() =
         actionDescriptorCollectionProvider.ActionDescriptors.Items
         |> Seq.map ^ fun item ->
-            let action = item.RouteValues |> Dictionary.tryGetValue "Action" |> Option.defaultValue ""
-            let controller = item.RouteValues |> Dictionary.tryGetValue "Controller" |> Option.defaultValue ""
+            let action = item.RouteValues |> Dictionary.tryGetValue "Action" |> ValueOption.defaultValue ""
+            let controller = item.RouteValues |> Dictionary.tryGetValue "Controller" |> ValueOption.defaultValue ""
             let name, template =
                 match item.AttributeRouteInfo with
                 | null -> "", ""

@@ -3,7 +3,7 @@
 open System
 open System.Runtime.CompilerServices
 open En3Tho.FSharp.Extensions
-open FSharp.Control.Tasks
+open En3Tho.FSharp.ComputationExpressions.Tasks
 
 type [<Struct; IsReadOnly>] AsyncMultiValidator20<'value, 'validator, 'validator2 when 'validator: struct
                                                                                    and 'validator: (new: unit -> 'validator)

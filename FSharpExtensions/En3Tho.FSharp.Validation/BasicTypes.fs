@@ -5,7 +5,7 @@ open System.ComponentModel
 open System.Runtime.CompilerServices
 open System.Threading.Tasks
 open En3Tho.FSharp.Extensions
-open FSharp.Control.Tasks
+open En3Tho.FSharp.ComputationExpressions.Tasks
 
 // TODO: ResourceManagement, Localization
 
@@ -51,7 +51,7 @@ type [<Struct; IsReadOnly>] NewCtorValidatorValidated<'value, 'validator when 'v
         | Error err -> Error err
 
     static member Make (value: 'value) =
-        NewCtorValidatorValidated<'value, 'validator>.Of(value) |> EResult.unwrap
+        NewCtorValidatorValidated<'value, 'validator>.Of(value) |> EResult.get
 
     [<EditorBrowsable(EditorBrowsableState.Never)>]
     member inline this.MapOf ([<InlineIfLambda>] map: 'value -> 'value) =
@@ -70,7 +70,7 @@ type [<Struct; IsReadOnly>] NewCtorValidatorValidated<'value, 'validator when 'v
             | Error err -> Error err
 
     static member MakeOption (valueOption: 'value voption) =
-        NewCtorValidatorValidated<'value, 'validator>.OfOption(valueOption) |> EResult.unwrap
+        NewCtorValidatorValidated<'value, 'validator>.OfOption(valueOption) |> EResult.get
 
     static member OfAggregate value =
         let validator = (new 'validator())
@@ -79,7 +79,7 @@ type [<Struct; IsReadOnly>] NewCtorValidatorValidated<'value, 'validator when 'v
         | Error err -> Error err
 
     static member MakeAggregate (value: 'value) =
-        NewCtorValidatorValidated<'value, 'validator>.OfAggregate(value) |> EResult.unwrap
+        NewCtorValidatorValidated<'value, 'validator>.OfAggregate(value) |> EResult.get
 
     member this.MapTryAggregate (map: 'value -> 'value) =
         NewCtorValidatorValidated<'value, 'validator>.OfAggregate(map this.Value)
@@ -96,7 +96,7 @@ type [<Struct; IsReadOnly>] NewCtorValidatorValidated<'value, 'validator when 'v
             | Error err -> Error err
 
     static member MakeAggregateV (valueOption: 'value voption) =
-        NewCtorValidatorValidated<'value, 'validator>.OfOptionAggregate(valueOption) |> EResult.unwrap
+        NewCtorValidatorValidated<'value, 'validator>.OfOptionAggregate(valueOption) |> EResult.get
 
     static member op_Implicit (validated: NewCtorValidatorValidated<'value, 'validator>) : 'value = validated.Value
 
@@ -119,7 +119,7 @@ type [<Struct; IsReadOnly>] InstanceValidatorValidated<'value, 'validator when '
         | Error err -> Error err
 
     static member Make(value: 'value, validator: 'validator) =
-        InstanceValidatorValidated<'value, 'validator>.Of(value, validator) |> EResult.unwrap
+        InstanceValidatorValidated<'value, 'validator>.Of(value, validator) |> EResult.get
 
     [<EditorBrowsable(EditorBrowsableState.Never)>]
     member this.TryValue(value: 'value) =
@@ -144,7 +144,7 @@ type [<Struct; IsReadOnly>] InstanceValidatorValidated<'value, 'validator when '
             | Error err -> Error err
 
     static member MakeOption(valueOption: 'value voption, validator: 'validator) =
-        InstanceValidatorValidated<'value, 'validator>.OfOption(valueOption, validator) |> EResult.unwrap
+        InstanceValidatorValidated<'value, 'validator>.OfOption(valueOption, validator) |> EResult.get
 
     static member OfAggregate(value: 'value, validator: 'validator) =
         match validator.ValidateAggregate value with
@@ -152,7 +152,7 @@ type [<Struct; IsReadOnly>] InstanceValidatorValidated<'value, 'validator when '
         | Error err -> Error err
 
     static member MakeAggregate(value: 'value, validator: 'validator) =
-        InstanceValidatorValidated<'value, 'validator>.OfAggregate(value, validator) |> EResult.unwrap
+        InstanceValidatorValidated<'value, 'validator>.OfAggregate(value, validator) |> EResult.get
 
     [<EditorBrowsable(EditorBrowsableState.Never)>]
     member this.TryValueAggregate(value: 'value) =
@@ -177,7 +177,7 @@ type [<Struct; IsReadOnly>] InstanceValidatorValidated<'value, 'validator when '
             | Error err -> Error err
 
     static member MakeOptionAggregate(valueOption: 'value voption, validator: 'validator) =
-        InstanceValidatorValidated<'value, 'validator>.OfOptionAggregate(valueOption, validator) |> EResult.unwrap
+        InstanceValidatorValidated<'value, 'validator>.OfOptionAggregate(valueOption, validator) |> EResult.get
 
     static member op_Implicit (validated: InstanceValidatorValidated<'value, 'validator>) : 'value = validated.Value
 
@@ -204,7 +204,7 @@ type [<Struct; IsReadOnly>] NewCtorAsyncValidatorValidated<'value, 'validator wh
 
     static member Make (value: 'value) = vtask {
         let! result = NewCtorAsyncValidatorValidated<'value, 'validator>.Of(value)
-        return result |> EResult.unwrap
+        return result |> EResult.get
     }
 
     member inline this.MapOf ([<InlineIfLambda>] map: 'value -> 'value) =
@@ -224,7 +224,7 @@ type [<Struct; IsReadOnly>] NewCtorAsyncValidatorValidated<'value, 'validator wh
 
     static member MakeOption (valueOption: 'value voption) = vtask {
         let! result = NewCtorAsyncValidatorValidated<'value, 'validator>.OfOption(valueOption)
-        return result |> EResult.unwrap
+        return result |> EResult.get
     }
 
     static member OfAggregate value = vtask {
@@ -236,7 +236,7 @@ type [<Struct; IsReadOnly>] NewCtorAsyncValidatorValidated<'value, 'validator wh
 
     static member MakeAggregate (value: 'value) = vtask {
         let! result = NewCtorAsyncValidatorValidated<'value, 'validator>.OfAggregate(value)
-        return result |> EResult.unwrap
+        return result |> EResult.get
     }
 
     member inline this.MapOfAggregate ([<InlineIfLambda>] map: 'value -> 'value) =
@@ -256,7 +256,7 @@ type [<Struct; IsReadOnly>] NewCtorAsyncValidatorValidated<'value, 'validator wh
 
     static member MakeOptionAggregate (valueOption: 'value voption) = vtask {
         let! result = NewCtorAsyncValidatorValidated<'value, 'validator>.OfOptionAggregate(valueOption)
-        return result |> EResult.unwrap
+        return result |> EResult.get
     }
 
     static member op_Implicit (validated: NewCtorAsyncValidatorValidated<'value, 'validator>) : 'value = validated.Value
@@ -282,7 +282,7 @@ type [<Struct; IsReadOnly>] InstanceAsyncValidatorValidated<'value, 'validator w
 
     static member Make(value: 'value, validator: 'validator) = vtask {
         let! result = InstanceAsyncValidatorValidated<'value, 'validator>.Of(value, validator)
-        return result  |> EResult.unwrap
+        return result  |> EResult.get
     }
 
     [<EditorBrowsable(EditorBrowsableState.Never)>]
@@ -310,7 +310,7 @@ type [<Struct; IsReadOnly>] InstanceAsyncValidatorValidated<'value, 'validator w
 
     static member MakeOption(valueOption: 'value voption, validator: 'validator) = vtask {
         let! result = InstanceAsyncValidatorValidated<'value, 'validator>.OfOption(valueOption, validator)
-        return result |> EResult.unwrap
+        return result |> EResult.get
     }
 
     static member OfAggregate(value: 'value, validator: 'validator) = vtask {
@@ -321,7 +321,7 @@ type [<Struct; IsReadOnly>] InstanceAsyncValidatorValidated<'value, 'validator w
 
     static member MakeAggregate(value: 'value, validator: 'validator) = vtask {
         let! result = InstanceAsyncValidatorValidated<'value, 'validator>.OfAggregate(value, validator)
-        return result |> EResult.unwrap
+        return result |> EResult.get
     }
 
     [<EditorBrowsable(EditorBrowsableState.Never)>]
@@ -347,9 +347,9 @@ type [<Struct; IsReadOnly>] InstanceAsyncValidatorValidated<'value, 'validator w
             | Error err -> return Error err
     }
 
-    static member MakeOptionAggregate(valueOption: 'value voption, validator: 'validator) =vtask {
+    static member MakeOptionAggregate(valueOption: 'value voption, validator: 'validator) = vtask {
         let! result = InstanceAsyncValidatorValidated<'value, 'validator>.OfOptionAggregate(valueOption, validator)
-        return result |> EResult.unwrap
+        return result |> EResult.get
     }
 
     static member op_Implicit (validated: InstanceAsyncValidatorValidated<'value, 'validator>) : 'value = validated.Value

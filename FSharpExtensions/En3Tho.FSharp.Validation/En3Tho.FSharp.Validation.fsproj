@@ -10,9 +10,9 @@
         <PackageLicenseUrl>https://github.com/En3Tho/FSharpExtensions/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/En3Tho/FSharpExtensions</RepositoryUrl>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-        <AssemblyVersion>1.0.6</AssemblyVersion>
-        <FileVersion>1.0.6</FileVersion>
-        <PackageVersion>1.0.6</PackageVersion>
+        <AssemblyVersion>1.0.7</AssemblyVersion>
+        <FileVersion>1.0.7</FileVersion>
+        <PackageVersion>1.0.7</PackageVersion>
         <!-- Optional: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <!-- Optional: Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
@@ -30,12 +30,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="En3Tho.FSharp.Extensions" Version="1.1.7" />
+      <PackageReference Include="En3Tho.FSharp.Extensions" Version="1.1.8" />
       <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Include="Ply" Version="0.3.1" />
       <PackageReference Update="FSharp.Core" Version="6.0.5" />
     </ItemGroup>
 
