@@ -6,6 +6,9 @@ open System.Collections.Immutable
 open System.Runtime.InteropServices
 open En3Tho.FSharp.Extensions.Disposables
 
+#nowarn "0042"
+#nowarn "0077"
+
 type block<'a> = ImmutableArray<'a>
 
 [<AutoOpen; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
@@ -166,7 +169,7 @@ module IEquatableEqualityOperatorEx =
     let inline callIEquatableEqualsOnLists<'a when 'a :> IEquatable<'a>> (left: 'a list) (right: 'a list) =
         let rec go left right =
             match left, right with
-            | leftHead :: leftTail, (rightHead :: rightTail) ->
+            | leftHead :: leftTail, rightHead :: rightTail ->
                 callIEquatableEqualsOnValues leftHead rightHead
                 && go leftTail rightTail
             | [], [] ->
