@@ -11,6 +11,8 @@ open En3Tho.FSharp.ComputationExpressions.Tasks
 
 // TODO: wait for ErasedUnions and experiment with better function signatures
 
+// TODO: experiment with static abstracts for this
+
 /// Indicates an error when trying to map DTO to domain type. Maps to BadRequest in REST.
 type ValidationException(message, innerException: Exception) =
     inherit Exception(message, innerException)
@@ -54,7 +56,7 @@ type [<Struct; IsReadOnly>] NewCtorValidatorValidated<'value, 'validator when 'v
         NewCtorValidatorValidated<'value, 'validator>.Of(value) |> EResult.get
 
     [<EditorBrowsable(EditorBrowsableState.Never)>]
-    member inline this.MapOf ([<InlineIfLambda>] map: 'value -> 'value) =
+    member inline this.Map ([<InlineIfLambda>] map: 'value -> 'value) =
         NewCtorValidatorValidated<'value, 'validator>.Of(map this.Value)
 
     [<EditorBrowsable(EditorBrowsableState.Never)>]
@@ -81,7 +83,7 @@ type [<Struct; IsReadOnly>] NewCtorValidatorValidated<'value, 'validator when 'v
     static member MakeAggregate (value: 'value) =
         NewCtorValidatorValidated<'value, 'validator>.OfAggregate(value) |> EResult.get
 
-    member this.MapTryAggregate (map: 'value -> 'value) =
+    member inline this.MapAggregate ([<InlineIfLambda>] map: 'value -> 'value) =
         NewCtorValidatorValidated<'value, 'validator>.OfAggregate(map this.Value)
 
     member inline this.MapMakeAggregate ([<InlineIfLambda>] map: 'value -> 'value) =
@@ -95,7 +97,7 @@ type [<Struct; IsReadOnly>] NewCtorValidatorValidated<'value, 'validator when 'v
             | Ok value -> value |> ValueSome |> Ok
             | Error err -> Error err
 
-    static member MakeAggregateV (valueOption: 'value voption) =
+    static member MakeOptionAggregate (valueOption: 'value voption) =
         NewCtorValidatorValidated<'value, 'validator>.OfOptionAggregate(valueOption) |> EResult.get
 
     static member op_Implicit (validated: NewCtorValidatorValidated<'value, 'validator>) : 'value = validated.Value
@@ -125,7 +127,7 @@ type [<Struct; IsReadOnly>] InstanceValidatorValidated<'value, 'validator when '
     member this.TryValue(value: 'value) =
         InstanceValidatorValidated<'value, 'validator>.Of(value, this.Validator)
 
-    member inline this.MapOf ([<InlineIfLambda>] map: 'value -> 'value) =
+    member inline this.Map ([<InlineIfLambda>] map: 'value -> 'value) =
         this.TryValue(map this.Value)
 
     [<EditorBrowsable(EditorBrowsableState.Never)>]
@@ -158,7 +160,7 @@ type [<Struct; IsReadOnly>] InstanceValidatorValidated<'value, 'validator when '
     member this.TryValueAggregate(value: 'value) =
         InstanceValidatorValidated<'value, 'validator>.OfAggregate(value, this.Validator)
 
-    member inline this.MapOfAggregate ([<InlineIfLambda>] map: 'value -> 'value) =
+    member inline this.MapAggregate ([<InlineIfLambda>] map: 'value -> 'value) =
         this.TryValueAggregate(map this.Value)
 
      [<EditorBrowsable(EditorBrowsableState.Never)>]
@@ -328,7 +330,7 @@ type [<Struct; IsReadOnly>] InstanceAsyncValidatorValidated<'value, 'validator w
     member this.OfValueAggregate(value: 'value) =
         InstanceAsyncValidatorValidated<'value, 'validator>.OfAggregate(value, this.Validator)
 
-    member inline this.MapOfAggregate ([<InlineIfLambda>] map: 'value -> 'value) =
+    member inline this.MapAggregate ([<InlineIfLambda>] map: 'value -> 'value) =
         this.OfValueAggregate(map this.Value)
 
     [<EditorBrowsable(EditorBrowsableState.Never)>]

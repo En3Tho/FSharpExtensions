@@ -13,12 +13,12 @@ type NewCtorValidatorValidated<'value, 'validator when 'validator: (new: unit ->
         | _ -> None
 
     member inline this.MapTry ([<InlineIfLambda>] map: 'value -> 'value) =
-        match this.MapOf map with
+        match this.Map map with
         | Ok result -> ValueSome result
         | _ -> ValueNone
 
     member inline this.MapTryO ([<InlineIfLambda>] map: 'value -> 'value) =
-        match this.MapOf map with
+        match this.Map map with
         | Ok result -> Some result
         | _ -> None
 
@@ -34,11 +34,11 @@ type InstanceValidatorValidated<'value, 'validator when 'validator :> IValidator
         | _ -> None
 
     member inline this.MapTry ([<InlineIfLambda>] map: 'value -> 'value) =
-        match this.MapOf map with
+        match this.Map map with
         | Ok result -> ValueSome result
         | _ -> ValueNone
 
     member inline this.MapTryO ([<InlineIfLambda>] map: 'value -> 'value) =
-        match this.MapOf map with
+        match this.Map map with
         | Ok result -> Some result
         | _ -> None

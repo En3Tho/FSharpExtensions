@@ -10,9 +10,9 @@
         <PackageLicenseUrl>https://github.com/En3Tho/FSharpExtensions/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/En3Tho/FSharpExtensions</RepositoryUrl>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-        <AssemblyVersion>1.0.7</AssemblyVersion>
-        <FileVersion>1.0.7</FileVersion>
-        <PackageVersion>1.0.7</PackageVersion>
+        <AssemblyVersion>1.0.8</AssemblyVersion>
+        <FileVersion>1.0.8</FileVersion>
+        <PackageVersion>1.0.8</PackageVersion>
         <!-- Optional: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <!-- Optional: Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
