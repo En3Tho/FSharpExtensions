@@ -15,10 +15,10 @@ let getMethodCodeForVerb dependenciesCount (verb: string) =
         $"public static IServiceCollection {verb}Func<TService, {genericParameters}>(this IServiceCollection collection,"
 
         indent {
-            "Func<TDependency1, TService> factory)"
+            $"Func<{genericParameters}, TService> factory)"
             "where TService : class"
             for i = 1 to dependenciesCount do
-                $"where TDependency{i} : notnull"
+                $"where TDependency{i} : class"
         }
         braceBlock {
             $"collection.{verb}("
