@@ -16,9 +16,9 @@ type ``Net 5, Net 6, Pgo``() =
             Job.Default.WithRuntime(CoreRuntime.Core50).WithId("Net5")
             Job.Default.WithRuntime(CoreRuntime.Core60).WithId("Net6")
             Job.Default.WithRuntime(CoreRuntime.Core60).WithId("Net6PGO")
-                        .WithEnvironmentVariables(EnvironmentVariable(TieredPGO, "1"),
-                                                  EnvironmentVariable(QuickJitForLoops, "1"),
-                                                  EnvironmentVariable(ReadyToRun, "0"))
+                       .WithEnvironmentVariables(EnvironmentVariable(TieredPGO, "1"),
+                                                 EnvironmentVariable(QuickJitForLoops, "1"),
+                                                 EnvironmentVariable(ReadyToRun, "0"))
         |]) |> ignore
 
 type ``Net 6, Pgo``() =
@@ -32,9 +32,9 @@ type ``Net 6, Pgo``() =
         base.AddJob([|
             Job.Default.WithRuntime(CoreRuntime.Core60).WithId("Net6")
             Job.Default.WithRuntime(CoreRuntime.Core60).WithId("Net6PGO")
-                        .WithEnvironmentVariables(EnvironmentVariable(TieredPGO, "1"),
-                                                  EnvironmentVariable(QuickJitForLoops, "1"),
-                                                  EnvironmentVariable(ReadyToRun, "0"))
+                       .WithEnvironmentVariables(EnvironmentVariable(TieredPGO, "1"),
+                                                 EnvironmentVariable(QuickJitForLoops, "1"),
+                                                 EnvironmentVariable(ReadyToRun, "0"))
         |]) |> ignore
 
 type ``Net 5, Net 6``() =
