@@ -702,7 +702,7 @@ module Enum =
 
 module Result =
     /// wraps a function with unit argument into try catch block returning a result
-    let inline wrap ([<InlineIfLambda>] f) = // TODO: F# 6 Inline if lambda attribute
+    let inline wrap ([<InlineIfLambda>] f) =
         try f() |> Ok
         with e -> e |> Error
 
@@ -722,6 +722,16 @@ module Result =
         match result with
         | Ok v -> v
         | Error _ -> value
+
+    let inline iter ([<InlineIfLambda>] f) value =
+        match value with
+        | Ok v -> f v
+        | Error _ -> ()
+
+    let inline iterError ([<InlineIfLambda>] f) value =
+        match value with
+        | Ok _ -> ()
+        | Error e -> f e
 
 type EResult<'a, 'b when 'b :> exn> = Result<'a, 'b>
 type AsyncEResult<'a, 'b when 'b :> exn> = Result<'a, 'b> ValueTask
@@ -857,16 +867,21 @@ module EqualityComparer =
 module Array =
     let inline isNullOrEmpty (arr: 'a[]) =
         Object.ReferenceEquals(arr, null) || arr.Length = 0
+
     let inline isNotNullOrEmpty (arr: 'a[]) =
         arr |> isNullOrEmpty |> not
+
     let inline defaultValue def arr =
         if isNullOrEmpty arr then def else arr
+
     let inline defaultWith ([<InlineIfLambda>] defThunk) arr =
         if isNullOrEmpty arr then defThunk() else arr
+
     let inline tryFindLast ([<InlineIfLambda>] f) arr =
         let mutable i = Array.length arr - 1
         while i >= 0 && not ^ f arr[i] do dec &i
         if i >= 0 then Some arr[i] else None
+
     let inline ofObj x = [| x |]
     let inline ofObj2 x1 x2 = [| x1; x2 |]
     let inline ofObj3 x1 x2 x3 = [| x1; x2; x3 |]
