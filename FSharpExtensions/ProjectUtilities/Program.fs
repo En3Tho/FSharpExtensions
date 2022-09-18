@@ -1,3 +1,3 @@
 open ProjectUtilities
 
-CodeGen.generateFiles()
+ServiceProviderAndScopeCodeGen.generateFiles()
