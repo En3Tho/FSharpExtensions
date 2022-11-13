@@ -9,8 +9,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="BenchmarkDotNet" Version="0.13.1" />
-      <PackageReference Include="FSharp.Core" Version="6.0.5" />
+      <PackageReference Include="BenchmarkDotNet" Version="0.13.2" />
+      <PackageReference Include="FSharp.Core" Version="7.0.0" />
     </ItemGroup>
 
     <ItemGroup>
