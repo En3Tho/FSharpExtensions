@@ -73,17 +73,17 @@ module IDictionaryBuilder =
     [<AbstractClass;Extension>]
     type IDictionaryExtensions() =
         [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
-        static member inline Yield(dictionary: #IDictionary<_,_>, (key, value): struct ('a * 'b)) : CollectionCode = fun() -> dictionary.Add(key, value)
+        static member inline Yield(dictionary: #IDictionary<_,_>, (key, value): struct ('a * 'b)) : CollectionCode = fun() -> dictionary[key] <- value
         [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
-        static member inline Yield(dictionary: #IDictionary<_,_>, kvp: KeyValuePair<_,_>) : CollectionCode = fun() -> dictionary.Add(kvp.Key, kvp.Value)
+        static member inline Yield(dictionary: #IDictionary<_,_>, kvp: KeyValuePair<_,_>) : CollectionCode = fun() -> dictionary[kvp.Key] <- kvp.Value
         [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
-        static member inline Yield(dictionary: #IDictionary<_,_>, (key, value): 'a * 'b) : CollectionCode = fun() -> dictionary.Add(key, value)
+        static member inline Yield(dictionary: #IDictionary<_,_>, (key, value): 'a * 'b) : CollectionCode = fun() -> dictionary[key] <- value
         [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
-        static member inline YieldFrom(dictionary: #IDictionary<_,_>, seq: ('a * 'b) seq) : CollectionCode = fun() -> for key, value in seq do dictionary.Add(key, value)
+        static member inline YieldFrom(dictionary: #IDictionary<_,_>, seq: ('a * 'b) seq) : CollectionCode = fun() -> for key, value in seq do dictionary[key] <- value
         [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
-        static member inline YieldFrom(dictionary: #IDictionary<_,_>, seq: KeyValuePair<_,_> seq) : CollectionCode = fun() -> for value in seq do dictionary.Add(value.Key, value.Value)
+        static member inline YieldFrom(dictionary: #IDictionary<_,_>, seq: KeyValuePair<_,_> seq) : CollectionCode = fun() -> for value in seq do dictionary[value.Key] <- value.Value
         [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
-        static member inline YieldFrom(dictionary: #IDictionary<_,_>, seq: struct ('a * 'b) seq) : CollectionCode = fun() -> for key, value in seq do dictionary.Add(key, value)
+        static member inline YieldFrom(dictionary: #IDictionary<_,_>, seq: struct ('a * 'b) seq) : CollectionCode = fun() -> for key, value in seq do dictionary[key] <- value
 
     type IDictionary<'a, 'b> with
         [<EditorBrowsable(EditorBrowsableState.Value)>]

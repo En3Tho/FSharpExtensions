@@ -3,6 +3,7 @@ module En3Tho.FSharp.Extensions.Tests.IEquatableOperatorTests
 open System.Collections.Generic
 open Xunit
 open En3Tho.FSharp.Extensions
+open En3Tho.FSharp.ComputationExpressions
 open En3Tho.FSharp.ComputationExpressions.ICollectionBuilder
 
 module Primitive =

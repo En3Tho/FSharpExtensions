@@ -3,7 +3,6 @@ module En3Tho.FSharp.Extensions.Extensions
 
 open System
 open System.Threading.Tasks
-open En3Tho.FSharp.ComputationExpressions.Tasks
 
 let private unitTask = Task.FromResult()
 
@@ -18,30 +17,6 @@ type Task with
 
     static member CompletedUnitTask = unitTask
 
-    member this.AsResult() =
-        if this.IsCompletedSuccessfully then ValueTask<_>(result = Ok())
-        else
-            vtask {
-                try
-                    do! this
-                    return Ok()
-                with e ->
-                    return Error e
-            }
-
-type Task<'a> with
-    member this.AsResult() =
-        if this.IsCompletedSuccessfully then ValueTask<_>(result = Ok this.Result)
-
-        else
-            vtask {
-                try
-                    let! result = this
-                    return Ok result
-                with e ->
-                    return Error e
-            }
-
 type ValueTask with
     static member inline RunSynchronously (task: ValueTask) =
         if task.IsCompletedSuccessfully then () else
@@ -55,31 +30,6 @@ type ValueTask with
     static member inline FromTask value = ValueTask(task = value)
 
     static member CompletedUnitTask = ValueTask<unit>()
-
-    member this.AsResult() =
-        if
-            this.IsCompletedSuccessfully then ValueTask<_>(result = Ok())
-        else
-            vtask {
-                try
-                    do! this
-                    return Ok()
-                with e ->
-                    return Error e
-            }
-
-type ValueTask<'a> with
-    member this.AsResult() =
-        if
-            this.IsCompletedSuccessfully then ValueTask<_>(result = Ok this.Result)
-        else
-            vtask {
-                try
-                    let! result = this
-                    return Ok result
-                with e ->
-                    return Error e
-            }
 
 type Async<'a> with
     static member inline AwaitValueTask (valueTask: ValueTask) =

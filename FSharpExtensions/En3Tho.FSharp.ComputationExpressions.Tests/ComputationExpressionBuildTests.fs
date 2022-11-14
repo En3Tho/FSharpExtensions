@@ -4,6 +4,7 @@ open System.Collections.Concurrent
 open System.Collections.Generic
 open System.ComponentModel
 open System.Threading.Tasks
+open En3Tho.FSharp.Extensions
 open En3Tho.FSharp.ComputationExpressions
 open En3Tho.FSharp.ComputationExpressions.SCollectionBuilder
 open En3Tho.FSharp.ComputationExpressions.ICollectionBuilder
@@ -45,26 +46,23 @@ let ``Test that async computation expression compiles`` () =
 
 [<Fact>]
 let ``Test that dictionary is supported as builder`` () =
-    let genericDict key value = Dictionary() {
-        struct (key, value)
-        key, value
+    let intIntDict1 = Dictionary() {
+        struct (1, 10)
+        1, 10
 
         let mutable x = 0
         while x < 10 do
             x <- x + 1
     }
 
-    let intIntDict1 = ConcurrentDictionary() {
+    let intIntDict12 = ConcurrentDictionary() {
         struct (1, 10)
         1, 10
         let mutable x = 0
         while x < 10 do
             x <- x + 1
     }
-
-    let intIntDict2 = genericDict 1 10
-
-    Assert.True(intIntDict1.GetType().GenericTypeArguments.SequenceEqual(intIntDict2.GetType().GenericTypeArguments))
+    Assert.True(intIntDict1.GetType().GenericTypeArguments.SequenceEqual(intIntDict12.GetType().GenericTypeArguments))
 
 [<Fact>]
 let ``Test that generics are working properly and builders are not conflicting with each other`` () =

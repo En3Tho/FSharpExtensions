@@ -9,8 +9,9 @@ open En3Tho.FSharp.ComputationExpressions.Tasks
 let ``Test array map does not throw with value task CE``() = vtask {
     let w = [| 1 |] |> Array.map (fun w -> w + 1) |> Array.head
     let! x = task { return 3 }
-    let finalResult = w + x + 3
-    Assert.Equal(7, finalResult)
+    let! y = vtask { return 4 }
+    let finalResult = w + x + y + 3
+    Assert.Equal(11, finalResult)
 }
 
 [<Fact>]
