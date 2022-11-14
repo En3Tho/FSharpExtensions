@@ -10,7 +10,7 @@ type [<Struct>] CustomRecordType = {
     V3: int64
 }
 
-[<MemoryDiagnoser; DisassemblyDiagnoser>]
+[<MemoryDiagnoser; DisassemblyDiagnoser(filters = [||])>]
 type Benchmark() =
 
     let value1 = {

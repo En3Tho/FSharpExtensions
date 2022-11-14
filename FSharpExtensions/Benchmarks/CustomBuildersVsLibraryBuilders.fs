@@ -1,14 +1,12 @@
 module Benchmarks.CustomBuildersVsLibraryBuilders
 
 open BenchmarkDotNet.Attributes
-open BenchmarkDotNet.Jobs
-open En3Tho.FSharp.Extensions
+open En3Tho.FSharp.ComputationExpressions
 open En3Tho.FSharp.ComputationExpressions.ArrayPoolBasedBuilders
 
 [<
   MemoryDiagnoser;
-  Config(typeof<BenchmarkConfig.``Net 6, Pgo``>)
-  //SimpleJob(RuntimeMoniker.Net60)
+  Config(typeof<``Net 6, Pgo``>)
 >]
 type Benchmark() =
     

@@ -34,9 +34,9 @@ open Assets
 
 [<
     MemoryDiagnoser;
-    DisassemblyDiagnoser;
+    DisassemblyDiagnoser(filters = [||]);
     //SimpleJob(RuntimeMoniker.Net60)
-    Config(typeof<BenchmarkConfig.``Net 6, Pgo``>)
+    Config(typeof<``Net 6, Pgo``>)
 >]
 type Benchmark() =
 

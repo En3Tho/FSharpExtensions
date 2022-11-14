@@ -1,9 +1,9 @@
-﻿namespace En3Tho.FSharp.Extensions
+﻿namespace En3Tho.FSharp.ComputationExpressions
 
 open System
 open System.ComponentModel
 open System.Runtime.CompilerServices
-open GenericBuilderBase
+open En3Tho.FSharp.Extensions
 
 
 module EditorBrowsableState =
@@ -17,7 +17,7 @@ type CollectionCode = UnitBuilderCode<unit>
 
 
 [<AbstractClass;Extension>]
-type CollectionCodeExtensions() =
+type UnitLikeCodeExtensions() =
 
     [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
     static member inline While(_, [<InlineIfLambda>] moveNext: unit -> bool, [<InlineIfLambda>] whileExpr: CollectionCode) : CollectionCode =
@@ -61,9 +61,6 @@ type CollectionCodeExtensions() =
                 )
             )
         )
-
-    [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
-    static member inline Zero _ : CollectionCode = fun() -> ()
 
     [<Extension; EditorBrowsable(EditorBrowsableState.Value)>]
     static member inline Delay(_, [<InlineIfLambda>] delay: unit -> CollectionCode) =

@@ -3,7 +3,7 @@ namespace En3Tho.FSharp.ComputationExpressions.CodeBuilder
 open System
 open System.Collections.Immutable
 open System.Text
-open En3Tho.FSharp.Extensions.GenericBuilderBase
+open En3Tho.FSharp.Extensions
 
 module CodeBuilderImpl =
 

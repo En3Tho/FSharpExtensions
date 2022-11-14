@@ -72,7 +72,7 @@ module PushStream =
 
 open PushStream
 
-[<MemoryDiagnoser; DisassemblyDiagnoser>]
+[<MemoryDiagnoser; DisassemblyDiagnoser(filters = [||])>]
 type Benchmark() =
 
     [<Benchmark>]
@@ -100,7 +100,7 @@ type Benchmark() =
         |>> fold (+) 0L
 
 open En3Tho.FSharp.Extensions
-[<MemoryDiagnoser; DisassemblyDiagnoser>]
+[<MemoryDiagnoser; DisassemblyDiagnoser(filters = [||])>]
 type Benchmark2() =
 
 //    [<Benchmark>]
@@ -135,7 +135,7 @@ module InlinePipe =
 //    let inline (|>) x = fun ([<InlineIfLambda>] f) -> (fun ([<InlineIfLambda>] x)  -> f x) x
 
 open InlinePipe
-[<MemoryDiagnoser; DisassemblyDiagnoser>]
+[<MemoryDiagnoser; DisassemblyDiagnoser(filters = [||])>]
 type Benchmark3() =
 
 //    [<Benchmark>]

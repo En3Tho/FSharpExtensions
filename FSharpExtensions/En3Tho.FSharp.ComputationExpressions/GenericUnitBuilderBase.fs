@@ -1,8 +1,10 @@
-module En3Tho.FSharp.Extensions.GenericBuilderBase
+namespace En3Tho.FSharp.Extensions
 
 open System
 
-type UnitBuilderCode<'Builder> = 'Builder -> unit
+[<AutoOpen>]
+module CodeDefinition =
+    type UnitBuilderCode<'Builder> = 'Builder -> unit
 
 type UnitBuilderBase<'Builder>() =
 

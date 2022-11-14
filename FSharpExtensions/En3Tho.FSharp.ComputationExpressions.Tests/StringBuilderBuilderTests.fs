@@ -3,7 +3,7 @@
 open System
 open System.Text
 open Xunit
-open En3Tho.FSharp.Extensions
+open En3Tho.FSharp.ComputationExpressions
 open En3Tho.FSharp.ComputationExpressions.SStringBuilderBuilder
 
 [<Fact>]

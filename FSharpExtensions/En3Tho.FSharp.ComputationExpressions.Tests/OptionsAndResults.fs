@@ -1,7 +1,6 @@
 ﻿module En3Tho.FSharp.Extensions.Tests.OptionsAndResults
 
 open System
-open System.Threading.Tasks
 open Xunit
 open En3Tho.FSharp.ComputationExpressions.OptionBuilder
 open En3Tho.FSharp.ComputationExpressions.ResultBuilder

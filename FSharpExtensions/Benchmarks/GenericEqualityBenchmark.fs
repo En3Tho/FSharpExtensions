@@ -44,7 +44,7 @@ let customWootRecordIEquatableEquality (woot1: WootRecord) (woot2: WootRecord) =
     && customIEquatableArrayEquality woot1.Value2 woot2.Value2
     && customIEquatableArrayEquality woot1.Value3 woot2.Value3
 
-[<MemoryDiagnoser; DisassemblyDiagnoser>]
+[<MemoryDiagnoser; DisassemblyDiagnoser(filters = [||])>]
 type Benchmark() =
 
     let woot1 = makeWootRecord()

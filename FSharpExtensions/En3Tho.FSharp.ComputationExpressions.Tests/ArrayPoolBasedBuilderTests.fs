@@ -3,7 +3,7 @@
 open System
 open System.Collections.Generic
 open Xunit
-open En3Tho.FSharp.Extensions
+open En3Tho.FSharp.ComputationExpressions
 open En3Tho.FSharp.ComputationExpressions.ArrayPoolBasedBuilders
 open En3Tho.FSharp.ComputationExpressions.ICollectionBuilder
 open System.Linq

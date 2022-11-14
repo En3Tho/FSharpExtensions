@@ -113,6 +113,7 @@ type [<NoEquality; NoComparison; Struct>] BlockBuilder<'a>(builder: ArrayPoolLis
         let this = this
         fun() -> for value in values do this.Builder.Add value
 
+    member inline this.Zero() : CollectionCode = fun() -> ()
     member inline this.Run ([<InlineIfLambda>] runExpr) =
         try
             runExpr()
@@ -129,6 +130,7 @@ type [<NoEquality; NoComparison; Struct>] ResizeArrayBuilder<'a>(builder: ArrayP
         let this = this
         fun() -> for value in values do this.Builder.Add value
 
+    member inline this.Zero() : CollectionCode = fun() -> ()
     member inline this.Run ([<InlineIfLambda>] runExpr) =
         try
             runExpr()
@@ -145,6 +147,7 @@ type [<NoEquality; NoComparison; Struct>] ArrayBuilder<'a>(builder: ArrayPoolLis
         let this = this
         fun() -> for value in values do this.Builder.Add value
 
+    member inline this.Zero() : CollectionCode = fun() -> ()
     member inline this.Run ([<InlineIfLambda>] runExpr) =
         try
             runExpr()
@@ -161,6 +164,7 @@ type [<NoEquality; NoComparison; Struct>] UnsafeBlockBuilder<'a>(builder: ArrayP
         let this = this
         fun() -> for value in values do this.Builder.Add value
 
+    member inline this.Zero() : CollectionCode = fun() -> ()
     member inline this.Run ([<InlineIfLambda>] runExpr) =
         runExpr()
         let result = this.Builder.ToImmutableArray()
@@ -176,6 +180,7 @@ type [<NoEquality; NoComparison; Struct>] UnsafeResizeArrayBuilder<'a>(builder: 
         let this = this
         fun() -> for value in values do this.Builder.Add value
 
+    member inline this.Zero() : CollectionCode = fun() -> ()
     member inline this.Run ([<InlineIfLambda>] runExpr) =
         runExpr()
         let result = this.Builder.ToResizeArray()
@@ -191,6 +196,7 @@ type [<NoEquality; NoComparison; Struct>] UnsafeArrayBuilder<'a>(builder: ArrayP
         let this = this
         fun() -> for value in values do this.Builder.Add value
 
+    member inline this.Zero() : CollectionCode = fun() -> ()
     member inline this.Run ([<InlineIfLambda>] runExpr) =
         runExpr()
         let result = this.Builder.ToArray()

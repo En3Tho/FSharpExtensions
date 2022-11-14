@@ -5,7 +5,6 @@ open System.Collections.Generic
 open System.ComponentModel
 open System.Runtime.CompilerServices
 open System.Text
-open En3Tho.FSharp.Extensions
 
 module SCollectionBuilder =
 
@@ -30,17 +29,43 @@ module ICollectionBuilder =
 
     type ICollection<'a> with
         [<EditorBrowsable(EditorBrowsableState.Value)>]
+        member inline this.Zero() : CollectionCode = fun() -> ()
+        [<EditorBrowsable(EditorBrowsableState.Value)>]
         member inline this.Run([<InlineIfLambda>] runExpr: CollectionCode) = runExpr(); this
 
     type List<'a> with
+        [<EditorBrowsable(EditorBrowsableState.Value)>]
+        member inline this.Zero() : CollectionCode = fun() -> ()
         [<EditorBrowsable(EditorBrowsableState.Value)>]
         member inline this.Run([<InlineIfLambda>] runExpr: CollectionCode) = runExpr(); this
 
     type HashSet<'a> with
         [<EditorBrowsable(EditorBrowsableState.Value)>]
+        member inline this.Zero() : CollectionCode = fun() -> ()
+        [<EditorBrowsable(EditorBrowsableState.Value)>]
         member inline this.Run([<InlineIfLambda>] runExpr: CollectionCode) = runExpr(); this
 
     type LinkedList<'a> with
+        [<EditorBrowsable(EditorBrowsableState.Value)>]
+        member inline this.Zero() : CollectionCode = fun() -> ()
+        [<EditorBrowsable(EditorBrowsableState.Value)>]
+        member inline this.Run([<InlineIfLambda>] runExpr: CollectionCode) = runExpr(); this
+
+    type Stack<'a> with
+        [<EditorBrowsable(EditorBrowsableState.Value)>]
+        member inline this.Zero() : CollectionCode = fun() -> ()
+        [<EditorBrowsable(EditorBrowsableState.Value)>]
+        member inline this.Run([<InlineIfLambda>] runExpr: CollectionCode) = runExpr(); this
+
+    type Queue<'a> with
+        [<EditorBrowsable(EditorBrowsableState.Value)>]
+        member inline this.Zero() : CollectionCode = fun() -> ()
+        [<EditorBrowsable(EditorBrowsableState.Value)>]
+        member inline this.Run([<InlineIfLambda>] runExpr: CollectionCode) = runExpr(); this
+
+    type SortedSet<'a> with
+        [<EditorBrowsable(EditorBrowsableState.Value)>]
+        member inline this.Zero() : CollectionCode = fun() -> ()
         [<EditorBrowsable(EditorBrowsableState.Value)>]
         member inline this.Run([<InlineIfLambda>] runExpr: CollectionCode) = runExpr(); this
 
@@ -62,13 +87,25 @@ module IDictionaryBuilder =
 
     type IDictionary<'a, 'b> with
         [<EditorBrowsable(EditorBrowsableState.Value)>]
+        member inline this.Zero() : CollectionCode = fun() -> ()
+        [<EditorBrowsable(EditorBrowsableState.Value)>]
         member inline this.Run([<InlineIfLambda>] runExpr: CollectionCode) = runExpr(); this
 
     type Dictionary<'a, 'b> with
         [<EditorBrowsable(EditorBrowsableState.Value)>]
+        member inline this.Zero() : CollectionCode = fun() -> ()
+        [<EditorBrowsable(EditorBrowsableState.Value)>]
+        member inline this.Run([<InlineIfLambda>] runExpr: CollectionCode) = runExpr(); this
+
+    type SortedList<'a, 'b> with
+        [<EditorBrowsable(EditorBrowsableState.Value)>]
+        member inline this.Zero() : CollectionCode = fun() -> ()
+        [<EditorBrowsable(EditorBrowsableState.Value)>]
         member inline this.Run([<InlineIfLambda>] runExpr: CollectionCode) = runExpr(); this
 
     type ConcurrentDictionary<'a, 'b> with
+        [<EditorBrowsable(EditorBrowsableState.Value)>]
+        member inline this.Zero() : CollectionCode = fun() -> ()
         [<EditorBrowsable(EditorBrowsableState.Value)>]
         member inline this.Run([<InlineIfLambda>] runExpr: CollectionCode) = runExpr(); this
 
@@ -85,5 +122,7 @@ module SStringBuilderBuilder =
         static member inline YieldFrom(builder, values: 'b seq) : CollectionCode = fun() -> for value in values do append value builder
 
     type StringBuilder with
+        [<EditorBrowsable(EditorBrowsableState.Value)>]
+        member inline this.Zero() : CollectionCode = fun() -> ()
         [<EditorBrowsable(EditorBrowsableState.Value)>]
         member inline this.Run([<InlineIfLambda>] runExpr: CollectionCode) = runExpr(); this

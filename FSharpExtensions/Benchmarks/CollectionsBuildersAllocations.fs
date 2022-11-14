@@ -2,12 +2,12 @@
 
 open BenchmarkDotNet.Attributes
 open BenchmarkDotNet.Jobs
-open En3Tho.FSharp.Extensions
+open En3Tho.FSharp.ComputationExpressions
 open En3Tho.FSharp.ComputationExpressions.ICollectionBuilder
 
 [<
     MemoryDiagnoser;
-    DisassemblyDiagnoser;
+    DisassemblyDiagnoser(filters = [||]);
     SimpleJob(RuntimeMoniker.Net60)
 >]
 type Benchmark() =

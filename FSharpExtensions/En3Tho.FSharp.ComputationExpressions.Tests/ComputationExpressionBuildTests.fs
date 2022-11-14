@@ -4,12 +4,12 @@ open System.Collections.Concurrent
 open System.Collections.Generic
 open System.ComponentModel
 open System.Threading.Tasks
+open En3Tho.FSharp.ComputationExpressions
 open En3Tho.FSharp.ComputationExpressions.SCollectionBuilder
 open En3Tho.FSharp.ComputationExpressions.ICollectionBuilder
 open En3Tho.FSharp.ComputationExpressions.IDictionaryBuilder
 open FSharp.Control
 open Xunit
-open En3Tho.FSharp.Extensions
 open System.Linq
 
 [<Fact>]

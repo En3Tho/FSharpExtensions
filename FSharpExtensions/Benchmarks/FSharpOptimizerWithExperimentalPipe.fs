@@ -103,7 +103,7 @@ let callSeq4InPlaceUnrolled num =
     |> Seq.map plus1
     |> fun x -> Seq.map plus1 x
 
-[<MemoryDiagnoser; DisassemblyDiagnoser>]
+[<MemoryDiagnoser; DisassemblyDiagnoser(filters = [||])>]
 type Benchmark() =
 
     [<Params(10)>]

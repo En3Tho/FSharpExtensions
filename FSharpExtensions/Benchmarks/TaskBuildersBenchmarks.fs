@@ -7,7 +7,7 @@ open En3Tho.FSharp.ComputationExpressions.Tasks
 
 [<
     MemoryDiagnoser;
-    DisassemblyDiagnoser;
+    DisassemblyDiagnoser(filters = [||]);
     SimpleJob(RuntimeMoniker.Net60)
 >]
 type Benchmark() =
