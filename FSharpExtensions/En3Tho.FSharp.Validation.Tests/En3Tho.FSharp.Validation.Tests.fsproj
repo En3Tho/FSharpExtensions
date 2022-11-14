@@ -14,7 +14,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="En3Tho.FSharp.XUnitExtensions" Version="1.0.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
         <PackageReference Include="xunit" Version="2.4.2" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
@@ -30,6 +29,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\En3Tho.FSharp.Validation\En3Tho.FSharp.Validation.fsproj" />
+      <ProjectReference Include="..\En3Tho.FSharp.XUnitExtensions\En3Tho.FSharp.XUnitExtensions.fsproj" />
     </ItemGroup>
 
 </Project>
