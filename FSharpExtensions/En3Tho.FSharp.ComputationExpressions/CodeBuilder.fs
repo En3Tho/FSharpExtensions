@@ -66,11 +66,11 @@ module CodeBuilderImpl =
                 for line in value.Lines do
                     builder.AddLine line
 
-        member inline _.Yield(value: 'a) : CodeBuilderCode =
+        member inline _.Yield(value: string) : CodeBuilderCode =
             fun builder ->
                 builder.AddLine(value)
 
-        member inline _.YieldFrom(values: 'b seq) : CodeBuilderCode =
+        member inline _.YieldFrom(values: string seq) : CodeBuilderCode =
             fun builder ->
                 for value in values do
                     builder.AddLine(value)
