@@ -37,7 +37,7 @@ type Async<'a> with
         else valueTask.AsTask() |> Async.AwaitTask
 
     static member inline AwaitValueTask (valueTask: ValueTask<_>) =
-        if valueTask.IsCompletedSuccessfully then valueTask.Result |> Async.ofObj
+        if valueTask.IsCompletedSuccessfully then valueTask.Result |> async.Return
         else valueTask.AsTask() |> Async.AwaitTask
 
     member this.AsResult() =

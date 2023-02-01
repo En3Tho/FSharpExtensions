@@ -225,7 +225,7 @@ module Stackalloc =
 
     let inline allocAnyOrNew<'a> len = // TODO: check if those are optimized
         match len with
-        | LtEq 16 -> allocAny16OrNew len
+        | LtEq 16 -> allocAny16OrNew<'a> len
         | LtEq 32 -> allocAny32OrNew len
         | LtEq 64 -> allocAny64OrNew len
         | LtEq 128 -> allocAny128OrNew len

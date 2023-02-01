@@ -209,57 +209,6 @@ module EResult =
         | _ ->
             result
 
-module Async =
-    let rec retryWhile condition retries work = async {
-        let! result = work
-        if condition result && retries > 0 then
-            return! retryWhile condition (retries - 1) work
-        else
-            return result
-    }
-
-    let rec retryWhileWith condition delay retries work = async {
-        let! result = work
-        if condition result && retries > 0 then
-            do! delay
-            return! retryWhileWith condition delay (retries - 1) work
-        else
-            return result
-    }
-
-    let inline ofObj x = async.Return x
-
-    module Array =
-        let map2 mapping (array1: 'T[]) (array2: 'U[]) = async {
-            Object.nullCheck "array1" array1
-            Object.nullCheck "array2" array2
-            let f = OptimizedClosures.FSharpFunc<_, _, _>.Adapt(mapping)
-            if array1.Length <> array2.Length then "Arrays cannot have different length" |> invalidOp
-            let res = Array.zeroCreate array1.Length
-            for i = 0 to res.Length - 1 do
-                let! result = f.Invoke(array1[i], array2[i])
-                res[i] <- result
-            return res
-        }
-
-        let fold<'T, 'State> folder (state: 'State) (array: 'T[]) = async {
-            Object.nullCheck "array" array
-            let f = OptimizedClosures.FSharpFunc<_, _, _>.Adapt(folder)
-            let mutable state = state
-            for i = 0 to array.Length - 1 do
-                let! result = f.Invoke(state, array[i])
-                state <- result
-            return state
-        }
-
-    module Debug =
-        let inline time logf work = async {
-            let start = DateTime.Now
-            let! result = work
-            logf (DateTime.Now - start)
-            return result
-        }
-
 module Byref =
 
     /// all setters are reversed (byref is first parameter) because usually you want to write something into byref

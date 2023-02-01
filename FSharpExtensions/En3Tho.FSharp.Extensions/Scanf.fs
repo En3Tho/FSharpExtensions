@@ -1,7 +1,7 @@
 ﻿module En3Tho.FSharp.Extensions.Scanf
 
 open System
-open System.Runtime.InteropServices
+open System.Diagnostics
 open En3Tho.FSharp.Extensions
 
 let [<Literal>] private InterpolationFormat = "%P()"
@@ -109,7 +109,8 @@ let private scanfInternal strict (memory: ReadOnlyMemory<char>) (fmt: Printf.Str
         | :? Ref<Guid> as ref ->
             success <- Guid.TryParse(value, ref)
         | _ ->
-            raise (NotImplementedException("Only Ref<PrimitiveType> is supported"))
+            Debug.Fail("Only Ref<PrimitiveType> is supported")
+            success <- false
 
         formatSpan <- formatSpan.SliceForward (literalAfterFormat.Length + 4)
         valueSpan <- valueSpan.SliceForward (charCounter + literalAfterFormat.Length)
