@@ -24,8 +24,8 @@ let private scanfInternal strict (memory: ReadOnlyMemory<char>) (fmt: Printf.Str
                false
            | index ->
                if valueSpan.StartsWith(formatSpan.Slice(0, index)) then
-                   formatSpan <- formatSpan.SliceForward(index + 4)
-                   valueSpan <- valueSpan.SliceForward index
+                   formatSpan <- formatSpan.Advance(index + 4)
+                   valueSpan <- valueSpan.Advance index
                    true
                else
                    false)
@@ -36,7 +36,7 @@ let private scanfInternal strict (memory: ReadOnlyMemory<char>) (fmt: Printf.Str
     while success && capturesSpan.Length > 0 do
 
         let currentCapture = capturesSpan.[0]
-        capturesSpan <- capturesSpan.SliceForward 1
+        capturesSpan <- capturesSpan.Advance 1
 
         let literalAfterFormat =
             match formatSpan.IndexOf(InterpolationFormat) with
@@ -112,8 +112,8 @@ let private scanfInternal strict (memory: ReadOnlyMemory<char>) (fmt: Printf.Str
             Debug.Fail("Only Ref<PrimitiveType> is supported")
             success <- false
 
-        formatSpan <- formatSpan.SliceForward (literalAfterFormat.Length + 4)
-        valueSpan <- valueSpan.SliceForward (charCounter + literalAfterFormat.Length)
+        formatSpan <- formatSpan.Advance (literalAfterFormat.Length + 4)
+        valueSpan <- valueSpan.Advance (charCounter + literalAfterFormat.Length)
 
     if success && strict then
         success <- formatSpan.IsEmpty && valueSpan.IsEmpty

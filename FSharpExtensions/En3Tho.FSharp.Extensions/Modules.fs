@@ -100,7 +100,7 @@ module ValueOption =
     let inline ofAnyRef (obj: ^a) = if obj &== null then ValueNone else ValueSome obj
     let inline toObjUnchecked opt = match opt with ValueSome x -> x | ValueNone -> Unchecked.defaultof<_>
     let inline ofArray (array: 'a[]) = if array = null || array.Length = 0 then ValueNone else ValueSome array
-    let inline ofSeq (seq: 'a seq) = if seq = null || Seq.length seq = 0 then ValueNone else ValueSome seq
+    let inline ofSeq (seq: 'a seq) = if seq = null || Seq.isEmpty seq then ValueNone else ValueSome seq
 
     /// Similar to Option.iter but accepts an additional state value
     let inline iterv ([<InlineIfLambda>] onValueSome) value opt =
@@ -257,7 +257,7 @@ module Array =
 
     let inline tryFindLast ([<InlineIfLambda>] f) arr =
         let mutable i = Array.length arr - 1
-        while i >= 0 && not ^ f arr[i] do dec &i
+        while i >= 0 && not ^ f arr[i] do i <- i - 1
         if i >= 0 then Some arr[i] else None
 
     let inline ofObj x = [| x |]
@@ -286,6 +286,7 @@ module List =
         (Object.ReferenceEquals(list, null) || list.IsEmpty) |> not |> ValueOption.ofBool
 
 // From https://github.com/fsharp/fsharp/blob/master/src/utils/ResizeArray.fs
+// TODO: rewrite these with cool stuff from CollectionsMarshal
 module ResizeArray =
     let add value (arr: ResizeArray<'T>) = arr.Add value
     let remove value (arr: ResizeArray<'T>) = arr.Remove value
@@ -295,11 +296,11 @@ module ResizeArray =
     let defaultValue def (arr: ResizeArray<'T>) = if arr |> isNullOrEmpty then def else arr
     let defaultWith defThunk (arr: ResizeArray<'T>) = if arr |> isNullOrEmpty then defThunk() else arr
 
-    let length (arr: ResizeArray<'T>) =  arr.Count
+    let length (arr: ResizeArray<'T>) = arr.Count
 
-    let get (arr: ResizeArray<'T>) (n: int) =  arr[n]
+    let get (arr: ResizeArray<'T>) (n: int) = arr[n]
 
-    let set (arr: ResizeArray<'T>) (n: int) (x:'T) =  arr[n] <- x
+    let set (arr: ResizeArray<'T>) (n: int) (x:'T) = arr[n] <- x
 
     let create (n: int) x = ResizeArray<_>(seq { for _ in 1 .. n -> x })
 
@@ -595,6 +596,7 @@ module ResizeArray =
             res2.Add(y)
         res1,res2
 
+// TODO: active patterns
 module Memory =
     let inline isEmpty (memory: Memory<_>) = memory.Length = 0
     let inline any (memory: Memory<_>) = memory.Length <> 0
@@ -604,6 +606,7 @@ module Memory =
     let inline fromArray (array: 'a[]): Memory<_> = Memory.op_Implicit array
     let inline fromArraySegment (array: 'a ArraySegment): Memory<_> = Memory.op_Implicit array
 
+// TODO: active patterns
 module ReadOnlyMemory =
     let inline isEmpty (memory: ReadOnlyMemory<_>) = memory.Length = 0
     let inline any (memory: ReadOnlyMemory<_>) = memory.Length <> 0
