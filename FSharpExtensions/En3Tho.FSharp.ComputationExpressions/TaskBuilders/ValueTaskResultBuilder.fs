@@ -416,11 +416,61 @@ module LowPriority =
                 //-- RESUMABLE CODE END
             )
 
+        member inline _.Bind (task: VerbatimTaskResult<'TResult1, 'TError>, continuation: (Result<'TResult1, 'TError> -> ValueTaskResultCode<'TOverall, 'TError, 'TResult2>)) : ValueTaskResultCode<'TOverall, 'TError, 'TResult2> =
+            ValueTaskResultCode<'TOverall, _, _>(fun sm ->
+                if __useResumableCode then
+                    //-- RESUMABLE CODE START
+                    // Get an awaiter from the task
+                    let mutable awaiter = task.Value.GetAwaiter()
+
+                    let mutable __stack_fin = true
+                    if not awaiter.IsCompleted then
+                        // This will yield with __stack_yield_fin = false
+                        // This will resume with __stack_yield_fin = true
+                        let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
+                        __stack_fin <- __stack_yield_fin
+                    if __stack_fin then
+                        let result = awaiter.GetResult()
+                        (continuation result).Invoke(&sm)
+                    else
+                        sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &sm)
+                        false
+                else
+                    ValueTaskResultBuilderBase.BindTaskDynamic(&sm, task.Value, continuation)
+                //-- RESUMABLE CODE END
+            )
+
+        member inline _.Bind (task: VerbatimValueTaskResult<'TResult1, 'TError>, continuation: (Result<'TResult1, 'TError> -> ValueTaskResultCode<'TOverall, 'TError, 'TResult2>)) : ValueTaskResultCode<'TOverall, 'TError, 'TResult2> =
+            ValueTaskResultCode<'TOverall, _, _>(fun sm ->
+                if __useResumableCode then
+                    //-- RESUMABLE CODE START
+                    // Get an awaiter from the task
+                    let mutable awaiter = task.Value.GetAwaiter()
+                    let mutable __stack_fin = true
+                    if not awaiter.IsCompleted then
+                        // This will yield with __stack_yield_fin = false
+                        // This will resume with __stack_yield_fin = true
+                        let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
+                        __stack_fin <- __stack_yield_fin
+                    if __stack_fin then
+                        let result = awaiter.GetResult()
+                        (continuation result).Invoke(&sm)
+                    else
+                        sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &sm)
+                        false
+                else
+                    ValueTaskResultBuilderBase.BindDynamic(&sm, task.Value, continuation)
+                //-- RESUMABLE CODE END
+            )
+
         member inline this.Bind (task: Result<'TResult1, 'TError>, continuation: ('TResult1 -> ValueTaskResultCode<'TOverall, 'TError, 'TResult2>)) : ValueTaskResultCode<'TOverall, 'TError, 'TResult2> =
             this.Bind(ValueTask<_>(result = task), continuation)
 
         member inline this.ReturnFrom (value: Result<'T, 'TError>)  : ValueTaskResultCode<'T, 'TError, 'T> =
             this.ReturnFrom (ValueTask<_>(result = value))
+
+        member inline this.Bind (value: VerbatimResult<'TResult1, 'TError>, continuation: (Result<'TResult1, 'TError> -> ValueTaskResultCode<'TOverall, 'TError, 'TResult2>)) : ValueTaskResultCode<'TOverall, 'TError, 'TResult2> =
+            this.Bind(ValueTask<_>(result = (value.Value |> Result.map Ok)), continuation)
 
 module HighPriority =
     // High priority extensions
