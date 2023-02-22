@@ -13,6 +13,12 @@ let q2 = Func<_,_,_>(f2)
 let q3 = Func<_,_,_,_>(f3)
 
 [<Fact>]
+let ``test that pipe one does not break usual type inference``() =
+    1
+    |> fun x -> x + 1
+    |> ignore
+
+[<Fact>]
 let ``test that pipe1 works as expected``() =
 
     let computation (x: int) =

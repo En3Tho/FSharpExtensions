@@ -43,7 +43,7 @@ module Core =
     let inline getHashCode (o: ^a) = o.GetHashCode()
 
     [<Obsolete("This logic needs to be implemented")>]
-    let inline TODO<'a> = raise (NotImplementedException())
+    let inline TODO<'a> = raise<'a> (NotImplementedException())
 
     let inline (&==) (a: 'a when 'a: not struct) (b: 'a) = Object.ReferenceEquals(a, b)
     let inline (&!=) (a: 'a when 'a: not struct) (b: 'a) = not (Object.ReferenceEquals(a, b))

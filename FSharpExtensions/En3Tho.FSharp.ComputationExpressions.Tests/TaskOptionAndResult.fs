@@ -151,6 +151,7 @@ let ``Test that exnresult properly catches exceptions`` () = vtask {
     Assert.Equal(res3, Error exn)
 }
 
+[<Fact>]
 let ``test that exnresultvtask properly works with exceptions of different types``() = exnresultvtask {
     let exnTask = task { failwith "" }
     let tryExnTask (t: Task<_>) = task {
@@ -166,4 +167,77 @@ let ``test that exnresultvtask properly works with exceptions of different types
     let! exn1 = Error (AggregateException()) |> ValueTask.FromResult
     let! exn2 = Error (ArgumentException()) |> ValueTask.FromResult
     return 0
+}
+
+[<Fact>]
+let ``test that explicit type does not exit early``() = vtask {
+    let mutable x = 0
+    let t = exnresultvtask {
+        let! (v: Result<int, exn>) = Error (Exception())
+        x <- 1
+        let! v = v
+        x <- 2
+    }
+    let! _ = t
+    Assert.Equal(1, x)
+}
+
+[<Fact>]
+let ``test verbatim handling works properly for error case``() = vtask {
+    let mutable x = 0
+    let t = exnresultvtask {
+        match! verb (Error (Exception())) with
+        | Error e ->
+            x <- 1
+        | Ok _ ->
+            ()
+        Assert.Equal(1, x)
+
+        match! verb (Task.FromResult(Error(Exception()))) with
+        | Error e ->
+            x <- 2
+        | Ok _ ->
+            ()
+        Assert.Equal(2, x)
+
+        match! verb (ValueTask.FromResult(Error(Exception()))) with
+        | Error e ->
+            x <- 3
+        | Ok _ ->
+            ()
+
+        Assert.Equal(3, x)
+    }
+    let! _ = t
+    ()
+}
+
+[<Fact>]
+let ``test verbatim handling works properly for ok case``() = vtask {
+    let mutable x = 0
+    let t = exnresultvtask {
+        match! verb (Ok 1) with
+        | Ok _ ->
+            x <- 1
+        | Error _ ->
+            ()
+        Assert.Equal(1, x)
+
+        match! verb (Task.FromResult(Ok 1)) with
+        | Ok _ ->
+            x <- 2
+        | Error _ ->
+            ()
+        Assert.Equal(2, x)
+
+        match! verb (ValueTask.FromResult(Ok 1)) with
+        | Ok _ ->
+            x <- 3
+        | Error _ ->
+            ()
+
+        Assert.Equal(3, x)
+    }
+    let! _ = t
+    ()
 }

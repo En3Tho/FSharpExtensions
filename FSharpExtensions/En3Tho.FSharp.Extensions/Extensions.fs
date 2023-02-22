@@ -37,7 +37,7 @@ type Async<'a> with
         else valueTask.AsTask() |> Async.AwaitTask
 
     static member inline AwaitValueTask (valueTask: ValueTask<_>) =
-        if valueTask.IsCompletedSuccessfully then valueTask.Result |> Async.ofObj
+        if valueTask.IsCompletedSuccessfully then valueTask.Result |> async.Return
         else valueTask.AsTask() |> Async.AwaitTask
 
     member this.AsResult() =
@@ -56,26 +56,32 @@ type Exception with
         | :? AggregateException as exn ->
             let mutable result = ValueNone
             let enum = exn.InnerExceptions.GetEnumerator()
+
             while result.IsNone && enum.MoveNext() do
                 result <- enum.Current.IsOrContains<'a>()
+
             match result with
-            | ValueSome _ -> result
-            | _ -> exn.InnerException.IsOrContains<'a>()
+            | ValueSome _ ->
+                result
+            | _ ->
+                exn.InnerException.IsOrContains<'a>()
         | _ ->
             match this.InnerException with
-            | null -> ValueNone
-            | exn -> exn.IsOrContains<'a>()
+            | null ->
+                ValueNone
+            | exn ->
+                exn.IsOrContains<'a>()
 
 // Move this to functions when byrefs are available as generics
 type Span<'a> with
-    member this.SliceForward value =
+    member this.Advance value =
         if uint value >= uint this.Length then
             Span<'a>()
         else
             this.Slice(value, this.Length - value)
 
 type ReadOnlySpan<'a> with
-    member this.SliceForward value =
+    member this.Advance value =
         if uint value >= uint this.Length then
             ReadOnlySpan<'a>()
         else
