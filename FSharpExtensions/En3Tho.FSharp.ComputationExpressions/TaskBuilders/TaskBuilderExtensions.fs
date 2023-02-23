@@ -7,9 +7,6 @@ open Microsoft.FSharp.Core.CompilerServices
 open Microsoft.FSharp.Core.CompilerServices.StateMachineHelpers
 open Microsoft.FSharp.Core.LanguagePrimitives.IntrinsicOperators
 
-#nowarn "1204"
-#nowarn "3513"
-
 type TaskBuilder with
     static member BindDynamic2 (sm: byref<_>, task: Task<'TResult1>, task2: Task<'TResult2>, continuation: ('TResult1 * 'TResult2 -> TaskCode<'TOverall, 'TResult3>)) : bool =
         let mutable awaiter = task.GetAwaiter()

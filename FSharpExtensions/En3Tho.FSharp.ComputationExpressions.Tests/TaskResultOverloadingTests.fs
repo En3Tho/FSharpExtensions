@@ -103,3 +103,49 @@ let ``test that resulttask works exactly as exnresultvtask``() = task {
     | _ ->
         Assert.True(false, $"Should not be possible: {result}")
 }
+
+type EE = {
+    X: int
+}
+
+type AA = {
+    X: int
+}
+
+[<Fact>]
+let ``text task type checking``() =
+    let getSomething (x: int) (y: int) = voptionvtask {
+        let x: ValueTask<EE> = ValueTask.FromResult({ X = 123 })
+        return x
+    }
+
+    let getAnother (x: int) (y: int) = voptionvtask {
+        let x: ValueTask<AA> = ValueTask.FromResult({ X = 123 })
+        return x
+    }
+
+    voptionvtask {
+        let! z1 = getSomething 1 2
+        let! z1 = z1 |> verb
+        let! z2 = getAnother z1.X z1.X
+        let! z2 = z2 |> verb
+        Assert.Equal(z1.X + z2.X, 246)
+    }
+
+[<Fact>]
+let ``text exnresultvtask type checking``() =
+    let getSomething (x: int) (y: int) = exnresultvtask {
+        let x: Task<Result<EE, exn>> = Task.FromResult(Ok { X = 123 })
+        return! x
+    }
+
+    let getAnother (x: int) (y: int) = exnresultvtask {
+        let x: Task<Result<AA, exn>> = Task.FromResult(Ok { X = 123 })
+        return! x
+    }
+
+    exnresultvtask {
+        let! z1 = getSomething 1 2
+        let! z2 = getAnother z1.X z1.X
+        Assert.Equal(z1.X + z2.X, 246)
+    }

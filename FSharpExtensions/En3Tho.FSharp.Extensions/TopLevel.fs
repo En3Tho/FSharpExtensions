@@ -6,9 +6,6 @@ open System.Collections.Immutable
 open System.Runtime.InteropServices
 open En3Tho.FSharp.Extensions.Disposables
 
-#nowarn "0042"
-#nowarn "0077"
-
 type block<'a> = ImmutableArray<'a>
 
 [<AutoOpen; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]

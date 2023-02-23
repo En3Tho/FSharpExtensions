@@ -3,19 +3,24 @@ namespace En3Tho.FSharp.ComputationExpressions.Tasks
 open System.Threading.Tasks
 
 [<Struct>]
-type VerbatimTaskResult<'T, 'U>(task: Task<Result<'T, 'U>>) =
+type VerbatimNonGenericTask(task: Task) =
     member _.Value = task
 
 [<Struct>]
-type VerbatimValueTaskResult<'T, 'U>(valueTask: ValueTask<Result<'T, 'U>>) =
+type VerbatimTask<'T>(task: Task<'T>) =
+    member _.Value = task
+
+[<Struct>]
+type VerbatimNonGenericValueTask(valueTask: ValueTask) =
     member _.Value = valueTask
 
 [<Struct>]
-type VerbatimResult<'T, 'U>(result: Result<'T, 'U>) =
-    member _.Value = result
+type VerbatimValueTask<'T>(valueTask: ValueTask<'T>) =
+    member _.Value = valueTask
 
 [<AbstractClass; Sealed; AutoOpen>]
 type TaskBuildersIntrinsics() =
-    static member verb(value) = VerbatimTaskResult(value)
-    static member verb(value) = VerbatimValueTaskResult(value)
-    static member verb(value) = VerbatimResult(value)
+    static member verb(value) = VerbatimTask(value)
+    static member verb(value) = VerbatimValueTask(value)
+    static member verb(value) = VerbatimNonGenericTask(value)
+    static member verb(value) = VerbatimNonGenericValueTask(value)

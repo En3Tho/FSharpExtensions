@@ -11,8 +11,6 @@
 // Updates:
 // Copyright (c) Microsoft Corporation.  All Rights Reserved.  See License.txt in the project root for license information.
 
-#nowarn "3513"
-
 namespace Microsoft.FSharp.Core.CompilerServices
 
 open System

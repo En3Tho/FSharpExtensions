@@ -186,13 +186,6 @@ let ``test that explicit type does not exit early``() = vtask {
 let ``test verbatim handling works properly for error case``() = vtask {
     let mutable x = 0
     let t = exnresultvtask {
-        match! verb (Error (Exception())) with
-        | Error e ->
-            x <- 1
-        | Ok _ ->
-            ()
-        Assert.Equal(1, x)
-
         match! verb (Task.FromResult(Error(Exception()))) with
         | Error e ->
             x <- 2
@@ -216,12 +209,6 @@ let ``test verbatim handling works properly for error case``() = vtask {
 let ``test verbatim handling works properly for ok case``() = vtask {
     let mutable x = 0
     let t = exnresultvtask {
-        match! verb (Ok 1) with
-        | Ok _ ->
-            x <- 1
-        | Error _ ->
-            ()
-        Assert.Equal(1, x)
 
         match! verb (Task.FromResult(Ok 1)) with
         | Ok _ ->
