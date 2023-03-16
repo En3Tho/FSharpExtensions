@@ -24,6 +24,7 @@
     <ItemGroup>
       <Compile Include="Disposables.fs" />
       <Compile Include="TopLevel.fs" />
+      <Compile Include="InterfaceShortcuts.fs" />
       <Compile Include="Modules.fs" />
       <Compile Include="String.fs" />
       <Compile Include="Span.fs" />

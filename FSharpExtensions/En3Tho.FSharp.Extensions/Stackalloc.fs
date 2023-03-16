@@ -6,8 +6,6 @@ open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
 open En3Tho.FSharp.Extensions
 
-#nowarn "9"
-
 module Stackalloc =
 
     type IValueBag<'a> =
@@ -292,7 +290,7 @@ type [<Struct; IsByRefLike>] StackHeapList<'a>(span: 'a Span) =
 
     member this.Add value =
         if uint this.count < uint span.Length then
-            this.StackSpan.[this.count] <- value
+            this.StackSpan[this.count] <- value
         else
             this.AddToList value
         this.count <- this.count + 1
@@ -305,7 +303,7 @@ type [<Struct; IsByRefLike>] StackList<'a>(span: 'a Span) =
 
     member this.Add value =
         if uint this.count < uint span.Length then
-            this.Span.[this.count] <- value
+            this.Span[this.count] <- value
         else
             invalidOp "Items count is exceeded"
         this.count <- this.count + 1

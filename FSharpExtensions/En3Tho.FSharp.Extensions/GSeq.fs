@@ -4,6 +4,7 @@ open En3Tho.FSharp.Extensions.GSeqEnumerators
 open System.Collections.Generic
 open System.Runtime.CompilerServices
 open En3Tho.FSharp.Extensions
+open En3Tho.FSharp.Extensions.InterfaceShortcuts
 
 module GSeq =
 
@@ -102,15 +103,6 @@ module GSeq =
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let tryFind (filter: 'i -> bool) (enumerator: SStructEnumerator<'i,'e>) =
         let mutable enumerator = enumerator
-        let mutable result = None
-        while result.IsNone && enumerator.MoveNext() do
-            let value = enumerator.Current
-            if value |> filter then result <- Some value
-        result
-
-    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let tryValueFind (filter: 'i -> bool) (enumerator: SStructEnumerator<'i,'e>) =
-        let mutable enumerator = enumerator
         let mutable result = ValueNone
         while result.IsNone && enumerator.MoveNext() do
             let value = enumerator.Current
@@ -118,22 +110,21 @@ module GSeq =
         result
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let tryPick filter (enumerator: SStructEnumerator<'i,'e>) =
-        let mutable enumerator = enumerator
-        let mutable result = None
-        while result.IsNone && enumerator.MoveNext() do
-            let value = enumerator.Current
-            result <- filter value
-        result
+    let tryFindOpt (filter: 'i -> bool) (enumerator: SStructEnumerator<'i,'e>) =
+        tryFind filter enumerator |> Option.ofValueOption
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let tryValuePick filter (enumerator: SStructEnumerator<'i,'e>) =
+    let tryPick filter (enumerator: SStructEnumerator<'i,'e>) =
         let mutable enumerator = enumerator
         let mutable result = ValueNone
         while result.IsNone && enumerator.MoveNext() do
             let value = enumerator.Current
             result <- filter value
         result
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    let tryPickOpt filter (enumerator: SStructEnumerator<'i,'e>) =
+        tryPick filter enumerator |> Option.ofValueOption
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let exists (filter: 'i -> bool) (enumerator: SStructEnumerator<'i,'e>) =
@@ -184,22 +175,23 @@ module GSeq =
         found
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let tryValueItem index (enumerator: SStructEnumerator<'i,'e>) =
-        if index < 0 then ValueNone else
-        let mutable enumerator = enumerator
-        let mutable counter = 0
-        while counter < index && enumerator.MoveNext() do ()
-        if enumerator.MoveNext() then ValueSome enumerator.Current
-        else ValueNone
+    let tryItem index (enumerator: SStructEnumerator<'i,'e>) =
+        if index < 0 then
+            ValueNone
+        else
+            let mutable enumerator = enumerator
+            let mutable counter = 0
+            while counter < index && enumerator.MoveNext() do
+                counter <- counter + 1
+
+            if enumerator.MoveNext() then
+                ValueSome enumerator.Current
+            else
+                ValueNone
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let tryItem index (enumerator: SStructEnumerator<'i,'e>) =
-        if index < 0 then None else
-        let mutable enumerator = enumerator
-        let mutable counter = 0
-        while counter < index && enumerator.MoveNext() do ()
-        if enumerator.MoveNext() then Some enumerator.Current
-        else None
+    let tryItemOpt index (enumerator: SStructEnumerator<'i,'e>) =
+        tryItem index enumerator |> Option.ofValueOption
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let fold initial folder (enumerator: SStructEnumerator<'i,'e>) =
@@ -228,7 +220,7 @@ module GSeq =
         let mutable result = initial
         while enumerator.MoveNext() do
             result <- folder.Invoke(count, result, enumerator.Current)
-            &count +<- 1
+            count <- count + 1
         result
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -240,7 +232,7 @@ module GSeq =
         let mutable result = initial
         while enumerator.MoveNext() && enumerator2.MoveNext() do
             result <- folder.Invoke(count, result, enumerator2.Current, enumerator.Current)
-            &count +<- 1
+            count <- count + 1
         result
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -273,7 +265,7 @@ module GSeq =
         let mutable i = 0
         while enumerator.MoveNext() do
             action.Invoke(i, enumerator.Current)
-            &i +<- 1
+            i <- i + 1
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let iteri2 (enumerator2: SStructEnumerator<'i2,'e2>) action (enumerator: SStructEnumerator<'i,'e>) =
@@ -283,7 +275,7 @@ module GSeq =
         let mutable i = 0
         while enumerator.MoveNext() && enumerator2.MoveNext() do
             action.Invoke(i, enumerator2.Current, enumerator.Current)
-            &i +<- 1
+            i <- i + 1
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let iteri3 (enumerator2: SStructEnumerator<'i2,'e2>) (enumerator3: SStructEnumerator<'i3,'e3>) action (enumerator: SStructEnumerator<'i,'e>) =
@@ -294,7 +286,7 @@ module GSeq =
         let mutable i = 0
         while enumerator.MoveNext() && enumerator2.MoveNext() && enumerator3.MoveNext() do
             action.Invoke(i, enumerator2.Current, enumerator3.Current, enumerator.Current)
-            &i +<- 1
+            i <- i + 1
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let identical (enumerator2: SStructEnumerator<'i,'e>) (enumerator: SStructEnumerator<'i,'e>) =
@@ -305,7 +297,7 @@ module GSeq =
             state <-
                 match enumerator.MoveNext(), enumerator2.MoveNext() with
                 | false, false -> 1
-                | true, true when enumerator.Current = enumerator2.Current -> 0
+                | true, true when IEquatable.equals enumerator.Current enumerator2.Current -> 0
                 | _ -> -1
         state = 1
 
@@ -326,7 +318,7 @@ module GSeq =
     let inline private minImpl (enumerator: SStructEnumerator<'i,'e> byref) =
         let mutable current = enumerator.Current
         while enumerator.MoveNext() do
-            current <- Operators.min current enumerator.Current
+            current <- IComparable.min current enumerator.Current
         current
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -341,22 +333,18 @@ module GSeq =
     let tryMin (enumerator: SStructEnumerator<'i,'e>) =
         let mutable enumerator = enumerator
         if not ^ enumerator.MoveNext() then
-            None
-        else
-            minImpl &enumerator |> Some
-
-    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let tryValueMin (enumerator: SStructEnumerator<'i,'e>) =
-        let mutable enumerator = enumerator
-        if not ^ enumerator.MoveNext() then
             ValueNone
         else
             minImpl &enumerator |> ValueSome
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    let tryMinOpt (enumerator: SStructEnumerator<'i,'e>) =
+        tryMin enumerator |> Option.ofValueOption
+
     let inline private maxImpl (enumerator: SStructEnumerator<'i,'e> byref) =
         let mutable current = enumerator.Current
         while enumerator.MoveNext() do
-            current <- Operators.max current enumerator.Current
+            current <- IComparable.max current enumerator.Current
         current
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -371,17 +359,13 @@ module GSeq =
     let tryMax (enumerator: SStructEnumerator<'i,'e>) =
         let mutable enumerator = enumerator
         if not ^ enumerator.MoveNext() then
-            None
-        else
-            maxImpl &enumerator |> Some
-
-    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let tryValueMax (enumerator: SStructEnumerator<'i,'e>) =
-        let mutable enumerator = enumerator
-        if not ^ enumerator.MoveNext() then
             ValueNone
         else
             maxImpl &enumerator |> ValueSome
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    let tryMaxOpt (enumerator: SStructEnumerator<'i,'e>) =
+        tryMax enumerator |> Option.ofValueOption
 
     let inline private minByImpl map (enumerator: SStructEnumerator<'i,'e> byref) =
         let mutable result = enumerator.Current
@@ -389,7 +373,7 @@ module GSeq =
         while enumerator.MoveNext() do
             let next = enumerator.Current
             let nextMapping = map next
-            if mapping > nextMapping then
+            if IComparable.gt mapping nextMapping then
                 mapping <- nextMapping
                 result <- next
         result
@@ -406,17 +390,13 @@ module GSeq =
     let tryMinBy map (enumerator: SStructEnumerator<'i,'e>) =
         let mutable enumerator = enumerator
         if not ^ enumerator.MoveNext() then
-            None
-        else
-            minByImpl map &enumerator |> Some
-
-    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let tryValueMinBy map (enumerator: SStructEnumerator<'i,'e>) =
-        let mutable enumerator = enumerator
-        if not ^ enumerator.MoveNext() then
             ValueNone
         else
             minByImpl map &enumerator |> ValueSome
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    let tryMinByOpt map (enumerator: SStructEnumerator<'i,'e>) =
+        tryMinBy map enumerator |> Option.ofValueOption
 
     let inline private maxByImpl map (enumerator: SStructEnumerator<'i,'e> byref) =
         let mutable result = enumerator.Current
@@ -424,7 +404,7 @@ module GSeq =
         while enumerator.MoveNext() do
             let next = enumerator.Current
             let nextMapping = map next
-            if mapping < nextMapping then
+            if IComparable.lt mapping nextMapping then
                 mapping <- nextMapping
                 result <- next
         result
@@ -453,14 +433,19 @@ module GSeq =
         else
             maxByImpl map &enumerator |> ValueSome
 
-    let inline sum (enumerator: SStructEnumerator<'i,'e>) = TODO
+    // TODO: NET 7.0
+    let inline sum (enumerator: SStructEnumerator<'i,'e>) =
+        let mutable counter = LanguagePrimitives.GenericZero
+        let mutable enumerator = enumerator
+        while enumerator.MoveNext() do
+            counter <- counter + enumerator.Current
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let length (enumerator: SStructEnumerator<'i,'e>) =
         let mutable result = 0
         let mutable enumerator = enumerator
         while enumerator.MoveNext() do
-            &result +<- 1
+            result <- result + 1
         result
 
     // [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -485,13 +470,11 @@ module GSeq =
     // }
 
     let toSeq (enumerator: SStructEnumerator<'i,'e>) =
-        let boxed = enumerator :> IEnumerator<'i>
         { new IEnumerable<'i> with
-            member _.GetEnumerator() = boxed :> System.Collections.IEnumerator
-            member _.GetEnumerator() = boxed }
+            member _.GetEnumerator() = enumerator :> System.Collections.IEnumerator
+            member _.GetEnumerator() = enumerator :> IEnumerator<'i> }
 
     // TODO: Match Seq's module functions
-    // TODO: ActivePatterns
 
 module GSeqv =
 
@@ -538,16 +521,6 @@ module GSeqv =
     let tryFind state filter (enumerator: SStructEnumerator<'i,'e>) =
         let filter = OptimizedClosures.FSharpFunc<_,_,_>.Adapt filter
         let mutable enumerator = enumerator
-        let mutable result = None
-        while result.IsNone && enumerator.MoveNext() do
-            let value = enumerator.Current
-            if filter.Invoke(state, value) then result <- Some value
-        result
-
-    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let tryValueFind state filter (enumerator: SStructEnumerator<'i,'e>) =
-        let filter = OptimizedClosures.FSharpFunc<_,_,_>.Adapt filter
-        let mutable enumerator = enumerator
         let mutable result = ValueNone
         while result.IsNone && enumerator.MoveNext() do
             let value = enumerator.Current
@@ -555,17 +528,11 @@ module GSeqv =
         result
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let tryPick state filter (enumerator: SStructEnumerator<'i,'e>) =
-        let filter = OptimizedClosures.FSharpFunc<_,_,_>.Adapt filter
-        let mutable enumerator = enumerator
-        let mutable result = None
-        while result.IsNone && enumerator.MoveNext() do
-            let value = enumerator.Current
-            result <- filter.Invoke(state, value)
-        result
+    let tryFindOpt state filter (enumerator: SStructEnumerator<'i,'e>) =
+        tryFind state filter enumerator |> Option.ofValueOption
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let tryValuePick state filter (enumerator: SStructEnumerator<'i,'e>) =
+    let tryPick state filter (enumerator: SStructEnumerator<'i,'e>) =
         let filter = OptimizedClosures.FSharpFunc<_,_,_>.Adapt filter
         let mutable enumerator = enumerator
         let mutable result = ValueNone
@@ -573,6 +540,10 @@ module GSeqv =
             let value = enumerator.Current
             result <- filter.Invoke(state, value)
         result
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    let tryPickOpt state filter (enumerator: SStructEnumerator<'i,'e>) =
+        tryPick state filter enumerator |> Option.ofValueOption
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let exists state filter (enumerator: SStructEnumerator<'i,'e>) =
@@ -642,7 +613,7 @@ module GSeqv =
         let mutable result = initial
         while enumerator.MoveNext() do
             result <- folder.Invoke(count, state, result, enumerator.Current)
-            &count +<- 1
+            count <- count + 1
         result
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -654,7 +625,7 @@ module GSeqv =
         let mutable result = initial
         while enumerator.MoveNext() && enumerator2.MoveNext() do
             result <- folder.Invoke(count, state, result, enumerator2.Current, enumerator.Current)
-            &count +<- 1
+            count <- count + 1
         result
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -688,7 +659,7 @@ module GSeqv =
         let mutable i = 0
         while enumerator.MoveNext() do
             action.Invoke(i, state, enumerator.Current)
-            &i +<- 1
+            i <- i + 1
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let iteri2 state (enumerator2: SStructEnumerator<'i2,'e2>) action (enumerator: SStructEnumerator<'i,'e>) =
@@ -698,7 +669,7 @@ module GSeqv =
         let mutable i = 0
         while enumerator.MoveNext() && enumerator2.MoveNext() do
             action.Invoke(i, state, enumerator2.Current, enumerator.Current)
-            &i +<- 1
+            i <- i + 1
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let iteri3 state (enumerator2: SStructEnumerator<'i2,'e2>) (enumerator3: SStructEnumerator<'i3,'e3>) action (enumerator: SStructEnumerator<'i,'e>) =
@@ -709,7 +680,7 @@ module GSeqv =
         let mutable i = 0
         while enumerator.MoveNext() && enumerator2.MoveNext() && enumerator3.MoveNext() do
             action.Invoke(i, state, enumerator2.Current, enumerator3.Current, enumerator.Current)
-            &i +<- 1
+            i <- i + 1
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let identicalBy state (enumerator2: SStructEnumerator<'i,'e>) comparer (enumerator: SStructEnumerator<'i,'e>) =
@@ -732,7 +703,7 @@ module GSeqv =
         while enumerator.MoveNext() do
             let next = enumerator.Current
             let nextMapping = map.Invoke(state, next)
-            if mapping > nextMapping then
+            if IComparable.gt mapping nextMapping then
                 mapping <- nextMapping
                 result <- next
         result
@@ -749,17 +720,13 @@ module GSeqv =
     let tryMinBy state map (enumerator: SStructEnumerator<'i,'e>) =
         let mutable enumerator = enumerator
         if not ^ enumerator.MoveNext() then
-            None
-        else
-            minByImpl state map &enumerator |> Some
-
-    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let tryValueMinBy state map (enumerator: SStructEnumerator<'i,'e>) =
-        let mutable enumerator = enumerator
-        if not ^ enumerator.MoveNext() then
             ValueNone
         else
             minByImpl state map &enumerator |> ValueSome
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    let tryMinByOpt state map (enumerator: SStructEnumerator<'i,'e>) =
+        tryMinBy state map enumerator |> Option.ofValueOption
 
     let inline private maxByImpl state map (enumerator: SStructEnumerator<'i,'e> byref) =
         let map = OptimizedClosures.FSharpFunc<_,_,_>.Adapt map
@@ -768,7 +735,7 @@ module GSeqv =
         while enumerator.MoveNext() do
             let next = enumerator.Current
             let nextMapping = map.Invoke(state, next)
-            if mapping < nextMapping then
+            if IComparable.lt mapping nextMapping then
                 mapping <- nextMapping
                 result <- next
         result
@@ -785,14 +752,10 @@ module GSeqv =
     let tryMaxBy state map (enumerator: SStructEnumerator<'i,'e>) =
         let mutable enumerator = enumerator
         if not ^ enumerator.MoveNext() then
-            None
-        else
-            maxByImpl state map &enumerator |> Some
-
-    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let tryValueMaxBy state map (enumerator: SStructEnumerator<'i,'e>) =
-        let mutable enumerator = enumerator
-        if not ^ enumerator.MoveNext() then
             ValueNone
         else
             maxByImpl state map &enumerator |> ValueSome
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    let tryMaxByOpt state map (enumerator: SStructEnumerator<'i,'e>) =
+        tryMaxBy state map enumerator |> Option.ofValueOption

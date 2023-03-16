@@ -35,7 +35,7 @@ let private scanfInternal strict (memory: ReadOnlyMemory<char>) (fmt: Printf.Str
 
     while success && capturesSpan.Length > 0 do
 
-        let currentCapture = capturesSpan.[0]
+        let currentCapture = capturesSpan[0]
         capturesSpan <- capturesSpan.Advance 1
 
         let literalAfterFormat =
@@ -77,7 +77,7 @@ let private scanfInternal strict (memory: ReadOnlyMemory<char>) (fmt: Printf.Str
                 ref.Value <- memory.Slice(memory.Length - valueSpan.Length, valueSpan.Length).Slice(0, charCounter)
         | :? Ref<char> as ref ->
             if value.Length = 1 then
-                ref.Value <- value.[0]
+                ref.Value <- value[0]
             else
                 success <- false
         | :? Ref<DateTime> as ref ->

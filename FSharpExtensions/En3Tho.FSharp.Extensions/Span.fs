@@ -5,7 +5,6 @@ open Microsoft.FSharp.NativeInterop
 
 // TODO: add functions from String module
 // TODO: active patterns for Span and ReadOnlySpan
-#nowarn "9"
 
 module Span =
     let inline isEmpty (span: Span<_>) = span.Length = 0

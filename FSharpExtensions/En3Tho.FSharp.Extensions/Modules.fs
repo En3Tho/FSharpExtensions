@@ -9,11 +9,7 @@ open System.Reflection
 open System.Reflection.Emit
 open System.Runtime.ExceptionServices
 open System.Threading.Tasks
-open FSharp.NativeInterop
 open Microsoft.FSharp.Reflection
-
-#nowarn "0077"
-#nowarn "0042"
 
 module Object =
     module Operators =
@@ -71,7 +67,7 @@ module Option =
     let inline ofStringW str = if String.IsNullOrWhiteSpace str then None else Some str
     let inline ofBool bool = if bool then someObj else None
     let inline ofTryPattern (success, value) = if success then Some value else None
-    let inline ofTryCast<'a> value =
+    let inline ofTryCast<'a when 'a: not struct> value =
         match box value with
         | :? 'a as value -> ValueSome value
         | _ -> ValueNone
@@ -80,6 +76,8 @@ module Option =
     let inline toObjUnchecked opt = match opt with Some x -> x | None -> Unchecked.defaultof<_>
     let inline ofArray (array: 'a[]) = if array = null || array.Length = 0 then None else Some array
     let inline ofSeq (seq: 'a seq) = if seq = null || Seq.length seq = 0 then None else Some seq
+    let inline ofValueOption (opt: ValueOption<'a>) = match opt with ValueSome x -> Some x | ValueNone -> None
+    let inline toValueOption (opt: 'a option) = match opt with Some x -> ValueSome x | None -> ValueNone
 
     /// Similar to Option.iter but accepts an additional state value
     let inline iterv ([<InlineIfLambda>] onSome) value opt =
@@ -92,7 +90,7 @@ module ValueOption =
     let inline ofStringW str = if String.IsNullOrWhiteSpace str then ValueNone else ValueSome str
     let inline ofBool bool = if bool then ValueSome() else ValueNone
     let inline ofTryPattern (success, value) = if success then ValueSome value else ValueNone
-    let inline ofTryCast<'a> value =
+    let inline ofTryCast<'a when 'a: not struct> value =
         match box value with
         | :? 'a as value -> ValueSome value
         | _ -> ValueNone
@@ -101,14 +99,14 @@ module ValueOption =
     let inline toObjUnchecked opt = match opt with ValueSome x -> x | ValueNone -> Unchecked.defaultof<_>
     let inline ofArray (array: 'a[]) = if array = null || array.Length = 0 then ValueNone else ValueSome array
     let inline ofSeq (seq: 'a seq) = if seq = null || Seq.isEmpty seq then ValueNone else ValueSome seq
+    let inline ofOption (opt: 'a option) = match opt with Some x -> ValueSome x | None -> ValueNone
+    let inline toOption (opt: ValueOption<'a>) = match opt with ValueSome x -> Some x | ValueNone -> None
 
     /// Similar to Option.iter but accepts an additional state value
     let inline iterv ([<InlineIfLambda>] onValueSome) value opt =
         match opt with
         | ValueSome obj -> obj |> onValueSome value
         | ValueNone -> ()
-
-
 
 type EnumShape<'enum when 'enum: struct
                       and 'enum :> Enum
@@ -218,9 +216,9 @@ module Byref =
     let inline seti (a: 'a byref) v _ = a <- v
     let inline setTrue (a: bool byref) _ = a <- true
     let inline setFalse (a: bool byref) _ = a <- false
-    let inline setZero (a: 'a byref) _ = a <- LanguagePrimitives.GenericZero
-    let inline setOne (a: 'a byref) _ = a <- LanguagePrimitives.GenericOne
-    let inline setMinusOne (a: 'a byref) _ = a <- -LanguagePrimitives.GenericOne
+    let inline setZero (a: 'a byref) _ = a <- LanguagePrimitives.GenericZero // TODO: .Net 7
+    let inline setOne (a: 'a byref) _ = a <- LanguagePrimitives.GenericOne // TODO: .Net 7
+    let inline setMinusOne (a: 'a byref) _ = a <- -LanguagePrimitives.GenericOne // TODO: .Net 7
     let inline setParse (a: 'a byref) v = a <- (^a: (static member Parse: string -> 'a) v)
     let inline defaultValue (a: 'a byref) v = if isNull a then a <- v
     let inline defaultWith (a: 'a byref) ([<InlineIfLambda>] defThunk) = if isNull a then a <- defThunk()
@@ -712,29 +710,29 @@ module ValueTuple =
 module Union =
     [<AbstractClass; Sealed>]
     type private TagGetter<'a>() =
-       static member generateGetTag() =
-            let parameterType = typeof<'a>
-            let returnType = typeof<int>
-            let tagPropertyInfo = parameterType.GetProperty("Tag", BindingFlags.Public ||| BindingFlags.Instance)
-            // these check are delegate creation time only (static ctor)
-            if parameterType |> FSharpType.IsUnion |> not
-               // checks below are just to stay sure
-               || isNull tagPropertyInfo
-               || tagPropertyInfo.PropertyType <> returnType
-               || isNull tagPropertyInfo.GetMethod then
-                invalidOp <| sprintf "Invalid type specified: %s" parameterType.FullName
-            else
-                let dynamicMethod = DynamicMethod("GetTag", returnType, [| parameterType |])
-                let generator = dynamicMethod.GetILGenerator()
-                generator.Emit OpCodes.Ldarg_0
-                generator.Emit(OpCodes.Call, tagPropertyInfo.GetMethod)
-                generator.Emit OpCodes.Ret
-                dynamicMethod.CreateDelegate typeof<Func<'a, int>> :?> Func<'a, int>
+        static member generateGetTag() =
+             let parameterType = typeof<'a>
+             let returnType = typeof<int>
+             let tagPropertyInfo = parameterType.GetProperty("Tag", BindingFlags.Public ||| BindingFlags.Instance)
+             // these check are delegate creation time only (static ctor)
+             if parameterType |> FSharpType.IsUnion |> not
+                // checks below are just to stay sure
+                || isNull tagPropertyInfo
+                || tagPropertyInfo.PropertyType <> returnType
+                || isNull tagPropertyInfo.GetMethod then
+                 invalidOp <| sprintf "Invalid type specified: %s" parameterType.FullName
+             else
+                 let dynamicMethod = DynamicMethod("GetTag", returnType, [| parameterType |])
+                 let generator = dynamicMethod.GetILGenerator()
+                 generator.Emit OpCodes.Ldarg_0
+                 generator.Emit(OpCodes.Call, tagPropertyInfo.GetMethod)
+                 generator.Emit OpCodes.Ret
+                 dynamicMethod.CreateDelegate typeof<Func<'a, int>> :?> Func<'a, int>
 
-       [<DefaultValue>]
-       static val mutable private _TagGetter: Func<'a, int>
-       static do TagGetter<'a>._TagGetter <- TagGetter<'a>.generateGetTag()
-       static member GetTag unionObj = TagGetter<'a>._TagGetter.Invoke unionObj
+        [<DefaultValue>]
+        static val mutable private _TagGetter: Func<'a, int>
+        static do TagGetter<'a>._TagGetter <- TagGetter<'a>.generateGetTag()
+        static member GetTag unionObj = TagGetter<'a>._TagGetter.Invoke unionObj
 
     [<AbstractClass; Sealed>]
     type private NameGetter<'a>() =

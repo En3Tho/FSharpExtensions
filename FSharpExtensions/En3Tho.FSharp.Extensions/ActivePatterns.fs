@@ -4,8 +4,6 @@ module En3Tho.FSharp.Extensions.ActivePatterns
 open System
 open Core
 
-#nowarn "0077"
-
 let inline (|Null|_|) value = if isNull value then Option.someObj else None
 let inline (|NotNull|_|) value = if isNotNull value then Option.someObj else None
 
