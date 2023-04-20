@@ -1,5 +1,5 @@
-﻿[<Microsoft.FSharp.Core.AutoOpen>]
-module Benchmarks.BDN
+﻿[<AutoOpen>]
+module Benchmarks.BenchmarkConfig
 
 open System
 open System.IO
@@ -7,26 +7,63 @@ open BenchmarkDotNet.Configs
 open BenchmarkDotNet.Environments
 open BenchmarkDotNet.Jobs
 open BenchmarkDotNet.Toolchains.CoreRun
+open En3Tho.FSharp.Extensions
 
-let [<Literal>] TieredPGO = "DOTNET_TieredPGO"
-let [<Literal>] QuickJitForLoops = "DOTNET_TC_QuickJitForLoop"
-let [<Literal>] ReadyToRun = "DOTNET_ReadyToRun"
+type EnvironmentVariable with
+    static member Get(name: string) =
+        match Environment.GetEnvironmentVariable(name) with
+        | String.NullOrWhiteSpace ->
+            raise ^ InvalidOperationException($"Unable to get {name} environment variable.")
+        | envVar ->
+            EnvironmentVariable(name, envVar)
 
-type CoreRuntime with
-    static member Core80 = CoreRuntime.CreateForNewVersion("net8.0", ".NET 8.0")
+module JitEnv =
+    module Env =
+        let [<Literal>] TieredPGO = "DOTNET_TieredPGO"
+        let [<Literal>] QuickJitForLoops = "DOTNET_TC_QuickJitForLoop"
+        let [<Literal>] ReadyToRun = "DOTNET_ReadyToRun"
+        let [<Literal>] JitStressModeNames = "DOTNET_JitStressModeNames"
+
+    type TieredPGO() =
+        static member On = EnvironmentVariable(Env.TieredPGO, "1")
+        static member Off = EnvironmentVariable(Env.TieredPGO, "0")
+
+    type QuickJitForLoops() =
+        static member On = EnvironmentVariable(Env.QuickJitForLoops, "1")
+        static member Off = EnvironmentVariable(Env.QuickJitForLoops, "0")
+
+    type ReadyToRun() =
+        static member On = EnvironmentVariable(Env.ReadyToRun, "1")
+        static member Off = EnvironmentVariable(Env.ReadyToRun, "0")
+
+    type JitStressModeNames() =
+        static member StressGeneralizedPromotion = EnvironmentVariable(Env.JitStressModeNames, "STRESS_GENERALIZED_PROMOTION")
+        static member StressGeneralizedPromotionCost = EnvironmentVariable(Env.JitStressModeNames, "STRESS_GENERALIZED_PROMOTION STRESS_GENERALIZED_PROMOTION_COST")
 
 type Job with
     static member Net5 = Job.Default.WithRuntime(CoreRuntime.Core50).WithId("Net5")
     static member Net6 = Job.Default.WithRuntime(CoreRuntime.Core60).WithId("Net6")
     static member Net7 = Job.Default.WithRuntime(CoreRuntime.Core70).WithId("Net7")
+    static member Net8 = Job.Default.WithRuntime(CoreRuntime.Core80).WithId("Net8")
     static member Main =
-        let path = Environment.GetEnvironmentVariable("BDN_DOTNET_PATH")
-        let moniker = Environment.GetEnvironmentVariable("BDN_DOTNET_MONIKER")
         Job.Default
             .WithToolchain(CoreRunToolchain(
-                coreRun = FileInfo path,
-                targetFrameworkMoniker = moniker))
+                coreRun = FileInfo(EnvironmentVariable.Get("DOTNET_CORERUN_PATH").Value),
+                targetFrameworkMoniker = EnvironmentVariable.Get("DOTNET_CORERUN_TFM").Value))
             .WithId("Main")
+
+type ``Net7, Net8``() =
+    inherit ManualConfig()
+
+    do
+        base.AddJob([|
+            Job.Net7
+            Job.Main
+                .WithEnvironmentVariables(
+                    JitEnv.JitStressModeNames.StressGeneralizedPromotion,
+                    EnvironmentVariable.Get("CORE_LIBRARIES")
+                )
+        |]) |> ignore
 
 type ``Net 5, Net 6, Pgo``() =
     inherit ManualConfig()
@@ -35,10 +72,13 @@ type ``Net 5, Net 6, Pgo``() =
         base.AddJob([|
             Job.Net5
             Job.Net6
-            Job.Net6.WithId("Net6PGO")
-                    .WithEnvironmentVariables(EnvironmentVariable(TieredPGO, "1"),
-                                              EnvironmentVariable(QuickJitForLoops, "1"),
-                                              EnvironmentVariable(ReadyToRun, "0"))
+            Job.Net6
+                .WithId("Net6PGO")
+                .WithEnvironmentVariables(
+                    JitEnv.TieredPGO.On,
+                    JitEnv.QuickJitForLoops.On,
+                    JitEnv.ReadyToRun.Off
+                )
         |]) |> ignore
 
 type ``Net 6, Pgo``() =
@@ -47,10 +87,13 @@ type ``Net 6, Pgo``() =
     do
         base.AddJob([|
             Job.Net6
-            Job.Net6.WithId("Net6PGO")
-                     .WithEnvironmentVariables(EnvironmentVariable(TieredPGO, "1"),
-                                                 EnvironmentVariable(QuickJitForLoops, "1"),
-                                                 EnvironmentVariable(ReadyToRun, "0"))
+            Job.Net6
+                .WithId("Net6PGO")
+                .WithEnvironmentVariables(
+                    JitEnv.TieredPGO.On,
+                    JitEnv.QuickJitForLoops.On,
+                    JitEnv.ReadyToRun.Off
+                )
         |]) |> ignore
 
 type ``Net 5, Net 6``() =

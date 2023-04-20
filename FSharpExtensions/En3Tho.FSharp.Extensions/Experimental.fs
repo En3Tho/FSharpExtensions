@@ -9,3 +9,6 @@ open En3Tho.FSharp.Extensions
 // some of the stuff will live here for a moment and then go to modules
 
 // module BitExtraction = ...
+
+// TODO: All operators based on new abstract statics?
+// + / - etc

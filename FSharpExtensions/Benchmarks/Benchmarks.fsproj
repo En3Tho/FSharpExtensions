@@ -8,6 +8,7 @@
 
     <ItemGroup>
         <Compile Include="BenchmarkConfig.fs" />
+        <Compile Include="BenchmarkRunner.fs" />
         <Compile Include="CustomBuildersVsLibraryBuilders.fs" />
         <Compile Include="CollectionsBuildersAllocations.fs" />
         <Compile Include="EResultAllocationsBenchmark.fs" />
@@ -22,11 +23,12 @@
         <Compile Include="ComparisonOperatorBenchmark.fs" />
         <Compile Include="MathematicalOperatorsBenchmarks.fs" />
         <Compile Include="NodeCode.fs" />
+        <Compile Include="GSeq.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="BenchmarkDotNet" Version="0.13.2" />
+      <PackageReference Include="BenchmarkDotNet" Version="0.13.5" />
       <PackageReference Update="FSharp.Core" Version="7.0.0" />
     </ItemGroup>
 
