@@ -86,3 +86,9 @@ type ReadOnlySpan<'a> with
             ReadOnlySpan<'a>()
         else
             this.Slice(value, this.Length - value)
+
+    // check if this is inlined, should be?
+    member internal this.Self() = this
+
+    member this.AsSpanUnsafe() =
+        (# "" (this.Self()): Span<'a> #)
