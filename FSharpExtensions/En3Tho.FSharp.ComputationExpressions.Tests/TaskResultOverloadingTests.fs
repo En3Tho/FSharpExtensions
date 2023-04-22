@@ -113,7 +113,7 @@ type AA = {
 }
 
 [<Fact>]
-let ``text task type checking``() =
+let ``test task type checking``() =
     let getSomething (x: int) (y: int) = voptionvtask {
         let x: ValueTask<EE> = ValueTask.FromResult({ X = 123 })
         return x
@@ -133,7 +133,7 @@ let ``text task type checking``() =
     }
 
 [<Fact>]
-let ``text exnresultvtask type checking``() =
+let ``test exnresultvtask type checking``() =
     let getSomething (x: int) (y: int) = exnresultvtask {
         let x: Task<Result<EE, exn>> = Task.FromResult(Ok { X = 123 })
         return! x
