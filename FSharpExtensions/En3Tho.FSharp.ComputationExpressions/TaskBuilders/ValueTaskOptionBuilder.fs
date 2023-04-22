@@ -144,7 +144,7 @@ type ValueTaskValueOptionBuilderBase() =
             sm.Data.MethodBuilder.Start(&sm)
             sm.Data.MethodBuilder.Task
 
-        static member inline Run(code: ValueTaskValueOptionCode<'T, 'T>) : ValueTask<'T voption> =
+        static member inline Run([<InlineIfLambda>] code: ValueTaskValueOptionCode<'T, 'T>) : ValueTask<'T voption> =
              if __useResumableCode then
                 __stateMachine<ValueTaskValueOptionStateMachineData<'T>, ValueTask<'T voption>>
                     (MoveNextMethodImpl<_>(fun sm ->
@@ -171,7 +171,7 @@ type ValueTaskValueOptionBuilderBase() =
              else
                 ValueTaskValueOptionBuilder.RunDynamic(code)
 
-        member inline _.Run(code: ValueTaskValueOptionCode<'T, 'T>) : ValueTask<'T voption> =
+        member inline _.Run([<InlineIfLambda>] code: ValueTaskValueOptionCode<'T, 'T>) : ValueTask<'T voption> =
            ValueTaskValueOptionBuilder.Run(code)
 
     type TaskValueOptionBuilder() =
@@ -210,7 +210,7 @@ type ValueTaskValueOptionBuilderBase() =
             sm.Data.MethodBuilder.Start(&sm)
             sm.Data.MethodBuilder.Task
 
-        static member inline Run(code: ValueTaskValueOptionCode<'T, 'T>) : Task<'T voption> =
+        static member inline Run([<InlineIfLambda>] code: ValueTaskValueOptionCode<'T, 'T>) : Task<'T voption> =
              (if __useResumableCode then
                 __stateMachine<ValueTaskValueOptionStateMachineData<'T>, ValueTask<'T voption>>
                     (MoveNextMethodImpl<_>(fun sm ->
@@ -237,7 +237,7 @@ type ValueTaskValueOptionBuilderBase() =
              else
                 TaskValueOptionBuilder.RunDynamic(code)).AsTask()
 
-        member inline _.Run(code: ValueTaskValueOptionCode<'T, 'T>) : Task<'T voption> =
+        member inline _.Run([<InlineIfLambda>] code: ValueTaskValueOptionCode<'T, 'T>) : Task<'T voption> =
            TaskValueOptionBuilder.Run(code)
 
 namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskValueOptionBuilderExtensions

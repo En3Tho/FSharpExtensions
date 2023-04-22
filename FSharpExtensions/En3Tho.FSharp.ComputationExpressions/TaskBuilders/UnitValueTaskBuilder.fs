@@ -144,7 +144,7 @@ type UnitValueTaskBuilderBase() =
             sm.Data.MethodBuilder.Start(&sm)
             sm.Data.MethodBuilder.Task
 
-        static member inline Run(code: UnitValueTaskCode<'T>) : ValueTask =
+        static member inline Run([<InlineIfLambda>] code: UnitValueTaskCode<'T>) : ValueTask =
              if __useResumableCode then
                 __stateMachine<UnitValueTaskStateMachineData, ValueTask>
                     (MoveNextMethodImpl<_>(fun sm ->
@@ -171,7 +171,7 @@ type UnitValueTaskBuilderBase() =
              else
                 UnitValueTaskBuilder.RunDynamic(code)
 
-        member inline _.Run(code: UnitValueTaskCode<unit>) : ValueTask =
+        member inline _.Run([<InlineIfLambda>] code: UnitValueTaskCode<unit>) : ValueTask =
            UnitValueTaskBuilder.Run(code)
 
 namespace En3Tho.FSharp.ComputationExpressions.Tasks.UnitValueTaskBuilderExtensions

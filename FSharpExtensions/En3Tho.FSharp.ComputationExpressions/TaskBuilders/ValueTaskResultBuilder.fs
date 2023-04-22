@@ -147,35 +147,35 @@ type ValueTaskResultBuilderBase() =
             sm.Data.MethodBuilder.Start(&sm)
             sm.Data.MethodBuilder.Task
 
-        static member inline Run(code: ValueTaskResultCode<'T, 'TError, 'T>) : ValueTask<Result<'T, 'TError>> =
-             if __useResumableCode then
-                __stateMachine<ValueTaskResultStateMachineData<'T, 'TError>, ValueTask<Result<'T, 'TError>>>
-                    (MoveNextMethodImpl<_>(fun sm ->
-                        //-- RESUMABLE CODE START
-                        __resumeAt sm.ResumptionPoint
-                        let mutable __stack_exn : Exception = null
-                        try
-                            let __stack_code_fin = code.Invoke(&sm)
-                            if __stack_code_fin then
-                                sm.Data.MethodBuilder.SetResult(sm.Data.Result)
-                        with exn ->
-                            __stack_exn <- exn
-                        // Run SetException outside the stack unwind, see https://github.com/dotnet/roslyn/issues/26567
-                        match __stack_exn with
-                        | null -> ()
-                        | exn -> sm.Data.MethodBuilder.SetException exn
-                        //-- RESUMABLE CODE END
-                    ))
-                    (SetStateMachineMethodImpl<_>(fun sm state -> sm.Data.MethodBuilder.SetStateMachine(state)))
-                    (AfterCode<_,_>(fun sm ->
-                        sm.Data.MethodBuilder <- AsyncValueTaskResultMethodBuilder<'T, 'TError>.Create()
-                        sm.Data.MethodBuilder.Start(&sm)
-                        sm.Data.MethodBuilder.Task))
-             else
-                ValueTaskResultBuilder.RunDynamic(code)
+        static member inline Run([<InlineIfLambda>] code: ValueTaskResultCode<'T, 'TError, 'T>) : ValueTask<Result<'T, 'TError>> =
+            if __useResumableCode then
+               __stateMachine<ValueTaskResultStateMachineData<'T, 'TError>, ValueTask<Result<'T, 'TError>>>
+                   (MoveNextMethodImpl<_>(fun sm ->
+                       //-- RESUMABLE CODE START
+                       __resumeAt sm.ResumptionPoint
+                       let mutable __stack_exn : Exception = null
+                       try
+                           let __stack_code_fin = code.Invoke(&sm)
+                           if __stack_code_fin then
+                               sm.Data.MethodBuilder.SetResult(sm.Data.Result)
+                       with exn ->
+                           __stack_exn <- exn
+                       // Run SetException outside the stack unwind, see https://github.com/dotnet/roslyn/issues/26567
+                       match __stack_exn with
+                       | null -> ()
+                       | exn -> sm.Data.MethodBuilder.SetException exn
+                       //-- RESUMABLE CODE END
+                   ))
+                   (SetStateMachineMethodImpl<_>(fun sm state -> sm.Data.MethodBuilder.SetStateMachine(state)))
+                   (AfterCode<_,_>(fun sm ->
+                       sm.Data.MethodBuilder <- AsyncValueTaskResultMethodBuilder<'T, 'TError>.Create()
+                       sm.Data.MethodBuilder.Start(&sm)
+                       sm.Data.MethodBuilder.Task))
+            else
+               ValueTaskResultBuilder.RunDynamic(code)
 
-        member inline _.Run(code: ValueTaskResultCode<'T, 'TError, 'T>) : ValueTask<Result<'T, 'TError>> =
-           ValueTaskResultBuilder.Run(code)
+        member inline _.Run([<InlineIfLambda>] code: ValueTaskResultCode<'T, 'TError, 'T>) : ValueTask<Result<'T, 'TError>> =
+            ValueTaskResultBuilder.Run(code)
 
     type TaskResultBuilder() =
 
@@ -240,7 +240,7 @@ type ValueTaskResultBuilderBase() =
              else
                 ValueTaskResultBuilder.RunDynamic(code)).AsTask()
 
-        member inline _.Run(code: ValueTaskResultCode<'T, 'TError, 'T>) : ValueTask<Result<'T, 'TError>> =
+        member inline _.Run([<InlineIfLambda>] code: ValueTaskResultCode<'T, 'TError, 'T>) : ValueTask<Result<'T, 'TError>> =
            ValueTaskResultBuilder.Run(code)
 
 namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskResultBuilderExtensions

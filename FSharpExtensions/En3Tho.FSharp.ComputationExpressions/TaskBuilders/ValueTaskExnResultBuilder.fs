@@ -147,7 +147,7 @@ type ValueTaskExnResultBuilderBase() =
             sm.Data.MethodBuilder.Start(&sm)
             sm.Data.MethodBuilder.Task
 
-        static member inline Run(code: ValueTaskExnResultCode<'T, 'T>) : ValueTask<Result<'T, exn>> =
+        static member inline Run([<InlineIfLambda>] code: ValueTaskExnResultCode<'T, 'T>) : ValueTask<Result<'T, exn>> =
              if __useResumableCode then
                 __stateMachine<ValueTaskExnResultStateMachineData<'T>, ValueTask<Result<'T, exn>>>
                     (MoveNextMethodImpl<_>(fun sm ->
@@ -174,7 +174,7 @@ type ValueTaskExnResultBuilderBase() =
              else
                 ValueTaskExnResultBuilder.RunDynamic(code)
 
-        member inline _.Run(code: ValueTaskExnResultCode<'T, 'T>) : ValueTask<Result<'T, exn>> =
+        member inline _.Run([<InlineIfLambda>] code: ValueTaskExnResultCode<'T, 'T>) : ValueTask<Result<'T, exn>> =
            ValueTaskExnResultBuilder.Run(code)
 
     type TaskExnResultBuilder() =
@@ -213,7 +213,7 @@ type ValueTaskExnResultBuilderBase() =
             sm.Data.MethodBuilder.Start(&sm)
             sm.Data.MethodBuilder.Task
 
-        static member inline Run(code: ValueTaskExnResultCode<'T, 'T>) : Task<Result<'T, exn>> =
+        static member inline Run([<InlineIfLambda>] code: ValueTaskExnResultCode<'T, 'T>) : Task<Result<'T, exn>> =
              (if __useResumableCode then
                 (__stateMachine<ValueTaskExnResultStateMachineData<'T>, ValueTask<Result<'T, exn>>>
                     (MoveNextMethodImpl<_>(fun sm ->
@@ -240,7 +240,7 @@ type ValueTaskExnResultBuilderBase() =
              else
                 TaskExnResultBuilder.RunDynamic(code)).AsTask()
 
-        member inline _.Run(code: ValueTaskExnResultCode<'T, 'T>) : Task<Result<'T, exn>> =
+        member inline _.Run([<InlineIfLambda>] code: ValueTaskExnResultCode<'T, 'T>) : Task<Result<'T, exn>> =
            TaskExnResultBuilder.Run(code)
 
 namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskExnResultBuilderExtensions

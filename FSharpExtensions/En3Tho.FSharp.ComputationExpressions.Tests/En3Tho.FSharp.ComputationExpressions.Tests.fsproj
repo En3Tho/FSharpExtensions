@@ -15,6 +15,7 @@
         <Compile Include="Tasks.fs" />
         <Compile Include="TaskOptionAndResult.fs" />
         <Compile Include="TaskResultOverloadingTests.fs" />
+        <Compile Include="HttpBuilderTests.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
