@@ -66,21 +66,3 @@ type HttpClient with
     member inline this.Post(url: string) = HttpRequestMessageStage(this, HttpRequestMessage(HttpMethod.Post, url))
     member inline this.Put(url: string) = HttpRequestMessageStage(this, HttpRequestMessage(HttpMethod.Put, url))
     member inline this.Delete(url: string) = HttpRequestMessageStage(this, HttpRequestMessage(HttpMethod.Delete, url))
-
-type TaskBuilder with // ValueTaskBuilder etc?
-    member inline this.Bind<'TResponseSerializer, 'TResult, 'TOverall,'TResult2 when 'TResponseSerializer :> IResponseSerializer<'TResult>>
-        (respStage: HttpRequestMessageResponseStage<'TResponseSerializer, 'TResult>, [<InlineIfLambda>] continuation: 'TResult -> TaskCode<'TOverall,'TResult2>) =
-        this.Bind(task {
-            use request = respStage.Request
-            let! response = respStage.Client.SendAsync(request)
-            return! respStage.Serializer.Serialize(response)
-        }, continuation)
-
-    member inline this.Bind<'TOverall,'TResult2>
-        (respStage: HttpRequestMessageContentStage, [<InlineIfLambda>] continuation: unit -> TaskCode<'TOverall,'TResult2>) =
-        this.Bind(task {
-            use request = respStage.Request
-            let! response = respStage.Client.SendAsync(request)
-            do! UnitResponseSerializer().Serialize(response)
-
-        }, continuation)

@@ -11,6 +11,9 @@ open En3Tho.FSharp.ComputationExpressions.Tasks
 open En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions.LowPriority
 open En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions.HighPriority
 
+type IResponseSerializer<'a> =
+    abstract member Serialize: response: HttpResponseMessage -> ValueTask<'a>
+
 type [<Struct>] RawResponseSerializer =
     member _.Serialize(response: HttpResponseMessage) =
         ValueTask.FromResult(response)
@@ -42,20 +45,20 @@ type [<Struct>] JsonResponseSerializer<'a>(options: JsonSerializerOptions) =
 
 type [<Struct>] StringResponseSerializer =
     member _.Serialize<'a>(response: HttpResponseMessage) =
-        ValueTask<_>(task = task {
+        vtask {
             use response = response
             return! response.EnsureSuccessStatusCode().Content.ReadAsStringAsync()
-        })
+        }
 
     interface IResponseSerializer<string> with
         member this.Serialize(response) = this.Serialize(response)
 
 type [<Struct>] ByteArrayResponseSerializer =
     member _.Serialize<'a>(response: HttpResponseMessage) =
-        ValueTask<_>(task = task {
+        vtask {
             use response = response
             return! response.EnsureSuccessStatusCode().Content.ReadAsByteArrayAsync()
-        })
+        }
 
     interface IResponseSerializer<byte[]> with
         member this.Serialize(response) = this.Serialize(response)
@@ -80,7 +83,7 @@ type [<Sealed>] private OwnerDisposingStream(owner: IDisposable, stream: Stream)
 
 type [<Struct>] StreamResponseSerializer =
     member _.Serialize<'a>(response: HttpResponseMessage) =
-        ValueTask<_>(task = task {
+        vtask {
             try
                 let! stream = response.EnsureSuccessStatusCode().Content.ReadAsStreamAsync()
                 return OwnerDisposingStream(response, stream) :> Stream
@@ -88,7 +91,7 @@ type [<Struct>] StreamResponseSerializer =
                 response.Dispose()
                 ExceptionDispatchInfo.Throw(e)
                 return Unchecked.defaultof<_>
-        })
+        }
 
     interface IResponseSerializer<Stream> with
         member this.Serialize(response) = this.Serialize(response)

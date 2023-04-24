@@ -3,11 +3,7 @@
 open System.Collections.Generic
 open System.Net.Http
 open System.Runtime.CompilerServices
-open System.Threading.Tasks
 open En3Tho.FSharp.ComputationExpressions
-
-type IResponseSerializer<'a> =
-    abstract member Serialize: response: HttpResponseMessage -> ValueTask<'a>
 
 type [<Struct; IsReadOnly>] HttpRequestMessageStage(client: HttpClient, request: HttpRequestMessage) =
     member _.Client = client
@@ -17,6 +13,16 @@ type [<Struct; IsReadOnly>] HttpRequestMessageContentStage(client: HttpClient, r
     member _.Client = client
     member _.Request = request
 
+    member this.SendRequest() =
+        let this = this
+        task {
+            use request = this.Request
+            let! response = this.Client.SendAsync(request)
+            do! UnitResponseSerializer().Serialize(response)
+        }
+
+    member this.GetAwaiter() = this.SendRequest().GetAwaiter()
+
 type [<Struct; IsReadOnly>] HttpRequestMessageResponseStage<'TResponseSerializer, 'TResult
                                                     when 'TResponseSerializer :> IResponseSerializer<'TResult>>
     (client: HttpClient, request: HttpRequestMessage, serializer: 'TResponseSerializer) =
@@ -24,13 +30,23 @@ type [<Struct; IsReadOnly>] HttpRequestMessageResponseStage<'TResponseSerializer
     member _.Request = request
     member _.Serializer = serializer
 
+    member this.SendRequest() =
+        let this = this
+        task {
+            use request = this.Request
+            let! response = this.Client.SendAsync(request)
+            return! this.Serializer.Serialize(response)
+        }
+
+    member this.GetAwaiter() = this.SendRequest().GetAwaiter()
+
     member inline this.Add(kvp: KeyValuePair<string, string>) =
         this.Request.Headers.Add(kvp.Key, kvp.Value)
 
-    member inline this.Add((key, value): (string * string)) =
+    member inline this.Add((key, value): string * string) =
         this.Request.Headers.Add(key, value)
 
-    member inline this.Add(key: string, value :string) =
+    member inline this.Add(key: string, value: string) =
         this.Request.Headers.Add(key, value)
 
     member inline this.Zero() : CollectionCode = fun() -> ()

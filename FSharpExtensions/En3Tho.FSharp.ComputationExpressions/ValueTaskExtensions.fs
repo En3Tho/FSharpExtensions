@@ -62,14 +62,14 @@ module TaskExtensions =
                         return Error e
                 }
     type ValueTask<'a> with
-    member this.AsResult() =
-        if
-            this.IsCompletedSuccessfully then ValueTask<_>(result = Ok this.Result)
-        else
-            vtask {
-                try
-                    let! result = this
-                    return Ok result
-                with e ->
-                    return Error e
-            }
+        member this.AsResult() =
+            if
+                this.IsCompletedSuccessfully then ValueTask<_>(result = Ok this.Result)
+            else
+                vtask {
+                    try
+                        let! result = this
+                        return Ok result
+                    with e ->
+                        return Error e
+                }
