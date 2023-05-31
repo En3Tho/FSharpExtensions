@@ -13,7 +13,7 @@ let getJsonMediaType() =
 let getStringMediaType() =
     MediaTypeHeaderValue(MediaTypeNames.Text.Plain, CharSet = "utf-8");
 let getByteArrayOrStreamMediaType() =
-    MediaTypeHeaderValue(MediaTypeNames.Application.Octet, CharSet = "utf-8");
+    MediaTypeHeaderValue(MediaTypeNames.Application.Octet);
 
 let makeJsonContent<'a>(value: 'a, options: JsonSerializerOptions) =
     let content = ByteArrayContent(JsonSerializer.SerializeToUtf8Bytes<'a>(value, options))
@@ -21,8 +21,8 @@ let makeJsonContent<'a>(value: 'a, options: JsonSerializerOptions) =
     content
 
 let makeStringContent(value: string) =
+    // String content has default utf8 content type anyway
     let content = StringContent(value)
-    content.Headers.ContentType <- getStringMediaType()
     content
 
 let makeUtf8StringContent(value: byte[]) =
@@ -31,6 +31,8 @@ let makeUtf8StringContent(value: byte[]) =
     content
 
 let makeByteArrayContent(value: byte[]) =
+    // Byte array content and stream content do not have default content type.
+    // I'm not sure I have to put content type manually. Maybe octet stream is default ?
     let content = ByteArrayContent(value)
     content.Headers.ContentType <- getByteArrayOrStreamMediaType()
     content
@@ -41,4 +43,5 @@ let makeStreamContent(value: Stream) =
     content
 
 let makeFormUrlEncodedContent values =
-    FormUrlEncodedContent(values)
+    let content = FormUrlEncodedContent(values)
+    content
