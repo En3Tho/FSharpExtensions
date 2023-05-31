@@ -45,6 +45,8 @@ module Core =
     let inline (&==) (a: 'a when 'a: not struct) (b: 'a) = Object.ReferenceEquals(a, b)
     let inline (&!=) (a: 'a when 'a: not struct) (b: 'a) = not (Object.ReferenceEquals(a, b))
 
+    let inline (--) key value = KeyValuePair(key, value)
+
     [<AbstractClass; AutoOpen>]
     type ActionFuncConverter =
         static member inline func<'a, 'b> ([<InlineIfLambda>] f: 'a -> 'b) = Func<'a, 'b>(f)

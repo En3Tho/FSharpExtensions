@@ -23,6 +23,7 @@ module JitEnv =
         let [<Literal>] QuickJitForLoops = "DOTNET_TC_QuickJitForLoop"
         let [<Literal>] ReadyToRun = "DOTNET_ReadyToRun"
         let [<Literal>] JitStressModeNames = "DOTNET_JitStressModeNames"
+        let [<Literal>] JitEnablePhysicalPromotion = "DOTNET_JitEnablePhysicalPromotion"
 
     type TieredPGO() =
         static member On = EnvironmentVariable(Env.TieredPGO, "1")
@@ -36,6 +37,10 @@ module JitEnv =
         static member On = EnvironmentVariable(Env.ReadyToRun, "1")
         static member Off = EnvironmentVariable(Env.ReadyToRun, "0")
 
+    type JitEnablePhysicalPromotion() =
+        static member On = EnvironmentVariable(Env.JitEnablePhysicalPromotion, "1")
+        static member Off = EnvironmentVariable(Env.JitEnablePhysicalPromotion, "0")
+
     type JitStressModeNames() =
         static member StressGeneralizedPromotion = EnvironmentVariable(Env.JitStressModeNames, "STRESS_GENERALIZED_PROMOTION")
         static member StressGeneralizedPromotionCost = EnvironmentVariable(Env.JitStressModeNames, "STRESS_GENERALIZED_PROMOTION STRESS_GENERALIZED_PROMOTION_COST")
@@ -45,12 +50,22 @@ type Job with
     static member Net6 = Job.Default.WithRuntime(CoreRuntime.Core60).WithId("Net6")
     static member Net7 = Job.Default.WithRuntime(CoreRuntime.Core70).WithId("Net7")
     static member Net8 = Job.Default.WithRuntime(CoreRuntime.Core80).WithId("Net8")
-    static member Main =
+    static member CoreRun =
         Job.Default
             .WithToolchain(CoreRunToolchain(
                 coreRun = FileInfo(EnvironmentVariable.Get("DOTNET_CORERUN_PATH").Value),
                 targetFrameworkMoniker = EnvironmentVariable.Get("DOTNET_CORERUN_TFM").Value))
-            .WithId("Main")
+            .WithId("CoreRun")
+
+type ``Net7, Net8, CoreRun``() =
+    inherit ManualConfig()
+
+    do
+        base.AddJob([|
+            Job.Net7
+            Job.Net8
+            Job.CoreRun
+        |]) |> ignore
 
 type ``Net7, Net8``() =
     inherit ManualConfig()
@@ -58,11 +73,15 @@ type ``Net7, Net8``() =
     do
         base.AddJob([|
             Job.Net7
-            Job.Main
-                .WithEnvironmentVariables(
-                    JitEnv.JitStressModeNames.StressGeneralizedPromotion,
-                    EnvironmentVariable.Get("CORE_LIBRARIES")
-                )
+            Job.Net8
+            Job.Net8.WithEnvironmentVariables(
+                JitEnv.JitEnablePhysicalPromotion.On,
+                JitEnv.JitStressModeNames.StressGeneralizedPromotionCost
+            )
+            // Job.Main.WithEnvironmentVariables(
+            //     JitEnv.JitStressModeNames.StressGeneralizedPromotion,
+            //     EnvironmentVariable.Get("CORE_LIBRARIES")
+            // )
         |]) |> ignore
 
 type ``Net 5, Net 6, Pgo``() =

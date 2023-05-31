@@ -115,22 +115,22 @@ let ``Test that result builder can process errors`` () = vtask {
 [<Fact>]
 let ``Test that exnresult properly catches exceptions`` () = vtask {
     let exn = Exception()
-    let! res1 = exnresultvtask {
+    let! res1 = evtask {
         let! a = Error exn // exits here
         let! b = Ok 10
         let! c = Ok 15
-        failwith "Lol"
+        failwith "Exn"
         return a + b + c + 10
     }
 
     match res1 with
-    | Error lolExn ->
-        Assert.Same(exn, lolExn)
+    | Error exn ->
+        Assert.Same(exn, exn)
     | _ ->
         Assert.True(false, "Result should not be OK here")
 
-    let! res2 = exnresultvtask {
-        failwith "LolException"
+    let! res2 = evtask {
+        failwith "Exn"
         let! a = Error exn
         let! b = Ok 10
         let! c = Ok 15
@@ -138,13 +138,13 @@ let ``Test that exnresult properly catches exceptions`` () = vtask {
     }
 
     match res2 with
-    | Error lolExn ->
-        Assert.Contains(lolExn.Message, "LolException", StringComparison.Ordinal)
+    | Error exn ->
+        Assert.Contains(exn.Message, "Exn", StringComparison.Ordinal)
     | _ ->
         Assert.True(false, "Result should not be OK here")
 
     let exn = Exception()
-    let! res3 = exnresultvtask {
+    let! res3 = evtask {
         return! Error exn
     }
 
@@ -152,30 +152,30 @@ let ``Test that exnresult properly catches exceptions`` () = vtask {
 }
 
 [<Fact>]
-let ``test that exnresultvtask properly works with exceptions of different types``() = exnresultvtask {
+let ``test that exnresultvtask properly works with exceptions of different types``() = evtask {
     let exnTask = task { failwith "" }
     let tryExnTask (t: Task<_>) = task {
         try
-            let! result = t
+            let! _ = t
             return Ok t
         with exn ->
             return Error exn
     }
 
-    let! exn0 = tryExnTask exnTask
+    let! _ = tryExnTask exnTask
 
-    let! exn1 = Error (AggregateException()) |> ValueTask.FromResult
-    let! exn2 = Error (ArgumentException()) |> ValueTask.FromResult
+    let! _ = Error (AggregateException()) |> ValueTask.FromResult
+    let! _ = Error (ArgumentException()) |> ValueTask.FromResult
     return 0
 }
 
 [<Fact>]
 let ``test that explicit type does not exit early``() = vtask {
     let mutable x = 0
-    let t = exnresultvtask {
+    let t = evtask {
         let! (v: Result<int, exn>) = Error (Exception())
         x <- 1
-        let! v = v
+        let! _ = v
         x <- 2
     }
     let! _ = t
@@ -185,16 +185,16 @@ let ``test that explicit type does not exit early``() = vtask {
 [<Fact>]
 let ``test verbatim handling works properly for error case``() = vtask {
     let mutable x = 0
-    let t = exnresultvtask {
+    let t = evtask {
         match! verb (Task.FromResult(Error(Exception()))) with
-        | Error e ->
+        | Error _ ->
             x <- 2
         | Ok _ ->
             ()
         Assert.Equal(2, x)
 
         match! verb (ValueTask.FromResult(Error(Exception()))) with
-        | Error e ->
+        | Error _ ->
             x <- 3
         | Ok _ ->
             ()
@@ -208,7 +208,7 @@ let ``test verbatim handling works properly for error case``() = vtask {
 [<Fact>]
 let ``test verbatim handling works properly for ok case``() = vtask {
     let mutable x = 0
-    let t = exnresultvtask {
+    let t = evtask {
 
         match! verb (Task.FromResult(Ok 1)) with
         | Ok _ ->

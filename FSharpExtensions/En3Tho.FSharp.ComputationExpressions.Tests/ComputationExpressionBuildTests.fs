@@ -48,21 +48,43 @@ let ``Test that async computation expression compiles`` () =
 let ``Test that dictionary is supported as builder`` () =
     let intIntDict1 = Dictionary() {
         struct (1, 10)
-        1, 10
+        2, 10
+        3 -- 10
 
-        let mutable x = 0
+        let mutable x = 4
         while x < 10 do
+            x -- 10
             x <- x + 1
     }
+
+    Assert.Equal(intIntDict1.Count, 9)
 
     let intIntDict12 = ConcurrentDictionary() {
         struct (1, 10)
         1, 10
+        1 -- 10
+
         let mutable x = 0
         while x < 10 do
             x <- x + 1
     }
     Assert.True(intIntDict1.GetType().GenericTypeArguments.SequenceEqual(intIntDict12.GetType().GenericTypeArguments))
+
+[<Fact>]
+let ``Test that dictionary builder doesn't throw when same key values are inserted``() =
+    let d = Dictionary() {
+        1 -- 10
+        1 -- 10
+    }
+    Assert.Equal(d.Count, 1)
+
+[<Fact>]
+let ``Test that hashset builder doesn't throw when same key values are inserted``() =
+    let d = HashSet() {
+        1 -- 10
+        1 -- 10
+    }
+    Assert.Equal(d.Count, 1)
 
 [<Fact>]
 let ``Test that generics are working properly and builders are not conflicting with each other`` () =

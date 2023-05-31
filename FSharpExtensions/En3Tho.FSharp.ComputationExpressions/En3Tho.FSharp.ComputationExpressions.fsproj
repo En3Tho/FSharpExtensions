@@ -44,7 +44,9 @@
       <Compile Include="TaskBuilders\TaskBuilders.fs" />
       <Compile Include="ValueTaskExtensions.fs" />
       <Compile Include="HttpBuilder\Serializers.fs" />
-      <Compile Include="HttpBuilder\Base.fs" />
+      <Compile Include="HttpBuilder\HeadersBuilders.fs" />
+      <Compile Include="HttpBuilder\Stages.fs" />
+      <Compile Include="HttpBuilder\Content.fs" />
       <Compile Include="HttpBuilder\Extensions.fs" />
     </ItemGroup>
 

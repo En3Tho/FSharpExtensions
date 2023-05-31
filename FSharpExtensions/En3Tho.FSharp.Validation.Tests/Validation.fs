@@ -101,4 +101,4 @@ let ``Test that multivalidation works for unsuccessful case``() =
         Assert.True(errors[0] :? ValueIsNegative)
         Assert.True(errors[1] :? StringIsEmpty)
     | _ ->
-        failwith "Impossible"
+        Assert.Fail("Impossible")

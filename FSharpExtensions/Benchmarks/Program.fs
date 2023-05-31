@@ -1,3 +1,4 @@
+open System
 open System.Runtime.InteropServices
 open BenchmarkDotNet.Configs
 open BenchmarkDotNet.Running

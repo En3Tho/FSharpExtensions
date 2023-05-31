@@ -142,7 +142,7 @@ let ``Test that eresult builder is can process multiple errors`` () =
             |> Seq.toArray
             |> Seq.forall (fun x -> Object.ReferenceEquals(x, exn)))
     | _ ->
-        Assert.True(false, "Result should not be OK here")
+        Assert.Fail("Result should not be OK here")
 
     let exn = Exception()
     let res2 = eresult {
@@ -158,7 +158,7 @@ let ``Test that exnresult properly catches exceptions`` () =
         let! a = Error exn
         and! b = Error exn
         and! c = Error exn
-        failwith "Lol"
+        failwith "Exn"
         return a + b + c + 10
     }
 
@@ -169,10 +169,10 @@ let ``Test that exnresult properly catches exceptions`` () =
             |> Seq.toArray
             |> Seq.forall (fun x -> Object.ReferenceEquals(x, exn)))
     | _ ->
-        Assert.True(false, "Result should not be OK or not an AggregateException here")
+        Assert.Fail("Result should not be OK or not an AggregateException here")
 
     let res2 = exnresult {
-        failwith "Lol"
+        failwith "Exn"
         let! a = Error exn
         and! b = Error exn
         and! c = Error exn
@@ -182,9 +182,9 @@ let ``Test that exnresult properly catches exceptions`` () =
 
     match res2 with
     | Error lolExn ->
-        Assert.Equal("Lol", lolExn.Message)
+        Assert.Equal("Exn", lolExn.Message)
     | _ ->
-        Assert.True(false, "Result should not be OK here")
+        Assert.Fail("Result should not be OK here")
 
     let exn = Exception()
     let res3 = exnresult {

@@ -11,6 +11,7 @@ open En3Tho.FSharp.ComputationExpressions.Tasks
 open En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions.LowPriority
 open En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions.HighPriority
 
+/// Serializer is responsible for cleanup unless serialization is bypassed
 type IResponseSerializer<'a> =
     abstract member Serialize: response: HttpResponseMessage -> ValueTask<'a>
 
@@ -94,6 +95,20 @@ type [<Struct>] StreamResponseSerializer =
         }
 
     interface IResponseSerializer<Stream> with
+        member this.Serialize(response) = this.Serialize(response)
+
+type [<Struct>] ValueOrResponseSerializer<'a, 'serializer when 'serializer :> IResponseSerializer<'a>>(serializer: 'serializer) =
+    member _.Serialize<'a>(response: HttpResponseMessage) =
+        let serializer = serializer
+        vtask {
+            if response.IsSuccessStatusCode then
+                let! res = serializer.Serialize(response)
+                return Ok res
+            else
+                return Error response
+        }
+
+    interface IResponseSerializer<Result<'a, HttpResponseMessage>> with
         member this.Serialize(response) = this.Serialize(response)
 
 type [<Struct>] JsonResultResponseSerializer<'a, 'b>(options: JsonSerializerOptions) =

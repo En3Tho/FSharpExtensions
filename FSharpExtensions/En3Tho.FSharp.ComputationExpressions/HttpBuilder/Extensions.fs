@@ -1,49 +1,65 @@
 ﻿module [<AutoOpen>] En3Tho.FSharp.ComputationExpressions.HttpBuilder.Extensions
 
-open System.Collections.Generic
 open System.IO
 open System.Text.Json
 open System.Net.Http
+open En3Tho.FSharp.ComputationExpressions.HttpBuilder.Content
 
-let (@) key value = KeyValuePair(key, value)
+let requestHeaders = RequestHeadersBuilder()
+let contentHeaders = ContentHeadersBuilder()
+
+let getRequest() = GetRequestIntrinsic()
+let getHeaders() = GetHeadersIntrinsic()
 
 type HttpRequestMessageStage with
-    member inline this.Json<'a>(value: 'a, options: JsonSerializerOptions) =
+
+    member inline this.CustomContent(value: HttpContent) =
         let request = this.Request
-        request.Content <- ByteArrayContent(JsonSerializer.SerializeToUtf8Bytes<'a>(value, options))
-        request.Headers.Add("Content-Type", "application/json")
+        request.Content <- value
         HttpRequestMessageContentStage(this.Client, request)
+
+    member inline this.Json<'a>(value: 'a, options: JsonSerializerOptions) =
+        this.CustomContent(makeJsonContent(value, options))
 
     member inline this.Json<'a>(value: 'a) =
         this.Json(value, null)
 
     member inline this.String(value: string) =
-        let request = this.Request
-        request.Content <- StringContent(value)
-        request.Headers.Add("Content-Type", "application/text")
-        HttpRequestMessageContentStage(this.Client, request)
+        this.CustomContent(makeStringContent(value))
+
+    member inline this.String(value: byte[]) =
+        this.CustomContent(makeUtf8StringContent(value))
 
     member inline this.ByteArray(value: byte[]) =
-        let request = this.Request
-        request.Content <- ByteArrayContent(value)
-        request.Headers.Add("Content-Type", "application/octet-stream")
-        HttpRequestMessageContentStage(this.Client, request)
+        this.CustomContent(makeByteArrayContent(value))
 
     member inline this.Stream(value: Stream) =
-        let request = this.Request
-        request.Content <- StreamContent(value)
-        request.Headers.Add("Content-Type", "application/octet-stream")
-        HttpRequestMessageContentStage(this.Client, request)
+        this.CustomContent(makeStreamContent(value))
+
+    member inline this.Form(values) =
+        this.CustomContent(makeFormUrlEncodedContent(values))
+
+    member inline this.EmptyContent() =
+        HttpRequestMessageContentStage(this.Client, this.Request)
 
 type HttpRequestMessageContentStage with
     member inline this.AsString() =
         HttpRequestMessageResponseStage(this.Client, this.Request, StringResponseSerializer())
 
+    member inline this.AsStringOrResponse() =
+        HttpRequestMessageResponseStage(this.Client, this.Request, ValueOrResponseSerializer(StringResponseSerializer()))
+
     member inline this.AsStream() =
         HttpRequestMessageResponseStage(this.Client, this.Request, StreamResponseSerializer())
 
+    member inline this.AsStreamOrResponse() =
+        HttpRequestMessageResponseStage(this.Client, this.Request, ValueOrResponseSerializer(StreamResponseSerializer()))
+
     member inline this.AsByteArray() =
         HttpRequestMessageResponseStage(this.Client, this.Request, ByteArrayResponseSerializer())
+
+    member inline this.AsByteArrayOrResponse() =
+        HttpRequestMessageResponseStage(this.Client, this.Request, ValueOrResponseSerializer(ByteArrayResponseSerializer()))
 
     member inline this.AsResponse() =
         HttpRequestMessageResponseStage(this.Client, this.Request, RawResponseSerializer())
@@ -54,7 +70,12 @@ type HttpRequestMessageContentStage with
     member inline this.AsJson<'a>(options: JsonSerializerOptions) =
         HttpRequestMessageResponseStage(this.Client, this.Request, JsonResponseSerializer<'a>(options))
 
+    member inline this.AsJsonOrResponse<'a>(options: JsonSerializerOptions) =
+        HttpRequestMessageResponseStage(this.Client, this.Request, ValueOrResponseSerializer(JsonResponseSerializer<'a>(options)))
+
     member inline this.AsJson<'a>() = this.AsJson<'a>(null)
+
+    member inline this.AsJsonOrResponse<'a>() = this.AsJsonOrResponse<'a>(null)
 
     member inline this.AsJsonResult<'a, 'b>(options: JsonSerializerOptions) =
         HttpRequestMessageResponseStage(this.Client, this.Request, JsonResultResponseSerializer<'a, 'b>(options))

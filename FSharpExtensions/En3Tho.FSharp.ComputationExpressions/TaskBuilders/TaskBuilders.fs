@@ -32,15 +32,18 @@ do()
 let unittask = UnitTaskBuilder()
 let vtask = ValueTaskBuilder()
 let unitvtask = UnitValueTaskBuilder()
+
 let voptionvtask = ValueTaskValueOptionBuilder()
 let voptiontask = TaskValueOptionBuilder()
 
-let exnresultvtask = ValueTaskExnResultBuilder()
-let exnresulttask = TaskExnResultBuilder()
 let evtask = ValueTaskExnResultBuilder()
+let exnresultvtask = ValueTaskExnResultBuilder()
+
+let exnresulttask = TaskExnResultBuilder()
 let etask = TaskExnResultBuilder()
 
 let resulttask = TaskResultBuilder()
 let rtask = TaskResultBuilder()
+
 let resultvtask = ValueTaskResultBuilder()
 let rvtask = ValueTaskResultBuilder()
