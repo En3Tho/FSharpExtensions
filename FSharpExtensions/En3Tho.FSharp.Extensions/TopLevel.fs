@@ -46,6 +46,7 @@ module Core =
     let inline (&!=) (a: 'a when 'a: not struct) (b: 'a) = not (Object.ReferenceEquals(a, b))
 
     let inline (--) key value = KeyValuePair(key, value)
+    let inline (~%) value = (^a: (member Value: ^b) value)
 
     [<AbstractClass; AutoOpen>]
     type ActionFuncConverter =
