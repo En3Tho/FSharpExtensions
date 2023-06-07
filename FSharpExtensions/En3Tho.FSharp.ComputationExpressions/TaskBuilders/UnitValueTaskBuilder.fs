@@ -248,7 +248,7 @@ module LowPriority =
             ResumableCode.Using(resource, body)
 
 module HighPriority =
-    // High priority extensions
+
     type UnitValueTaskBuilderBase with
         static member BindDynamic (sm: byref<_>, task: Task<'TResult1>, continuation: ('TResult1 -> UnitValueTaskCode<'TResult2>)) : bool =
             let mutable awaiter = task.GetAwaiter()

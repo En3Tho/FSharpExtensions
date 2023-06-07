@@ -32,7 +32,6 @@
       <Compile Include="OptionBuilder.fs" />
       <Compile Include="ResultBuilder.fs" />
       <Compile Include="CodeBuilder.fs" />
-      <Compile Include="TaskBuilders\TaskBuildersIntrinsics.fs" />
       <Compile Include="TaskBuilders\AwaiterHelper.fs" />
       <Compile Include="TaskBuilders\TaskBuilderExtensions.fs" />
       <Compile Include="TaskBuilders\UnitTaskBuilder.fs" />

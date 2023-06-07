@@ -12,6 +12,7 @@
         <Compile Include="ArrayPoolBasedBuilderTests.fs" />
         <Compile Include="StringBuilderBuilderTests.fs" />
         <Compile Include="OptionsAndResults.fs" />
+        <Compile Include="VerbatimTasks.fs" />
         <Compile Include="Tasks.fs" />
         <Compile Include="TaskOptionAndResult.fs" />
         <Compile Include="TaskResultOverloadingTests.fs" />
