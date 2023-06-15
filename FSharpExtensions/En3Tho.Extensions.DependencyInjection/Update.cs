@@ -40,7 +40,6 @@ public static partial class IServiceCollectionExtensions
                 var implementationFactory = ActivatorUtilities.CreateFactory(typeof(TService), Array.Empty<Type>());
                 var factoryFromServices = (IServiceProvider serviceProvider) =>
                 {
-
                     var oldImplementationInstance = implementationFactory(serviceProvider, Array.Empty<object>());
                     return configureFactory((TService)oldImplementationInstance);
                 };
