@@ -1,3 +1,4 @@
 open ProjectUtilities
 
 ServiceProviderAndScopeCodeGen.generateFiles()
+WebApplicationsExtensionsCodeGen.generateFiles()

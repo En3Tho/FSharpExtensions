@@ -1,26 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <LangVersion>10</LangVersion>
-        <RootNamespace>En3Tho.Extensions.DependencyInjection.XUnit</RootNamespace>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Authors> Igor Bagdamyan</Authors>
-        <Copyright>Copyright (c) 2022 Igor Bagdamyan</Copyright>
-        <PackageProjectUrl>https://github.com/En3Tho/FSharpExtensions</PackageProjectUrl>
-        <PackageLicenseUrl>https://github.com/En3Tho/FSharpExtensions/blob/main/LICENSE</PackageLicenseUrl>
-        <RepositoryUrl>https://github.com/En3Tho/FSharpExtensions</RepositoryUrl>
-        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-        <AssemblyVersion>1.0.1</AssemblyVersion>
-        <FileVersion>1.0.1</FileVersion>
-        <!-- Optional: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
-        <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <!-- Optional: Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
-        <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageVersion>1.0.2</PackageVersion>
+        <NugetVersion>1.0.3</NugetVersion>
+        <Description>Small set of extensions based on XUnit.DependencyInjection library</Description>
     </PropertyGroup>
 
     <ItemGroup>

@@ -1,0 +1,19 @@
+<Project>
+
+    <PropertyGroup Condition="'$(NugetVersion)' != ''">
+        <Authors>Igor Bagdamyan</Authors>
+        <Copyright>Copyright (c) 2023 Igor Bagdamyan</Copyright>
+        <PackageProjectUrl>https://github.com/En3Tho/FSharpExtensions</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/En3Tho/FSharpExtensions/blob/main/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/En3Tho/FSharpExtensions</RepositoryUrl>
+        <AssemblyVersion>$(NugetVersion)</AssemblyVersion>
+        <FileVersion>$(NugetVersion)</FileVersion>
+        <PackageVersion>$(NugetVersion)</PackageVersion>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
+
+</Project>

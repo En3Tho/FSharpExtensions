@@ -1,4 +1,15 @@
 <Project>
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.csproj'">
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>10</LangVersion>
+    </PropertyGroup>
+
     <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.fsproj'">
         <Tailcalls>false</Tailcalls>
         <NoWarn>
@@ -12,4 +23,5 @@
             <!--Compiler only construct--> 1204
         </NoWarn>
     </PropertyGroup>
+
 </Project>

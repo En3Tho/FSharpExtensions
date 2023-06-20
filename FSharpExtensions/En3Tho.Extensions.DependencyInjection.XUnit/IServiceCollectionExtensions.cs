@@ -16,7 +16,7 @@ public static class IServiceCollectionExtensions
         where TService : class
     {
         collection.AddSingleton<Moq.Mock<TService>>()
-                  .AddSingleton(services => services.GetService<Moq.Mock<TService>>().Object);
+                  .AddSingleton(services => services.GetRequiredService<Moq.Mock<TService>>().Object);
         return collection;
     }
 
@@ -24,7 +24,7 @@ public static class IServiceCollectionExtensions
         where TService : class
     {
         collection.AddScoped<Moq.Mock<TService>>()
-                  .AddScoped(services => services.GetService<Moq.Mock<TService>>().Object);
+                  .AddScoped(services => services.GetRequiredService<Moq.Mock<TService>>().Object);
         return collection;
     }
 }

@@ -12,7 +12,7 @@ public static partial class IServiceCollectionExtensions
         collection.TryAddSingleton(services =>
             services.GetRequiredService<IConfiguration>()
                 .GetSection(name)
-                .Get<TService>());
+                .Get<TService>()!);
         return collection;
     }
 
@@ -29,7 +29,7 @@ public static partial class IServiceCollectionExtensions
         return collection.TryAddSingletonOrFail(services =>
             services.GetRequiredService<IConfiguration>()
                 .GetSection(name)
-                .Get<TService>());
+                .Get<TService>()!);
     }
 
     public static IServiceCollection TryAddSingletonFromConfigurationOrFail<TService>(this IServiceCollection collection)

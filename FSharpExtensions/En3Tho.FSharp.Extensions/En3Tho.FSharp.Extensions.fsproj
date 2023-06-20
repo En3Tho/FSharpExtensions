@@ -1,24 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <AssemblyVersion>1.2.0</AssemblyVersion>
-        <FileVersion>1.2.0</FileVersion>
+        <NugetVersion>1.2.1</NugetVersion>
         <Description>A set of extensions for F# base library</Description>
-        <Copyright>Copyright (c) 2022 Igor Bagdamyan</Copyright>
-        <PackageProjectUrl>https://github.com/En3Tho/FSharpExtensions</PackageProjectUrl>
-        <PackageLicenseUrl>https://github.com/En3Tho/FSharpExtensions/blob/main/LICENSE</PackageLicenseUrl>
-        <RepositoryUrl>https://github.com/En3Tho/FSharpExtensions</RepositoryUrl>
-        <Authors> Igor Bagdamyan</Authors>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageVersion>1.2.0</PackageVersion>
-        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-        <!-- Optional: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
-        <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <!-- Optional: Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
-        <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>        
     </PropertyGroup>
 
     <ItemGroup>

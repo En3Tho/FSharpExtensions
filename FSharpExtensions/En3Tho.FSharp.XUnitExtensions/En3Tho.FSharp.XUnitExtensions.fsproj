@@ -1,24 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
-        <IsPackable>true</IsPackable>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <AssemblyVersion>1.0.1</AssemblyVersion>
-        <FileVersion>1.0.1</FileVersion>
-        <PackageVersion>1.0.1</PackageVersion>
+        <NugetVersion>1.0.1</NugetVersion>
         <Description>A set of extensions for Xunit Assert</Description>
-        <Copyright>Copyright (c) 2022 Igor Bagdamyan</Copyright>
-        <PackageProjectUrl>https://github.com/En3Tho/FSharpExtensions</PackageProjectUrl>
-        <PackageLicenseUrl>https://github.com/En3Tho/FSharpExtensions/blob/main/LICENSE</PackageLicenseUrl>
-        <RepositoryUrl>https://github.com/En3Tho/FSharpExtensions</RepositoryUrl>
-        <Authors> Igor Bagdamyan</Authors>
-        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-        <!-- Optional: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
-        <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <!-- Optional: Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
-        <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
 
     <ItemGroup>

@@ -67,6 +67,24 @@ type ``Net7, Net8, CoreRun``() =
             Job.CoreRun
         |]) |> ignore
 
+type ``Net6, Net7, Net8``() =
+    inherit ManualConfig()
+
+    do
+        base.AddJob([|
+            Job.Net6
+            Job.Net7
+            Job.Net8
+            // Job.Net8.WithEnvironmentVariables(
+            //     JitEnv.JitEnablePhysicalPromotion.On,
+            //     JitEnv.JitStressModeNames.StressGeneralizedPromotionCost
+            // )
+            // Job.Main.WithEnvironmentVariables(
+            //     JitEnv.JitStressModeNames.StressGeneralizedPromotion,
+            //     EnvironmentVariable.Get("CORE_LIBRARIES")
+            // )
+        |]) |> ignore
+
 type ``Net7, Net8``() =
     inherit ManualConfig()
 
@@ -75,8 +93,8 @@ type ``Net7, Net8``() =
             Job.Net7
             Job.Net8
             Job.Net8.WithEnvironmentVariables(
-                JitEnv.JitEnablePhysicalPromotion.On,
-                JitEnv.JitStressModeNames.StressGeneralizedPromotionCost
+                JitEnv.JitEnablePhysicalPromotion.On
+                // JitEnv.JitStressModeNames.StressGeneralizedPromotionCost
             )
             // Job.Main.WithEnvironmentVariables(
             //     JitEnv.JitStressModeNames.StressGeneralizedPromotion,

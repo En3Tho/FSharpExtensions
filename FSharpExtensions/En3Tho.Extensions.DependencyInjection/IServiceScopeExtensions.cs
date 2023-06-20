@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace En3Tho.Extensions.DependencyInjection;
@@ -1176,4 +1174,4 @@ public static partial class IServiceScopeExtensions
         return scope.ServiceProvider.RunAsync(func);
     }
 
-}
+}

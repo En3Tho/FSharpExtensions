@@ -12,25 +12,40 @@ module CodeBuilderImpl =
         Text: string
     }
 
-    type CodeBuilder(builder: ResizeArray<LineOfCode>) =
+    type CodeBuilder(lines: ResizeArray<LineOfCode>) =
 
         static let commonIndentations = ImmutableArray.Create<string> [|
             for i = 0 to 16 do
                 String.replicate (i * 4) " "
         |]
 
-        let mutable indentationCount = 0
+        let mutable indentation = 0
+        let mutable length = 0
 
         new() = CodeBuilder(ResizeArray())
 
-        member _.Lines = builder
-        member _.Indentation = indentationCount
+        member _.Lines = lines
+        member _.Indentation = indentation
 
-        member _.IndentOnce() = indentationCount <- indentationCount + 1
-        member _.UnIndentOnce() = indentationCount <- indentationCount - 1
+        member _.IndentOnce() = indentation <- indentation + 1
+        member _.UnIndentOnce() = indentation <- indentation - 1
 
-        member _.AddLine(value) = builder.Add({Indentation = indentationCount; Text = value.ToString()})
-        member _.AddLine(value: LineOfCode) = builder.Add({Indentation = value.Indentation + indentationCount; Text = value.Text})
+        member private _.AddLength(text: string, indentation) =
+            length <- length + Math.Max(1, text.Length) + indentation * 4
+
+        member this.AddLine(value) =
+            let text = value.ToString()
+            let indentation = indentation
+
+            this.AddLength(text, indentation)
+            lines.Add({ Indentation = indentation; Text = text })
+
+        member this.AddLine(value: LineOfCode) =
+            let text = value.Text
+            let indentation = value.Indentation + indentation
+
+            this.AddLength(text, indentation)
+            lines.Add({ Indentation = indentation; Text = text })
 
         member private _.GetIndentation count =
             if commonIndentations.Length < count then
@@ -39,8 +54,8 @@ module CodeBuilderImpl =
                 String.replicate (count * 4) " "
 
         override this.ToString() =
-            let sb = StringBuilder()
-            for lineOfCode in builder do
+            let sb = StringBuilder(length)
+            for lineOfCode in lines do
                 if String.IsNullOrWhiteSpace(lineOfCode.Text) then
                     sb.AppendLine() |> ignore
                 else
@@ -102,7 +117,7 @@ module CodeBuilderImpl =
 
         inherit CodeBlockBase()
         member inline this.Run([<InlineIfLambda>] runExpr: CodeBuilderCode) =
-            let builder = CodeBuilder(ResizeArray())
+            let builder = CodeBuilder(ResizeArray(128))
             runExpr builder
             builder
 
