@@ -6,12 +6,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="WebApplicationExtensions.fs" />
+        <Compile Include="WebApplicationExtensions.fs"/>
     </ItemGroup>
 
     <ItemGroup>
-        <FrameworkReference Include="Microsoft.AspNetCore.App" />
-        <PackageReference Update="FSharp.Core" Version="7.0.0" />
+        <PackageReference Include="FSharp.Core"/>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
     </ItemGroup>
 
 </Project>

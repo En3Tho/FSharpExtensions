@@ -6,22 +6,22 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="BasicTypes.fs" />
-        <Compile Include="MultiValidators.fs" />
-        <Compile Include="AsyncMultiValidators.fs" />
-        <Compile Include="Extensions.fs" />
-        <Compile Include="CommonValidatedTypes.fs" />
-        <Compile Include="JsonConverter.fs" />
+        <Compile Include="BasicTypes.fs"/>
+        <Compile Include="MultiValidators.fs"/>
+        <Compile Include="AsyncMultiValidators.fs"/>
+        <Compile Include="Extensions.fs"/>
+        <Compile Include="CommonValidatedTypes.fs"/>
+        <Compile Include="JsonConverter.fs"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="En3Tho.FSharp.ComputationExpressions" Version="1.1.9" />
-      <PackageReference Include="En3Tho.FSharp.Extensions" Version="1.2.0" />
-      <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Update="FSharp.Core" Version="7.0.0" />
+        <PackageReference Include="En3Tho.FSharp.ComputationExpressions"/>
+        <PackageReference Include="En3Tho.FSharp.Extensions"/>
+        <PackageReference Include="Microsoft.SourceLink.GitHub">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="FSharp.Core"/>
     </ItemGroup>
 
 </Project>

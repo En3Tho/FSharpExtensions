@@ -6,34 +6,34 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="BenchmarkConfig.fs" />
-        <Compile Include="BenchmarkRunner.fs" />
-        <Compile Include="CustomBuildersVsLibraryBuilders.fs" />
-        <Compile Include="CollectionsBuildersAllocations.fs" />
-        <Compile Include="EResultAllocationsBenchmark.fs" />
-        <Compile Include="ScanfBenchmark.fs" />
-        <Compile Include="TaskBuildersBenchmarks.fs" />
-        <Compile Include="FSharpOptimizerWithExperimentalPipe.fs" />
-        <Compile Include="FSharpOptimizer.fs" />
-        <Compile Include="PushStream.fs" />
-        <Compile Include="GenericEqualityBenchmark.fs" />
-        <Compile Include="GenericEqualityObjectArrayBenchmark.fs" />
-        <Compile Include="IEquatableEqualityOperatorBenchmark.fs" />
-        <Compile Include="ComparisonOperatorBenchmark.fs" />
-        <Compile Include="MathematicalOperatorsBenchmarks.fs" />
-        <Compile Include="NodeCode.fs" />
-        <Compile Include="GSeq.fs" />
-        <Compile Include="Program.fs" />
+        <Compile Include="BenchmarkConfig.fs"/>
+        <Compile Include="BenchmarkRunner.fs"/>
+        <Compile Include="CustomBuildersVsLibraryBuilders.fs"/>
+        <Compile Include="CollectionsBuildersAllocations.fs"/>
+        <Compile Include="EResultAllocationsBenchmark.fs"/>
+        <Compile Include="ScanfBenchmark.fs"/>
+        <Compile Include="TaskBuildersBenchmarks.fs"/>
+        <Compile Include="FSharpOptimizerWithExperimentalPipe.fs"/>
+        <Compile Include="FSharpOptimizer.fs"/>
+        <Compile Include="PushStream.fs"/>
+        <Compile Include="GenericEqualityBenchmark.fs"/>
+        <Compile Include="GenericEqualityObjectArrayBenchmark.fs"/>
+        <Compile Include="IEquatableEqualityOperatorBenchmark.fs"/>
+        <Compile Include="ComparisonOperatorBenchmark.fs"/>
+        <Compile Include="MathematicalOperatorsBenchmarks.fs"/>
+        <Compile Include="NodeCode.fs"/>
+        <Compile Include="GSeq.fs"/>
+        <Compile Include="Program.fs"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="BenchmarkDotNet" Version="0.13.5" />
-      <PackageReference Update="FSharp.Core" Version="7.0.0" />
+        <PackageReference Include="BenchmarkDotNet"/>
+        <PackageReference Include="FSharp.Core"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\En3Tho.FSharp.ComputationExpressions\En3Tho.FSharp.ComputationExpressions.fsproj" />
-      <ProjectReference Include="..\En3Tho.FSharp.Extensions\En3Tho.FSharp.Extensions.fsproj" />
+        <ProjectReference Include="..\En3Tho.FSharp.ComputationExpressions\En3Tho.FSharp.ComputationExpressions.fsproj"/>
+        <ProjectReference Include="..\En3Tho.FSharp.Extensions\En3Tho.FSharp.Extensions.fsproj"/>
     </ItemGroup>
 
 </Project>

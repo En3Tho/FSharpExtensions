@@ -6,44 +6,36 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Compile Include="GenericUnitBuilderBase.fs" />
-      <Compile Include="GenericCollectionCodeExtensions.fs" />
-      <Compile Include="ArrayPoolBasedBuilders.fs" />
-      <Compile Include="CollectionBuilderExtensions.fs" />
-      <Compile Include="OptionBuilder.fs" />
-      <Compile Include="ResultBuilder.fs" />
-      <Compile Include="CodeBuilder.fs" />
-      <Compile Include="TaskBuilders\AwaiterHelper.fs" />
-      <Compile Include="TaskBuilders\TaskBuilderExtensions.fs" />
-      <Compile Include="TaskBuilders\UnitTaskBuilder.fs" />
-      <Compile Include="TaskBuilders\UnitValueTaskBuilder.fs" />
-      <Compile Include="TaskBuilders\ValueTaskBuilder.fs" />
-      <Compile Include="TaskBuilders\ValueTaskOptionBuilder.fs" />
-      <Compile Include="TaskBuilders\ValueTaskResultBuilder.fs" />
-      <Compile Include="TaskBuilders\ValueTaskExnResultBuilder.fs" />
-      <Compile Include="TaskBuilders\TaskBuilders.fs" />
-      <Compile Include="ValueTaskExtensions.fs" />
-      <Compile Include="HttpBuilder\Serializers.fs" />
-      <Compile Include="HttpBuilder\HeadersBuilders.fs" />
-      <Compile Include="HttpBuilder\Stages.fs" />
-      <Compile Include="HttpBuilder\Content.fs" />
-      <Compile Include="HttpBuilder\Extensions.fs" />
+        <Compile Include="GenericUnitBuilderBase.fs"/>
+        <Compile Include="GenericCollectionCodeExtensions.fs"/>
+        <Compile Include="ArrayPoolBasedBuilders.fs"/>
+        <Compile Include="CollectionBuilderExtensions.fs"/>
+        <Compile Include="OptionBuilder.fs"/>
+        <Compile Include="ResultBuilder.fs"/>
+        <Compile Include="CodeBuilder.fs"/>
+        <Compile Include="TaskBuilders\AwaiterHelper.fs"/>
+        <Compile Include="TaskBuilders\TaskBuilderExtensions.fs"/>
+        <Compile Include="TaskBuilders\UnitTaskBuilder.fs"/>
+        <Compile Include="TaskBuilders\UnitValueTaskBuilder.fs"/>
+        <Compile Include="TaskBuilders\ValueTaskBuilder.fs"/>
+        <Compile Include="TaskBuilders\ValueTaskOptionBuilder.fs"/>
+        <Compile Include="TaskBuilders\ValueTaskResultBuilder.fs"/>
+        <Compile Include="TaskBuilders\ValueTaskExnResultBuilder.fs"/>
+        <Compile Include="TaskBuilders\TaskBuilders.fs"/>
+        <Compile Include="ValueTaskExtensions.fs"/>
+        <Compile Include="HttpBuilder\Serializers.fs"/>
+        <Compile Include="HttpBuilder\HeadersBuilders.fs"/>
+        <Compile Include="HttpBuilder\Stages.fs"/>
+        <Compile Include="HttpBuilder\Content.fs"/>
+        <Compile Include="HttpBuilder\Extensions.fs"/>
     </ItemGroup>
 
-    <ItemGroup>      
-      <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Update="FSharp.Core" Version="7.0.0" />      
-    </ItemGroup>
-    
-    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="6.0.0" />
-        <PackageReference Include="System.Buffers" Version="4.5.1" />
-        <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
-        <PackageReference Include="System.Memory" Version="4.5.4" />
-        <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
+    <ItemGroup>
+        <PackageReference Include="FSharp.Core"/>
+        <PackageReference Include="Microsoft.SourceLink.GitHub">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
 </Project>

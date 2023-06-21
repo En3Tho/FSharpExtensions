@@ -5,20 +5,20 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="ServiceCollectionCodeGen.fs" />
-        <Compile Include="ServiceProviderCodeGen.fs" />
-        <Compile Include="ActivePatternsCodeGen.fs" />
-        <Compile Include="WebApplicationsExtensionsCodeGen.fs" />
-        <Compile Include="Program.fs" />
+        <Compile Include="ServiceCollectionCodeGen.fs"/>
+        <Compile Include="ServiceProviderCodeGen.fs"/>
+        <Compile Include="ActivePatternsCodeGen.fs"/>
+        <Compile Include="WebApplicationsExtensionsCodeGen.fs"/>
+        <Compile Include="Program.fs"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\En3Tho.FSharp.ComputationExpressions\En3Tho.FSharp.ComputationExpressions.fsproj" />
-      <ProjectReference Include="..\En3Tho.FSharp.Extensions\En3Tho.FSharp.Extensions.fsproj" />
+        <ProjectReference Include="..\En3Tho.FSharp.ComputationExpressions\En3Tho.FSharp.ComputationExpressions.fsproj"/>
+        <ProjectReference Include="..\En3Tho.FSharp.Extensions\En3Tho.FSharp.Extensions.fsproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Update="FSharp.Core" Version="7.0.0" />
+        <PackageReference Include="FSharp.Core"/>
     </ItemGroup>
 
 </Project>

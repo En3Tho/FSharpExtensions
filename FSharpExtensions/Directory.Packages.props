@@ -1,0 +1,36 @@
+<Project>
+
+    <PropertyGroup>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageVersion Include="FSharp.Core" Version="7.0.0"/>
+        <PackageVersion Include="Microsoft.Extensions.Configuration" Version="7.0.0"/>
+        <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.0"/>
+        <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0"/>
+        <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0"/>
+        <PackageVersion Include="Microsoft.Extensions.Http" Version="7.0.0"/>
+        <PackageVersion Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5"/>
+        <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.1"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageVersion Include="En3Tho.FSharp.Extensions" Version="1.2.0"/>
+        <PackageVersion Include="En3Tho.FSharp.ComputationExpressions" Version="1.1.9"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageVersion Include="BenchmarkDotNet" Version="0.13.5"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.4.0"/>
+        <PackageVersion Include="xunit" Version="2.4.2"/>
+        <PackageVersion Include="xunit.runner.visualstudio" Version="2.4.5"/>
+        <PackageVersion Include="coverlet.collector" Version="3.2.0"/>
+        <PackageVersion Include="Xunit.DependencyInjection" Version="8.6.1"/>
+        <PackageVersion Include="Moq" Version="4.18.2"/>
+    </ItemGroup>
+
+</Project>

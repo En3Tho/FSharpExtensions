@@ -6,27 +6,27 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Compile Include="Disposables.fs" />
-      <Compile Include="TopLevel.fs" />
-      <Compile Include="InterfaceShortcuts.fs" />
-      <Compile Include="Modules.fs" />
-      <Compile Include="String.fs" />
-      <Compile Include="Span.fs" />
-      <Compile Include="Extensions.fs" />
-      <Compile Include="ActivePatterns.fs" />
-      <Compile Include="Scanf.fs" />
-      <Compile Include="Experimental.fs" />
-      <Compile Include="Stackalloc.fs" />
-      <Compile Include="GSeqEnumerators.fs" />
-      <Compile Include="GSeq.fs" />
+        <Compile Include="Disposables.fs"/>
+        <Compile Include="TopLevel.fs"/>
+        <Compile Include="InterfaceShortcuts.fs"/>
+        <Compile Include="Modules.fs"/>
+        <Compile Include="String.fs"/>
+        <Compile Include="Span.fs"/>
+        <Compile Include="Extensions.fs"/>
+        <Compile Include="ActivePatterns.fs"/>
+        <Compile Include="Scanf.fs"/>
+        <Compile Include="Experimental.fs"/>
+        <Compile Include="Stackalloc.fs"/>
+        <Compile Include="GSeqEnumerators.fs"/>
+        <Compile Include="GSeq.fs"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Update="FSharp.Core" Version="7.0.0" />
+        <PackageReference Include="FSharp.Core"/>
+        <PackageReference Include="Microsoft.SourceLink.GitHub">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
 </Project>

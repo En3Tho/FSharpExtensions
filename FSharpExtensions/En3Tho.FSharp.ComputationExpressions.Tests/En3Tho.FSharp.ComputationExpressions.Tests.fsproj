@@ -5,35 +5,36 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="ComputationExpressionBuildTests.fs" />
-        <Compile Include="ArrayPoolBasedBuilderTests.fs" />
-        <Compile Include="StringBuilderBuilderTests.fs" />
-        <Compile Include="OptionsAndResults.fs" />
-        <Compile Include="VerbatimTasks.fs" />
-        <Compile Include="Tasks.fs" />
-        <Compile Include="TaskOptionAndResult.fs" />
-        <Compile Include="TaskResultOverloadingTests.fs" />
-        <Compile Include="HttpBuilderTests.fs" />
-        <Compile Include="Program.fs" />
+        <Compile Include="ComputationExpressionBuildTests.fs"/>
+        <Compile Include="ArrayPoolBasedBuilderTests.fs"/>
+        <Compile Include="StringBuilderBuilderTests.fs"/>
+        <Compile Include="OptionsAndResults.fs"/>
+        <Compile Include="VerbatimTasks.fs"/>
+        <Compile Include="Tasks.fs"/>
+        <Compile Include="TaskOptionAndResult.fs"/>
+        <Compile Include="TaskResultOverloadingTests.fs"/>
+        <Compile Include="HttpBuilderTests.fs"/>
+        <Compile Include="Program.fs"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
-        <PackageReference Include="xunit" Version="2.4.2" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+        <PackageReference Include="FSharp.Core"/>
+
+        <PackageReference Include="Microsoft.NET.Test.Sdk"/>
+        <PackageReference Include="xunit"/>
+        <PackageReference Include="xunit.runner.visualstudio">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="coverlet.collector" Version="3.2.0">
+        <PackageReference Include="coverlet.collector">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Update="FSharp.Core" Version="7.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\En3Tho.FSharp.ComputationExpressions\En3Tho.FSharp.ComputationExpressions.fsproj" />
-      <ProjectReference Include="..\En3Tho.FSharp.Extensions\En3Tho.FSharp.Extensions.fsproj" />
+        <ProjectReference Include="..\En3Tho.FSharp.ComputationExpressions\En3Tho.FSharp.ComputationExpressions.fsproj"/>
+        <ProjectReference Include="..\En3Tho.FSharp.Extensions\En3Tho.FSharp.Extensions.fsproj"/>
     </ItemGroup>
 
 </Project>

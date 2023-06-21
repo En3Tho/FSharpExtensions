@@ -14,6 +14,7 @@ ProjectSection(SolutionItems) = preProject
 	global.json = global.json
 	Directory.Build.props = Directory.Build.props
 	Directory.Build.targets = Directory.Build.targets
+	Directory.Packages.props = Directory.Packages.props
 EndProjectSection
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.Extensions.Tests", "En3Tho.FSharp.Extensions.Tests\En3Tho.FSharp.Extensions.Tests.fsproj", "{355D7405-CE6D-41C9-B6EF-C573364DE503}"
@@ -39,6 +40,10 @@ EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.XUnitExtensions", "En3Tho.FSharp.XUnitExtensions\En3Tho.FSharp.XUnitExtensions.fsproj", "{EAD3C4E0-6961-4D74-9747-6B870C7060CE}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.Extensions.AspNetCore", "En3Tho.FSharp.Extensions.AspNetCore\En3Tho.FSharp.Extensions.AspNetCore.fsproj", "{06710AE9-9D30-438D-9765-D02DB1302D82}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3F96FD51-137E-4572-A477-35B7F5F653DA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Benchmarks", "Benchmarks", "{9374398C-1C27-4372-813E-DDB8CA5C5F90}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -106,5 +111,13 @@ Global
 		{06710AE9-9D30-438D-9765-D02DB1302D82}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06710AE9-9D30-438D-9765-D02DB1302D82}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{06710AE9-9D30-438D-9765-D02DB1302D82}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{ED4D366B-0F29-4095-A8C8-EFED608A547B} = {3F96FD51-137E-4572-A477-35B7F5F653DA}
+		{355D7405-CE6D-41C9-B6EF-C573364DE503} = {3F96FD51-137E-4572-A477-35B7F5F653DA}
+		{971B6FBC-D904-4816-ABB2-87D7D9442A1D} = {3F96FD51-137E-4572-A477-35B7F5F653DA}
+		{908FDF05-C71C-4933-A64A-64488E609961} = {9374398C-1C27-4372-813E-DDB8CA5C5F90}
+		{C0271E8E-4FCF-407E-9154-503012658ECA} = {9374398C-1C27-4372-813E-DDB8CA5C5F90}
+		{73FE40B4-55FF-4758-AE4A-53709E398543} = {3F96FD51-137E-4572-A477-35B7F5F653DA}
 	EndGlobalSection
 EndGlobal
