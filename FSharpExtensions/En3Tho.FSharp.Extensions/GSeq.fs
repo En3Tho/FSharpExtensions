@@ -110,7 +110,7 @@ module GSeq =
         result
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let tryFindOpt (filter: 'i -> bool) (enumerator: SStructEnumerator<'i,'e>) =
+    let tryFindOption (filter: 'i -> bool) (enumerator: SStructEnumerator<'i,'e>) =
         tryFind filter enumerator |> Option.ofValueOption
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -123,7 +123,7 @@ module GSeq =
         result
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let tryPickOpt filter (enumerator: SStructEnumerator<'i,'e>) =
+    let tryPickOption filter (enumerator: SStructEnumerator<'i,'e>) =
         tryPick filter enumerator |> Option.ofValueOption
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -190,7 +190,7 @@ module GSeq =
                 ValueNone
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let tryItemOpt index (enumerator: SStructEnumerator<'i,'e>) =
+    let tryItemOption index (enumerator: SStructEnumerator<'i,'e>) =
         tryItem index enumerator |> Option.ofValueOption
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -338,7 +338,7 @@ module GSeq =
             minImpl &enumerator |> ValueSome
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let tryMinOpt (enumerator: SStructEnumerator<'i,'e>) =
+    let tryMinOption (enumerator: SStructEnumerator<'i,'e>) =
         tryMin enumerator |> Option.ofValueOption
 
     let inline private maxImpl (enumerator: SStructEnumerator<'i,'e> byref) =
@@ -364,7 +364,7 @@ module GSeq =
             maxImpl &enumerator |> ValueSome
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let tryMaxOpt (enumerator: SStructEnumerator<'i,'e>) =
+    let tryMaxOption (enumerator: SStructEnumerator<'i,'e>) =
         tryMax enumerator |> Option.ofValueOption
 
     let inline private minByImpl map (enumerator: SStructEnumerator<'i,'e> byref) =
@@ -395,7 +395,7 @@ module GSeq =
             minByImpl map &enumerator |> ValueSome
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let tryMinByOpt map (enumerator: SStructEnumerator<'i,'e>) =
+    let tryMinByOption map (enumerator: SStructEnumerator<'i,'e>) =
         tryMinBy map enumerator |> Option.ofValueOption
 
     let inline private maxByImpl map (enumerator: SStructEnumerator<'i,'e> byref) =
@@ -528,7 +528,7 @@ module GSeqv =
         result
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let tryFindOpt state filter (enumerator: SStructEnumerator<'i,'e>) =
+    let tryFindOption state filter (enumerator: SStructEnumerator<'i,'e>) =
         tryFind state filter enumerator |> Option.ofValueOption
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -542,7 +542,7 @@ module GSeqv =
         result
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let tryPickOpt state filter (enumerator: SStructEnumerator<'i,'e>) =
+    let tryPickOption state filter (enumerator: SStructEnumerator<'i,'e>) =
         tryPick state filter enumerator |> Option.ofValueOption
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -725,7 +725,7 @@ module GSeqv =
             minByImpl state map &enumerator |> ValueSome
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let tryMinByOpt state map (enumerator: SStructEnumerator<'i,'e>) =
+    let tryMinByOption state map (enumerator: SStructEnumerator<'i,'e>) =
         tryMinBy state map enumerator |> Option.ofValueOption
 
     let inline private maxByImpl state map (enumerator: SStructEnumerator<'i,'e> byref) =
@@ -757,5 +757,5 @@ module GSeqv =
             maxByImpl state map &enumerator |> ValueSome
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let tryMaxByOpt state map (enumerator: SStructEnumerator<'i,'e>) =
+    let tryMaxByOption state map (enumerator: SStructEnumerator<'i,'e>) =
         tryMaxBy state map enumerator |> Option.ofValueOption

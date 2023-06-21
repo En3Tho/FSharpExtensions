@@ -5,7 +5,6 @@ open System.ComponentModel
 open System.Runtime.CompilerServices
 open En3Tho.FSharp.Extensions
 
-
 module EditorBrowsableState =
 #if SHOW_COMPEXPR_EXTENSIONS
     let [<Literal>] Value = EditorBrowsableState.Always

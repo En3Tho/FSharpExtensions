@@ -8,7 +8,6 @@ open System.Collections.Immutable
 open System.Linq
 open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
-open En3Tho.FSharp.Extensions
 
 module ArrayPoolList =
     type ArrayPool<'a> with
