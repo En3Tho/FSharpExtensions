@@ -17,10 +17,6 @@
     <ItemGroup>
         <PackageReference Include="En3Tho.FSharp.ComputationExpressions"/>
         <PackageReference Include="En3Tho.FSharp.Extensions"/>
-        <PackageReference Include="Microsoft.SourceLink.GitHub">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
         <PackageReference Include="FSharp.Core"/>
     </ItemGroup>
 

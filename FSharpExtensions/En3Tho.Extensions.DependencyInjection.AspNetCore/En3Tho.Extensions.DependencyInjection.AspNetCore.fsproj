@@ -14,10 +14,6 @@
         <PackageReference Include="En3Tho.FSharp.Extensions"/>
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Core"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection"/>
-        <PackageReference Include="Microsoft.SourceLink.GitHub">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
         <PackageReference Include="FSharp.Core"/>
     </ItemGroup>
 
