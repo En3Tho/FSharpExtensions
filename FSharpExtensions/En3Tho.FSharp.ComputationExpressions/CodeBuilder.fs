@@ -2,13 +2,40 @@ namespace En3Tho.FSharp.ComputationExpressions.CodeBuilder
 
 open System
 open System.Collections.Immutable
+open System.IO
+open System.Runtime.InteropServices
 open System.Text
 open En3Tho.FSharp.Extensions
 
 module CodeBuilderImpl =
 
+    type ITextWriter =
+        abstract Write: value: string -> unit
+        abstract WriteLine: value: string -> unit
+
+    // TODO: async version with vtask
+    // type IAsyncTextWriter =
+    //     abstract WriteAsync: value: string -> ValueTask
+    //     abstract WriteLineAsync: value: string -> ValueTask
+
+    type [<Struct>] StringBuilderTextWriter(sb: StringBuilder) =
+        member _.Write(value: string) = sb.Append(value) |> ignore
+        member _.WriteLine(value: string) = sb.AppendLine(value) |> ignore
+
+        interface ITextWriter with
+            member this.Write(value) = this.Write(value)
+            member this.WriteLine(value) = this.WriteLine(value)
+
+    type [<Struct>] TextWriterTextWriter(textWriter: TextWriter) = // lul name
+        member _.Write(value: string) = textWriter.Write(value)
+        member _.WriteLine(value: string) = textWriter.WriteLine(value)
+
+        interface ITextWriter with
+            member this.Write(value) = this.Write(value)
+            member this.WriteLine(value) = this.WriteLine(value)
+
     type [<Struct>] LineOfCode = {
-        Indentation: int
+        Indent: int
         Text: string
     }
 
@@ -38,33 +65,46 @@ module CodeBuilderImpl =
             let indentation = indentation
 
             this.AddLength(text, indentation)
-            lines.Add({ Indentation = indentation; Text = text })
+            lines.Add({ Indent = indentation; Text = text })
 
         member this.AddLine(value: LineOfCode) =
             let text = value.Text
-            let indentation = value.Indentation + indentation
+            let indentation = value.Indent + indentation
 
             this.AddLength(text, indentation)
-            lines.Add({ Indentation = indentation; Text = text })
+            lines.Add({ Indent = indentation; Text = text })
 
-        member private _.GetIndentation count =
+        member private _.GetIndent count =
             if commonIndentations.Length < count then
                 commonIndentations[count]
             else
                 String.replicate (count * 4) " "
 
+        member this.Flush<'a when 'a :> ITextWriter>(writer: 'a) =
+            let linesSpan = CollectionsMarshal.AsSpan(lines)
+            for lineOfCode in linesSpan do
+                if String.IsNullOrWhiteSpace(lineOfCode.Text) then
+                    writer.WriteLine("")
+                else
+                    writer.Write(this.GetIndent lineOfCode.Indent)
+                    writer.WriteLine(lineOfCode.Text)
+
+        member this.Flush(textWriter: TextWriter) =
+            let textWriter = TextWriterTextWriter(textWriter)
+            this.Flush(textWriter)
+
+        member this.Flush(stringBuilder: StringBuilder) =
+            let textWriter = StringBuilderTextWriter(stringBuilder)
+            this.Flush(textWriter)
+
+        member this.Reset() =
+            length <- 0
+            indentation <- 0
+            lines.Clear()
+
         override this.ToString() =
             let sb = StringBuilder(length)
-            for lineOfCode in lines do
-                if String.IsNullOrWhiteSpace(lineOfCode.Text) then
-                    sb.AppendLine() |> ignore
-                else
-                    sb.Append(this.GetIndentation lineOfCode.Indentation).AppendLine(lineOfCode.Text) |> ignore
-
-            // Remove new line at the end
-            if sb.Length > 0 then
-                sb.Remove(sb.Length - 1, 1) |> ignore
-
+            this.Flush(sb)
             sb.ToString()
 
     type CodeBuilderCode = UnitBuilderCode<CodeBuilder>

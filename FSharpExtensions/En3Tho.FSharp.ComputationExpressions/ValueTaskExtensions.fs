@@ -4,6 +4,9 @@ open En3Tho.FSharp.ComputationExpressions.Tasks
 open System.Threading.Tasks
 open En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions.LowPriority
 open En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions.HighPriority
+open En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskExnResultBuilderExtensions.TaskLikeLowPriority
+open En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskExnResultBuilderExtensions.TaskLikeHighPriority
+open En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskExnResultBuilderExtensions.LowPriority
 
 module ValueTask =
     let inline map ([<InlineIfLambda>] mapper) (job: ValueTask<'a>) =
@@ -28,25 +31,17 @@ module TaskExtensions =
         member this.AsResult() =
             if this.IsCompletedSuccessfully then ValueTask<_>(result = Ok())
             else
-                vtask {
-                    try
-                        do! this
-                        return Ok()
-                    with e ->
-                        return Error e
+                evtask {
+                    do! this
                 }
 
     type Task<'a> with
         member this.AsResult() =
             if this.IsCompletedSuccessfully then ValueTask<_>(result = Ok this.Result)
-
             else
-                vtask {
-                    try
-                        let! result = this
-                        return Ok result
-                    with e ->
-                        return Error e
+                evtask {
+                    let! (v: 'a) = this
+                    return v
                 }
 
     type ValueTask with
@@ -54,22 +49,14 @@ module TaskExtensions =
             if
                 this.IsCompletedSuccessfully then ValueTask<_>(result = Ok())
             else
-                vtask {
-                    try
-                        do! this
-                        return Ok()
-                    with e ->
-                        return Error e
+                evtask {
+                    do! this
                 }
     type ValueTask<'a> with
         member this.AsResult() =
             if
                 this.IsCompletedSuccessfully then ValueTask<_>(result = Ok this.Result)
             else
-                vtask {
-                    try
-                        let! result = this
-                        return Ok result
-                    with e ->
-                        return Error e
+                evtask {
+                    return! this
                 }

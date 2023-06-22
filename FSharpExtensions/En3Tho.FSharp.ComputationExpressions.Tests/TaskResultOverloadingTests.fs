@@ -171,6 +171,15 @@ let ``test exnresultvtask type checking with records``() =
     }
 
 [<Fact>]
+let ``test exnresultvtask type checking with generic tasks``() =
+    let test (x: Task<'a>) = evtask {
+        let! (v: 'a) = x // can't figure out overloads without this but whatever
+        return v
+    }
+
+    test (Task.FromResult(1))
+
+[<Fact>]
 let ``test exnresultvtask type checking with ints``() =
     let getSomething (x: int) (y: int) = evtask {
         let x: Task<Result<int, exn>> = Task.FromResult(Ok 1)

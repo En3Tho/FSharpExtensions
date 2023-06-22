@@ -6,28 +6,28 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="GenericUnitBuilderBase.fs"/>
-        <Compile Include="GenericCollectionCodeExtensions.fs"/>
-        <Compile Include="ArrayPoolBasedBuilders.fs"/>
-        <Compile Include="CollectionBuilderExtensions.fs"/>
-        <Compile Include="OptionBuilder.fs"/>
-        <Compile Include="ResultBuilder.fs"/>
-        <Compile Include="CodeBuilder.fs"/>
-        <Compile Include="TaskBuilders\AwaiterHelper.fs"/>
-        <Compile Include="TaskBuilders\TaskBuilderExtensions.fs"/>
-        <Compile Include="TaskBuilders\UnitTaskBuilder.fs"/>
-        <Compile Include="TaskBuilders\UnitValueTaskBuilder.fs"/>
-        <Compile Include="TaskBuilders\ValueTaskBuilder.fs"/>
-        <Compile Include="TaskBuilders\ValueTaskOptionBuilder.fs"/>
-        <Compile Include="TaskBuilders\ValueTaskResultBuilder.fs"/>
-        <Compile Include="TaskBuilders\ValueTaskExnResultBuilder.fs"/>
-        <Compile Include="TaskBuilders\TaskBuilders.fs"/>
-        <Compile Include="ValueTaskExtensions.fs"/>
-        <Compile Include="HttpBuilder\Serializers.fs"/>
-        <Compile Include="HttpBuilder\HeadersBuilders.fs"/>
-        <Compile Include="HttpBuilder\Stages.fs"/>
-        <Compile Include="HttpBuilder\Content.fs"/>
-        <Compile Include="HttpBuilder\Extensions.fs"/>
+        <Compile Include="GenericUnitBuilderBase.fs" />
+        <Compile Include="GenericCollectionCodeExtensions.fs" />
+        <Compile Include="ArrayPoolBasedBuilders.fs" />
+        <Compile Include="CollectionBuilderExtensions.fs" />
+        <Compile Include="OptionBuilder.fs" />
+        <Compile Include="ResultBuilder.fs" />
+        <Compile Include="CodeBuilder.fs" />
+        <Compile Include="TaskBuilders\AwaiterHelper.fs" />
+        <Compile Include="TaskBuilders\TaskBuilderExtensions.fs" />
+        <Compile Include="TaskBuilders\UnitTaskBuilder.fs" />
+        <Compile Include="TaskBuilders\UnitValueTaskBuilder.fs" />
+        <Compile Include="TaskBuilders\ValueTaskBuilder.fs" />
+        <Compile Include="TaskBuilders\ValueTaskOptionBuilder.fs" />
+        <Compile Include="TaskBuilders\ValueTaskResultBuilder.fs" />
+        <Compile Include="TaskBuilders\ValueTaskExnResultBuilder.fs" />
+        <Compile Include="TaskBuilders\TaskBuilders.fs" />
+        <Compile Include="ValueTaskExtensions.fs" />
+        <Compile Include="HttpBuilder\Serializers.fs" />
+        <Compile Include="HttpBuilder\HeadersBuilders.fs" />
+        <Compile Include="HttpBuilder\Stages.fs" />
+        <Compile Include="HttpBuilder\Content.fs" />
+        <Compile Include="HttpBuilder\Extensions.fs" />
     </ItemGroup>
 
 </Project>
