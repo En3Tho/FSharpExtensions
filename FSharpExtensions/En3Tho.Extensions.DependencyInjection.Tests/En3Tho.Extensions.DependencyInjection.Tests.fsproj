@@ -1,8 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <GenerateProgramFile>false</GenerateProgramFile>
-        <IsUnitTest>true</IsUnitTest>
+        <UnitTest>true</UnitTest>
     </PropertyGroup>
 
     <ItemGroup>

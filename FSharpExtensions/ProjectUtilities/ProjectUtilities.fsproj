@@ -17,8 +17,4 @@
         <ProjectReference Include="..\En3Tho.FSharp.Extensions\En3Tho.FSharp.Extensions.fsproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="FSharp.Core"/>
-    </ItemGroup>
-
 </Project>

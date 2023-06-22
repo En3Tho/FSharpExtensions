@@ -28,7 +28,6 @@
 
     <ItemGroup>
         <PackageReference Include="BenchmarkDotNet"/>
-        <PackageReference Include="FSharp.Core"/>
     </ItemGroup>
 
     <ItemGroup>

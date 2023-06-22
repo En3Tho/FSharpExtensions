@@ -23,7 +23,11 @@
         </PackageReference>
     </ItemGroup>
 
-    <ItemGroup Condition="'$(IsUnitTest)' == 'true'">
+    <PropertyGroup Condition="'$(UnitTest)' == 'true'">
+        <GenerateProgramFile>false</GenerateProgramFile>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(UnitTest)' == 'true'">
         <PackageReference Include="Microsoft.NET.Test.Sdk"/>
         <PackageReference Include="xunit"/>
         <PackageReference Include="xunit.runner.visualstudio">

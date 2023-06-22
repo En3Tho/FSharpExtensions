@@ -14,7 +14,6 @@
         <PackageReference Include="En3Tho.FSharp.Extensions"/>
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Core"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection"/>
-        <PackageReference Include="FSharp.Core"/>
     </ItemGroup>
 
 </Project>

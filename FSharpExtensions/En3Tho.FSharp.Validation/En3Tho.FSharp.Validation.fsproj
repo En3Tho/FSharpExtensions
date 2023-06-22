@@ -17,7 +17,6 @@
     <ItemGroup>
         <PackageReference Include="En3Tho.FSharp.ComputationExpressions"/>
         <PackageReference Include="En3Tho.FSharp.Extensions"/>
-        <PackageReference Include="FSharp.Core"/>
     </ItemGroup>
 
 </Project>

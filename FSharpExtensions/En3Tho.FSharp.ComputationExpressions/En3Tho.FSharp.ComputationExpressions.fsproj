@@ -30,8 +30,4 @@
         <Compile Include="HttpBuilder\Extensions.fs"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="FSharp.Core"/>
-    </ItemGroup>
-
 </Project>

@@ -21,8 +21,4 @@
         <Compile Include="GSeq.fs"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="FSharp.Core"/>
-    </ItemGroup>
-
 </Project>
