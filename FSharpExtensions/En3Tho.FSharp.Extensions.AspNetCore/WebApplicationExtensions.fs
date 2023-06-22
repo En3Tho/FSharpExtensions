@@ -1,3 +1,4 @@
+// auto-generated
 [<AutoOpen>]
 module En3Tho.FSharp.Extensions.AspNetCore.WebAppExtensions
 
@@ -89,4 +90,3 @@ type WebApplication with
     member inline this.MapPatch(pattern, func: Func<'T1, 'T2, 'T3, 'T4, 'T5, 'T6, 'T7, 'T8, 'T9, 'T10, 'T11, 'T12, 'T13, 'T14, 'TResult>) = this.MapGet(pattern, handler = func)
     member inline this.MapPatch(pattern, func: Func<'T1, 'T2, 'T3, 'T4, 'T5, 'T6, 'T7, 'T8, 'T9, 'T10, 'T11, 'T12, 'T13, 'T14, 'T15, 'TResult>) = this.MapGet(pattern, handler = func)
     member inline this.MapPatch(pattern, func: Func<'T1, 'T2, 'T3, 'T4, 'T5, 'T6, 'T7, 'T8, 'T9, 'T10, 'T11, 'T12, 'T13, 'T14, 'T15, 'T16, 'TResult>) = this.MapGet(pattern, handler = func)
-

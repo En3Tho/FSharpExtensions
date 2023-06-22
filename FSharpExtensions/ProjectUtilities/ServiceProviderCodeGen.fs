@@ -14,7 +14,7 @@ module ServiceProviderCodeGen =
             $"public static void Run<{typeArgs}>(this IServiceProvider provider, Action<{typeArgs}> action)"
             indent {
                 for i = 1 to genericArgsCount do
-                    $"where T{i} : class"
+                    $"where T{i} : notnull"
             }
             braceBlock {
                 "action("
@@ -38,7 +38,7 @@ module ServiceProviderCodeGen =
             $"public static {returnType} Run<{typeArgs}, {returnType}>(this IServiceProvider provider, Func<{typeArgs}, {returnType}> func)"
             indent {
                 for i = 1 to genericArgsCount do
-                    $"where T{i} : class"
+                    $"where T{i} : notnull"
             }
             braceBlock {
                 "return func("
@@ -62,7 +62,7 @@ module ServiceProviderCodeGen =
             $"public static {returnType} RunAsync<{typeArgs}>(this IServiceProvider provider, Func<{typeArgs}, {returnType}> func)"
             indent {
                 for i = 1 to genericArgsCount do
-                    $"where T{i} : class"
+                    $"where T{i} : notnull"
             }
             braceBlock {
                 "return func("
@@ -86,7 +86,7 @@ module ServiceProviderCodeGen =
             $"public static {returnType} RunAsync<{typeArgs}, TOut>(this IServiceProvider provider, Func<{typeArgs}, {returnType}> func)"
             indent {
                for i = 1 to genericArgsCount do
-                    $"where T{i} : class"
+                    $"where T{i} : notnull"
             }
             braceBlock {
                 "return func("
@@ -110,7 +110,7 @@ module ServiceScopeCodeGen =
             $"public static void Run<{typeArgs}>(this IServiceScope scope, Action<{typeArgs}> action)"
             indent {
                 for i = 1 to genericArgsCount do
-                    $"where T{i} : class"
+                    $"where T{i} : notnull"
             }
             braceBlock {
                 "scope.ServiceProvider.Run(action);"
@@ -128,7 +128,7 @@ module ServiceScopeCodeGen =
             $"public static {returnType} Run<{typeArgs}, {returnType}>(this IServiceScope scope, Func<{typeArgs}, {returnType}> func)"
             indent {
                 for i = 1 to genericArgsCount do
-                    $"where T{i} : class"
+                    $"where T{i} : notnull"
             }
             braceBlock {
                 "return scope.ServiceProvider.Run(func);"
@@ -146,7 +146,7 @@ module ServiceScopeCodeGen =
             $"public static {returnType} RunAsync<{typeArgs}>(this IServiceScope scope, Func<{typeArgs}, {returnType}> func)"
             indent {
                 for i = 1 to genericArgsCount do
-                    $"where T{i} : class"
+                    $"where T{i} : notnull"
             }
             braceBlock {
                 "return scope.ServiceProvider.RunAsync(func);"
@@ -164,7 +164,7 @@ module ServiceScopeCodeGen =
             $"public static {returnType} RunAsync<{typeArgs}, TOut>(this IServiceScope scope, Func<{typeArgs}, {returnType}> func)"
             indent {
                 for i = 1 to genericArgsCount do
-                    $"where T{i} : class"
+                    $"where T{i} : notnull"
             }
             braceBlock {
                 "return scope.ServiceProvider.RunAsync(func);"
@@ -224,8 +224,6 @@ module ServiceProviderAndScopeCodeGen =
     let generateFileCode (codeBlock: CodeBuilderImpl.CodeBuilder) =
         code {
             "// auto-generated"
-            "using System;"
-            "using System.Threading.Tasks;"
             "using Microsoft.Extensions.DependencyInjection;"
             ""
             "namespace En3Tho.Extensions.DependencyInjection;"

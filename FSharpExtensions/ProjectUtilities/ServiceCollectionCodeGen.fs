@@ -17,7 +17,7 @@ let getMethodCodeForVerb dependenciesCount (verb: string) =
             $"Func<{genericParameters}, TService> factory)"
             "where TService : class"
             for i = 1 to dependenciesCount do
-                $"where TDependency{i} : class"
+                $"where TDependency{i} : notnull"
         }
         braceBlock {
             $"collection.{verb}("
@@ -28,8 +28,8 @@ let getMethodCodeForVerb dependenciesCount (verb: string) =
                         $"serviceProvider.GetRequiredService<TDependency{index}>(),"
                     $"serviceProvider.GetRequiredService<TDependency{dependenciesCount}>()"
                 }
-                "))";
             }
+            "));"
             "return collection;"
         }
     }
@@ -37,8 +37,9 @@ let getMethodCodeForVerb dependenciesCount (verb: string) =
 let generateFileForVerb dependenciesCount verb =
     code {
         "// auto-generated"
-        "using System;"
         "using Microsoft.Extensions.DependencyInjection;"
+        "using Microsoft.Extensions.DependencyInjection.Extensions;"
+        ""
         "namespace En3Tho.Extensions.DependencyInjection;"
         ""
         "public static partial class IServiceCollectionExtensions"

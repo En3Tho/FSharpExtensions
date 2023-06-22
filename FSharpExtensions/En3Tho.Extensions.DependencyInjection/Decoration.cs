@@ -14,8 +14,6 @@ public static partial class IServiceCollectionExtensions
     /// <exception cref="InvalidOperationException"></exception>
     public static IServiceCollection Decorate<TService, TImpl>(this IServiceCollection collection) where TImpl : TService
     {
-        // first, find the most latest service registered
-
         if (!collection.TryFindServiceDescriptor<TService>(out ServiceDescriptorEnvelope possibleDescriptor))
             throw new InvalidOperationException(
                 $"Service {typeof(TService).FullName} was not found among registered services");
