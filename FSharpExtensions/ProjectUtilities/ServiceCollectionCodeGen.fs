@@ -1,7 +1,6 @@
 module ProjectUtilities.ServiceCollectionCodeGen
 
 open System
-open System.IO
 open En3Tho.FSharp.Extensions
 open En3Tho.FSharp.ComputationExpressions.CodeBuilder
 
@@ -37,6 +36,7 @@ let getMethodCodeForVerb dependenciesCount (verb: string) =
 
 let generateFileForVerb dependenciesCount verb =
     code {
+        "// auto-generated"
         "using System;"
         "using Microsoft.Extensions.DependencyInjection;"
         "namespace En3Tho.Extensions.DependencyInjection;"
@@ -46,6 +46,7 @@ let generateFileForVerb dependenciesCount verb =
             for i = 1 to dependenciesCount do
                 getMethodCodeForVerb i verb
                 ""
+            trimEnd()
         }
     }
 
@@ -55,20 +56,12 @@ let generateAllLifetimesAndVerbs() = seq {
     for lifetime in lifetimes do
         let verbs = [| $"Add{lifetime}"; $"TryAdd{lifetime}"; $"TryAdd{lifetime}OrFail" |]
         for verb in verbs do
-            let count = 15
+            let funcArgsCount = 16
             let filePath = $"{verb}Func.cs"
-            filePath, generateFileForVerb count verb
+            filePath, generateFileForVerb funcArgsCount verb
 }
 
-let makeFiles() =
+let generateFiles() =
     generateAllLifetimesAndVerbs()
     |> Seq.iter ^ fun (filePath, code) ->
-        let text = code |> toString
-        File.WriteAllText(filePath, text)
-
-let dumpToConsole() =
-    generateAllLifetimesAndVerbs()
-    |> Seq.iter ^ fun (_, code) ->
-        let text = code |> toString
-        Console.WriteLine(text)
-        Console.WriteLine()
+        Code.writeToFile filePath code

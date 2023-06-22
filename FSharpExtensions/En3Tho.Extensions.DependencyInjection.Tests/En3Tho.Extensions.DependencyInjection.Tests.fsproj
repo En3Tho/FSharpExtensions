@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <UnitTest>true</UnitTest>
+        <ProjectType>UnitTest</ProjectType>
     </PropertyGroup>
 
     <ItemGroup>
@@ -12,7 +12,6 @@
         <Compile Include="Module2DependencyInjectionTest.fs" />
         <Compile Include="ServiceCollectionExtensionsTests.fs" />
         <Compile Include="AddFuncTests.fs" />
-        <Compile Include="Program.fs" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,13 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <UnitTest>true</UnitTest>
+        <ProjectType>UnitTest</ProjectType>
     </PropertyGroup>
 
     <ItemGroup>
         <Compile Include="Validation.fs" />
         <Compile Include="JsonSerialization.fs" />
-        <Compile Include="Program.fs" />
     </ItemGroup>
 
     <ItemGroup>

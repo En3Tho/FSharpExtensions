@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <UnitTest>true</UnitTest>
+        <ProjectType>UnitTest</ProjectType>
         <LangVersion>preview</LangVersion>
     </PropertyGroup>
 
@@ -12,7 +12,6 @@
         <Compile Include="IEquatableOperatorTests.fs" />
         <Compile Include="Byrefs.fs" />
         <Compile Include="GSeq.fs" />
-        <Compile Include="Program.fs" />
     </ItemGroup>
 
     <ItemGroup>

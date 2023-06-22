@@ -1,6 +1,5 @@
 namespace ProjectUtilities
 
-open System.IO
 open En3Tho.FSharp.Extensions
 open En3Tho.FSharp.ComputationExpressions.CodeBuilder
 
@@ -174,7 +173,7 @@ module ServiceScopeCodeGen =
 
 module ServiceProviderAndScopeCodeGen =
 
-    let serviceProviderCode =
+    let generateServiceProviderCode() =
 
         let generators = [|
             ServiceProviderCodeGen.makeActionCode
@@ -188,16 +187,17 @@ module ServiceProviderAndScopeCodeGen =
         |]
 
         code {
-            "public static partial class IServiceProviderExtensions"
+            "public static class IServiceProviderExtensions"
             braceBlock {
                 for generator in generators do
-                    for i = 1 to 15 do
+                    for i = 1 to 16 do
                         generator i
                         ""
+                trimEnd()
             }
         }
 
-    let serviceScopeCode =
+    let generateServiceScopeCode() =
 
         let generators = [|
             ServiceScopeCodeGen.makeActionCode
@@ -211,17 +211,19 @@ module ServiceProviderAndScopeCodeGen =
         |]
 
         code {
-            "public static partial class IServiceScopeExtensions"
+            "public static class IServiceScopeExtensions"
             braceBlock {
                 for generator in generators do
-                    for i = 1 to 15 do
+                    for i = 1 to 16 do
                         generator i
                         ""
+                trimEnd()
             }
         }
 
-    let generateFileForCodeBlock fileName (codeBlock: CodeBuilderImpl.CodeBuilder) =
+    let generateFileCode (codeBlock: CodeBuilderImpl.CodeBuilder) =
         code {
+            "// auto-generated"
             "using System;"
             "using System.Threading.Tasks;"
             "using Microsoft.Extensions.DependencyInjection;"
@@ -230,11 +232,12 @@ module ServiceProviderAndScopeCodeGen =
             ""
             codeBlock
         }
-        |> toString
-        |> fun text -> File.WriteAllText(fileName, text)
 
     let generateFiles() =
-        let dirName = ".artifacts"
-        if not ^ Directory.Exists dirName then Directory.CreateDirectory(dirName) |> ignore
-        generateFileForCodeBlock $"{dirName}/IServiceProviderExtensions.cs" serviceProviderCode
-        generateFileForCodeBlock $"{dirName}/IServiceScopeExtensions.cs" serviceScopeCode
+        generateServiceProviderCode()
+        |> generateFileCode
+        |> Code.writeToFile "IServiceProviderExtensions.cs"
+
+        generateServiceScopeCode()
+        |> generateFileCode
+        |> Code.writeToFile "IServiceScopeExtensions.cs"

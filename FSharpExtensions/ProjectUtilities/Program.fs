@@ -1,4 +1,15 @@
+open System
+open System.Diagnostics
 open ProjectUtilities
 
-ServiceProviderAndScopeCodeGen.generateFiles()
-WebApplicationsExtensionsCodeGen.generateFiles()
+let go() =
+
+    let sw = Stopwatch.StartNew()
+
+    ServiceCollectionCodeGen.generateFiles()
+    ServiceProviderAndScopeCodeGen.generateFiles()
+    WebApplicationsExtensionsCodeGen.generateFiles()
+
+    Console.WriteLine($"Elapsed: {sw.Elapsed}")
+
+go()
