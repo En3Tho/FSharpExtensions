@@ -6,8 +6,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Moq"/>
-        <PackageReference Include="Xunit.DependencyInjection"/>
+        <PackageReference Include="Moq" />
+        <PackageReference Include="Xunit.DependencyInjection" />
     </ItemGroup>
 
 </Project>
