@@ -58,44 +58,26 @@ let initGlobalProperties (projectPath: string) (toolsPath: string) =
         GlobalProperties.MSBuildEnableWorkloadResolver -- "false" // TODO: should this be enabled? if yes then find a way to run this thing
         GlobalProperties.RestorePackagesPath -- Environment.GetEnvironmentVariable("NUGET_PACKAGES")
     }
-    
-let initEnvironmentVariables (globalProperties: Dictionary<string, string>) =
-    for prop in globalProperties do
-        Environment.SetEnvironmentVariable(prop.Key, prop.Value)
-    Environment.SetEnvironmentVariable(EnvironmentVariables.MSBUILD_NUGET_PATH, globalProperties[GlobalProperties.RestorePackagesPath])
-
-// TODO: find a way to pass toolsPath as msbuild property or something?
-let copyRelevantFiles toolsPath =
-    File.Copy(Path.Combine(toolsPath, "Microsoft.Build.NuGetSdkResolver.dll"), "Microsoft.Build.NuGetSdkResolver.dll", true)
-
-let prepareEnvironment toolsPath solutionPath =
-    let globalProperties = initGlobalProperties solutionPath toolsPath
-    initEnvironmentVariables globalProperties
-    copyRelevantFiles toolsPath
-    
-    let collection = ProjectCollection(globalProperties)
-    collection.AddToolset(Toolset(ToolLocationHelper.CurrentToolsVersion, toolsPath, collection, ""))
-    collection
-
-let tryPackageReferenceInclude (item: ProjectItemInstance) =
-    if item.ItemType.Equals(Items.PackageReference) then
-        let version = item.Metadata |> Seq.tryFind ^ fun metadata -> metadata.Name.Equals(Items.Metadata.Version)
-        match version with
-        | Some version ->
-            match item.EvaluatedInclude, version.EvaluatedValue with
-            | String.NotNullOrEmpty & packageName, String.NotNullOrEmpty & packageVersion ->
-                Some (packageName, packageVersion)
-            | _ ->
-                None
-        | _ ->
-            None
-    else
-        None
 
 type ProjectInstance with
     member this.PackageReferences =
+        let tryGetPackageReferenceWithVersion (item: ProjectItemInstance) =
+            if item.ItemType.Equals(Items.PackageReference) then
+                let version = item.Metadata |> Seq.tryFind ^ fun metadata -> metadata.Name.Equals(Items.Metadata.Version)
+                match version with
+                | Some version ->
+                    match item.EvaluatedInclude, version.EvaluatedValue with
+                    | String.NotNullOrEmpty & packageName, String.NotNullOrEmpty & packageVersion ->
+                        Some (packageName, packageVersion)
+                    | _ ->
+                        None
+                | _ ->
+                    None
+            else
+                None
+
         this.Items
-        |> Seq.choose tryPackageReferenceInclude
+        |> Seq.choose tryGetPackageReferenceWithVersion
 
     member this.IsManagedCentrally =
         this.Properties
@@ -147,8 +129,29 @@ type XmlNode with
     member this.IncludeAttribute =
         this.Attributes[Items.Metadata.Include] |> Option.ofObj
 
+    member this.UpdateAttribute =
+        this.Attributes[Items.Metadata.Update] |> Option.ofObj
+
     member this.ManagePackageVersionsCentrallyNode =
         this[Properties.ManagePackageVersionsCentrally] |> Option.ofObj
+
+let initEnvironmentVariables (globalProperties: Dictionary<string, string>) =
+    for prop in globalProperties do
+        Environment.SetEnvironmentVariable(prop.Key, prop.Value)
+    Environment.SetEnvironmentVariable(EnvironmentVariables.MSBUILD_NUGET_PATH, globalProperties[GlobalProperties.RestorePackagesPath])
+
+// TODO: find a way to pass toolsPath as msbuild property or something?
+let copyRelevantFiles toolsPath =
+    File.Copy(Path.Combine(toolsPath, "Microsoft.Build.NuGetSdkResolver.dll"), "Microsoft.Build.NuGetSdkResolver.dll", true)
+
+let prepareEnvironment toolsPath solutionPath =
+    let globalProperties = initGlobalProperties solutionPath toolsPath
+    initEnvironmentVariables globalProperties
+    copyRelevantFiles toolsPath
+    
+    let collection = ProjectCollection(globalProperties)
+    collection.AddToolset(Toolset(ToolLocationHelper.CurrentToolsVersion, toolsPath, collection, ""))
+    collection
 
 let removeVersionAttributesFromPackageReferences (projectPath: string) (projectPackageVersions: IReadOnlyDictionary<string, string>) =
     if projectPackageVersions.Count > 0 then
@@ -158,9 +161,10 @@ let removeVersionAttributesFromPackageReferences (projectPath: string) (projectP
 
         for itemGroup in project.ItemGroups do
             for packageReference in itemGroup.PackageReferences do
-                match packageReference.IncludeAttribute with
-                | Some include' ->
-                    if projectPackageVersions.ContainsKey(include'.Value) then
+                match packageReference.IncludeAttribute, packageReference.UpdateAttribute with
+                | Some packageName, _
+                | _, Some packageName ->
+                    if projectPackageVersions.ContainsKey(packageName.Value) then
                         match packageReference.VersionAttribute with
                         | Some version ->
                             packageReference.Attributes.Remove(version) |> ignore
@@ -279,8 +283,7 @@ let analyzeSolution toolsPath solutionPath =
     document.WriteToFile(filePath)
 
 let run() =
-    let solutionPath = @"G:\source\repos\En3Tho\FSharpExtensions\FSharpExtensions\FSharpExtensions.sln"
-    let solutionPath = @"G:\source\repos\En3Tho\MyBlazorApp\src\MyBlazorApp.sln"
+    let solutionPath = @"G:\source\repos\En3Tho\PoshRedisViewer\PoshRedisViewer\PoshRedisViewer.sln"
     let toolsPath = DotnetInfo.getCoreBasePath solutionPath
     analyzeSolution toolsPath solutionPath
     
