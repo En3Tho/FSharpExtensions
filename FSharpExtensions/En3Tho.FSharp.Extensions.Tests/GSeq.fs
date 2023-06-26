@@ -8,7 +8,7 @@ let ``ofArrayRev``() =
     [| 1; 2; 3 |]
     |> GSeq.ofArrayRev
     |> GSeq.toSeq
-    |> fun rev -> Assert.True(rev == [| 3; 2; 1 |])
+    |> fun rev -> Assert.True(rev === [| 3; 2; 1 |])
 
 [<Fact>]
 let ``filter skip map fold``() =

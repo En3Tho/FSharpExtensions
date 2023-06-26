@@ -45,6 +45,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3F96FD51
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Benchmarks", "Benchmarks", "{9374398C-1C27-4372-813E-DDB8CA5C5F90}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "CentralPackageManagementMigrationTool", "CentralPackageManagementMigrationTool\CentralPackageManagementMigrationTool.fsproj", "{0E898CE9-0FA1-40C3-BFA9-2094F4C8B09E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +113,10 @@ Global
 		{06710AE9-9D30-438D-9765-D02DB1302D82}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06710AE9-9D30-438D-9765-D02DB1302D82}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{06710AE9-9D30-438D-9765-D02DB1302D82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E898CE9-0FA1-40C3-BFA9-2094F4C8B09E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E898CE9-0FA1-40C3-BFA9-2094F4C8B09E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E898CE9-0FA1-40C3-BFA9-2094F4C8B09E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E898CE9-0FA1-40C3-BFA9-2094F4C8B09E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{ED4D366B-0F29-4095-A8C8-EFED608A547B} = {3F96FD51-137E-4572-A477-35B7F5F653DA}

@@ -642,7 +642,7 @@ module Seq =
         |> ofGenericEnumerator
 
     let inline identical (seq2: 'a seq) (seq1: 'a seq) =
-        seq1 == seq2
+        seq1 === seq2
 
     let identicalBy (seq2: 'a seq) comparer (seq1: 'a seq) =
         use enum1 = seq1.GetEnumerator()

@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net7.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="ProcessUtils.fs" />
+        <Compile Include="DotnetInfo.fs" />
+        <Compile Include="Program.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Build" />
+      <PackageReference Include="Microsoft.Build.Framework" />
+      <PackageReference Include="Microsoft.Build.Runtime" />
+      <PackageReference Include="Microsoft.Build.Tasks.Core" />
+      <PackageReference Include="Microsoft.Build.Tasks.Git">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Microsoft.Build.Utilities.Core" />
+      <PackageReference Include="NuGet.Common" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\En3Tho.FSharp.ComputationExpressions\En3Tho.FSharp.ComputationExpressions.fsproj" />
+      <ProjectReference Include="..\En3Tho.FSharp.Extensions\En3Tho.FSharp.Extensions.fsproj" />
+    </ItemGroup>
+
+</Project>

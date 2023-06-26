@@ -184,7 +184,6 @@ module IEquatableEqualityOperatorEx =
     let inline callIEquatableEqualsOnHashSets<'a when 'a :> IEquatable<'a>> (left: 'a HashSet) (right: 'a HashSet) =
         left.Count = right.Count
         && Object.ReferenceEquals(left.Comparer, right.Comparer)
-        && Object.ReferenceEquals(left.Comparer, EqualityComparer<'a>.Default)
         && (let mutable leftEnumerator = left.GetEnumerator()
             let rec go rightCount =
                 if leftEnumerator.MoveNext() then
@@ -201,7 +200,6 @@ module IEquatableEqualityOperatorEx =
     let inline callIEquatableEqualsOnDictionaries<'a, 'b when 'a :> IEquatable<'a> and 'b :> IEquatable<'b>> (left: Dictionary<'a, 'b>) (right: Dictionary<'a, 'b>) =
         left.Count = right.Count
         && Object.ReferenceEquals(left.Comparer, right.Comparer)
-        && Object.ReferenceEquals(left.Comparer, EqualityComparer<'a>.Default)
         && (let mutable leftEnumerator = left.GetEnumerator()
             let rec go rightCount =
                 if leftEnumerator.MoveNext() then
@@ -218,19 +216,26 @@ module IEquatableEqualityOperatorEx =
             go right.Count)
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-    type T = T with
-        static member inline ($) (T, value) = fun otherValue -> callIEquatableEqualsOnValues value otherValue
-        static member inline ($) (T, value) = fun otherValue -> callIEquatableEqualsOnArrays value otherValue
-        static member inline ($) (T, value) = fun otherValue -> callIEquatableEqualsOnResizeArrays value otherValue
-        static member inline ($) (T, value) = fun otherValue -> callIEquatableEqualsOnLists value otherValue
-        static member inline ($) (T, value) = fun otherValue -> callIEquatableEqualsOnLinkedLists value otherValue
-        static member inline ($) (T, value) = fun otherValue -> callIEquatableEqualsOnSeq value otherValue
-        static member inline ($) (T, value) = fun otherValue -> callIEquatableEqualsOnHashSets value otherValue
-        static member inline ($) (T, value) = fun otherValue -> callIEquatableEqualsOnDictionaries value otherValue
+    type ValueEquality = ValueEquality with
+        static member inline ($) (ValueEquality, value) = fun otherValue -> callIEquatableEqualsOnValues value otherValue
 
-    let inline (==) a b = (T $ a) b
+    let inline (==) a b = (ValueEquality $ a) b
 
     let inline (!=) a b = not (a == b)
+
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    type CollectionEquality = CollectionEquality with
+        static member inline ($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnArrays value otherValue
+        static member inline ($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnResizeArrays value otherValue
+        static member inline ($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnLists value otherValue
+        static member inline ($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnLinkedLists value otherValue
+        static member inline ($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnSeq value otherValue
+        static member inline ($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnHashSets value otherValue
+        static member inline ($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnDictionaries value otherValue
+
+    let inline (===) a b = (CollectionEquality $ a) b
+
+    let inline (!==) a b = not (a == b)
 
 [<AutoOpen; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 module ByRefOperators =

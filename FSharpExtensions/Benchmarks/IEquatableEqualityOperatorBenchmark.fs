@@ -46,16 +46,16 @@ type Benchmark() =
     member _.TestValues() = value1 == value2
 
     [<Benchmark>]
-    member _.TestArrays() = array1 == array2
+    member _.TestArrays() = array1 === array2
 
     [<Benchmark>]
-    member _.TestLists() = list1 == list2
+    member _.TestLists() = list1 === list2
 
     [<Benchmark>]
-    member _.TestSequences() = sequence1 == sequence2
+    member _.TestSequences() = sequence1 === sequence2
 
     [<Benchmark>]
-    member _.TestResizeArrays() = resizeArray1 == resizeArray2
+    member _.TestResizeArrays() = resizeArray1 === resizeArray2
 
     [<Benchmark>]
     member _.TestValuesUsingDefaultEqualityOperator() = value1 = value2
