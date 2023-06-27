@@ -8,36 +8,40 @@ type SStructEnumerator<'i, 'e when 'e: struct
                               and 'e :> IEnumerator<'i>> = 'e
 
 [<Struct; NoComparison; NoEquality>]
-type StructIEnumeratorWrapper<'i>(enumerator: IEnumerator<'i>) =
+type StructIEnumeratorWrapper<'i, 'e when 'e :> IEnumerator<'i>> =
+    val mutable private enumerator: 'e
+
+    new (enumerator) = { enumerator = enumerator }
+
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    member this.MoveNext() = enumerator.MoveNext()
+    member this.MoveNext() = this.enumerator.MoveNext()
 
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
-        enumerator.Current
+        this.enumerator.Current
 
-    member this.Dispose() = enumerator.Dispose()
+    member this.Dispose() = this.enumerator.Dispose()
 
     interface IEnumerator<'i> with
-        member this.Current = enumerator.Current :> obj
-        member this.Current = enumerator.Current
-        member this.Dispose() = enumerator.Dispose()
-        member this.MoveNext() = enumerator.MoveNext()
-        member this.Reset() = enumerator.Reset()
+        member this.Current = this.enumerator.Current :> obj
+        member this.Current = this.enumerator.Current
+        member this.Dispose() = this.enumerator.Dispose()
+        member this.MoveNext() = this.enumerator.MoveNext()
+        member this.Reset() = this.enumerator.Reset()
 
 [<Struct; NoComparison; NoEquality>]
 type StructArrayEnumerator<'i> =
-    val private array: 'i[]
+    val private data: 'i[]
     val mutable private index: int
 
-    new (array) = { index = -1; array = array; }
+    new (data) = { index = -1; data = data; }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
         this.index <- this.index + 1
-        uint32 this.index < uint32 this.array.Length
+        uint32 this.index < uint32 this.data.Length
 
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
-        this.array[this.index]
+        this.data[this.index]
 
     member this.Dispose() = ()
 
@@ -50,18 +54,18 @@ type StructArrayEnumerator<'i> =
 
 [<Struct; NoComparison; NoEquality>]
 type StructResizeArrayEnumerator<'i> =
-    val private array: 'i ResizeArray
+    val private data: 'i ResizeArray
     val mutable private index: int
 
-    new (array) = { index = -1; array = array; }
+    new (data) = { index = -1; data = data; }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
         this.index <- this.index + 1
-        uint32 this.index < uint32 this.array.Count
+        uint32 this.index < uint32 this.data.Count
 
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
-        this.array[this.index]
+        this.data[this.index]
 
     member this.Dispose() = ()
 
@@ -73,19 +77,19 @@ type StructResizeArrayEnumerator<'i> =
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructIListEnumerator<'i> =
-    val private array: 'i IList
+type StructIListEnumerator<'i, 'list when 'list :> IList<'i>> =
+    val mutable private data: 'list
     val mutable private index: int
 
-    new (array) = { index = -1; array = array; }
+    new (data) = { index = -1; data = data; }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
         this.index <- this.index + 1
-        uint32 this.index < uint32 this.array.Count
+        uint32 this.index < uint32 this.data.Count
 
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
-        this.array[this.index]
+        this.data[this.index]
 
     member this.Dispose() = ()
 
@@ -98,18 +102,18 @@ type StructIListEnumerator<'i> =
 
 [<Struct; NoComparison; NoEquality>]
 type StructArrayRevEnumerator<'i> =
-    val private array: 'i[]
+    val private data: 'i[]
     val mutable private index: int
 
-    new (array) = { array = array; index = array.Length }
+    new (data) = { data = data; index = data.Length }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
         this.index <- this.index - 1
-        uint32 this.index < uint32 this.array.Length
+        uint32 this.index < uint32 this.data.Length
 
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
-        this.array[this.index]
+        this.data[this.index]
 
     member this.Dispose() = ()
 
@@ -122,18 +126,18 @@ type StructArrayRevEnumerator<'i> =
 
 [<Struct; NoComparison; NoEquality>]
 type StructResizeArrayRevEnumerator<'i> =
-    val private array: 'i ResizeArray
+    val private data: 'i ResizeArray
     val mutable private index: int
 
-    new (array) = { array = array; index = array.Count }
+    new (data) = { data = data; index = data.Count }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
         this.index <- this.index - 1
-        uint32 this.index < uint32 this.array.Count
+        uint32 this.index < uint32 this.data.Count
 
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
-        this.array[this.index]
+        this.data[this.index]
 
     member this.Dispose() = ()
 
@@ -145,19 +149,19 @@ type StructResizeArrayRevEnumerator<'i> =
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructIListRevEnumerator<'i> =
-    val private array: 'i IList
+type StructIListRevEnumerator<'i, 'list when 'list :> IList<'i>> =
+    val mutable private data: 'list
     val mutable private index: int
 
-    new (array) = { array = array; index = array.Count }
+    new (data) = { data = data; index = data.Count }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
         this.index <- this.index - 1
-        uint32 this.index < uint32 this.array.Count
+        uint32 this.index < uint32 this.data.Count
 
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
-        this.array[this.index]
+        this.data[this.index]
 
     member this.Dispose() = ()
 
@@ -170,18 +174,18 @@ type StructIListRevEnumerator<'i> =
 
 [<Struct; NoComparison; NoEquality>]
 type StructImmutableArrayEnumerator<'i> =
-    val private array: 'i ImmutableArray
+    val private data: 'i ImmutableArray
     val mutable private index: int
 
-    new (array) = { index = -1; array = array; }
+    new (data) = { index = -1; data = data; }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
         this.index <- this.index + 1
-        uint32 this.index < uint32 this.array.Length
+        uint32 this.index < uint32 this.data.Length
 
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
-        this.array[this.index]
+        this.data[this.index]
 
     member this.Dispose() = ()
 
@@ -194,18 +198,18 @@ type StructImmutableArrayEnumerator<'i> =
 
 [<Struct; NoComparison; NoEquality>]
 type StructImmutableArrayRevEnumerator<'i> =
-    val private array: 'i ImmutableArray
+    val private data: 'i ImmutableArray
     val mutable private index: int
 
-    new (array) = { index = -1; array = array; }
+    new (data) = { index = -1; data = data; }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
         this.index <- this.index - 1
-        uint32 this.index < uint32 this.array.Length
+        uint32 this.index < uint32 this.data.Length
 
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
-        this.array[this.index]
+        this.data[this.index]
 
     member this.Dispose() = ()
 

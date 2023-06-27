@@ -448,27 +448,6 @@ module GSeq =
             result <- result + 1
         result
 
-    // [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    // let toArray (enumerator: SStructEnumerator<'i,'e>) = arr {
-    //     let mutable enumerator = enumerator
-    //     while enumerator.MoveNext() do
-    //         enumerator.Current
-    // }
-    //
-    // [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    // let toResizeArray (enumerator: SStructEnumerator<'i,'e>) = rsz {
-    //     let mutable enumerator = enumerator
-    //     while enumerator.MoveNext() do
-    //         enumerator.Current
-    // }
-    //
-    // [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    // let toBlock (enumerator: SStructEnumerator<'i,'e>) = block {
-    //     let mutable enumerator = enumerator
-    //     while enumerator.MoveNext() do
-    //         enumerator.Current
-    // }
-
     let toSeq (enumerator: SStructEnumerator<'i,'e>) =
         { new IEnumerable<'i> with
             member _.GetEnumerator() = enumerator :> System.Collections.IEnumerator

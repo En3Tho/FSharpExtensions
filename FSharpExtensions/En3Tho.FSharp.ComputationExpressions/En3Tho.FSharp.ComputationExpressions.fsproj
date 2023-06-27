@@ -9,6 +9,7 @@
         <Compile Include="GenericUnitBuilderBase.fs" />
         <Compile Include="GenericCollectionCodeExtensions.fs" />
         <Compile Include="ArrayPoolBasedBuilders.fs" />
+        <Compile Include="GSeqExtensions.fs" />
         <Compile Include="CollectionBuilderExtensions.fs" />
         <Compile Include="OptionBuilder.fs" />
         <Compile Include="ResultBuilder.fs" />
