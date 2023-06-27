@@ -161,9 +161,8 @@ let removeVersionAttributesFromPackageReferences (projectPath: string) (projectP
 
         for itemGroup in project.ItemGroups do
             for packageReference in itemGroup.PackageReferences do
-                match packageReference.IncludeAttribute, packageReference.UpdateAttribute with
-                | Some packageName, _
-                | _, Some packageName ->
+                match packageReference.IncludeAttribute |> Option.orElse packageReference.UpdateAttribute with
+                | Some packageName ->
                     if projectPackageVersions.ContainsKey(packageName.Value) then
                         match packageReference.VersionAttribute with
                         | Some version ->
@@ -196,26 +195,22 @@ let getOrCreateDirectoryTargetsProps (filePath: string) =
 let updateDirectoryTargetProps (document: XmlDocument) (allPackageVersions: IReadOnlyDictionary<string, string>) =
     let project = document[Sdk.Project]
 
-    let mutable managePackagesCentrallyIsSet = false
-    for propertyGroup in project.PropertyGroups do
-        if not managePackagesCentrallyIsSet then
-            match propertyGroup.ManagePackageVersionsCentrallyNode with
-            | Some managePackagesCentrally ->
-                managePackagesCentrally.InnerText <- "true"
-                managePackagesCentrallyIsSet <- true
-            | _ ->
-                ()
+    let managePackagesCentrally =
+        project.PropertyGroups
+        |> Seq.tryPick ^ fun node ->
+            node.ManagePackageVersionsCentrallyNode
 
-    if not managePackagesCentrallyIsSet then
+    match managePackagesCentrally with
+    | Some managePackagesCentrally ->
+        managePackagesCentrally.InnerText <- "true"
+    | _ ->
         let propertyGroup = document.CreateElement(Properties.PropertyGroup)
         let managePackagesCentrally = document.CreateElement(Properties.ManagePackageVersionsCentrally, InnerText = "true")
         propertyGroup.AppendChild(managePackagesCentrally) |> ignore
         project.AppendChild(propertyGroup) |> ignore
 
     let packageReferencesToAdd = Dictionary(allPackageVersions)
-    let mutable lastItemGroup = null
     for itemGroup in project.ItemGroups do
-        lastItemGroup <- itemGroup
         for packageReference in itemGroup.PackageVersions do
             match packageReference.IncludeAttribute with
             | Some include' ->
@@ -229,11 +224,7 @@ let updateDirectoryTargetProps (document: XmlDocument) (allPackageVersions: IRea
             | _ ->
                 ()
 
-    if lastItemGroup &== null then
-        let itemGroup = document.CreateElement(Items.ItemGroup)
-        project.AppendChild(itemGroup) |> ignore
-        lastItemGroup <- itemGroup
-
+    let packageReferences = document.CreateElement(Items.ItemGroup)
     for packageReference in packageReferencesToAdd do
         let include' = packageReference.Key
         let version = packageReference.Value
@@ -243,9 +234,11 @@ let updateDirectoryTargetProps (document: XmlDocument) (allPackageVersions: IRea
         let versionAttribute = document.CreateAttribute(Items.Metadata.Version, Value = version)
         packageReference.Attributes.Append(includeAttribute) |> ignore
         packageReference.Attributes.Append(versionAttribute) |> ignore
-        lastItemGroup.AppendChild(packageReference) |> ignore
+        packageReferences.AppendChild(packageReference) |> ignore
 
-let analyzeSolution toolsPath solutionPath =    
+    project.AppendChild(packageReferences) |> ignore
+
+let analyzeSolution toolsPath solutionPath =
     let solution = SolutionFile.Parse(solutionPath)
     use projectCollection = prepareEnvironment toolsPath solutionPath
 
