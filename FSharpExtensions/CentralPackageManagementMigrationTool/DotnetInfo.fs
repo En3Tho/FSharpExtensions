@@ -7,6 +7,17 @@ open System.IO
 
 let [<Literal>] DOTNET_CLI_UI_LANGUAGE = "DOTNET_CLI_UI_LANGUAGE"
 
+let readProcessOutput (startInfo: ProcessStartInfo) =
+    use process' = Process.Start(startInfo)
+    let lines = List<string>();
+    process'.OutputDataReceived.AddHandler (fun _ e ->
+        if String.IsNullOrWhiteSpace(e.Data) |> not then
+            lines.Add(e.Data);
+    )
+    process'.BeginOutputReadLine();
+    process'.WaitForExit()
+    lines
+
 let parseCoreBasePath (lines: List<string>) =
     let rec findBasePath i =
         let line = lines[i]
@@ -30,7 +41,7 @@ let getCoreBasePath (projectPath: string) =
             RedirectStandardOutput = true,
             RedirectStandardError = true
         )
-        let lines = ProcessUtils.readProcessOutput startInfo
+        let lines = readProcessOutput startInfo
         parseCoreBasePath lines
     finally
         Environment.SetEnvironmentVariable(DOTNET_CLI_UI_LANGUAGE, originalCliLanguage);

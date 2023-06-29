@@ -5,8 +5,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="ProcessUtils.fs" />
         <Compile Include="DotnetInfo.fs" />
+        <Compile Include="PropertiesAndExtensions.fs" />
+        <Compile Include="MigrationTool.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 

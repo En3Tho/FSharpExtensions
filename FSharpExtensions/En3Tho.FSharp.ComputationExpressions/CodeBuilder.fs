@@ -15,7 +15,7 @@ module CodeBuilderImpl =
         abstract Write: value: string -> unit
         abstract WriteLine: value: string -> unit
 
-    // TODO: async version with vtask
+    // TODO: async version with vtask?
     // type IAsyncTextWriter =
     //     abstract WriteAsync: value: string -> ValueTask
     //     abstract WriteLineAsync: value: string -> ValueTask
@@ -41,6 +41,7 @@ module CodeBuilderImpl =
         Text: string
     }
 
+    // in fact there can be no list really, can flush directly to sb or textwriter or whatever
     type CodeBuilder(lines: ResizeArray<LineOfCode>) =
 
         static let commonIndentations = ImmutableArray.Create<string> [|
