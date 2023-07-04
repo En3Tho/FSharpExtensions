@@ -24,6 +24,8 @@ module JitEnv =
         let [<Literal>] ReadyToRun = "DOTNET_ReadyToRun"
         let [<Literal>] JitStressModeNames = "DOTNET_JitStressModeNames"
         let [<Literal>] JitEnablePhysicalPromotion = "DOTNET_JitEnablePhysicalPromotion"
+        let [<Literal>] JitOptRepeat = "DOTNET_JitOptRepeat"
+        let [<Literal>] JitOptRepeatCount = "DOTNET_JitOptRepeatCount"
 
     type TieredPGO() =
         static member On = EnvironmentVariable(Env.TieredPGO, "1")
@@ -44,6 +46,11 @@ module JitEnv =
     type JitStressModeNames() =
         static member StressGeneralizedPromotion = EnvironmentVariable(Env.JitStressModeNames, "STRESS_GENERALIZED_PROMOTION")
         static member StressGeneralizedPromotionCost = EnvironmentVariable(Env.JitStressModeNames, "STRESS_GENERALIZED_PROMOTION STRESS_GENERALIZED_PROMOTION_COST")
+
+    type JitOptRepeat =
+        static member All = EnvironmentVariable(Env.JitOptRepeat, "*")
+        static member Count(count: int) = EnvironmentVariable(Env.JitOptRepeatCount, count.ToString())
+
 
 type Job with
     static member Net5 = Job.Default.WithRuntime(CoreRuntime.Core50).WithId("Net5")
@@ -94,9 +101,8 @@ type ``Net7, Net8``() =
             Job.Net8
             Job.Net8.WithEnvironmentVariables(
                 JitEnv.JitEnablePhysicalPromotion.On
-                // JitEnv.JitStressModeNames.StressGeneralizedPromotionCost
             )
-            // Job.Main.WithEnvironmentVariables(
+            // Job.CoreRun.WithEnvironmentVariables(
             //     JitEnv.JitStressModeNames.StressGeneralizedPromotion,
             //     EnvironmentVariable.Get("CORE_LIBRARIES")
             // )

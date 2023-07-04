@@ -2,6 +2,7 @@ module Benchmarks.GSeq
 
 open En3Tho.FSharp.Extensions
 open BenchmarkDotNet.Attributes
+open System.Linq
 
 [<MemoryDiagnoser; DisassemblyDiagnoser(filters = [||])>]
 [<Config(typeof<``Net7, Net8``>)>]
@@ -15,6 +16,14 @@ type Benchmark() =
     [<GlobalSetup>]
     member this.GlobalSetup() =
         this.Array <- Array.init this.Count id
+
+    [<Benchmark>]
+    member this.IEnumerableFilterMapSkipFold() =
+        this.Array
+            .Where(fun x -> x % 2 <> 0)
+            .Skip(5)
+            .Select(fun x -> x + 15)
+            .Aggregate(0, (fun x y -> x + y))
 
     [<Benchmark>]
     member this.SeqFilterMapSkipFold() =
