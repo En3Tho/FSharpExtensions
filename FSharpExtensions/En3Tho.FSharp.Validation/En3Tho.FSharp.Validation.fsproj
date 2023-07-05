@@ -6,17 +6,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="BasicTypes.fs"/>
-        <Compile Include="MultiValidators.fs"/>
-        <Compile Include="AsyncMultiValidators.fs"/>
-        <Compile Include="Extensions.fs"/>
-        <Compile Include="CommonValidatedTypes.fs"/>
-        <Compile Include="JsonConverter.fs"/>
+        <Compile Include="BasicTypes.fs" />
+        <Compile Include="MultiValidators.fs" />
+        <Compile Include="AsyncMultiValidators.fs" />
+        <Compile Include="Extensions.fs" />
+        <Compile Include="CommonValidatedTypes.fs" />
+        <Compile Include="JsonConverter.fs" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="En3Tho.FSharp.ComputationExpressions"/>
-        <PackageReference Include="En3Tho.FSharp.Extensions"/>
+        <PackageReference Include="En3Tho.FSharp.ComputationExpressions" />
+        <PackageReference Include="En3Tho.FSharp.Extensions" />
     </ItemGroup>
 
 </Project>

@@ -3,13 +3,13 @@ module CentralPackageManagementMigrationTool.MigrationTool
 open System
 
 open System.Collections.Generic
+open System.IO
 open System.Xml
 open CentralPackageManagementMigrationTool.PropertiesAndExtensions
 open En3Tho.FSharp.Extensions
 open Microsoft.Build.Construction
 open Microsoft.Build.Evaluation
 open Microsoft.Build.Utilities
-open Microsoft.IO
 
 let initEnvironmentVariables (globalProperties: Dictionary<string, string>) =
     for prop in globalProperties do

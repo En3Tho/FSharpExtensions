@@ -5,14 +5,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="BenchmarkDotNet"/>
-        <PackageReference Include="FSharp.Core"/>
+        <PackageReference Include="BenchmarkDotNet" />
+        <PackageReference Include="FSharp.Core" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Benchmarks\Benchmarks.fsproj"/>
-        <ProjectReference Include="..\En3Tho.FSharp.ComputationExpressions\En3Tho.FSharp.ComputationExpressions.fsproj"/>
-        <ProjectReference Include="..\En3Tho.FSharp.Extensions\En3Tho.FSharp.Extensions.fsproj"/>
+        <ProjectReference Include="..\Benchmarks\Benchmarks.fsproj" />
+        <ProjectReference Include="..\En3Tho.FSharp.ComputationExpressions\En3Tho.FSharp.ComputationExpressions.fsproj" />
+        <ProjectReference Include="..\En3Tho.FSharp.Extensions\En3Tho.FSharp.Extensions.fsproj" />
     </ItemGroup>
 
 </Project>

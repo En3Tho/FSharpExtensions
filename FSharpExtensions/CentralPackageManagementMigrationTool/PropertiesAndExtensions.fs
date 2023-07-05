@@ -2,12 +2,12 @@ module CentralPackageManagementMigrationTool.PropertiesAndExtensions
 
 open System
 open System.Collections.Generic
+open System.IO
 open System.Xml
 open En3Tho.FSharp.Extensions
 open En3Tho.FSharp.ComputationExpressions
 open En3Tho.FSharp.ComputationExpressions.IDictionaryBuilder
 open Microsoft.Build.Execution
-open Microsoft.IO
 
 module GlobalProperties =
     let [<Literal>] MSBuildExtensionsPath = "MSBuildExtensionsPath"

@@ -6,11 +6,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Extensions.fs"/>
+        <Compile Include="Extensions.fs" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="xunit"/>
+        <PackageReference Include="xunit" />
     </ItemGroup>
 
 </Project>
