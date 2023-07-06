@@ -9,6 +9,7 @@ let go() =
     ServiceCollectionCodeGen.generateFiles()
     ServiceProviderAndScopeCodeGen.generateFiles()
     WebApplicationsExtensionsCodeGen.generateFiles()
+    ILoggerExtensionsCodeGen.generateFiles()
 
     Console.WriteLine($"Elapsed: {sw.Elapsed}")
 

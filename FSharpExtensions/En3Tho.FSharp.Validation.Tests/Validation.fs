@@ -48,13 +48,12 @@ let ``Test that Validated's generated`` () =
 
 
 type Age = NonNegativeValue<int>
-type Age2 = Age
 type Name = NonEmptyString
 type Person = {
     Age: Age
     Name: Name
 } with
-    static member Of (age, name) = exnresult {
+    static member Of(age, name) = exnresult {
         let! age = Age.Of age // would be good if "age" could be passed implicitly
         and! name = Name.Of name // would be good if "age" could be passed implicitly
         return {
