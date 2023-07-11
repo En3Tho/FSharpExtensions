@@ -19,6 +19,22 @@ let ``test simple code``() =
     Assert.Equal(expected, code.ToString())
 
 [<Fact>]
+let ``test simple code with codeBlock``() =
+    let code = code {
+        codeBlock {
+            "let x = 0"
+            "Console.WriteLine(x + 1)"
+        }
+    }
+
+    let expected = String.concat Environment.NewLine [
+        "let x = 0"
+        "Console.WriteLine(x + 1)"
+    ]
+
+    Assert.Equal(expected, code.ToString())
+
+[<Fact>]
 let ``test simple code indent``() =
     let code = code {
         indent {
@@ -105,3 +121,22 @@ let ``test simple code trim2``() =
 
     code.TrimEnd()
     Assert.Equal(expected, code.ToString())
+
+[<Fact>]
+let ``test that code builder itself can accept new code``() =
+    let codeB = code {
+        "let x = 0"
+        "Console.WriteLine(x + 1)"
+    }
+
+    codeB {
+        "let y = 0"
+    } |> ignore
+
+    let expected = String.concat Environment.NewLine [
+        "let x = 0"
+        "Console.WriteLine(x + 1)"
+        "let y = 0"
+    ]
+
+    Assert.Equal(expected, codeB.ToString())

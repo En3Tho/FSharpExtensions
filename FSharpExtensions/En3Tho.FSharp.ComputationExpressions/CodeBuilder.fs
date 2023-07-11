@@ -15,11 +15,6 @@ module CodeBuilderImpl =
         abstract Write: value: string -> unit
         abstract WriteLine: value: string -> unit
 
-    // TODO: async version with vtask?
-    // type IAsyncTextWriter =
-    //     abstract WriteAsync: value: string -> ValueTask
-    //     abstract WriteLineAsync: value: string -> ValueTask
-
     type [<Struct>] StringBuilderTextWriter(sb: StringBuilder) =
         member _.Write(value: string) = sb.Append(value) |> ignore
         member _.WriteLine(value: string) = sb.AppendLine(value) |> ignore
@@ -43,6 +38,7 @@ module CodeBuilderImpl =
 
     // in fact there can be no list really, can flush directly to sb or textwriter or whatever
     type CodeBuilder(lines: ResizeArray<LineOfCode>) =
+        inherit CodeBlockBase()
 
         static let commonIndentations = ImmutableArray.Create<string> [|
             for i = 0 to 16 do
@@ -131,9 +127,13 @@ module CodeBuilderImpl =
             this.Flush(sb)
             sb.ToString()
 
-    type CodeBuilderCode = UnitBuilderCode<CodeBuilder>
+        member inline this.Run([<InlineIfLambda>] runExpr: CodeBuilderCode) =
+            runExpr this
+            this
 
-    type CodeBlockBase() =
+    and CodeBuilderCode = UnitBuilderCode<CodeBuilder>
+
+    and CodeBlockBase() =
         inherit UnitBuilderBase<CodeBuilder>()
 
         member inline _.Yield([<InlineIfLambda>] codeBuilderCode: CodeBuilderCode) : CodeBuilderCode =
@@ -181,6 +181,14 @@ module CodeBuilderImpl =
                 builder.AddLine("}")
 
     [<Sealed>]
+    type CodeBlock() =
+        inherit CodeBlockBase()
+
+        member inline this.Run([<InlineIfLambda>] runExpr: CodeBuilderCode) : CodeBuilderCode =
+            fun builder ->
+                runExpr builder
+
+    [<Sealed>]
     type CodeBuilderRunner() =
 
         inherit CodeBlockBase()
@@ -194,6 +202,7 @@ module CodeBuilder =
     open CodeBuilderImpl
 
     let code = CodeBuilderRunner()
+    let codeBlock = CodeBlock()
     let indent = Indent()
     let braceBlock = BraceBlock()
     let trimEnd() = TrimEnd()

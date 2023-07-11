@@ -111,6 +111,24 @@ module IEquatableEqualityOperatorEx =
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     let inline callIEquatableEqualsOnValues<'a when 'a :> IEquatable<'a>> (left: 'a) (right: 'a) = left.Equals(right)
 
+    // TODO: spans?
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    let inline callIEquatableEqualsOnSpans<'a when 'a :> IEquatable<'a>> (left: Span<'a>) (right: Span<'a>) =
+        left.SequenceEqual(right)
+
+    // TODO: spans?
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    let inline callIEquatableEqualsOnReadOnlySpans<'a when 'a :> IEquatable<'a>> (left: ReadOnlySpan<'a>) (right: ReadOnlySpan<'a>) =
+        left.SequenceEqual(right)
+
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    let inline callIEquatableEqualsOnMemory<'a when 'a :> IEquatable<'a>> (left: Memory<'a>) (right: Memory<'a>) =
+        left.Span.SequenceEqual(right.Span)
+
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    let inline callIEquatableEqualsOnReadOnlyMemory<'a when 'a :> IEquatable<'a>> (left: ReadOnlyMemory<'a>) (right: ReadOnlyMemory<'a>) =
+        left.Span.SequenceEqual(right.Span)
+
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     let inline callIEquatableEqualsOnArrays<'a when 'a :> IEquatable<'a>> (left: 'a[]) (right: 'a[]) =
         left.AsSpan().SequenceEqual(right)
@@ -226,6 +244,8 @@ module IEquatableEqualityOperatorEx =
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     type CollectionEquality = CollectionEquality with
         static member inline ($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnArrays value otherValue
+        static member inline ($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnMemory value otherValue
+        static member inline ($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnReadOnlyMemory value otherValue
         static member inline ($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnResizeArrays value otherValue
         static member inline ($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnLists value otherValue
         static member inline ($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnLinkedLists value otherValue
