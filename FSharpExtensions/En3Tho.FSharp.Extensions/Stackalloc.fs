@@ -8,12 +8,14 @@ open En3Tho.FSharp.Extensions
 
 module Stackalloc =
 
+    let inline private self (value: 'a byref) = &value
+
     type IValueBag<'a> =
         abstract member FirstElementRef: 'a byref
         abstract member Length: int
 
 
-    [<Struct>]
+    [<Struct; NoEquality; NoComparison>]
     type ValueBag4<'a> =
         [<DefaultValue(false)>] val mutable value1: 'a
         [<DefaultValue(false)>] val mutable private value2: 'a
@@ -22,85 +24,79 @@ module Stackalloc =
 
         interface IValueBag<'a> with
             member this.FirstElementRef =
-                let ptr = Unsafe.AsPointer(&this.value1)
-                &Unsafe.AsRef(ptr)
+                &(self &this.value1)
+
             member this.Length = 4
 
-    [<Struct>]
+    [<Struct; NoEquality; NoComparison>]
     type ValueBag8<'a> =
         [<DefaultValue(false)>] val mutable value1: ValueBag4<'a>
         [<DefaultValue(false)>] val mutable private value2: ValueBag4<'a>
 
         interface IValueBag<'a> with
             member this.FirstElementRef =
-                let ptr = Unsafe.AsPointer(&this.value1.value1)
-                &Unsafe.AsRef(ptr)
+                &(self &this.value1.value1)
             member this.Length = 8
 
-    [<Struct>]
+    [<Struct; NoEquality; NoComparison>]
     type ValueBag16<'a> =
         [<DefaultValue(false)>] val mutable value1: ValueBag8<'a>
         [<DefaultValue(false)>] val mutable private value2: ValueBag8<'a>
 
         interface IValueBag<'a> with
             member this.FirstElementRef =
-                let ptr = Unsafe.AsPointer(&this.value1.value1.value1)
-                &Unsafe.AsRef(ptr)
+                &(self &this.value1.value1.value1)
             member this.Length = 16
 
-    [<Struct>]
+    [<Struct; NoEquality; NoComparison>]
     type ValueBag32<'a> =
         [<DefaultValue(false)>] val mutable value1: ValueBag16<'a>
         [<DefaultValue(false)>] val mutable private value2: ValueBag16<'a>
 
         interface IValueBag<'a> with
             member this.FirstElementRef =
-                let ptr = Unsafe.AsPointer(&this.value1.value1.value1.value1)
-                &Unsafe.AsRef(ptr)
+                &(self &this.value1.value1.value1.value1)
             member this.Length = 32
 
-    [<Struct>]
+    [<Struct; NoEquality; NoComparison>]
     type ValueBag64<'a> =
         [<DefaultValue(false)>] val mutable value1: ValueBag32<'a>
         [<DefaultValue(false)>] val mutable private value2: ValueBag32<'a>
 
         interface IValueBag<'a> with
             member this.FirstElementRef =
-                let ptr = Unsafe.AsPointer(&this.value1.value1.value1.value1.value1)
-                &Unsafe.AsRef(ptr)
+                &(self &this.value1.value1.value1.value1.value1)
             member this.Length = 64
 
-    [<Struct>]
+    [<Struct; NoEquality; NoComparison>]
     type ValueBag128<'a> =
         [<DefaultValue(false)>] val mutable value1: ValueBag64<'a>
         [<DefaultValue(false)>] val mutable private value2: ValueBag64<'a>
 
         interface IValueBag<'a> with
             member this.FirstElementRef =
-                let ptr = Unsafe.AsPointer(&this.value1.value1.value1.value1.value1.value1)
-                &Unsafe.AsRef(ptr)
+                &(self &this.value1.value1.value1.value1.value1.value1)
             member this.Length = 128
 
-    [<Struct>]
+    [<Struct; NoEquality; NoComparison>]
     type ValueBag256<'a> =
         [<DefaultValue(false)>] val mutable value1: ValueBag128<'a>
         [<DefaultValue(false)>] val mutable private value2: ValueBag128<'a>
 
         interface IValueBag<'a> with
             member this.FirstElementRef =
-                let ptr = Unsafe.AsPointer(&this.value1.value1.value1.value1.value1.value1.value1)
-                &Unsafe.AsRef(ptr)
+                &(self &this.value1.value1.value1.value1.value1.value1.value1)
+
             member this.Length = 256
 
-    [<Struct>]
+    [<Struct; NoEquality; NoComparison>]
     type ValueBag512<'a> =
         [<DefaultValue(false)>] val mutable value1: ValueBag256<'a>
         [<DefaultValue(false)>] val mutable private value2: ValueBag256<'a>
 
         interface IValueBag<'a> with
             member this.FirstElementRef =
-                let ptr = Unsafe.AsPointer(&this.value1.value1.value1.value1.value1.value1.value1.value1)
-                &Unsafe.AsRef(ptr)
+                &(self &this.value1.value1.value1.value1.value1.value1.value1.value1)
             member this.Length = 512
 
     module ValueBag =
@@ -118,7 +114,7 @@ module Stackalloc =
         member this.Span = this.span
 
         member this.Dispose() =
-            if not (Object.ReferenceEquals(this.array, null)) then
+            if this.array &!= null then
                 ArrayPool.Shared.Return this.array
 
         interface IDisposable with
@@ -141,10 +137,6 @@ module Stackalloc =
         interface IDisposable with
             member this.Dispose() = this.Dispose()
 
-    let inline alloc<'a when 'a: unmanaged> len =
-        let ptr = NativeInterop.NativePtr.stackalloc<'a> len
-        Span<'a>(NativeInterop.NativePtr.toVoidPtr ptr, len)
-
     let inline allocUsingValueBag<'a, 'b when 'a: struct and 'a: (new: unit -> 'a) and 'a :> IValueBag<'b>>() =
         let mutable bag = new 'a()
         ValueBag.getSpan &bag
@@ -153,13 +145,13 @@ module Stackalloc =
         if len > maxLen then
             new StackOrPooled<'a>(ArrayPool<'a>.Shared.Rent len)
         else
-            new StackOrPooled<'a>(alloc<'a> len)
+            new StackOrPooled<'a>(Span.stackalloc<'a> len)
 
     let inline allocOrNew<'a when 'a: unmanaged> len maxLen =
         if len > maxLen then
-            Span<'a>(Array.zeroCreate<'a> len)
+            Span.alloc<'a> len
         else
-            alloc<'a> len
+            Span.stackalloc<'a> len
 
     let inline allocAny4<'a>() =
         allocUsingValueBag<ValueBag4<'a>,_>()
