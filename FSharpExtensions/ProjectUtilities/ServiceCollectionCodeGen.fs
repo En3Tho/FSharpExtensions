@@ -10,7 +10,7 @@ let getMethodCodeForVerb dependenciesCount (verb: string) =
         let dependencies = [| for index = 1 to dependenciesCount do  $"TDependency{index}" |]
         String.Join(", ", dependencies)
 
-    code {
+    codeBlock {
         $"public static IServiceCollection {verb}Func<TService, {genericParameters}>(this IServiceCollection collection,"
 
         indent {

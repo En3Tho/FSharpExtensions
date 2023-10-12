@@ -19,7 +19,7 @@ let parametersToParamString (parameters: ParameterInfo[]) =
     |> Array.map ^ fun param -> $"{renameParamNameIfException param.Name}"
     |> String.concat ", "
 
-let generateCodeForLogLevel (logLevel: LogLevel) (methods: MethodInfo[]) = code {
+let generateCodeForLogLevel (logLevel: LogLevel) (methods: MethodInfo[]) = codeBlock {
     for method in methods do
         let nonLoggerAndNonArgsParameters =
             method.GetParameters()

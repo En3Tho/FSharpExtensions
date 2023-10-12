@@ -9,11 +9,13 @@ open System.Text.Json
 // TODO: try to experiment with Memory<byte> / Memory<char> based HttpContent?
 
 let getJsonMediaType() =
-    MediaTypeHeaderValue(MediaTypeNames.Application.Json, CharSet = "utf-8");
+    MediaTypeHeaderValue(MediaTypeNames.Application.Json, CharSet = "utf-8")
+
 let getStringMediaType() =
-    MediaTypeHeaderValue(MediaTypeNames.Text.Plain, CharSet = "utf-8");
+    MediaTypeHeaderValue(MediaTypeNames.Text.Plain, CharSet = "utf-8")
+
 let getByteArrayOrStreamMediaType() =
-    MediaTypeHeaderValue(MediaTypeNames.Application.Octet);
+    MediaTypeHeaderValue(MediaTypeNames.Application.Octet)
 
 let makeJsonContent<'a>(value: 'a, options: JsonSerializerOptions) =
     let content = ByteArrayContent(JsonSerializer.SerializeToUtf8Bytes<'a>(value, options))
