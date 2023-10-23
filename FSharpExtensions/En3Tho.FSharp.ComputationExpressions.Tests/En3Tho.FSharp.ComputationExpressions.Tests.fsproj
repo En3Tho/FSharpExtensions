@@ -15,6 +15,7 @@
         <Compile Include="TaskResultOverloadingTests.fs" />
         <Compile Include="HttpBuilderTests.fs" />
         <Compile Include="CodeBuilderTests.fs" />
+        <Compile Include="TryExprBuilderTests.fs" />
     </ItemGroup>
 
     <ItemGroup>

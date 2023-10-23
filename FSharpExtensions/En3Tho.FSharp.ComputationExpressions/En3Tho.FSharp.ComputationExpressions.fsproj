@@ -29,6 +29,7 @@
         <Compile Include="HttpBuilder\Stages.fs" />
         <Compile Include="HttpBuilder\Content.fs" />
         <Compile Include="HttpBuilder\Extensions.fs" />
+        <Compile Include="TryExprBuilder.fs" />
     </ItemGroup>
 
 </Project>
