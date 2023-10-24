@@ -28,15 +28,15 @@ module LowPriority =
              task: ^TaskLike,
              [<InlineIfLambda>] continuation: 'TResult1 -> GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult2>) : bool =
 
-            let mutable awaiter = (^TaskLike: (member GetAwaiter : unit -> ^Awaiter)(task))
+            let mutable awaiter = (^TaskLike: (member GetAwaiter: unit -> ^Awaiter) task)
 
             let cont =
                 GenericUnitTaskResumptionFunc<'TMethodBuilder, 'TAwaiter, 'TTask>(fun sm ->
-                   let result = (^Awaiter : (member GetResult: unit -> 'TResult1)(awaiter))
+                   let result = (^Awaiter : (member GetResult: unit -> 'TResult1) awaiter)
                    (continuation result).Invoke(&sm))
 
             // shortcut to continue immediately
-            if (^Awaiter : (member get_IsCompleted : unit -> bool)(awaiter)) then
+            if (^Awaiter : (member get_IsCompleted: unit -> bool) awaiter) then
                 cont.Invoke(&sm)
             else
                 sm.ResumptionDynamicInfo.ResumptionData <- (awaiter :> ICriticalNotifyCompletion)
@@ -62,17 +62,17 @@ module LowPriority =
                 if __useResumableCode then
                     //-- RESUMABLE CODE START
                     // Get an awaiter from the awaitable
-                    let mutable awaiter = (^TaskLike: (member GetAwaiter : unit -> ^Awaiter)(task))
+                    let mutable awaiter = (^TaskLike: (member GetAwaiter: unit -> ^Awaiter) task)
 
                     let mutable __stack_fin = true
-                    if not (^Awaiter : (member get_IsCompleted : unit -> bool)(awaiter)) then
+                    if not (^Awaiter : (member get_IsCompleted: unit -> bool) awaiter) then
                         // This will yield with __stack_yield_fin = false
                         // This will resume with __stack_yield_fin = true
                         let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
                         __stack_fin <- __stack_yield_fin
 
                     if __stack_fin then
-                        let result = (^Awaiter : (member GetResult: unit -> 'TResult1)(awaiter))
+                        let result = (^Awaiter: (member GetResult: unit -> 'TResult1) awaiter)
                         (continuation result).Invoke(&sm)
                     else
                         sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &sm)
@@ -84,7 +84,7 @@ module LowPriority =
 
         [<NoEagerConstraintApplication>]
         member inline this.ReturnFrom (task: ^TaskLike) =
-            this.Bind(task, (fun v -> this.Return()))
+            this.Bind(task, (fun _ -> this.Return()))
 
         [<NoEagerConstraintApplication>]
         member inline _.Using<'Resource, 'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult
@@ -103,9 +103,9 @@ module HighPriority =
             let mutable awaiter = task.GetAwaiter()
 
             let cont =
-                (GenericUnitTaskResumptionFunc<'TMethodBuilder, 'TAwaiter, 'TTask>(fun sm ->
-                    let result = awaiter.GetResult()
-                    (continuation result).Invoke(&sm)))
+                GenericUnitTaskResumptionFunc<'TMethodBuilder, 'TAwaiter, 'TTask>(fun sm ->
+                   let result = awaiter.GetResult()
+                   (continuation result).Invoke(&sm))
 
             // shortcut to continue immediately
             if awaiter.IsCompleted then
@@ -139,7 +139,7 @@ module HighPriority =
                 //-- RESUMABLE CODE END
             )
         member inline this.ReturnFrom (task: Task<'TResult>) : GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult> =
-            this.Bind(task, (fun v -> this.Return()))
+            this.Bind(task, (fun _ -> this.Return()))
 
 module MediumPriority =
     open HighPriority

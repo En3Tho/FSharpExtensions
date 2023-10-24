@@ -40,7 +40,6 @@ type IAsyncMethodBuilderBase =
         awaiter: byref<'TAwaiter>  * stateMachine: byref<'TStateMachine>  -> unit
 
 // unit for most cases and 'TInitialState for special ones like activity stuff or cancellable etc?
-
 type IAsyncMethodBuilderCreator<'TSelf> =
     static abstract member Create: unit -> 'TSelf
 
@@ -52,9 +51,6 @@ type IAsyncMethodBuilder<'TAwaiter, 'TTask when 'TTask :> ITaskLike<'TAwaiter> a
     // static abstract member Create: unit -> 'TSelf // TODO: move to IAsyncMethodBuilderBase<'TSelf>
     abstract SetResult: unit -> unit
     abstract Task: 'TTask
-
-// type IAsyncMethodBuilderSetResult<'TResult> // ?
-// type IAsyncMethodBuilderTask<'TAwaiter, 'TTask, 'TResult> // ?
 
 type IAsyncMethodBuilder<'TAwaiter, 'TTask, 'TResult when 'TTask :> ITaskLike<'TAwaiter, 'TResult> and 'TAwaiter :> ITaskAwaiter<'TResult>> =
     inherit IAsyncMethodBuilderBase

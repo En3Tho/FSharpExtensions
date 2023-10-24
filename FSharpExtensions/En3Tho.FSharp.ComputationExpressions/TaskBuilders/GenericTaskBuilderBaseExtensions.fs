@@ -63,17 +63,17 @@ module LowPriority =
                 if __useResumableCode then
                     //-- RESUMABLE CODE START
                     // Get an awaiter from the awaitable
-                    let mutable awaiter = (^TaskLike: (member GetAwaiter: unit -> ^Awaiter)(task))
+                    let mutable awaiter = (^TaskLike: (member GetAwaiter: unit -> ^Awaiter) task)
 
                     let mutable __stack_fin = true
-                    if not (^Awaiter: (member get_IsCompleted: unit -> bool)(awaiter)) then
+                    if not (^Awaiter: (member get_IsCompleted: unit -> bool) awaiter) then
                         // This will yield with __stack_yield_fin = false
                         // This will resume with __stack_yield_fin = true
                         let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
                         __stack_fin <- __stack_yield_fin
 
                     if __stack_fin then
-                        let result = (^Awaiter: (member GetResult: unit -> 'TResult1)(awaiter))
+                        let result = (^Awaiter: (member GetResult: unit -> 'TResult1) awaiter)
                         (continuation result).Invoke(&sm)
                     else
                         sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &sm)
@@ -104,9 +104,9 @@ module HighPriority =
             let mutable awaiter = task.GetAwaiter()
 
             let cont =
-                (GenericTaskResumptionFunc<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>(fun sm ->
-                    let result = awaiter.GetResult()
-                    (continuation result).Invoke(&sm)))
+                GenericTaskResumptionFunc<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>(fun sm ->
+                   let result = awaiter.GetResult()
+                   (continuation result).Invoke(&sm))
 
             // shortcut to continue immediately
             if awaiter.IsCompleted then
