@@ -33,7 +33,7 @@ type TaskWrapperBuilder =
 type ExnResultValueTaskBuilder<'a> =
     GenericTaskBuilder<ExnResultValueTaskMethodBuilder<'a>, ExnResultValueTaskAwaiter<'a>, ExnResultValueTask<'a>, Result<'a, exn>, ExnResultValueTask<'a>>
 
-type ActivityValueTaskBuilder<'a> =
+type ActivityValueTaskBuilder =
     GenericTaskBuilderWithState<ActivityValueTaskMethodBuilder<'a>, ActivityValueTaskAwaiter<'a>, ActivityValueTask<'a>, 'a, ActivityValueTask<'a>, string>
 
 type ActivityTaskBuilder<'a> =
@@ -47,7 +47,7 @@ let myUnitTask = TaskWrapperBuilder()
 
 let inline myExnResultValueTask<'a> = Unchecked.defaultof<ExnResultValueTaskBuilder<'a>>
 
-let inline myActivityValueTask activityName = ActivityValueTaskBuilder<'a>(activityName)
+let inline myActivityValueTask activityName = ActivityValueTaskBuilder(activityName)
 let inline myActivityTask activityName = ActivityTaskBuilder<'a>(activityName)
 
 [<Fact>]

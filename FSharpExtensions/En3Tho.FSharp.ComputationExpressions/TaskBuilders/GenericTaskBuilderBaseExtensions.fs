@@ -32,9 +32,9 @@ module LowPriority =
             let mutable awaiter = (^TaskLike: (member GetAwaiter: unit -> ^Awaiter) task)
 
             let cont =
-                (GenericTaskResumptionFunc<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>(fun sm ->
-                    let result = (^Awaiter: (member GetResult: unit -> 'TResult1) awaiter)
-                    (continuation result).Invoke(&sm)))
+                GenericTaskResumptionFunc<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>(fun sm ->
+                   let result = (^Awaiter: (member GetResult: unit -> 'TResult1) awaiter)
+                   (continuation result).Invoke(&sm))
 
             // shortcut to continue immediately
             if (^Awaiter: (member get_IsCompleted: unit -> bool) awaiter) then

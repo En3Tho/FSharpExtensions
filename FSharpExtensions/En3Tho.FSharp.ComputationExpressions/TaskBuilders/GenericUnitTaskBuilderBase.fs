@@ -12,8 +12,7 @@ open Microsoft.FSharp.Collections
 
 type GenericUnitTaskBuilderBase() =
 
-    member inline _.Delay(
-        [<InlineIfLambda>] generator: unit -> GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult>) =
+    member inline _.Delay([<InlineIfLambda>] generator: unit -> GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult>) =
         GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult>(fun sm -> (generator()).Invoke(&sm))
 
     [<DefaultValue>]
@@ -30,7 +29,7 @@ type GenericUnitTaskBuilderBase() =
         : GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult> =
         ResumableCode.Combine(task1, task2)
 
-    member inline _.While (
+    member inline _.While(
         [<InlineIfLambda>] condition: unit -> bool,
         [<InlineIfLambda>] body: GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, unit>)
         : GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, unit> =
@@ -42,13 +41,13 @@ type GenericUnitTaskBuilderBase() =
         : GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult> =
         ResumableCode.TryWith(body, catch)
 
-    member inline _.TryFinally (
+    member inline _.TryFinally(
         [<InlineIfLambda>] body: GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult>,
         [<InlineIfLambda>] compensation: unit -> unit)
         : GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult> =
         ResumableCode.TryFinally(body, ResumableCode<_,_>(fun _sm -> compensation(); true))
 
-    member inline _.For (
+    member inline _.For(
         sequence: seq<'T>,
         [<InlineIfLambda>] body: 'T -> GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, unit>)
         : GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, unit> =

@@ -13,7 +13,7 @@ open Microsoft.FSharp.Collections
 type GenericTaskBuilderBase() =
 
     member inline _.Delay([<InlineIfLambda>] generator: unit -> GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult>) =
-        ResumableCode.Delay(generator)
+        GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult>(fun sm -> (generator()).Invoke(&sm))
 
     [<DefaultValue>]
     member inline _.Zero() : GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, unit> =
@@ -30,25 +30,25 @@ type GenericTaskBuilderBase() =
         : GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult> =
         ResumableCode.Combine(task1, task2)
 
-    member inline _.While (
+    member inline _.While(
         [<InlineIfLambda>] condition: unit -> bool,
         [<InlineIfLambda>] body: GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, unit>)
         : GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, unit> =
         ResumableCode.While(condition, body)
 
-    member inline _.TryWith (
+    member inline _.TryWith(
         [<InlineIfLambda>] body: GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult>,
         [<InlineIfLambda>] catch: exn -> GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult>)
         : GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult> =
         ResumableCode.TryWith(body, catch)
 
-    member inline _.TryFinally (
+    member inline _.TryFinally(
         [<InlineIfLambda>] body: GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult>,
         [<InlineIfLambda>] compensation: unit -> unit)
         : GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult> =
         ResumableCode.TryFinally(body, ResumableCode<_,_>(fun _sm -> compensation(); true))
 
-    member inline _.For (
+    member inline _.For(
         sequence: seq<'T>,
         [<InlineIfLambda>] body: 'T -> GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, unit>)
         : GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, unit> =
