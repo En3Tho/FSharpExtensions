@@ -147,7 +147,7 @@ type ValueTaskResultBuilderBase() =
             sm.Data.MethodBuilder.Start(&sm)
             sm.Data.MethodBuilder.Task
 
-        static member inline Run([<InlineIfLambda>] code: ValueTaskResultCode<'T, 'TError, 'T>) : ValueTask<Result<'T, 'TError>> =
+        member inline _.Run([<InlineIfLambda>] code: ValueTaskResultCode<'T, 'TError, 'T>) : ValueTask<Result<'T, 'TError>> =
             if __useResumableCode then
                __stateMachine<ValueTaskResultStateMachineData<'T, 'TError>, ValueTask<Result<'T, 'TError>>>
                    (MoveNextMethodImpl<_>(fun sm ->
@@ -173,9 +173,6 @@ type ValueTaskResultBuilderBase() =
                        sm.Data.MethodBuilder.Task))
             else
                ValueTaskResultBuilder.RunDynamic(code)
-
-        member inline _.Run([<InlineIfLambda>] code: ValueTaskResultCode<'T, 'TError, 'T>) : ValueTask<Result<'T, 'TError>> =
-            ValueTaskResultBuilder.Run(code)
 
     type TaskResultBuilder() =
 
@@ -213,7 +210,7 @@ type ValueTaskResultBuilderBase() =
             sm.Data.MethodBuilder.Start(&sm)
             sm.Data.MethodBuilder.Task
 
-        static member inline Run(code: ValueTaskResultCode<'T, 'TError, 'T>) : Task<Result<'T, 'TError>> =
+        member inline _.Run([<InlineIfLambda>] code: ValueTaskResultCode<'T, 'TError, 'T>) : Task<Result<'T, 'TError>> =
              (if __useResumableCode then
                 __stateMachine<ValueTaskResultStateMachineData<'T, 'TError>, ValueTask<Result<'T, 'TError>>>
                     (MoveNextMethodImpl<_>(fun sm ->
@@ -239,9 +236,6 @@ type ValueTaskResultBuilderBase() =
                         sm.Data.MethodBuilder.Task))
              else
                 ValueTaskResultBuilder.RunDynamic(code)).AsTask()
-
-        member inline _.Run([<InlineIfLambda>] code: ValueTaskResultCode<'T, 'TError, 'T>) : ValueTask<Result<'T, 'TError>> =
-           ValueTaskResultBuilder.Run(code)
 
 namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskResultBuilderExtensions
 

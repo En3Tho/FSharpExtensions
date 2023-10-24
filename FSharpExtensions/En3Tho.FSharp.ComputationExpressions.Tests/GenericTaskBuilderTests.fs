@@ -1,8 +1,10 @@
 ﻿module En3Tho.FSharp.ComputationExpressions.Tests.GenericTaskBuilderTests
 
 open System
+open System.Diagnostics
 open System.Threading.Tasks
 open En3Tho.FSharp.ComputationExpressions.TaskBuilders.ExnResultValueTask
+open En3Tho.FSharp.ComputationExpressions.TaskBuilders.ActivityTask
 open En3Tho.FSharp.ComputationExpressions.Tasks
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 open En3Tho.FSharp.Xunit
@@ -31,6 +33,12 @@ type TaskWrapperBuilder =
 type ExnResultValueTaskBuilder<'a> =
     GenericTaskBuilder<ExnResultValueTaskMethodBuilder<'a>, ExnResultValueTaskAwaiter<'a>, ExnResultValueTask<'a>, Result<'a, exn>, ExnResultValueTask<'a>>
 
+type ActivityValueTaskBuilder<'a> =
+    GenericTaskBuilderWithState<ActivityValueTaskMethodBuilder<'a>, ActivityValueTaskAwaiter<'a>, ActivityValueTask<'a>, 'a, ActivityValueTask<'a>, string>
+
+type ActivityTaskBuilder<'a> =
+    GenericTaskBuilderWithState<ActivityTaskMethodBuilder<'a>, ActivityTaskAwaiter<'a>, ActivityTask<'a>, 'a, ActivityTask<'a>, string>
+
 let inline myValueTask<'a> = Unchecked.defaultof<ValueTaskWrapperBuilder<'a>>
 let myUnitValueTask = ValueTaskWrapperBuilder()
 
@@ -38,6 +46,96 @@ let inline myTask<'a> = Unchecked.defaultof<TaskWrapperBuilder<'a>>
 let myUnitTask = TaskWrapperBuilder()
 
 let inline myExnResultValueTask<'a> = Unchecked.defaultof<ExnResultValueTaskBuilder<'a>>
+
+let inline myActivityValueTask activityName = ActivityValueTaskBuilder<'a>(activityName)
+let inline myActivityTask activityName = ActivityTaskBuilder<'a>(activityName)
+
+[<Fact>]
+let ``test that most basic return works with task``() = task {
+    let! result = myValueTask {
+        return 1
+    }
+    Assert.Equal(1, result)
+
+    let! result = myTask {
+        return 1
+    }
+    Assert.Equal(1, result)
+}
+
+[<Fact>]
+let ``test that most basic return works with mytask``() = myTask<unit> {
+    let! result = myValueTask {
+        return 1
+    }
+    Assert.Equal(1, result)
+
+    let! result = myTask {
+        return 1
+    }
+    Assert.Equal(1, result)
+}
+
+[<Fact>]
+let ``test that most basic return works from results``() = task {
+    let! result = ValueTaskWrapper<int>(ValueTask.FromResult(1))
+    Assert.Equal(1, result)
+
+    let! result = TaskWrapper<int>(Task.FromResult(1))
+    Assert.Equal(1, result)
+}
+
+[<Fact>]
+let ``test that activity task works``() = task {
+    use source = ActivitySource("mySource")
+    use listener = ActivityListener(
+        ShouldListenTo = (fun _ -> true),
+        Sample = (fun _ -> ActivitySamplingResult.AllData)
+    )
+    ActivitySource.AddActivityListener(listener)
+
+    use _ = source.StartActivity("Test")
+
+    let activity = Activity.Current
+    Assert.NotNull(activity)
+    Assert.Equal("Test", activity.DisplayName)
+
+    let! result = myActivityTask "NewOne" {
+
+        let activity = Activity.Current
+        Assert.NotNull(activity)
+        Assert.Equal("NewOne", activity.DisplayName)
+
+        return 1
+    }
+    Assert.Equal(1, result)
+}
+
+[<Fact>]
+let ``test that activity value task works``() = task {
+    use source = ActivitySource("mySource")
+    use listener = ActivityListener(
+        ShouldListenTo = (fun _ -> true),
+        Sample = (fun _ -> ActivitySamplingResult.AllData)
+    )
+    ActivitySource.AddActivityListener(listener)
+
+    use _ = source.StartActivity("Test")
+
+    let activity = Activity.Current
+    Assert.NotNull(activity)
+    Assert.Equal("Test", activity.DisplayName)
+
+    let! result = myActivityValueTask "NewOne" {
+
+        let activity = Activity.Current
+        Assert.NotNull(activity)
+        Assert.Equal("NewOne", activity.DisplayName)
+
+        return 1
+    }
+    Assert.Equal(1, result)
+}
 
 [<Fact>]
 let ``test that exn result task caches exceptions automatically``() = task {

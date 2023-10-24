@@ -8,27 +8,29 @@ open Microsoft.FSharp.Core.CompilerServices
 open Microsoft.FSharp.Core.CompilerServices.StateMachineHelpers
 open Microsoft.FSharp.Core.LanguagePrimitives.IntrinsicOperators
 
-type GenericTaskBuilder<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResultTask
-    when 'TMethodBuilder :> IAsyncMethodBuilder<'TAwaiter, 'TTask, 'TOverall>
-    and 'TMethodBuilder :> IAsyncMethodBuilderCreator<'TMethodBuilder>
-    and 'TAwaiter :> ITaskAwaiter<'TOverall>
-    and 'TTask :> ITaskLike<'TAwaiter, 'TOverall>
-    and 'TTask :> ITaskLikeTask<'TResultTask>>() =
+type GenericUnitTaskBuilderWithState<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResultTask, 'TInitialState
+    when 'TMethodBuilder :> IAsyncMethodBuilder<'TAwaiter, 'TTask>
+    and 'TMethodBuilder :> IAsyncMethodBuilderCreator<'TInitialState, 'TMethodBuilder>
+    and 'TAwaiter :> ITaskAwaiter
+    and 'TTask :> ITaskLike<'TAwaiter>
+    and 'TTask :> ITaskLikeTask<'TResultTask>>(initialState: 'TInitialState) =
 
-    inherit GenericTaskBuilderBase()
+    inherit GenericUnitTaskBuilderBase()
 
-    static member inline RunDynamic([<InlineIfLambda>] code: GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult>) : 'TTask =
-        let mutable sm = GenericTaskStateMachine<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>()
-        let initialResumptionFunc = GenericTaskResumptionFunc<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>(fun sm -> code.Invoke(&sm))
+    static member inline RunDynamic(
+        [<InlineIfLambda>] code: GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult>, initialState: 'TInitialState)
+        : 'TTask =
+        let mutable sm = GenericUnitTaskStateMachine<'TMethodBuilder, 'TAwaiter, 'TTask>()
+        let initialResumptionFunc = GenericUnitTaskResumptionFunc<'TMethodBuilder, 'TAwaiter, 'TTask>(fun sm -> code.Invoke(&sm))
         let resumptionInfo =
-            { new GenericTaskResumptionDynamicInfo<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>(initialResumptionFunc) with
+            { new GenericUnitTaskResumptionDynamicInfo<'TMethodBuilder, 'TAwaiter, 'TTask>(initialResumptionFunc) with
                 member info.MoveNext(sm) =
                     let mutable savedExn = null
                     try
                         sm.ResumptionDynamicInfo.ResumptionData <- null
                         let step = info.ResumptionFunc.Invoke(&sm)
                         if step then
-                            sm.Data.MethodBuilder.SetResult(sm.Data.Result)
+                            sm.Data.MethodBuilder.SetResult()
                         else
                             let mutable awaiter = sm.ResumptionDynamicInfo.ResumptionData :?> ICriticalNotifyCompletion
                             assert not (isNull awaiter)
@@ -46,13 +48,17 @@ type GenericTaskBuilder<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResultT
                 }
 
         sm.ResumptionDynamicInfo <- resumptionInfo
-        sm.Data.MethodBuilder <- 'TMethodBuilder.Create()
+        sm.Data.MethodBuilder <- 'TMethodBuilder.Create(initialState)
         sm.Data.MethodBuilder.Start(&sm)
         sm.Data.MethodBuilder.Task
 
-    member inline _.Run([<InlineIfLambda>] code: GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult>) : 'TTask =
+    member _.InitialState = initialState
+
+    member inline this.Run(
+        [<InlineIfLambda>] code: GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult>)
+        : 'TTask =
          if __useResumableCode then
-            __stateMachine<GenericTaskStateMachineData<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>, 'TTask>
+            __stateMachine<GenericUnitTaskStateMachineData<'TMethodBuilder, 'TAwaiter, 'TTask>, 'TTask>
                 (MoveNextMethodImpl<_>(fun sm ->
                     //-- RESUMABLE CODE START
                     __resumeAt sm.ResumptionPoint
@@ -60,7 +66,7 @@ type GenericTaskBuilder<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResultT
                     try
                         let __stack_code_fin = code.Invoke(&sm)
                         if __stack_code_fin then
-                            sm.Data.MethodBuilder.SetResult(sm.Data.Result)
+                            sm.Data.MethodBuilder.SetResult()
                     with exn ->
                         __stack_exn <- exn
                     // Run SetException outside the stack unwind, see https://github.com/dotnet/roslyn/issues/26567
@@ -71,8 +77,8 @@ type GenericTaskBuilder<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResultT
                 ))
                 (SetStateMachineMethodImpl<_>(fun sm state -> sm.Data.MethodBuilder.SetStateMachine(state)))
                 (AfterCode<_,_>(fun sm ->
-                    sm.Data.MethodBuilder <- 'TMethodBuilder.Create()
+                    sm.Data.MethodBuilder <- 'TMethodBuilder.Create(this.InitialState)
                     sm.Data.MethodBuilder.Start(&sm)
                     sm.Data.MethodBuilder.Task))
          else
-            GenericTaskBuilder.RunDynamic(code)
+            GenericUnitTaskBuilderWithState.RunDynamic(code, this.InitialState)

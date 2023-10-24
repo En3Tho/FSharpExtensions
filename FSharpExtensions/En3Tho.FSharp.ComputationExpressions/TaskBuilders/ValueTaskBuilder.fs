@@ -151,7 +151,7 @@ type ValueTaskBuilderBase() =
             sm.Data.MethodBuilder.Start(&sm)
             sm.Data.MethodBuilder.Task
 
-        static member inline Run([<InlineIfLambda>] code: ValueTaskCode<'T, 'T>) : ValueTask<'T> =
+        member inline _.Run([<InlineIfLambda>] code: ValueTaskCode<'T, 'T>) : ValueTask<'T> =
              if __useResumableCode then
                 __stateMachine<ValueTaskStateMachineData<'T>, ValueTask<'T>>
                     (MoveNextMethodImpl<_>(fun sm ->
@@ -177,9 +177,6 @@ type ValueTaskBuilderBase() =
                         sm.Data.MethodBuilder.Task))
              else
                 ValueTaskBuilder.RunDynamic(code)
-
-        member inline _.Run([<InlineIfLambda>] code: ValueTaskCode<'T, 'T>) : ValueTask<'T> =
-           ValueTaskBuilder.Run(code)
 
 namespace En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions
 

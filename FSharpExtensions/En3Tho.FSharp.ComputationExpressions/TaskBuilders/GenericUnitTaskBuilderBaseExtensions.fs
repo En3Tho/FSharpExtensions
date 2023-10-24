@@ -1,4 +1,4 @@
-﻿namespace En3Tho.FSharp.ComputationExpressions.Tasks.GenericTaskBuilderExtensions
+﻿namespace En3Tho.FSharp.ComputationExpressions.Tasks.GenericUnitTaskBuilderExtensions
 
 open En3Tho.FSharp.ComputationExpressions.Tasks
 open System
@@ -12,13 +12,13 @@ open Microsoft.FSharp.Core.LanguagePrimitives.IntrinsicOperators
 
 module LowPriority =
 
-    type GenericTaskBuilderBase with
+    type GenericUnitTaskBuilderBase with
 
         [<NoEagerConstraintApplication>]
-        static member inline BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall
-            when 'TMethodBuilder :> IAsyncMethodBuilder<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>
-            and 'TAwaiter :> ITaskAwaiter<'TOverall>
-            and 'TTask :> ITaskLike<'TAwaiter, 'TOverall>
+        static member inline BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TMethodBuilder, 'TAwaiter, 'TTask
+            when 'TMethodBuilder :> IAsyncMethodBuilder<'TAwaiter, 'TTask>
+            and 'TAwaiter :> ITaskAwaiter
+            and 'TTask :> ITaskLike<'TAwaiter>
 
             and ^TaskLike: (member GetAwaiter: unit -> ^Awaiter)
             and ^Awaiter :> ICriticalNotifyCompletion
@@ -26,15 +26,14 @@ module LowPriority =
             and ^Awaiter: (member GetResult: unit -> 'TResult1)>
             (sm: byref<_>,
              task: ^TaskLike,
-             [<InlineIfLambda>] continuation: 'TResult1 -> GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult2>)
-            : bool =
+             [<InlineIfLambda>] continuation: 'TResult1 -> GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult2>) : bool =
 
             let mutable awaiter = (^TaskLike: (member GetAwaiter : unit -> ^Awaiter)(task))
 
             let cont =
-                (GenericTaskResumptionFunc<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>(fun sm ->
-                    let result = (^Awaiter : (member GetResult : unit -> 'TResult1)(awaiter))
-                    (continuation result).Invoke(&sm)))
+                GenericUnitTaskResumptionFunc<'TMethodBuilder, 'TAwaiter, 'TTask>(fun sm ->
+                   let result = (^Awaiter : (member GetResult: unit -> 'TResult1)(awaiter))
+                   (continuation result).Invoke(&sm))
 
             // shortcut to continue immediately
             if (^Awaiter : (member get_IsCompleted : unit -> bool)(awaiter)) then
@@ -45,10 +44,10 @@ module LowPriority =
                 false
 
         [<NoEagerConstraintApplication>]
-        member inline _.Bind< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall
-            when 'TMethodBuilder :> IAsyncMethodBuilder<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>
-            and 'TAwaiter :> ITaskAwaiter<'TOverall>
-            and 'TTask :> ITaskLike<'TAwaiter, 'TOverall>
+        member inline _.Bind< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TMethodBuilder, 'TAwaiter, 'TTask
+            when 'TMethodBuilder :> IAsyncMethodBuilder<'TAwaiter, 'TTask>
+            and 'TAwaiter :> ITaskAwaiter
+            and 'TTask :> ITaskLike<'TAwaiter>
 
             and ^TaskLike: (member GetAwaiter: unit -> ^Awaiter)
             and ^Awaiter :> ICriticalNotifyCompletion
@@ -56,10 +55,10 @@ module LowPriority =
             and ^Awaiter: (member GetResult: unit -> 'TResult1)>
 
             (task: ^TaskLike,
-             [<InlineIfLambda>] continuation: 'TResult1 -> GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult2>)
-            : GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult2> =
+             [<InlineIfLambda>] continuation: 'TResult1 -> GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult2>)
+            : GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult2> =
 
-            GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult2>(fun sm ->
+            GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult2>(fun sm ->
                 if __useResumableCode then
                     //-- RESUMABLE CODE START
                     // Get an awaiter from the awaitable
@@ -80,31 +79,31 @@ module LowPriority =
                         false
                     //-- RESUMABLE CODE END
                 else
-                    GenericTaskBuilderBase.BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>(&sm, task, continuation)
+                    GenericUnitTaskBuilderBase.BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TMethodBuilder, 'TAwaiter, 'TTask>(&sm, task, continuation)
             )
 
         [<NoEagerConstraintApplication>]
         member inline this.ReturnFrom (task: ^TaskLike) =
-            this.Bind(task, (fun v -> this.Return v))
+            this.Bind(task, (fun v -> this.Return()))
 
         [<NoEagerConstraintApplication>]
-        member inline _.Using<'Resource, 'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall
-            when 'TMethodBuilder :> IAsyncMethodBuilder<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>
-            and 'TAwaiter :> ITaskAwaiter<'TOverall>
-            and 'TTask :> ITaskLike<'TAwaiter, 'TOverall>
+        member inline _.Using<'Resource, 'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult
+            when 'TMethodBuilder :> IAsyncMethodBuilder<'TAwaiter, 'TTask>
+            and 'TAwaiter :> ITaskAwaiter
+            and 'TTask :> ITaskLike<'TAwaiter>
             and 'Resource :> IDisposable> (
                 resource: 'Resource,
-                [<InlineIfLambda>] body: 'Resource -> GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TOverall>) =
+                [<InlineIfLambda>] body: 'Resource -> GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult>) =
             ResumableCode.Using(resource, body)
 
 module HighPriority =
 
-    type GenericTaskBuilderBase with
-        static member BindDynamic (sm: byref<_>, task: Task<'TResult1>, continuation: 'TResult1 -> GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult2>) : bool =
+    type GenericUnitTaskBuilderBase with
+        static member BindDynamic (sm: byref<_>, task: Task<'TResult1>, continuation: 'TResult1 -> GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult2>) : bool =
             let mutable awaiter = task.GetAwaiter()
 
             let cont =
-                (GenericTaskResumptionFunc<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>(fun sm ->
+                (GenericUnitTaskResumptionFunc<'TMethodBuilder, 'TAwaiter, 'TTask>(fun sm ->
                     let result = awaiter.GetResult()
                     (continuation result).Invoke(&sm)))
 
@@ -116,8 +115,8 @@ module HighPriority =
                 sm.ResumptionDynamicInfo.ResumptionFunc <- cont
                 false
 
-        member inline _.Bind (task: Task<'TResult1>, [<InlineIfLambda>] continuation: 'TResult1 -> GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult2>) =
-            GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, _>(fun sm ->
+        member inline _.Bind (task: Task<'TResult1>, [<InlineIfLambda>] continuation: 'TResult1 -> GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult2>) =
+            GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, _>(fun sm ->
                 if __useResumableCode then
                     //-- RESUMABLE CODE START
                     // Get an awaiter from the task
@@ -136,18 +135,18 @@ module HighPriority =
                         sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &sm)
                         false
                 else
-                    GenericTaskBuilderBase.BindDynamic(&sm, task, continuation)
+                    GenericUnitTaskBuilderBase.BindDynamic(&sm, task, continuation)
                 //-- RESUMABLE CODE END
             )
-        member inline this.ReturnFrom (task: Task<'TResult>) : GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult, 'TResult> =
-            this.Bind(task, (fun v -> this.Return v))
+        member inline this.ReturnFrom (task: Task<'TResult>) : GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult> =
+            this.Bind(task, (fun v -> this.Return()))
 
 module MediumPriority =
     open HighPriority
 
     // Medium priority extensions
-    type GenericTaskBuilderBase with
-        member inline this.Bind (computation: Async<'TResult1>, [<InlineIfLambda>] continuation: 'TResult1 -> GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult2>) =
+    type GenericUnitTaskBuilderBase with
+        member inline this.Bind (computation: Async<'TResult1>, [<InlineIfLambda>] continuation: 'TResult1 -> GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult2>) =
             this.Bind (Async.StartAsTask computation, continuation)
 
         member inline this.ReturnFrom (computation: Async<'TResult>) =
