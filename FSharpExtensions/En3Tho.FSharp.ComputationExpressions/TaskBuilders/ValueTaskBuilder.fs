@@ -198,10 +198,10 @@ module LowPriority =
 
         [<NoEagerConstraintApplication>]
         static member inline BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter , 'TOverall
-                                            when  ^TaskLike: (member GetAwaiter:  unit ->  ^Awaiter)
+                                            when  ^TaskLike: (member GetAwaiter:  unit -> ^Awaiter)
                                             and ^Awaiter :> ICriticalNotifyCompletion
                                             and ^Awaiter: (member get_IsCompleted:  unit -> bool)
-                                            and ^Awaiter: (member GetResult:  unit ->  'TResult1)>
+                                            and ^Awaiter: (member GetResult:  unit -> 'TResult1)>
                     (sm: byref<_>, task: ^TaskLike, continuation: ('TResult1 -> ValueTaskCode<'TOverall, 'TResult2>)) : bool =
 
                 let mutable awaiter = (^TaskLike: (member GetAwaiter : unit -> ^Awaiter)(task))
@@ -221,10 +221,10 @@ module LowPriority =
 
         [<NoEagerConstraintApplication>]
         member inline _.Bind< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter , 'TOverall
-                                            when  ^TaskLike: (member GetAwaiter:  unit ->  ^Awaiter)
+                                            when  ^TaskLike: (member GetAwaiter:  unit -> ^Awaiter)
                                             and ^Awaiter :> ICriticalNotifyCompletion
                                             and ^Awaiter: (member get_IsCompleted:  unit -> bool)
-                                            and ^Awaiter: (member GetResult:  unit ->  'TResult1)>
+                                            and ^Awaiter: (member GetResult:  unit -> 'TResult1)>
                     (task: ^TaskLike, continuation: ('TResult1 -> ValueTaskCode<'TOverall, 'TResult2>)) : ValueTaskCode<'TOverall, 'TResult2> =
 
             ValueTaskCode<'TOverall, _>(fun sm ->
@@ -253,10 +253,10 @@ module LowPriority =
 
         [<NoEagerConstraintApplication>]
         member inline this.ReturnFrom< ^TaskLike, ^Awaiter, 'T
-                                              when  ^TaskLike: (member GetAwaiter:  unit ->  ^Awaiter)
+                                              when  ^TaskLike: (member GetAwaiter:  unit -> ^Awaiter)
                                               and ^Awaiter :> ICriticalNotifyCompletion
                                               and ^Awaiter: (member get_IsCompleted: unit -> bool)
-                                              and ^Awaiter: (member GetResult: unit ->  'T)>
+                                              and ^Awaiter: (member GetResult: unit -> 'T)>
                 (task: ^TaskLike) : ValueTaskCode< 'T,  'T> =
 
             this.Bind(task, (fun v -> this.Return v))

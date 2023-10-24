@@ -261,7 +261,7 @@ module TaskLikeLowPriority =
 
         [<NoEagerConstraintApplication>]
         static member inline BindTaskLikeDynamic< ^TaskLike, 'TResult1, 'TResult2, 'TError, ^Awaiter, 'TOverall
-                                            when  ^TaskLike: (member GetAwaiter: unit ->  ^Awaiter)
+                                            when  ^TaskLike: (member GetAwaiter: unit -> ^Awaiter)
                                             and ^Awaiter :> ICriticalNotifyCompletion
                                             and ^Awaiter: (member get_IsCompleted: unit -> bool)
                                             and ^Awaiter: (member GetResult: unit -> 'TResult1)>
@@ -331,7 +331,7 @@ module TaskLikeHighPriority =
 
         [<NoEagerConstraintApplication>]
         static member inline BindTaskLikeResultDynamic< ^TaskLike, 'TResult1, 'TResult2, 'TError, ^Awaiter , 'TOverall
-                                        when  ^TaskLike: (member GetAwaiter:  unit ->  ^Awaiter)
+                                        when  ^TaskLike: (member GetAwaiter:  unit -> ^Awaiter)
                                         and ^Awaiter :> ICriticalNotifyCompletion
                                         and ^Awaiter: (member get_IsCompleted:  unit -> bool)
                                         and ^Awaiter: (member GetResult:  unit -> Result<'TResult1, 'TError>)>
@@ -360,7 +360,7 @@ module TaskLikeHighPriority =
 
         [<NoEagerConstraintApplication>]
         member inline _.Bind< ^TaskLike, 'TResult1, 'TResult2, 'TError, ^Awaiter , 'TOverall
-                                            when  ^TaskLike: (member GetAwaiter: unit ->  ^Awaiter)
+                                            when  ^TaskLike: (member GetAwaiter: unit -> ^Awaiter)
                                             and ^Awaiter :> ICriticalNotifyCompletion
                                             and ^Awaiter: (member get_IsCompleted: unit -> bool)
                                             and ^Awaiter: (member GetResult: unit -> Result<'TResult1, 'TError>)>

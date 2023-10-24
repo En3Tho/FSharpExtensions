@@ -16,11 +16,13 @@
         <Compile Include="HttpBuilderTests.fs" />
         <Compile Include="CodeBuilderTests.fs" />
         <Compile Include="TryExprBuilderTests.fs" />
+        <Compile Include="GenericTaskBuilderTests.fs" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\En3Tho.FSharp.ComputationExpressions\En3Tho.FSharp.ComputationExpressions.fsproj" />
         <ProjectReference Include="..\En3Tho.FSharp.Extensions\En3Tho.FSharp.Extensions.fsproj" />
+        <ProjectReference Include="..\En3Tho.FSharp.XUnitExtensions\En3Tho.FSharp.XUnitExtensions.fsproj" />
     </ItemGroup>
 
 </Project>

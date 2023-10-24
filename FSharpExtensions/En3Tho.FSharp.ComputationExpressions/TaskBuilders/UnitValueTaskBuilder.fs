@@ -51,7 +51,7 @@ type UnitValueTaskBuilderBase() =
         ResumableCode.Combine(task1, task2)
 
     /// Builds a step that executes the body while the condition predicate is true.
-    member inline _.While ([<InlineIfLambda>] condition : unit -> bool, body : UnitValueTaskCode<unit>) : UnitValueTaskCode<unit> =
+    member inline _.While ([<InlineIfLambda>] condition: unit -> bool, body : UnitValueTaskCode<unit>) : UnitValueTaskCode<unit> =
         ResumableCode.While(condition, body)
 
     /// Wraps a step in a try/with. This catches exceptions both in the evaluation of the function
@@ -67,7 +67,7 @@ type UnitValueTaskBuilderBase() =
     member inline _.For (sequence : seq<'T>, body : 'T -> UnitValueTaskCode<unit>) : UnitValueTaskCode<unit> =
         ResumableCode.For(sequence, body)
 
-    member inline internal this.TryFinallyAsync(body: UnitValueTaskCode<'T>, compensation : unit -> ValueTask) : UnitValueTaskCode<'T> =
+    member inline internal this.TryFinallyAsync(body: UnitValueTaskCode<'T>, [<InlineIfLambda>] compensation : unit -> ValueTask) : UnitValueTaskCode<'T> =
         ResumableCode.TryFinallyAsync(body, UnitValueTaskCode<_>(fun sm ->
             if __useResumableCode then
                 let mutable __stack_condition_fin = true
@@ -99,7 +99,7 @@ type UnitValueTaskBuilderBase() =
                     false
                 ))
 
-    member inline this.Using<'Resource, 'TOverall, 'T when 'Resource :> IAsyncDisposable> (resource: 'Resource, body: 'Resource -> UnitValueTaskCode<'T>) : UnitValueTaskCode<'T> =
+    member inline this.Using<'Resource, 'TOverall, 'T when 'Resource :> IAsyncDisposable> (resource: 'Resource, [<InlineIfLambda>] body: 'Resource -> UnitValueTaskCode<'T>) : UnitValueTaskCode<'T> =
         this.TryFinallyAsync(
             (fun sm -> (body resource).Invoke(&sm)),
             (fun () ->
@@ -191,10 +191,10 @@ module LowPriority =
 
         [<NoEagerConstraintApplication>]
         static member inline BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter
-                                            when  ^TaskLike: (member GetAwaiter:  unit ->  ^Awaiter)
+                                            when  ^TaskLike: (member GetAwaiter:  unit -> ^Awaiter)
                                             and ^Awaiter :> ICriticalNotifyCompletion
                                             and ^Awaiter: (member get_IsCompleted:  unit -> bool)
-                                            and ^Awaiter: (member GetResult:  unit ->  'TResult1)>
+                                            and ^Awaiter: (member GetResult:  unit -> 'TResult1)>
                     (sm: byref<_>, task: ^TaskLike, continuation: ('TResult1 -> UnitValueTaskCode<'TResult2>)) : bool =
 
                 let mutable awaiter = (^TaskLike: (member GetAwaiter : unit -> ^Awaiter)(task))
@@ -214,10 +214,10 @@ module LowPriority =
 
         [<NoEagerConstraintApplication>]
         member inline _.Bind< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter
-                                            when  ^TaskLike: (member GetAwaiter:  unit ->  ^Awaiter)
+                                            when  ^TaskLike: (member GetAwaiter:  unit -> ^Awaiter)
                                             and ^Awaiter :> ICriticalNotifyCompletion
                                             and ^Awaiter: (member get_IsCompleted:  unit -> bool)
-                                            and ^Awaiter: (member GetResult:  unit ->  'TResult1)>
+                                            and ^Awaiter: (member GetResult:  unit -> 'TResult1)>
                     (task: ^TaskLike, continuation: ('TResult1 -> UnitValueTaskCode<'TResult2>)) : UnitValueTaskCode<'TResult2> =
 
             UnitValueTaskCode<_>(fun sm ->
@@ -244,7 +244,7 @@ module LowPriority =
                 //-- RESUMABLE CODE END
             )
 
-        member inline _.Using<'Resource, 'T when 'Resource :> IDisposable> (resource: 'Resource, body: 'Resource -> UnitValueTaskCode<'T>) =
+        member inline _.Using<'Resource, 'TResult when 'Resource :> IDisposable> (resource: 'Resource, body: 'Resource -> UnitValueTaskCode<'TResult>) =
             ResumableCode.Using(resource, body)
 
 module HighPriority =
@@ -291,7 +291,7 @@ module HighPriority =
                 //-- RESUMABLE CODE END
             )
 
-        member inline this.ReturnFrom (task: Task<'T>) : UnitValueTaskCode<'T> =
+        member inline this.ReturnFrom (task: Task<'TResult>) : UnitValueTaskCode<'TResult> =
             this.Bind(task, (fun v -> this.Return v))
 
         static member BindDynamic (sm: byref<_>, task: ValueTask<'TResult1>, continuation: ('TResult1 -> UnitValueTaskCode<'TResult2>)) : bool =

@@ -14,6 +14,7 @@
         <Compile Include="OptionBuilder.fs" />
         <Compile Include="ResultBuilder.fs" />
         <Compile Include="CodeBuilder.fs" />
+        <Compile Include="TryExprBuilder.fs" />
         <Compile Include="TaskBuilders\AwaiterHelper.fs" />
         <Compile Include="TaskBuilders\TaskBuilderExtensions.fs" />
         <Compile Include="TaskBuilders\UnitTaskBuilder.fs" />
@@ -22,6 +23,15 @@
         <Compile Include="TaskBuilders\ValueTaskOptionBuilder.fs" />
         <Compile Include="TaskBuilders\ValueTaskResultBuilder.fs" />
         <Compile Include="TaskBuilders\ValueTaskExnResultBuilder.fs" />
+        <Compile Include="TaskBuilders\GenericTaskBuilderInterfaces.fs" />
+        <Compile Include="TaskBuilders\GenericTaskBuilder.fs" />
+        <Compile Include="TaskBuilders\GenericTaskBuilderExtensions.fs" />
+        <Compile Include="TaskBuilders\GenericUnitTaskBuilderInterfaces.fs" />
+        <Compile Include="TaskBuilders\GenericUnitTaskBuilder.fs" />
+        <Compile Include="TaskBuilders\GenericUnitTaskBuilderExtensions.fs" />
+        <Compile Include="TaskBuilders\ValueTaskWrapper.fs" />
+        <Compile Include="TaskBuilders\TaskWrapper.fs" />
+        <Compile Include="TaskBuilders\ExnResultValueTask.fs" />
         <Compile Include="TaskBuilders\TaskBuilders.fs" />
         <Compile Include="ValueTaskExtensions.fs" />
         <Compile Include="HttpBuilder\Serializers.fs" />
@@ -29,7 +39,6 @@
         <Compile Include="HttpBuilder\Stages.fs" />
         <Compile Include="HttpBuilder\Content.fs" />
         <Compile Include="HttpBuilder\Extensions.fs" />
-        <Compile Include="TryExprBuilder.fs" />
     </ItemGroup>
 
 </Project>

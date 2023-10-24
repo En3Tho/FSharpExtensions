@@ -200,10 +200,10 @@ module LowPriority =
 
         [<NoEagerConstraintApplication>]
         static member inline BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter
-                                            when  ^TaskLike: (member GetAwaiter:  unit ->  ^Awaiter)
+                                            when  ^TaskLike: (member GetAwaiter:  unit -> ^Awaiter)
                                             and ^Awaiter :> ICriticalNotifyCompletion
                                             and ^Awaiter: (member get_IsCompleted:  unit -> bool)
-                                            and ^Awaiter: (member GetResult:  unit ->  'TResult1)>
+                                            and ^Awaiter: (member GetResult:  unit -> 'TResult1)>
                     (sm: byref<_>, task: ^TaskLike, continuation: ('TResult1 -> UnitTaskCode<'TResult2>)) : bool =
 
                 let mutable awaiter = (^TaskLike: (member GetAwaiter : unit -> ^Awaiter)(task))
@@ -223,10 +223,10 @@ module LowPriority =
 
         [<NoEagerConstraintApplication>]
         member inline _.Bind< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter
-                                            when  ^TaskLike: (member GetAwaiter:  unit ->  ^Awaiter)
+                                            when  ^TaskLike: (member GetAwaiter:  unit -> ^Awaiter)
                                             and ^Awaiter :> ICriticalNotifyCompletion
                                             and ^Awaiter: (member get_IsCompleted:  unit -> bool)
-                                            and ^Awaiter: (member GetResult:  unit ->  'TResult1)>
+                                            and ^Awaiter: (member GetResult:  unit -> 'TResult1)>
                     (task: ^TaskLike, continuation: ('TResult1 -> UnitTaskCode<'TResult2>)) : UnitTaskCode<'TResult2> =
 
             UnitTaskCode<_>(fun sm ->

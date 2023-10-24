@@ -153,7 +153,7 @@ type ValueTaskExnResultBuilderBase() =
                     (MoveNextMethodImpl<_>(fun sm ->
                         //-- RESUMABLE CODE START
                         __resumeAt sm.ResumptionPoint
-                        let mutable __stack_exn : Exception = null
+                        let mutable __stack_exn: Exception = null
                         try
                             let __stack_code_fin = code.Invoke(&sm)
                             if __stack_code_fin then
@@ -261,7 +261,7 @@ module TaskLikeLowPriority =
 
         [<NoEagerConstraintApplication>]
         static member inline BindTaskLikeDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter , 'TOverall
-                                            when  ^TaskLike: (member GetAwaiter: unit ->  ^Awaiter)
+                                            when  ^TaskLike: (member GetAwaiter: unit -> ^Awaiter)
                                             and ^Awaiter :> ICriticalNotifyCompletion
                                             and ^Awaiter: (member get_IsCompleted: unit -> bool)
                                             and ^Awaiter: (member GetResult: unit -> 'TResult1)>
@@ -331,7 +331,7 @@ module TaskLikeHighPriority =
 
         [<NoEagerConstraintApplication>]
         static member inline BindTaskLikeResultDynamic< ^TaskLike, 'TResult1, 'TResult2, 'TExn, ^Awaiter , 'TOverall
-                                        when  ^TaskLike: (member GetAwaiter:  unit ->  ^Awaiter)
+                                        when  ^TaskLike: (member GetAwaiter:  unit -> ^Awaiter)
                                         and 'TExn :> exn
                                         and ^Awaiter :> ICriticalNotifyCompletion
                                         and ^Awaiter: (member get_IsCompleted:  unit -> bool)
@@ -361,7 +361,7 @@ module TaskLikeHighPriority =
 
         [<NoEagerConstraintApplication>]
         member inline _.Bind< ^TaskLike, 'TResult1, 'TResult2, 'TExn, ^Awaiter , 'TOverall
-                                            when  ^TaskLike: (member GetAwaiter: unit ->  ^Awaiter)
+                                            when  ^TaskLike: (member GetAwaiter: unit -> ^Awaiter)
                                             and 'TExn :> exn
                                             and ^Awaiter :> ICriticalNotifyCompletion
                                             and ^Awaiter: (member get_IsCompleted: unit -> bool)
