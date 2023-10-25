@@ -1,21 +1,20 @@
-namespace En3Tho.FSharp.ComputationExpressions.Tasks
+namespace En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 
 open System
 open System.Runtime.CompilerServices
-open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 open Microsoft.FSharp.Core
 open Microsoft.FSharp.Core.CompilerServices
 open Microsoft.FSharp.Core.CompilerServices.StateMachineHelpers
 open Microsoft.FSharp.Core.LanguagePrimitives.IntrinsicOperators
 
-type GenericUnitTaskBuilder<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResultTask
+type GenericUnitTaskBuilder<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResultTask, 'TExtensionsMarker
     when 'TMethodBuilder :> IAsyncMethodBuilder<'TAwaiter, 'TTask>
     and 'TMethodBuilder :> IAsyncMethodBuilderCreator<'TMethodBuilder>
     and 'TAwaiter :> ITaskAwaiter
     and 'TTask :> ITaskLike<'TAwaiter>
     and 'TTask :> ITaskLikeTask<'TResultTask>>() =
 
-    inherit GenericUnitTaskBuilderBase()
+    inherit GenericUnitTaskBuilderBase<'TExtensionsMarker>()
 
     static member inline RunDynamic(
         [<InlineIfLambda>] code: GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult>)
@@ -79,4 +78,4 @@ type GenericUnitTaskBuilder<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResultTask
                     sm.Data.MethodBuilder.Start(&sm)
                     sm.Data.MethodBuilder.Task))
         else
-            GenericUnitTaskBuilder.RunDynamic(code)
+            GenericUnitTaskBuilder<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResultTask, 'TExtensionsMarker>.RunDynamic(code)

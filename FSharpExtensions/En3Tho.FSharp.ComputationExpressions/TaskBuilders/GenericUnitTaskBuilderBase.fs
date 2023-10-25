@@ -1,9 +1,8 @@
-namespace En3Tho.FSharp.ComputationExpressions.Tasks
+namespace En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 
 open System
 open System.Runtime.CompilerServices
 open System.Threading.Tasks
-open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 open Microsoft.FSharp.Core
 open Microsoft.FSharp.Core.CompilerServices
 open Microsoft.FSharp.Core.CompilerServices.StateMachineHelpers
@@ -104,3 +103,6 @@ type GenericUnitTaskBuilderBase() =
                     resource.DisposeAsync()
                 else
                     ValueTask()))
+
+type GenericUnitTaskBuilderBase<'TExtensionMarker>() =
+    inherit GenericUnitTaskBuilderBase()

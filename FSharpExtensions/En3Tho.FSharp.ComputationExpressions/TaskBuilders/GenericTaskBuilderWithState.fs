@@ -1,4 +1,4 @@
-namespace En3Tho.FSharp.ComputationExpressions.Tasks
+namespace En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 
 open System
 open System.Runtime.CompilerServices
@@ -8,14 +8,14 @@ open Microsoft.FSharp.Core.CompilerServices
 open Microsoft.FSharp.Core.CompilerServices.StateMachineHelpers
 open Microsoft.FSharp.Core.LanguagePrimitives.IntrinsicOperators
 
-type GenericTaskBuilderWithState<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResultTask, 'TInitialState
+type GenericTaskBuilderWithState<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResultTask, 'TInitialState, 'TExtensionsMarker
     when 'TMethodBuilder :> IAsyncMethodBuilder<'TAwaiter, 'TTask, 'TOverall>
     and 'TMethodBuilder :> IAsyncMethodBuilderCreator<'TInitialState, 'TMethodBuilder>
     and 'TAwaiter :> ITaskAwaiter<'TOverall>
     and 'TTask :> ITaskLike<'TAwaiter, 'TOverall>
     and 'TTask :> ITaskLikeTask<'TResultTask>>(initialState: 'TInitialState) =
 
-    inherit GenericTaskBuilderBase()
+    inherit GenericTaskBuilderBase<'TExtensionsMarker>()
 
     static member inline RunDynamic([<InlineIfLambda>] code: GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult>, initialState: 'TInitialState) : 'TTask =
         let mutable sm = GenericTaskStateMachine<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>()
@@ -77,4 +77,4 @@ type GenericTaskBuilderWithState<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 
                     sm.Data.MethodBuilder.Start(&sm)
                     sm.Data.MethodBuilder.Task))
         else
-            GenericTaskBuilderWithState.RunDynamic(code, this.InitialState)
+            GenericTaskBuilderWithState<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResultTask, 'TInitialState, 'TExtensionsMarker>.RunDynamic(code, this.InitialState)

@@ -1,11 +1,10 @@
-namespace En3Tho.FSharp.ComputationExpressions.TaskBuilders.ActivityTask
+namespace En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks
 
-open System.Diagnostics
 open System.Runtime.CompilerServices
 open System.Threading.Tasks
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 
-type [<Struct>] ActivityTaskAwaiter<'a> =
+type [<Struct>] TaskWrapperAwaiter<'a> =
     val mutable private awaiter: TaskAwaiter<'a>
     new(awaiter) = { awaiter = awaiter }
 
@@ -20,46 +19,25 @@ type [<Struct>] ActivityTaskAwaiter<'a> =
         member this.OnCompleted(continuation) = this.OnCompleted(continuation)
         member this.UnsafeOnCompleted(continuation) = this.UnsafeOnCompleted(continuation)
 
-and [<Struct>] ActivityTaskMethodBuilder<'a> =
+and [<Struct>] TaskWrapperMethodBuilder<'a> =
     val mutable private builder: AsyncTaskMethodBuilder<'a>
-    val mutable private activity: Activity
-    new(builder, activityName: string) = {
-        builder = builder
-        activity =
-            match Activity.Current with
-            | null -> null
-            | activity ->
-                activity.Source.StartActivity(activityName)
-    }
+    new(builder) = { builder = builder }
 
-    static member Create(activityName) = ActivityTaskMethodBuilder(AsyncTaskMethodBuilder<'a>.Create(), activityName)
-
-    member this.SetException(exn: exn) =
-        match this.activity with
-        | null -> ()
-        | activity ->
-            activity.SetStatus(ActivityStatusCode.Error, exn.Message).Dispose()
-        this.builder.SetException(exn)
-
-    member this.SetResult(data) =
-        match this.activity with
-        | null -> ()
-        | activity ->
-            activity.Dispose()
-        this.builder.SetResult(data)
-
+    static member Create() = TaskWrapperMethodBuilder(AsyncTaskMethodBuilder<'a>.Create())
     member this.AwaitOnCompleted(awaiter: byref<#INotifyCompletion>, stateMachine: byref<#IAsyncStateMachine>) =
         this.builder.AwaitOnCompleted(&awaiter, &stateMachine)
     member this.AwaitUnsafeOnCompleted(awaiter: byref<#INotifyCompletion>, stateMachine: byref<#IAsyncStateMachine>) =
         this.builder.AwaitUnsafeOnCompleted(&awaiter, &stateMachine)
+    member this.SetException(``exception``) = this.builder.SetException(``exception``)
+    member this.SetResult(data) = this.builder.SetResult(data)
     member this.SetStateMachine(stateMachine) = this.builder.SetStateMachine(stateMachine)
     member this.Start(stateMachine: byref<#IAsyncStateMachine>) = this.builder.Start(&stateMachine)
-    member this.Task = ActivityTask(this.builder.Task)
+    member this.Task = TaskWrapper(this.builder.Task)
 
-    interface IAsyncMethodBuilderCreator<string, ActivityTaskMethodBuilder<'a>> with
-        static member Create(initialState) = ActivityTaskMethodBuilder<'a>.Create(initialState)
+    interface IAsyncMethodBuilderCreator<TaskWrapperMethodBuilder<'a>> with
+        static member Create() = TaskWrapperMethodBuilder.Create()
 
-    interface IAsyncMethodBuilder<ActivityTaskAwaiter<'a>, ActivityTask<'a>, 'a> with
+    interface IAsyncMethodBuilder<TaskWrapperAwaiter<'a>, TaskWrapper<'a>, 'a> with
         member this.AwaitOnCompleted(awaiter, stateMachine) = this.AwaitOnCompleted(&awaiter, &stateMachine)
         member this.AwaitUnsafeOnCompleted(awaiter, stateMachine) = this.AwaitUnsafeOnCompleted(&awaiter, &stateMachine)
         member this.SetException(``exception``) = this.SetException(``exception``)
@@ -68,27 +46,24 @@ and [<Struct>] ActivityTaskMethodBuilder<'a> =
         member this.Start(stateMachine: byref<#IAsyncStateMachine>) = this.Start(&stateMachine)
         member this.Task = this.Task
 
-and [<Struct>] ActivityTask<'a> =
+and [<Struct>] TaskWrapper<'a> =
     val mutable private task: Task<'a>
     new(task) = { task = task }
+    
+    member this.GetAwaiter() = TaskWrapperAwaiter(this.task.GetAwaiter())
 
-    member this.GetAwaiter() = ActivityTaskAwaiter(this.task.GetAwaiter())
-    member this.Task = this.task
+    interface ITaskLike<TaskWrapperAwaiter<'a>, 'a> with
+        member this.GetAwaiter() = this.GetAwaiter()
 
-    interface ITaskLike<ActivityTaskAwaiter<'a>, 'a> with
-        member this.GetAwaiter() = ActivityTaskAwaiter(this.task.GetAwaiter())
+    interface ITaskLikeTask<Task<'a>> with
+        member this.Task = this.task
 
-    interface ITaskLikeTask<ActivityTask<'a>> with
-        member this.Task = this
+type [<Struct>] TaskWrapperAwaiter(awaiter: TaskAwaiter) =
 
-type [<Struct>] ActivityTaskAwaiter =
-    val mutable private awaiter: TaskAwaiter
-    new(awaiter) = { awaiter = awaiter }
-
-    member this.IsCompleted = this.awaiter.IsCompleted
-    member this.GetResult() = this.awaiter.GetResult()
-    member this.OnCompleted(continuation) = this.awaiter.OnCompleted(continuation)
-    member this.UnsafeOnCompleted(continuation) = this.awaiter.UnsafeOnCompleted(continuation)
+    member _.IsCompleted = awaiter.IsCompleted
+    member _.GetResult() = awaiter.GetResult()
+    member _.OnCompleted(continuation) = awaiter.OnCompleted(continuation)
+    member _.UnsafeOnCompleted(continuation) = awaiter.UnsafeOnCompleted(continuation)
 
     interface ITaskAwaiter with
         member this.IsCompleted = this.IsCompleted
@@ -96,62 +71,41 @@ type [<Struct>] ActivityTaskAwaiter =
         member this.OnCompleted(continuation) = this.OnCompleted(continuation)
         member this.UnsafeOnCompleted(continuation) = this.UnsafeOnCompleted(continuation)
 
-and [<Struct>] ActivityTaskMethodBuilder =
+and [<Struct>] TaskWrapperMethodBuilder =
     val mutable private builder: AsyncTaskMethodBuilder
-    val mutable private activity: Activity
-    new(builder, activityName: string) = {
-        builder = builder
-        activity =
-            match Activity.Current with
-            | null -> null
-            | activity ->
-                activity.Source.StartActivity(activityName)
-    }
+    new(builder) = { builder = builder }
 
-    static member Create(activityName) = ActivityTaskMethodBuilder(AsyncTaskMethodBuilder.Create(), activityName)
-
-    member this.SetException(exn: exn) =
-        match this.activity with
-        | null -> ()
-        | activity ->
-            activity.SetStatus(ActivityStatusCode.Error, exn.Message).Dispose()
-        this.builder.SetException(exn)
-
-    member this.SetResult() =
-        match this.activity with
-        | null -> ()
-        | activity ->
-            activity.Dispose()
-        this.builder.SetResult()
-
+    static member Create() = TaskWrapperMethodBuilder(AsyncTaskMethodBuilder.Create())
     member this.AwaitOnCompleted(awaiter: byref<#INotifyCompletion>, stateMachine: byref<#IAsyncStateMachine>) =
         this.builder.AwaitOnCompleted(&awaiter, &stateMachine)
     member this.AwaitUnsafeOnCompleted(awaiter: byref<#INotifyCompletion>, stateMachine: byref<#IAsyncStateMachine>) =
         this.builder.AwaitUnsafeOnCompleted(&awaiter, &stateMachine)
+    member this.SetException(``exception``) = this.builder.SetException(``exception``)
+    member this.SetResult() = this.builder.SetResult()
     member this.SetStateMachine(stateMachine) = this.builder.SetStateMachine(stateMachine)
     member this.Start(stateMachine: byref<#IAsyncStateMachine>) = this.builder.Start(&stateMachine)
-    member this.Task = ActivityTask(this.builder.Task)
+    member this.Task = TaskWrapper(this.builder.Task)
 
-    interface IAsyncMethodBuilderCreator<string, ActivityTaskMethodBuilder> with
-        static member Create(initialState) = ActivityTaskMethodBuilder.Create(initialState)
+    interface IAsyncMethodBuilderCreator<TaskWrapperMethodBuilder> with
+        static member Create() = TaskWrapperMethodBuilder.Create()
 
-    interface IAsyncMethodBuilder<ActivityTaskAwaiter, ActivityTask> with
+    interface IAsyncMethodBuilder<TaskWrapperAwaiter, TaskWrapper> with
         member this.AwaitOnCompleted(awaiter, stateMachine) = this.AwaitOnCompleted(&awaiter, &stateMachine)
         member this.AwaitUnsafeOnCompleted(awaiter, stateMachine) = this.AwaitUnsafeOnCompleted(&awaiter, &stateMachine)
         member this.SetException(``exception``) = this.SetException(``exception``)
-        member this.SetResult() = this.builder.SetResult()
+        member this.SetResult() = this.SetResult()
         member this.SetStateMachine(stateMachine) = this.SetStateMachine(stateMachine)
         member this.Start(stateMachine) = this.Start(&stateMachine)
         member this.Task = this.Task
 
-and [<Struct>] ActivityTask =
+and [<Struct>] TaskWrapper =
     val mutable private task: Task
     new(task) = { task = task }
 
-    member this.GetAwaiter() = ActivityTaskAwaiter(this.task.GetAwaiter())
+    member this.GetAwaiter() = TaskWrapperAwaiter(this.task.GetAwaiter())
 
-    interface ITaskLike<ActivityTaskAwaiter> with
+    interface ITaskLike<TaskWrapperAwaiter> with
         member this.GetAwaiter() = this.GetAwaiter()
 
-    interface ITaskLikeTask<ActivityTask> with
-        member this.Task = this
+    interface ITaskLikeTask<Task> with
+        member this.Task = this.task

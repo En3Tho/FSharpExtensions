@@ -3,41 +3,42 @@
 open System
 open System.Diagnostics
 open System.Threading.Tasks
-open En3Tho.FSharp.ComputationExpressions.TaskBuilders.ExnResultValueTask
-open En3Tho.FSharp.ComputationExpressions.TaskBuilders.ActivityTask
-open En3Tho.FSharp.ComputationExpressions.Tasks
+open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 open En3Tho.FSharp.Xunit
 
-open En3Tho.FSharp.ComputationExpressions.Tasks.GenericTaskBuilderExtensions.LowPriority
-open En3Tho.FSharp.ComputationExpressions.Tasks.GenericTaskBuilderExtensions.MediumPriority
-open En3Tho.FSharp.ComputationExpressions.Tasks.GenericTaskBuilderExtensions.HighPriority
+open GenericTaskBuilderExtensionsLowPriority
+open GenericTaskBuilderBasicBindExtensionsLowPriority
+open GenericTaskBuilderBasicBindExtensionsMediumPriority
+open GenericTaskBuilderBasicBindExtensionsHighPriority
 
-open En3Tho.FSharp.ComputationExpressions.Tasks.GenericUnitTaskBuilderExtensions.LowPriority
-open En3Tho.FSharp.ComputationExpressions.Tasks.GenericUnitTaskBuilderExtensions.MediumPriority
-open En3Tho.FSharp.ComputationExpressions.Tasks.GenericUnitTaskBuilderExtensions.HighPriority
+open GenericUnitTaskBuilderExtensionsLowPriority
+open GenericUnitTaskBuilderBasicBindExtensionsLowPriority
+open GenericUnitTaskBuilderBasicBindExtensionsMediumPriority
+open GenericUnitTaskBuilderBasicBindExtensionsHighPriority
+
 open Xunit
 
-type ValueTaskWrapperBuilder<'a> =
-    GenericTaskBuilder<ValueTaskWrapperMethodBuilder<'a>, ValueTaskWrapperAwaiter<'a>, ValueTaskWrapper<'a>, 'a, ValueTask<'a>>
+type ValueTaskWrapperBuilder<'a>() =
+    inherit GenericTaskBuilder<ValueTaskWrapperMethodBuilder<'a>, ValueTaskWrapperAwaiter<'a>, ValueTaskWrapper<'a>, 'a, ValueTask<'a>, IGenericTaskBuilderBasicBindExtensions>()
 
-type ValueTaskWrapperBuilder =
-    GenericUnitTaskBuilder<ValueTaskWrapperMethodBuilder, ValueTaskWrapperAwaiter, ValueTaskWrapper, ValueTask>
+type ValueTaskWrapperBuilder() =
+    inherit GenericUnitTaskBuilder<ValueTaskWrapperMethodBuilder, ValueTaskWrapperAwaiter, ValueTaskWrapper, ValueTask, IGenericUnitTaskBuilderBasicBindExtensions>()
 
-type TaskWrapperBuilder<'a> =
-    GenericTaskBuilder<TaskWrapperMethodBuilder<'a>, TaskWrapperAwaiter<'a>, TaskWrapper<'a>, 'a, Task<'a>>
+type TaskWrapperBuilder<'a>() =
+    inherit GenericTaskBuilder<TaskWrapperMethodBuilder<'a>, TaskWrapperAwaiter<'a>, TaskWrapper<'a>, 'a, Task<'a>, IGenericTaskBuilderBasicBindExtensions>()
 
-type TaskWrapperBuilder =
-    GenericUnitTaskBuilder<TaskWrapperMethodBuilder, TaskWrapperAwaiter, TaskWrapper, Task>
+type TaskWrapperBuilder() =
+    inherit GenericUnitTaskBuilder<TaskWrapperMethodBuilder, TaskWrapperAwaiter, TaskWrapper, Task, IGenericUnitTaskBuilderBasicBindExtensions>()
 
-type ExnResultValueTaskBuilder<'a> =
-    GenericTaskBuilder<ExnResultValueTaskMethodBuilder<'a>, ExnResultValueTaskAwaiter<'a>, ExnResultValueTask<'a>, Result<'a, exn>, ExnResultValueTask<'a>>
+type ActivityValueTaskBuilder<'a>(activityName) =
+    inherit GenericTaskBuilderWithState<ActivityValueTaskMethodBuilder<'a>, ActivityValueTaskAwaiter<'a>, ActivityValueTask<'a>, 'a, ActivityValueTask<'a>, string, IGenericTaskBuilderBasicBindExtensions>(activityName)
 
-type ActivityValueTaskBuilder =
-    GenericTaskBuilderWithState<ActivityValueTaskMethodBuilder<'a>, ActivityValueTaskAwaiter<'a>, ActivityValueTask<'a>, 'a, ActivityValueTask<'a>, string>
+type ActivityTaskBuilder<'a>(activityName) =
+    inherit GenericTaskBuilderWithState<ActivityTaskMethodBuilder<'a>, ActivityTaskAwaiter<'a>, ActivityTask<'a>, 'a, ActivityTask<'a>, string, IGenericTaskBuilderBasicBindExtensions>(activityName)
 
-type ActivityTaskBuilder<'a> =
-    GenericTaskBuilderWithState<ActivityTaskMethodBuilder<'a>, ActivityTaskAwaiter<'a>, ActivityTask<'a>, 'a, ActivityTask<'a>, string>
+type ExnResultValueTaskBuilder<'a>() = // TODO: non-basic binds
+    inherit GenericTaskBuilder<ExnResultValueTaskMethodBuilder<'a>, ExnResultValueTaskAwaiter<'a>, ExnResultValueTask<'a>, Result<'a, exn>, ExnResultValueTask<'a>, IGenericTaskBuilderBasicBindExtensions>()
 
 let inline myValueTask<'a> = Unchecked.defaultof<ValueTaskWrapperBuilder<'a>>
 let myUnitValueTask = ValueTaskWrapperBuilder()
@@ -100,15 +101,47 @@ let ``test that activity task works``() = task {
     Assert.NotNull(activity)
     Assert.Equal("Test", activity.DisplayName)
 
+    let mutable activityFromTask = null
     let! result = myActivityTask "NewOne" {
 
         let activity = Activity.Current
         Assert.NotNull(activity)
         Assert.Equal("NewOne", activity.DisplayName)
 
+        activityFromTask <- activity
+
         return 1
     }
+
     Assert.Equal(1, result)
+    Assert.True(activityFromTask.IsStopped)
+    Assert.True(activityFromTask.Status = ActivityStatusCode.Ok)
+}
+
+[<Fact>]
+let ``test that activity task sets activity error code``() = task {
+    use source = ActivitySource("mySource")
+    use listener = ActivityListener(
+        ShouldListenTo = (fun _ -> true),
+        Sample = (fun _ -> ActivitySamplingResult.AllData)
+    )
+    ActivitySource.AddActivityListener(listener)
+
+    use _ = source.StartActivity("Test")
+
+    let mutable activityFromTask = null
+
+    let! _ = myExnResultValueTask {
+        let! _ = myActivityTask "NewOne" {
+            activityFromTask <- Activity.Current
+            failwith "boom"
+        }
+        return Ok()
+    }
+
+    Assert.True(activityFromTask.IsStopped)
+    Assert.True(activityFromTask.Status = ActivityStatusCode.Error)
+    Assert.Equal("boom", activityFromTask.StatusDescription)
 }
 
 [<Fact>]
