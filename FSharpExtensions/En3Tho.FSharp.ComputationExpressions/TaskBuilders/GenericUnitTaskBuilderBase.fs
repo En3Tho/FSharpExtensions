@@ -34,7 +34,7 @@ type GenericUnitTaskBuilderBase() =
         : GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, unit> =
         ResumableCode.While(condition, body)
 
-    member inline _.TryWith (
+    member inline _.TryWith(
         [<InlineIfLambda>] body: GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult>,
         [<InlineIfLambda>] catch: exn -> GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult>)
         : GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult> =
@@ -92,7 +92,7 @@ type GenericUnitTaskBuilderBase() =
         when 'Resource :> IAsyncDisposable
         and 'TMethodBuilder :> IAsyncMethodBuilder<'TAwaiter, 'TTask>
         and 'TAwaiter :> ITaskAwaiter
-        and 'TTask :> ITaskLike<'TAwaiter>> (
+        and 'TTask :> ITaskLike<'TAwaiter>>(
         resource: 'Resource,
         [<InlineIfLambda>] body: 'Resource -> GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult>)
         : GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult> =

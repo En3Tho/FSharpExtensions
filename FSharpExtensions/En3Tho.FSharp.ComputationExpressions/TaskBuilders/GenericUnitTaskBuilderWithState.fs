@@ -54,9 +54,8 @@ type GenericUnitTaskBuilderWithState<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResul
     member _.InitialState = initialState
 
     member inline this.Run(
-        [<InlineIfLambda>] code: GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult>)
-        : 'TTask =
-        if __useResumableCode then
+        [<InlineIfLambda>] code: GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult>) : 'TResultTask =
+        (if __useResumableCode then
             __stateMachine<GenericUnitTaskStateMachineData<'TMethodBuilder, 'TAwaiter, 'TTask>, 'TTask>
                 (MoveNextMethodImpl<_>(fun sm ->
                     //-- RESUMABLE CODE START
@@ -80,4 +79,4 @@ type GenericUnitTaskBuilderWithState<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResul
                     sm.Data.MethodBuilder.Start(&sm)
                     sm.Data.MethodBuilder.Task))
         else
-            GenericUnitTaskBuilderWithState<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResultTask, 'TInitialState, 'TExtensionsMarker>.RunDynamic(code, this.InitialState)
+            GenericUnitTaskBuilderWithState<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResultTask, 'TInitialState, 'TExtensionsMarker>.RunDynamic(code, this.InitialState)).Task

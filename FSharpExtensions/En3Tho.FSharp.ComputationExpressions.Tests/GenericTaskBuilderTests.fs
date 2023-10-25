@@ -1,6 +1,7 @@
 ﻿module En3Tho.FSharp.ComputationExpressions.Tests.GenericTaskBuilderTests
 
 open System
+open System.Collections.Generic
 open System.Diagnostics
 open System.Threading.Tasks
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks
@@ -259,3 +260,39 @@ let ``Test that dispose works with vtask CE``() =
         use _ = { new IDisposable with member _.Dispose() = raise (ObjectDisposedException("")) }
         ()
     }})
+
+type MyAsyncEnumerator(count: int, dispose: unit -> ValueTask) =
+    let mutable counter = 0
+
+    interface IAsyncEnumerator<int> with
+        member this.DisposeAsync() = dispose()
+        member this.MoveNextAsync() = myValueTask {
+            if counter < count then
+                counter <- counter + 1
+                do! Task.Delay(1)
+                return true
+            else
+                return false
+        }
+
+        member this.Current = counter
+
+type MyAsyncEnumerable(count, dispose) =
+
+    interface IAsyncEnumerable<int> with
+        member this.GetAsyncEnumerator(_) = MyAsyncEnumerator(count, dispose)
+
+[<Fact>]
+let ``test IAsyncEnumerable support for generic task builder``() = task {
+    let count = 10
+    let mutable testCounter = 0
+    let dispose() =
+        testCounter <- testCounter + 1
+        ValueTask.CompletedTask
+
+    do! myTask {
+        for _ in MyAsyncEnumerable(count, dispose) do
+            testCounter <- testCounter + 1
+    }
+    Assert.Equal(count + 1, testCounter)
+}

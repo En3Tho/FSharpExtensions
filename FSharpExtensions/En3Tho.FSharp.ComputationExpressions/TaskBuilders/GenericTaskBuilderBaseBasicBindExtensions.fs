@@ -54,7 +54,6 @@ module GenericTaskBuilderBasicBindExtensionsLowPriority =
                 and ^Awaiter :> ICriticalNotifyCompletion
                 and ^Awaiter: (member get_IsCompleted: unit -> bool)
                 and ^Awaiter: (member GetResult: unit -> 'TResult1)>
-
                 (_: GenericTaskBuilderBase<IGenericTaskBuilderBasicBindExtensions>, task: ^TaskLike,
                  [<InlineIfLambda>] continuation: 'TResult1 -> GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult2>)
                 : GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult2> =

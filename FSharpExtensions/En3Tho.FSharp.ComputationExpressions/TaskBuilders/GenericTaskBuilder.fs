@@ -50,8 +50,8 @@ type GenericTaskBuilder<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResultT
         sm.Data.MethodBuilder.Start(&sm)
         sm.Data.MethodBuilder.Task
 
-    member inline _.Run([<InlineIfLambda>] code: GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult>) : 'TTask =
-        if __useResumableCode then
+    member inline _.Run([<InlineIfLambda>] code: GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult>) : 'TResultTask =
+        (if __useResumableCode then
             __stateMachine<GenericTaskStateMachineData<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>, 'TTask>
                 (MoveNextMethodImpl<_>(fun sm ->
                     //-- RESUMABLE CODE START
@@ -75,4 +75,4 @@ type GenericTaskBuilder<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResultT
                     sm.Data.MethodBuilder.Start(&sm)
                     sm.Data.MethodBuilder.Task))
         else
-            GenericTaskBuilder<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResultTask, 'TExtensionsMarker>.RunDynamic(code)
+            GenericTaskBuilder<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResultTask, 'TExtensionsMarker>.RunDynamic(code)).Task
