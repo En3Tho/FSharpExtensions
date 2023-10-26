@@ -44,7 +44,7 @@ type GenericUnitTaskBuilderBase() =
         [<InlineIfLambda>] body: GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult>,
         [<InlineIfLambda>] compensation: unit -> unit)
         : GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult> =
-        ResumableCode.TryFinally(body, ResumableCode<_,_>(fun _sm -> compensation(); true))
+        ResumableCode.TryFinally(body, GenericUnitTaskCode(fun _sm -> compensation(); true))
 
     member inline _.For(
         sequence: seq<'T>,
@@ -61,12 +61,15 @@ type GenericUnitTaskBuilderBase() =
                 let mutable __stack_condition_fin = true
                 let __stack_vtask = compensation()
                 let mutable awaiter = __stack_vtask.GetAwaiter()
+
                 if not awaiter.IsCompleted then
                     let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
                     __stack_condition_fin <- __stack_yield_fin
 
-                    if not __stack_condition_fin then
-                        sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &sm)
+                if __stack_condition_fin then
+                    awaiter.GetResult()
+                else
+                    sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &sm)
 
                 __stack_condition_fin
             else
@@ -80,7 +83,7 @@ type GenericUnitTaskBuilderBase() =
                     )
 
                 if awaiter.IsCompleted then
-                    true
+                    cont.Invoke(&sm)
                 else
                     sm.ResumptionDynamicInfo.ResumptionData <- (awaiter :> ICriticalNotifyCompletion)
                     sm.ResumptionDynamicInfo.ResumptionFunc <- cont

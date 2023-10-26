@@ -108,6 +108,7 @@ module GenericUnitTaskBuilderBasicBindExtensionsHighPriority =
                     if not awaiter.IsCompleted then
                         let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
                         __stack_fin <- __stack_yield_fin
+
                     if __stack_fin then
                         let result = awaiter.GetResult()
                         (continuation result).Invoke(&sm)

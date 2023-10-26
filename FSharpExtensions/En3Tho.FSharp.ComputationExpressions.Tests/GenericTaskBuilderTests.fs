@@ -287,9 +287,10 @@ let ``test IAsyncEnumerable support for generic task builder``() = task {
     let count = 10
     let mutable testCounter = 0
 
-    let dispose() =
+    let dispose() = ValueTask(task = task {
         testCounter <- testCounter + 1
-        ValueTask.CompletedTask
+        do! Task.Delay(1)
+    })
 
     do! myTask {
         for _ in MyAsyncEnumerable(count, dispose) do
@@ -307,6 +308,32 @@ let ``test IAsyncEnumerable support for generic task builder``() = task {
 
     Assert.Equal(22, testCounterCopy)
     Assert.Equal(22, testCounter)
+}
+
+[<Fact>]
+let ``test IAsyncEnumerable support for generic task builder fails if exception is thrown in finally``() = task {
+    let count = 10
+    let mutable testCounter = 0
+
+    let dispose() = ValueTask(task = task {
+        do! Task.Delay(1)
+        return failwith "abc"
+    })
+
+    let fail() = myUnitTask {
+        for _ in MyAsyncEnumerable(count, dispose) do
+            testCounter <- testCounter + 1
+    }
+
+    do! Assert.ThrowsAsync<Exception>(fail) :> Task
+
+    let fail() =
+        myTask {
+            for _ in MyAsyncEnumerable(count, dispose) do
+                testCounter <- testCounter + 1
+        } :> Task
+
+    do! Assert.ThrowsAsync<Exception>(fail) :> Task
 }
 
 [<Fact>]
