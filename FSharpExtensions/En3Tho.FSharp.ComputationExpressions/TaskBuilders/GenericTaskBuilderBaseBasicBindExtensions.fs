@@ -60,14 +60,10 @@ module GenericTaskBuilderBasicBindExtensionsLowPriority =
 
                 GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult2>(fun sm ->
                     if __useResumableCode then
-                        //-- RESUMABLE CODE START
-                        // Get an awaiter from the awaitable
                         let mutable awaiter = (^TaskLike: (member GetAwaiter: unit -> ^Awaiter) task)
 
                         let mutable __stack_fin = true
                         if not (^Awaiter: (member get_IsCompleted: unit -> bool) awaiter) then
-                            // This will yield with __stack_yield_fin = false
-                            // This will resume with __stack_yield_fin = true
                             let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
                             __stack_fin <- __stack_yield_fin
 
@@ -77,7 +73,6 @@ module GenericTaskBuilderBasicBindExtensionsLowPriority =
                         else
                             sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &sm)
                             false
-                        //-- RESUMABLE CODE END
                     else
                         GenericTaskBuilderBasicBindExtensionsLowPriorityImpl.BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>(&sm, task, continuation)
                 )
@@ -99,7 +94,6 @@ module GenericTaskBuilderBasicBindExtensionsHighPriority =
                    let result = awaiter.GetResult()
                    (continuation result).Invoke(&sm))
 
-            // shortcut to continue immediately
             if awaiter.IsCompleted then
                 cont.Invoke(&sm)
             else
@@ -111,14 +105,10 @@ module GenericTaskBuilderBasicBindExtensionsHighPriority =
         static member inline Bind(_: GenericTaskBuilderBase<IGenericTaskBuilderBasicBindExtensions>, task: Task<'TResult1>, [<InlineIfLambda>] continuation: 'TResult1 -> GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult2>) =
             GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, _>(fun sm ->
                 if __useResumableCode then
-                    //-- RESUMABLE CODE START
-                    // Get an awaiter from the task
                     let mutable awaiter = task.GetAwaiter()
 
                     let mutable __stack_fin = true
                     if not awaiter.IsCompleted then
-                        // This will yield with __stack_yield_fin = false
-                        // This will resume with __stack_yield_fin = true
                         let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
                         __stack_fin <- __stack_yield_fin
                     if __stack_fin then
@@ -129,7 +119,6 @@ module GenericTaskBuilderBasicBindExtensionsHighPriority =
                         false
                 else
                     GenericTaskBuilderBasicBindExtensionsHighPriorityImpl.BindDynamic(&sm, task, continuation)
-                //-- RESUMABLE CODE END
             )
 
         [<Extension>]

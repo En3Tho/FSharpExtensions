@@ -79,7 +79,6 @@ type GenericUnitTaskBuilderBase() =
                         true
                     )
 
-                // shortcut to continue immediately
                 if awaiter.IsCompleted then
                     true
                 else

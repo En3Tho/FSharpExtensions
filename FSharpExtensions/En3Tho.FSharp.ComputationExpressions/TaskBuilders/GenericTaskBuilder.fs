@@ -27,6 +27,7 @@ type GenericTaskBuilder<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResultT
                     try
                         sm.ResumptionDynamicInfo.ResumptionData <- null
                         let step = info.ResumptionFunc.Invoke(&sm)
+
                         if step then
                             sm.Data.MethodBuilder.SetResult(sm.Data.Result)
                         else
@@ -43,14 +44,14 @@ type GenericTaskBuilder<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResultT
 
                 member _.SetStateMachine(sm, state) =
                     sm.Data.MethodBuilder.SetStateMachine(state)
-                }
+            }
 
         sm.ResumptionDynamicInfo <- resumptionInfo
         sm.Data.MethodBuilder <- 'TMethodBuilder.Create()
         sm.Data.MethodBuilder.Start(&sm)
         sm.Data.MethodBuilder.Task
 
-    member inline _.Run([<InlineIfLambda>] code: GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult>) : 'TResultTask =
+    member inline _.Run([<InlineIfLambda>] code: GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TOverall>) : 'TResultTask =
         (if __useResumableCode then
             __stateMachine<GenericTaskStateMachineData<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>, 'TTask>
                 (MoveNextMethodImpl<_>(fun sm ->

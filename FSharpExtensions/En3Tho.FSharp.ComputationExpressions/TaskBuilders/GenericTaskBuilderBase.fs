@@ -63,6 +63,7 @@ type GenericTaskBuilderBase() =
                 let mutable __stack_condition_fin = true
                 let __stack_vtask = compensation()
                 let mutable awaiter = __stack_vtask.GetAwaiter()
+
                 if not awaiter.IsCompleted then
                     let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
                     __stack_condition_fin <- __stack_yield_fin
@@ -81,7 +82,6 @@ type GenericTaskBuilderBase() =
                         true
                     )
 
-                // shortcut to continue immediately
                 if awaiter.IsCompleted then
                     true
                 else
@@ -90,14 +90,14 @@ type GenericTaskBuilderBase() =
                     false
                 ))
 
-    member inline this.Using<'Resource, 'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall
+    member inline this.Using<'Resource, 'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult
         when 'Resource :> IAsyncDisposable
         and 'TMethodBuilder :> IAsyncMethodBuilder<'TAwaiter, 'TTask, 'TOverall>
         and 'TAwaiter :> ITaskAwaiter<'TOverall>
         and 'TTask :> ITaskLike<'TAwaiter, 'TOverall>> (
         resource: 'Resource,
-        [<InlineIfLambda>] body: 'Resource -> GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TOverall>)
-        : GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TOverall> =
+        [<InlineIfLambda>] body: 'Resource -> GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult>)
+        : GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult> =
         this.TryFinallyAsync(
             (fun sm -> (body resource).Invoke(&sm)),
             (fun () ->

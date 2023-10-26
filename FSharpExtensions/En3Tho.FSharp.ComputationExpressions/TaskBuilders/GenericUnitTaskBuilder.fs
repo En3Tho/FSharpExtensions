@@ -52,7 +52,7 @@ type GenericUnitTaskBuilder<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResultTask, 'T
         sm.Data.MethodBuilder.Task
 
     member inline _.Run(
-        [<InlineIfLambda>] code: GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult>) : 'TResultTask =
+        [<InlineIfLambda>] code: GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, unit>) : 'TResultTask =
         (if __useResumableCode then
             __stateMachine<GenericUnitTaskStateMachineData<'TMethodBuilder, 'TAwaiter, 'TTask>, 'TTask>
                 (MoveNextMethodImpl<_>(fun sm ->
