@@ -7,8 +7,6 @@ open Microsoft.FSharp.Core.CompilerServices
 open Microsoft.FSharp.Core.CompilerServices.StateMachineHelpers
 open Microsoft.FSharp.Core.LanguagePrimitives.IntrinsicOperators
 
-type IGenericTaskBuilderBasicBindExtensions = interface end
-
 module GenericTaskBuilderBasicBindExtensionsLowPriority =
 
     [<AbstractClass; Sealed; Extension>]
@@ -54,7 +52,7 @@ module GenericTaskBuilderBasicBindExtensionsLowPriority =
             and ^Awaiter :> ICriticalNotifyCompletion
             and ^Awaiter: (member get_IsCompleted: unit -> bool)
             and ^Awaiter: (member GetResult: unit -> 'TResult1)>
-            (_: GenericTaskBuilderBase<IGenericTaskBuilderBasicBindExtensions>, task: ^TaskLike,
+            (_: GenericTaskBuilderBase<BasicBindExtensions>, task: ^TaskLike,
              [<InlineIfLambda>] continuation: 'TResult1 -> GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult2>)
             : GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult2> =
 
@@ -78,7 +76,7 @@ module GenericTaskBuilderBasicBindExtensionsLowPriority =
             )
 
         [<NoEagerConstraintApplication; Extension>]
-        static member inline ReturnFrom (this: GenericTaskBuilderBase<IGenericTaskBuilderBasicBindExtensions>, task: ^TaskLike) =
+        static member inline ReturnFrom (this: GenericTaskBuilderBase<BasicBindExtensions>, task: ^TaskLike) =
             this.Bind(task, (fun v -> this.Return v))
 
 module GenericTaskBuilderBasicBindExtensionsHighPriority =
@@ -102,7 +100,7 @@ module GenericTaskBuilderBasicBindExtensionsHighPriority =
                 false
 
         [<Extension>]
-        static member inline Bind(_: GenericTaskBuilderBase<IGenericTaskBuilderBasicBindExtensions>, task: Task<'TResult1>, [<InlineIfLambda>] continuation: 'TResult1 -> GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult2>) =
+        static member inline Bind(_: GenericTaskBuilderBase<BasicBindExtensions>, task: Task<'TResult1>, [<InlineIfLambda>] continuation: 'TResult1 -> GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult2>) =
             GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, _>(fun sm ->
                 if __useResumableCode then
                     let mutable awaiter = task.GetAwaiter()
@@ -123,7 +121,7 @@ module GenericTaskBuilderBasicBindExtensionsHighPriority =
             )
 
         [<Extension>]
-        static member inline ReturnFrom(this: GenericTaskBuilderBase<IGenericTaskBuilderBasicBindExtensions>, task: Task<'TResult>) : GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult, 'TResult> =
+        static member inline ReturnFrom(this: GenericTaskBuilderBase<BasicBindExtensions>, task: Task<'TResult>) : GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult, 'TResult> =
             this.Bind(task, (fun v -> this.Return v))
 
 module GenericTaskBuilderBasicBindExtensionsMediumPriority =
@@ -132,9 +130,9 @@ module GenericTaskBuilderBasicBindExtensionsMediumPriority =
     [<AbstractClass; Sealed; Extension>]
     type GenericTaskBuilderBasicBindExtensionsMediumPriorityImpl() =
         [<Extension>]
-        static member inline Bind(this: GenericTaskBuilderBase<IGenericTaskBuilderBasicBindExtensions>, computation: Async<'TResult1>, [<InlineIfLambda>] continuation: 'TResult1 -> GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult2>) =
+        static member inline Bind(this: GenericTaskBuilderBase<BasicBindExtensions>, computation: Async<'TResult1>, [<InlineIfLambda>] continuation: 'TResult1 -> GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult2>) =
             this.Bind (Async.StartAsTask computation, continuation)
 
         [<Extension>]
-        static member inline ReturnFrom(this: GenericTaskBuilderBase<IGenericTaskBuilderBasicBindExtensions>, computation: Async<'TResult>) =
+        static member inline ReturnFrom(this: GenericTaskBuilderBase<BasicBindExtensions>, computation: Async<'TResult>) =
             this.ReturnFrom (Async.StartAsTask computation)

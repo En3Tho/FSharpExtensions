@@ -7,8 +7,6 @@ open Microsoft.FSharp.Core.CompilerServices
 open Microsoft.FSharp.Core.CompilerServices.StateMachineHelpers
 open Microsoft.FSharp.Core.LanguagePrimitives.IntrinsicOperators
 
-type IGenericUnitTaskBuilderBasicBindExtensions = interface end
-
 module GenericUnitTaskBuilderBasicBindExtensionsLowPriority =
 
     [<AbstractClass; Sealed; Extension>]
@@ -55,7 +53,7 @@ module GenericUnitTaskBuilderBasicBindExtensionsLowPriority =
             and ^Awaiter: (member get_IsCompleted: unit -> bool)
             and ^Awaiter: (member GetResult: unit -> 'TResult1)>
 
-            (_: GenericUnitTaskBuilderBase<IGenericUnitTaskBuilderBasicBindExtensions>, task: ^TaskLike,
+            (_: GenericUnitTaskBuilderBase<BasicBindExtensions>, task: ^TaskLike,
              [<InlineIfLambda>] continuation: 'TResult1 -> GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult2>)
             : GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult2> =
 
@@ -99,7 +97,7 @@ module GenericUnitTaskBuilderBasicBindExtensionsHighPriority =
                 false
 
         [<Extension>]
-        static member inline Bind(_: GenericUnitTaskBuilderBase<IGenericUnitTaskBuilderBasicBindExtensions>, task: Task<'TResult1>, [<InlineIfLambda>] continuation: 'TResult1 -> GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult2>) =
+        static member inline Bind(_: GenericUnitTaskBuilderBase<BasicBindExtensions>, task: Task<'TResult1>, [<InlineIfLambda>] continuation: 'TResult1 -> GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult2>) =
             GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, _>(fun sm ->
                 if __useResumableCode then
                     let mutable awaiter = task.GetAwaiter()
@@ -125,5 +123,5 @@ module GenericUnitTaskBuilderBasicBindExtensionsMediumPriority =
     [<AbstractClass; Sealed; Extension>]
     type GenericUnitTaskBuilderBasicBindExtensionsMediumPriorityImpl() =
         [<Extension>]
-        static member inline Bind(this: GenericUnitTaskBuilderBase<IGenericUnitTaskBuilderBasicBindExtensions>, computation: Async<'TResult1>, [<InlineIfLambda>] continuation: 'TResult1 -> GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult2>) =
+        static member inline Bind(this: GenericUnitTaskBuilderBase<BasicBindExtensions>, computation: Async<'TResult1>, [<InlineIfLambda>] continuation: 'TResult1 -> GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult2>) =
             this.Bind (Async.StartAsTask computation, continuation)

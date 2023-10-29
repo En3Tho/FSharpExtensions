@@ -23,49 +23,49 @@ open GenericUnitTaskBuilderBasicBindExtensionsHighPriority
 open Xunit
 
 type ValueTaskWrapperBuilder() =
-    inherit GenericTaskBuilder<IGenericTaskBuilderBasicBindExtensions>()
+    inherit GenericTaskBuilder<BasicBindExtensions>()
     member inline this.Run([<InlineIfLambda>] code: GenericTaskCode<ValueTaskWrapperMethodBuilder<'a>, _, _, _, _>) =
-        GenericTaskBuilder<IGenericTaskBuilderBasicBindExtensions>.Run(code)
+       this.RunInternal(code)
 
 type UnitValueTaskWrapperBuilder() =
-    inherit GenericUnitTaskBuilder<IGenericUnitTaskBuilderBasicBindExtensions>()
+    inherit GenericUnitTaskBuilder<BasicBindExtensions>()
     member inline this.Run([<InlineIfLambda>] code: GenericUnitTaskCode<ValueTaskWrapperMethodBuilder, _, _, _>) =
-        GenericUnitTaskBuilder<IGenericTaskBuilderBasicBindExtensions>.Run(code)
+        this.RunInternal(code)
 
 type TaskWrapperBuilder() =
-    inherit GenericTaskBuilder<IGenericTaskBuilderBasicBindExtensions>()
+    inherit GenericTaskBuilder<BasicBindExtensions>()
     member inline this.Run([<InlineIfLambda>] code: GenericTaskCode<TaskWrapperMethodBuilder<'a>, _, _, _, _>) =
-        GenericTaskBuilder<IGenericTaskBuilderBasicBindExtensions>.Run(code)
+        this.RunInternal(code)
 
 type UnitTaskWrapperBuilder() =
-    inherit GenericUnitTaskBuilder<IGenericUnitTaskBuilderBasicBindExtensions>()
+    inherit GenericUnitTaskBuilder<BasicBindExtensions>()
     member inline this.Run([<InlineIfLambda>] code: GenericUnitTaskCode<TaskWrapperMethodBuilder, _, _, _>) =
-        GenericUnitTaskBuilder<IGenericTaskBuilderBasicBindExtensions>.Run(code)
+        this.RunInternal(code)
 
 type ActivityValueTaskBuilder(activity) =
-    inherit GenericTaskBuilderWithState<IGenericTaskBuilderBasicBindExtensions, Activity>(activity)
+    inherit GenericTaskBuilderWithState<BasicBindExtensions, Activity, IgnoreStateCheck<Activity>>(activity)
     member inline this.Run([<InlineIfLambda>] code: GenericTaskCode<ActivityValueTaskMethodBuilder<'a>, _, _, _, _>) =
-        GenericTaskBuilderWithState<IGenericTaskBuilderBasicBindExtensions, Activity>.Run(code, this.State)
+        this.RunInternal(code)
 
 type ActivityUnitValueTaskBuilder(activity) =
-    inherit GenericTaskBuilderWithState<IGenericUnitTaskBuilderBasicBindExtensions, Activity>(activity)
+    inherit GenericUnitTaskBuilderWithState<BasicBindExtensions, Activity, IgnoreStateCheck<Activity>>(activity)
     member inline this.Run([<InlineIfLambda>] code: GenericUnitTaskCode<ActivityValueTaskMethodBuilder, _, _, _>) =
-        GenericUnitTaskBuilderWithState<IGenericTaskBuilderBasicBindExtensions, Activity>.Run(code, this.State)
+        this.RunInternal(code)
 
 type ActivityTaskBuilder(activity) =
-    inherit GenericTaskBuilderWithState<IGenericTaskBuilderBasicBindExtensions, Activity>(activity)
+    inherit GenericTaskBuilderWithState<BasicBindExtensions, Activity, IgnoreStateCheck<Activity>>(activity)
     member inline this.Run([<InlineIfLambda>] code: GenericTaskCode<ActivityTaskMethodBuilder<'a>, _, _, _, _>) =
-        GenericTaskBuilderWithState<IGenericTaskBuilderBasicBindExtensions, Activity>.Run(code, this.State)
+        this.RunInternal(code)
 
 type ActivityUnitTaskBuilder(activity) =
-    inherit GenericTaskBuilderWithState<IGenericUnitTaskBuilderBasicBindExtensions, Activity>(activity)
+    inherit GenericUnitTaskBuilderWithState<BasicBindExtensions, Activity, IgnoreStateCheck<Activity>>(activity)
     member inline this.Run([<InlineIfLambda>] code: GenericUnitTaskCode<ActivityTaskMethodBuilder, _, _, _>) =
-        GenericUnitTaskBuilderWithState<IGenericTaskBuilderBasicBindExtensions, Activity>.Run(code, this.State)
+        this.RunInternal(code)
 
 type ExnResultValueTaskBuilder() =
-    inherit GenericTaskBuilder<IGenericTaskBuilderBasicBindExtensions>()
+    inherit GenericTaskBuilder<BasicBindExtensions>()
     member inline this.Run([<InlineIfLambda>] code: GenericTaskCode<ExnResultValueTaskMethodBuilder<'a>, _, _, _, _>) =
-        GenericTaskBuilder<IGenericTaskBuilderBasicBindExtensions>.Run(code)
+        this.RunInternal(code)
 
 let myValueTask = ValueTaskWrapperBuilder()
 let myUnitValueTask = UnitValueTaskWrapperBuilder()

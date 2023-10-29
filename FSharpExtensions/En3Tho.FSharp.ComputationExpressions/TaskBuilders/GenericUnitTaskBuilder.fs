@@ -51,7 +51,7 @@ type GenericUnitTaskBuilder<'TExtensionsMarker>() =
         sm.Data.MethodBuilder.Start(&sm)
         sm.Data.MethodBuilder.Task
 
-    static member inline Run<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResultTask
+    member inline this.RunInternal<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResultTask
         when 'TMethodBuilder :> IAsyncMethodBuilder<'TAwaiter, 'TTask>
         and 'TMethodBuilder :> IAsyncMethodBuilderCreator<'TMethodBuilder>
         and 'TAwaiter :> ITaskAwaiter

@@ -7,50 +7,13 @@ open Microsoft.FSharp.Core
 open Microsoft.FSharp.Core.CompilerServices
 open Microsoft.FSharp.Core.CompilerServices.StateMachineHelpers
 open Microsoft.FSharp.Core.LanguagePrimitives.IntrinsicOperators
-open Microsoft.FSharp.Collections
 
 type GenericUnitTaskBuilderBase() =
-
-    member inline _.Delay([<InlineIfLambda>] generator: unit -> GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult>) =
-        GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult>(fun sm -> (generator()).Invoke(&sm))
-
-    [<DefaultValue>]
-    member inline _.Zero() : GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, unit> =
-        ResumableCode.Zero()
+    inherit TaskLikeBuilderBase()
 
     member inline _.Return() =
         GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, unit>(fun sm ->
             true)
-
-    member inline _.Combine(
-        [<InlineIfLambda>] task1: GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, unit>,
-        [<InlineIfLambda>] task2: GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult>)
-        : GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult> =
-        ResumableCode.Combine(task1, task2)
-
-    member inline _.While(
-        [<InlineIfLambda>] condition: unit -> bool,
-        [<InlineIfLambda>] body: GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, unit>)
-        : GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, unit> =
-        ResumableCode.While(condition, body)
-
-    member inline _.TryWith(
-        [<InlineIfLambda>] body: GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult>,
-        [<InlineIfLambda>] catch: exn -> GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult>)
-        : GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult> =
-        ResumableCode.TryWith(body, catch)
-
-    member inline _.TryFinally(
-        [<InlineIfLambda>] body: GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult>,
-        [<InlineIfLambda>] compensation: unit -> unit)
-        : GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult> =
-        ResumableCode.TryFinally(body, GenericUnitTaskCode(fun _sm -> compensation(); true))
-
-    member inline _.For(
-        sequence: seq<'T>,
-        [<InlineIfLambda>] body: 'T -> GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, unit>)
-        : GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, unit> =
-        ResumableCode.For(sequence, body)
 
     member inline internal this.TryFinallyAsync(
         [<InlineIfLambda>] body: GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult>,

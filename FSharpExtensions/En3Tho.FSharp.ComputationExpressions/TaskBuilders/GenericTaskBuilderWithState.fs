@@ -8,7 +8,7 @@ open Microsoft.FSharp.Core.CompilerServices
 open Microsoft.FSharp.Core.CompilerServices.StateMachineHelpers
 open Microsoft.FSharp.Core.LanguagePrimitives.IntrinsicOperators
 
-type GenericTaskBuilderWithState<'TExtensionsMarker, 'TState>(state: 'TState) =
+type GenericTaskBuilderWithState<'TExtensionsMarker, 'TState, 'MoveNextStateCheck when 'MoveNextStateCheck :> IMoveNextStateCheck<'TState>>(state: 'TState) =
     
     inherit GenericTaskBuilderBase<'TExtensionsMarker>()
     
@@ -34,6 +34,9 @@ type GenericTaskBuilderWithState<'TExtensionsMarker, 'TState>(state: 'TState) =
                     let mutable savedExn = null
                     try
                         sm.ResumptionDynamicInfo.ResumptionData <- null
+
+                        'MoveNextStateCheck.CheckState(state)
+
                         let step = info.ResumptionFunc.Invoke(&sm)
                         if step then
                             sm.Data.MethodBuilder.SetResult(sm.Data.Result)
@@ -58,13 +61,13 @@ type GenericTaskBuilderWithState<'TExtensionsMarker, 'TState>(state: 'TState) =
         sm.Data.MethodBuilder.Start(&sm)
         sm.Data.MethodBuilder.Task
 
-    static member inline Run<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResultTask
+    member inline this.RunInternal<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResultTask
         when 'TMethodBuilder :> IAsyncMethodBuilder<'TAwaiter, 'TTask, 'TOverall>
         and 'TMethodBuilder :> IAsyncMethodBuilderCreator<'TState, 'TMethodBuilder>
         and 'TAwaiter :> ITaskAwaiter<'TOverall>
         and 'TTask :> ITaskLike<'TAwaiter, 'TOverall>
         and 'TTask :> ITaskLikeTask<'TResultTask>>
-        ([<InlineIfLambda>] code: GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TOverall>, state: 'TState) : 'TResultTask =
+        ([<InlineIfLambda>] code: GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TOverall>) : 'TResultTask =
         (if __useResumableCode then
             __stateMachine<GenericTaskStateMachineData<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>, 'TTask>
                 (MoveNextMethodImpl<_>(fun sm ->
@@ -72,6 +75,9 @@ type GenericTaskBuilderWithState<'TExtensionsMarker, 'TState>(state: 'TState) =
                     __resumeAt sm.ResumptionPoint
                     let mutable __stack_exn: Exception = null
                     try
+                        // first check state like cancellation for example
+                        'MoveNextStateCheck.CheckState(this.State)
+
                         let __stack_code_fin = code.Invoke(&sm)
                         if __stack_code_fin then
                             sm.Data.MethodBuilder.SetResult(sm.Data.Result)
@@ -85,8 +91,8 @@ type GenericTaskBuilderWithState<'TExtensionsMarker, 'TState>(state: 'TState) =
                 ))
                 (SetStateMachineMethodImpl<_>(fun sm state -> sm.Data.MethodBuilder.SetStateMachine(state)))
                 (AfterCode<_,_>(fun sm ->
-                    sm.Data.MethodBuilder <- 'TMethodBuilder.Create(state)
+                    sm.Data.MethodBuilder <- 'TMethodBuilder.Create(this.State)
                     sm.Data.MethodBuilder.Start(&sm)
                     sm.Data.MethodBuilder.Task))
         else
-            GenericTaskBuilderWithState<'TExtensionsMarker, 'TState>.RunDynamic(code, state)).Task
+            GenericTaskBuilderWithState<'TExtensionsMarker, 'TState, 'MoveNextStateCheck>.RunDynamic(code, this.State)).Task
