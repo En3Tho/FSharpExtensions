@@ -3,6 +3,8 @@
 open System
 open System.Collections.Generic
 open System.Diagnostics
+open System.Runtime.CompilerServices
+open System.Runtime.InteropServices
 open System.Threading.Tasks
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
@@ -20,37 +22,104 @@ open GenericUnitTaskBuilderBasicBindExtensionsHighPriority
 
 open Xunit
 
-type ValueTaskWrapperBuilder<'a>() =
-    inherit GenericTaskBuilder<ValueTaskWrapperMethodBuilder<'a>, ValueTaskWrapperAwaiter<'a>, ValueTaskWrapper<'a>, 'a, ValueTask<'a>, IGenericTaskBuilderBasicBindExtensions>()
-
 type ValueTaskWrapperBuilder() =
-    inherit GenericUnitTaskBuilder<ValueTaskWrapperMethodBuilder, ValueTaskWrapperAwaiter, ValueTaskWrapper, ValueTask, IGenericUnitTaskBuilderBasicBindExtensions>()
+    inherit GenericTaskBuilder<IGenericTaskBuilderBasicBindExtensions>()
+    member inline this.Run([<InlineIfLambda>] code: GenericTaskCode<ValueTaskWrapperMethodBuilder<'a>, _, _, _, _>) =
+        GenericTaskBuilder<IGenericTaskBuilderBasicBindExtensions>.Run(code)
 
-type TaskWrapperBuilder<'a>() =
-    inherit GenericTaskBuilder<TaskWrapperMethodBuilder<'a>, TaskWrapperAwaiter<'a>, TaskWrapper<'a>, 'a, Task<'a>, IGenericTaskBuilderBasicBindExtensions>()
+type UnitValueTaskWrapperBuilder() =
+    inherit GenericUnitTaskBuilder<IGenericUnitTaskBuilderBasicBindExtensions>()
+    member inline this.Run([<InlineIfLambda>] code: GenericUnitTaskCode<ValueTaskWrapperMethodBuilder, _, _, _>) =
+        GenericUnitTaskBuilder<IGenericTaskBuilderBasicBindExtensions>.Run(code)
 
 type TaskWrapperBuilder() =
-    inherit GenericUnitTaskBuilder<TaskWrapperMethodBuilder, TaskWrapperAwaiter, TaskWrapper, Task, IGenericUnitTaskBuilderBasicBindExtensions>()
+    inherit GenericTaskBuilder<IGenericTaskBuilderBasicBindExtensions>()
+    member inline this.Run([<InlineIfLambda>] code: GenericTaskCode<TaskWrapperMethodBuilder<'a>, _, _, _, _>) =
+        GenericTaskBuilder<IGenericTaskBuilderBasicBindExtensions>.Run(code)
 
-type ActivityValueTaskBuilder<'a>(activityName) =
-    inherit GenericTaskBuilderWithState<ActivityValueTaskMethodBuilder<'a>, ActivityValueTaskAwaiter<'a>, ActivityValueTask<'a>, 'a, ActivityValueTask<'a>, string, IGenericTaskBuilderBasicBindExtensions>(activityName)
+type UnitTaskWrapperBuilder() =
+    inherit GenericUnitTaskBuilder<IGenericUnitTaskBuilderBasicBindExtensions>()
+    member inline this.Run([<InlineIfLambda>] code: GenericUnitTaskCode<TaskWrapperMethodBuilder, _, _, _>) =
+        GenericUnitTaskBuilder<IGenericTaskBuilderBasicBindExtensions>.Run(code)
 
-type ActivityTaskBuilder<'a>(activityName) =
-    inherit GenericTaskBuilderWithState<ActivityTaskMethodBuilder<'a>, ActivityTaskAwaiter<'a>, ActivityTask<'a>, 'a, ActivityTask<'a>, string, IGenericTaskBuilderBasicBindExtensions>(activityName)
+type ActivityValueTaskBuilder(activity) =
+    inherit GenericTaskBuilderWithState<IGenericTaskBuilderBasicBindExtensions, Activity>(activity)
+    member inline this.Run([<InlineIfLambda>] code: GenericTaskCode<ActivityValueTaskMethodBuilder<'a>, _, _, _, _>) =
+        GenericTaskBuilderWithState<IGenericTaskBuilderBasicBindExtensions, Activity>.Run(code, this.State)
 
-type ExnResultValueTaskBuilder<'a>() = // TODO: non-basic binds
-    inherit GenericTaskBuilder<ExnResultValueTaskMethodBuilder<'a>, ExnResultValueTaskAwaiter<'a>, ExnResultValueTask<'a>, Result<'a, exn>, ExnResultValueTask<'a>, IGenericTaskBuilderBasicBindExtensions>()
+type ActivityUnitValueTaskBuilder(activity) =
+    inherit GenericTaskBuilderWithState<IGenericUnitTaskBuilderBasicBindExtensions, Activity>(activity)
+    member inline this.Run([<InlineIfLambda>] code: GenericUnitTaskCode<ActivityValueTaskMethodBuilder, _, _, _>) =
+        GenericUnitTaskBuilderWithState<IGenericTaskBuilderBasicBindExtensions, Activity>.Run(code, this.State)
 
-let inline myValueTask<'a> = Unchecked.defaultof<ValueTaskWrapperBuilder<'a>>
-let myUnitValueTask = ValueTaskWrapperBuilder()
+type ActivityTaskBuilder(activity) =
+    inherit GenericTaskBuilderWithState<IGenericTaskBuilderBasicBindExtensions, Activity>(activity)
+    member inline this.Run([<InlineIfLambda>] code: GenericTaskCode<ActivityTaskMethodBuilder<'a>, _, _, _, _>) =
+        GenericTaskBuilderWithState<IGenericTaskBuilderBasicBindExtensions, Activity>.Run(code, this.State)
 
-let inline myTask<'a> = Unchecked.defaultof<TaskWrapperBuilder<'a>>
-let myUnitTask = TaskWrapperBuilder()
+type ActivityUnitTaskBuilder(activity) =
+    inherit GenericTaskBuilderWithState<IGenericUnitTaskBuilderBasicBindExtensions, Activity>(activity)
+    member inline this.Run([<InlineIfLambda>] code: GenericUnitTaskCode<ActivityTaskMethodBuilder, _, _, _>) =
+        GenericUnitTaskBuilderWithState<IGenericTaskBuilderBasicBindExtensions, Activity>.Run(code, this.State)
 
-let inline myExnResultValueTask<'a> = Unchecked.defaultof<ExnResultValueTaskBuilder<'a>>
+type ExnResultValueTaskBuilder() =
+    inherit GenericTaskBuilder<IGenericTaskBuilderBasicBindExtensions>()
+    member inline this.Run([<InlineIfLambda>] code: GenericTaskCode<ExnResultValueTaskMethodBuilder<'a>, _, _, _, _>) =
+        GenericTaskBuilder<IGenericTaskBuilderBasicBindExtensions>.Run(code)
 
-let inline myActivityValueTask activityName = ActivityValueTaskBuilder(activityName)
-let inline myActivityTask activityName = ActivityTaskBuilder<'a>(activityName)
+let myValueTask = ValueTaskWrapperBuilder()
+let myUnitValueTask = UnitValueTaskWrapperBuilder()
+let myTask = TaskWrapperBuilder()
+let myUnitTask = UnitTaskWrapperBuilder()
+
+let myExnResultValueTask = ExnResultValueTaskBuilder()
+
+[<AbstractClass; Sealed; AutoOpen>]
+type ActivityBuilders() =
+    static member inline activityValueTask(activity) = ActivityValueTaskBuilder(activity)
+    static member inline activityValueTask([<CallerMemberName; Optional; DefaultParameterValue("")>] activityName: string) =
+
+        let activity =
+            match Activity.Current with
+            | null -> null
+            | activity ->
+                activity.Source.StartActivity(activityName)
+
+        activityValueTask(activity)
+
+    static member inline activityTask(activity) = ActivityTaskBuilder(activity)
+    static member inline activityTask([<CallerMemberName; Optional; DefaultParameterValue("")>] activityName: string) =
+
+        let activity =
+            match Activity.Current with
+            | null -> null
+            | activity ->
+                activity.Source.StartActivity(activityName)
+
+        activityTask(activity)
+
+// unit auto inference test as xunit doesn't allow generic methods
+[<Fact>]
+let ``test that unit is inferred for myTask same as task if no return is called``() = myTask {
+    let! _ = task { return 1 }
+    Assert.True(true)
+}
+
+// unit auto inference test as xunit doesn't allow generic methods
+[<Fact>]
+let ``test that unit is inferred for myValueTask same as task if no return is called``() = myValueTask {
+    let! _ = task { return 1 }
+    Assert.True(true)
+}
+
+[<Fact>]
+let ``test that this thing works``() = task {
+    let! z = myValueTask {
+        return 1
+    }
+
+    Assert.Equal(1, z)
+}
 
 [<Fact>]
 let ``test that most basic return works with task``() = task {
@@ -66,7 +135,7 @@ let ``test that most basic return works with task``() = task {
 }
 
 [<Fact>]
-let ``test that most basic return works with mytask``() = myTask<unit> {
+let ``test that most basic return works with mytask``() = myTask {
     let! result = myValueTask {
         return 1
     }
@@ -103,11 +172,14 @@ let ``test that activity task works``() = task {
     Assert.Equal("Test", activity.DisplayName)
 
     let mutable activityFromTask = null
-    let! result = myActivityTask "NewOne" {
+    let! result = activityTask "NewOne" {
 
         let activity = Activity.Current
         Assert.NotNull(activity)
         Assert.Equal("NewOne", activity.DisplayName)
+
+        let! activityState = getState()
+        Assert.Equal(activityState, activity)
 
         activityFromTask <- activity
 
@@ -117,6 +189,68 @@ let ``test that activity task works``() = task {
     Assert.Equal(1, result)
     Assert.True(activityFromTask.IsStopped)
     Assert.True(activityFromTask.Status = ActivityStatusCode.Ok)
+}
+
+[<Fact>]
+let ``test that activity task returns correct activity as state``() = task {
+    use source = ActivitySource("mySource")
+    use listener = ActivityListener(
+        ShouldListenTo = (fun _ -> true),
+        Sample = (fun _ -> ActivitySamplingResult.AllData)
+    )
+    ActivitySource.AddActivityListener(listener)
+
+    use _ = source.StartActivity("Test")
+
+    do! activityTask "NewOne" {
+        let activityFromCurrent = Activity.Current
+        let! activityFromState = getState()
+        Assert.True(Object.ReferenceEquals(activityFromState, activityFromCurrent))
+    }
+}
+
+module TestCallerMemberName =
+    let startActivity() =
+        activityTask() {
+        let! activityFromState = getState()
+        Assert.Equal("startActivity", activityFromState.DisplayName)
+    }
+
+[<Fact>]
+let ``test that caller member name works with activity builder``() = task {
+
+    use source = ActivitySource("mySource")
+    use listener = ActivityListener(
+        ShouldListenTo = (fun _ -> true),
+        Sample = (fun _ -> ActivitySamplingResult.AllData)
+    )
+    ActivitySource.AddActivityListener(listener)
+
+    use _ = source.StartActivity("Test")
+
+    do! TestCallerMemberName.startActivity()
+}
+
+[<Fact>]
+let ``test that activity task returns provided activity as state and stops provided activity``() = task {
+    use source = ActivitySource("mySource")
+    use listener = ActivityListener(
+        ShouldListenTo = (fun _ -> true),
+        Sample = (fun _ -> ActivitySamplingResult.AllData)
+    )
+    ActivitySource.AddActivityListener(listener)
+
+    let testActivity = source.StartActivity("Test")
+
+    do! activityTask testActivity {
+        let activityFromCurrent = Activity.Current
+        let! activityFromState = getState()
+        Assert.True(Object.ReferenceEquals(testActivity, activityFromState))
+        Assert.True(Object.ReferenceEquals(activityFromState, activityFromCurrent))
+    }
+
+    Assert.True(testActivity.IsStopped)
+    Assert.True(testActivity.Status = ActivityStatusCode.Ok)
 }
 
 [<Fact>]
@@ -133,7 +267,7 @@ let ``test that activity task sets activity error code``() = task {
     let mutable activityFromTask = null
 
     let! _ = myExnResultValueTask {
-        let! _ = myActivityTask "NewOne" {
+        let! _ = activityTask "NewOne" {
             activityFromTask <- Activity.Current
             failwith "boom"
         }
@@ -160,7 +294,7 @@ let ``test that activity value task works``() = task {
     Assert.NotNull(activity)
     Assert.Equal("Test", activity.DisplayName)
 
-    let! result = myActivityValueTask "NewOne" {
+    let! result = activityValueTask "NewOne" {
 
         let activity = Activity.Current
         Assert.NotNull(activity)
@@ -189,7 +323,7 @@ let ``test that exn result task caches exceptions automatically``() = task {
 }
 
 [<Fact>]
-let ``Test array map does not throw with value task CE``() = myValueTask<unit> {
+let ``Test array map does not throw with value task CE``() = myValueTask {
     let w = [| 1 |] |> Array.map (fun w -> w + 1) |> Array.head
     let! x = myTask { return 3 }
     let! y = myValueTask { return 4 }
@@ -199,12 +333,14 @@ let ``Test array map does not throw with value task CE``() = myValueTask<unit> {
 
 [<Fact>]
 let ``Test that non generic value task and task work properly with unittask CE``() = myUnitTask {
+    do! task { () }
     do! Task.CompletedTask
     do! ValueTask()
 }
 
 [<Fact>]
 let ``Test that non generic value task and task work properly with unitvtask CE``() = myUnitValueTask {
+    do! task { () }
     do! Task.CompletedTask
     do! ValueTask()
 }

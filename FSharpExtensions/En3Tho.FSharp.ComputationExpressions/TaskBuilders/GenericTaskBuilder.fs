@@ -8,16 +8,17 @@ open Microsoft.FSharp.Core.CompilerServices
 open Microsoft.FSharp.Core.CompilerServices.StateMachineHelpers
 open Microsoft.FSharp.Core.LanguagePrimitives.IntrinsicOperators
 
-type GenericTaskBuilder<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResultTask, 'TExtensionsMarker
-    when 'TMethodBuilder :> IAsyncMethodBuilder<'TAwaiter, 'TTask, 'TOverall>
-    and 'TMethodBuilder :> IAsyncMethodBuilderCreator<'TMethodBuilder>
-    and 'TAwaiter :> ITaskAwaiter<'TOverall>
-    and 'TTask :> ITaskLike<'TAwaiter, 'TOverall>
-    and 'TTask :> ITaskLikeTask<'TResultTask>>() =
-
+type GenericTaskBuilder<'TExtensionsMarker>() =
     inherit GenericTaskBuilderBase<'TExtensionsMarker>()
 
-    static member inline RunDynamic([<InlineIfLambda>] code: GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult>) : 'TTask =
+    static member inline RunDynamic<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResultTask
+        when 'TMethodBuilder :> IAsyncMethodBuilder<'TAwaiter, 'TTask, 'TOverall>
+        and 'TMethodBuilder :> IAsyncMethodBuilderCreator<'TMethodBuilder>
+        and 'TAwaiter :> ITaskAwaiter<'TOverall>
+        and 'TTask :> ITaskLike<'TAwaiter, 'TOverall>
+        and 'TTask :> ITaskLikeTask<'TResultTask>>
+        ([<InlineIfLambda>] code: GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TOverall>) : 'TTask =
+
         let mutable sm = GenericTaskStateMachine<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>()
         let initialResumptionFunc = GenericTaskResumptionFunc<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>(fun sm -> code.Invoke(&sm))
         let resumptionInfo =
@@ -51,11 +52,17 @@ type GenericTaskBuilder<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResultT
         sm.Data.MethodBuilder.Start(&sm)
         sm.Data.MethodBuilder.Task
 
-    member inline _.Run([<InlineIfLambda>] code: GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TOverall>) : 'TResultTask =
+    static member inline Run<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResultTask
+        when 'TMethodBuilder :> IAsyncMethodBuilder<'TAwaiter, 'TTask, 'TOverall>
+        and 'TMethodBuilder :> IAsyncMethodBuilderCreator<'TMethodBuilder>
+        and 'TAwaiter :> ITaskAwaiter<'TOverall>
+        and 'TTask :> ITaskLike<'TAwaiter, 'TOverall>
+        and 'TTask :> ITaskLikeTask<'TResultTask>>
+        ([<InlineIfLambda>] code: GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TOverall>) : 'TResultTask =
+
         (if __useResumableCode then
             __stateMachine<GenericTaskStateMachineData<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>, 'TTask>
                 (MoveNextMethodImpl<_>(fun sm ->
-                    //-- RESUMABLE CODE START
                     __resumeAt sm.ResumptionPoint
                     let mutable __stack_exn: Exception = null
                     try
@@ -68,7 +75,6 @@ type GenericTaskBuilder<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResultT
                     match __stack_exn with
                     | null -> ()
                     | exn -> sm.Data.MethodBuilder.SetException exn
-                    //-- RESUMABLE CODE END
                 ))
                 (SetStateMachineMethodImpl<_>(fun sm state -> sm.Data.MethodBuilder.SetStateMachine(state)))
                 (AfterCode<_,_>(fun sm ->
@@ -76,4 +82,4 @@ type GenericTaskBuilder<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResultT
                     sm.Data.MethodBuilder.Start(&sm)
                     sm.Data.MethodBuilder.Task))
         else
-            GenericTaskBuilder<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResultTask, 'TExtensionsMarker>.RunDynamic(code)).Task
+            GenericTaskBuilder<'TExtensionsMarker>.RunDynamic(code)).Task

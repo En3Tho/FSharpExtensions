@@ -3,7 +3,11 @@
 open System
 open System.Runtime.CompilerServices
 
-// TODO: Explore srtp-based approach?
+type StateIntrinsic = struct end
+
+[<AutoOpen>]
+module Intrinsics =
+    let inline getState() = StateIntrinsic()
 
 type ITaskAwaiterBase =
     inherit ICriticalNotifyCompletion
@@ -36,12 +40,12 @@ type IAsyncMethodBuilderBase =
     abstract AwaitUnsafeOnCompleted<'TAwaiter, 'TStateMachine when 'TAwaiter :> ICriticalNotifyCompletion and 'TStateMachine :> IAsyncStateMachine> :
         awaiter: byref<'TAwaiter>  * stateMachine: byref<'TStateMachine>  -> unit
 
-// unit for most cases and 'TInitialState for special ones like activity stuff or cancellable etc
+// unit for most cases and 'Tstate for special ones like activity stuff or cancellable etc
 type IAsyncMethodBuilderCreator<'TSelf> =
     static abstract member Create: unit -> 'TSelf
 
-type IAsyncMethodBuilderCreator<'TInitialState, 'TSelf> =
-    static abstract member Create: initialState: 'TInitialState -> 'TSelf
+type IAsyncMethodBuilderCreator<'TState, 'TSelf> =
+    static abstract member Create: state: 'TState -> 'TSelf
 
 type IAsyncMethodBuilder<'TAwaiter, 'TTask when 'TTask :> ITaskLike<'TAwaiter> and 'TAwaiter :> ITaskAwaiter> =
     inherit IAsyncMethodBuilderBase

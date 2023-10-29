@@ -45,38 +45,38 @@ module GenericUnitTaskBuilderBasicBindExtensionsLowPriority =
                 false
 
         [<NoEagerConstraintApplication; Extension>]
-            static member inline Bind< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TMethodBuilder, 'TAwaiter, 'TTask
-                when 'TMethodBuilder :> IAsyncMethodBuilder<'TAwaiter, 'TTask>
-                and 'TAwaiter :> ITaskAwaiter
-                and 'TTask :> ITaskLike<'TAwaiter>
+        static member inline Bind< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TMethodBuilder, 'TAwaiter, 'TTask
+            when 'TMethodBuilder :> IAsyncMethodBuilder<'TAwaiter, 'TTask>
+            and 'TAwaiter :> ITaskAwaiter
+            and 'TTask :> ITaskLike<'TAwaiter>
 
-                and ^TaskLike: (member GetAwaiter: unit -> ^Awaiter)
-                and ^Awaiter :> ICriticalNotifyCompletion
-                and ^Awaiter: (member get_IsCompleted: unit -> bool)
-                and ^Awaiter: (member GetResult: unit -> 'TResult1)>
+            and ^TaskLike: (member GetAwaiter: unit -> ^Awaiter)
+            and ^Awaiter :> ICriticalNotifyCompletion
+            and ^Awaiter: (member get_IsCompleted: unit -> bool)
+            and ^Awaiter: (member GetResult: unit -> 'TResult1)>
 
-                (_: GenericUnitTaskBuilderBase<IGenericUnitTaskBuilderBasicBindExtensions>, task: ^TaskLike,
-                 [<InlineIfLambda>] continuation: 'TResult1 -> GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult2>)
-                : GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult2> =
+            (_: GenericUnitTaskBuilderBase<IGenericUnitTaskBuilderBasicBindExtensions>, task: ^TaskLike,
+             [<InlineIfLambda>] continuation: 'TResult1 -> GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult2>)
+            : GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult2> =
 
-                GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult2>(fun sm ->
-                    if __useResumableCode then
-                        let mutable awaiter = (^TaskLike: (member GetAwaiter: unit -> ^Awaiter) task)
+            GenericUnitTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult2>(fun sm ->
+                if __useResumableCode then
+                    let mutable awaiter = (^TaskLike: (member GetAwaiter: unit -> ^Awaiter) task)
 
-                        let mutable __stack_fin = true
-                        if not (^Awaiter: (member get_IsCompleted: unit -> bool) awaiter) then
-                            let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
-                            __stack_fin <- __stack_yield_fin
+                    let mutable __stack_fin = true
+                    if not (^Awaiter: (member get_IsCompleted: unit -> bool) awaiter) then
+                        let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
+                        __stack_fin <- __stack_yield_fin
 
-                        if __stack_fin then
-                            let result = (^Awaiter: (member GetResult: unit -> 'TResult1) awaiter)
-                            (continuation result).Invoke(&sm)
-                        else
-                            sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &sm)
-                            false
+                    if __stack_fin then
+                        let result = (^Awaiter: (member GetResult: unit -> 'TResult1) awaiter)
+                        (continuation result).Invoke(&sm)
                     else
-                        GenericUnitTaskBuilderBasicBindExtensionsLowPriorityImpl.BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TMethodBuilder, 'TAwaiter, 'TTask>(&sm, task, continuation)
-                )
+                        sm.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &sm)
+                        false
+                else
+                    GenericUnitTaskBuilderBasicBindExtensionsLowPriorityImpl.BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TMethodBuilder, 'TAwaiter, 'TTask>(&sm, task, continuation)
+            )
 
 module GenericUnitTaskBuilderBasicBindExtensionsHighPriority =
 
