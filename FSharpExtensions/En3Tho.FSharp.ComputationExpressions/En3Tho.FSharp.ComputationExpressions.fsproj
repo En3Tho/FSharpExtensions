@@ -43,6 +43,10 @@
         <Compile Include="GenericTaskBuilders\GenericTaskBuilderX\GenericTaskBuilderBaseExtensions.fs" />
         <Compile Include="GenericTaskBuilders\GenericTaskBuilderX\GenericTaskBuilders2.fs" />
         <Compile Include="GenericTaskBuilders\GenericTaskBuilderX\StateMachineData.fs" />
+        <Compile Include="GenericTaskBuilders\GenericTaskBuilderX\StateMachineDataWithState.fs" />
+        <Compile Include="GenericTaskBuilders\GenericTaskBuilderX\UnitStateMachineData.fs" />
+        <Compile Include="GenericTaskBuilders\GenericTaskBuilderX\UnitStateMachineDataWithState.fs" />
+        <Compile Include="GenericTaskBuilders\GenericTaskBuilderX\StateMachineSeqData.fs" />
         <Compile Include="GenericTaskBuilders\GenericTaskBuilder2Tasks\ValueTaskBuilder.fs" />
         <Compile Include="GenericTaskBuilders\GenericTaskBuilder2Tasks\UnitValueTaskBuilder.fs" />
         <Compile Include="GenericTaskBuilders\GenericTaskBuilder2Tasks\TaskSeqBuilder.fs" />

@@ -17,6 +17,7 @@
         <Compile Include="CodeBuilderTests.fs" />
         <Compile Include="TryExprBuilderTests.fs" />
         <Compile Include="GenericTaskBuilderTests.fs" />
+        <Compile Include="GenericTaskBuilder2Tests.fs" />
     </ItemGroup>
 
     <ItemGroup>
