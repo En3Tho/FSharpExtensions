@@ -12,22 +12,22 @@ module GenericTaskBuilderExtensionsLowPriority =
 
     let rec WhileDynamicAsync
         (
-            sm: byref<GenericTaskStateMachine<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>>,
+            sm: byref<_>,
             condition: unit -> ValueTask<bool>,
-            body: GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, unit>
+            body: ResumableCode<'TOverall, unit>
         ) : bool =
         let mutable vtTask = condition()
         let mutable awaiter = vtTask.GetAwaiter()
 
         let cont =
-            GenericTaskResumptionFunc<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>(fun sm ->
+            ResumptionFunc(fun sm ->
                 if awaiter.GetResult() then
                     if body.Invoke(&sm) then
                         WhileDynamicAsync(&sm, condition, body)
                     else
                         let rf = sm.ResumptionDynamicInfo.ResumptionFunc
                         sm.ResumptionDynamicInfo.ResumptionFunc <-
-                            GenericTaskResumptionFunc<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>(fun sm -> WhileBodyDynamicAuxAsync(&sm, condition, body, rf))
+                            ResumptionFunc(fun sm -> WhileBodyDynamicAuxAsync(&sm, condition, body, rf))
                         false
                 else
                     true
@@ -42,27 +42,22 @@ module GenericTaskBuilderExtensionsLowPriority =
 
     and WhileBodyDynamicAuxAsync
         (
-            sm: byref<GenericTaskStateMachine<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>>,
+            sm: byref<_>,
             condition: unit -> ValueTask<bool>,
-            body: GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, unit>,
-            rf: GenericTaskResumptionFunc<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>
+            body: ResumableCode<'TOverall, unit>,
+            rf
         ) : bool =
         if rf.Invoke(&sm) then
             WhileDynamicAsync(&sm, condition, body)
         else
             let rf = sm.ResumptionDynamicInfo.ResumptionFunc
             sm.ResumptionDynamicInfo.ResumptionFunc <-
-                GenericTaskResumptionFunc<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall>(fun sm -> WhileBodyDynamicAuxAsync(&sm, condition, body, rf))
+                ResumptionFunc(fun sm -> WhileBodyDynamicAuxAsync(&sm, condition, body, rf))
             false
 
     type GenericTaskBuilderBase with
         [<NoEagerConstraintApplication>]
-        member inline _.Using<'Resource, 'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult
-            when 'TMethodBuilder :> IAsyncMethodBuilder<'TAwaiter, 'TTask, 'TOverall>
-            and 'TAwaiter :> ITaskAwaiter<'TOverall>
-            and 'TTask :> ITaskLike<'TAwaiter, 'TOverall>
-            and 'Resource :> IDisposable>(resource: 'Resource,
-                [<InlineIfLambda>] body: 'Resource -> GenericTaskCode<'TMethodBuilder, 'TAwaiter, 'TTask, 'TOverall, 'TResult>) =
+        member inline _.Using(resource: 'Resource, [<InlineIfLambda>] body) =
             ResumableCode.Using(resource, body)
 
         member inline this.WhileAsync

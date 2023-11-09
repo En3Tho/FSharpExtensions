@@ -1,4 +1,4 @@
-﻿module En3Tho.FSharp.ComputationExpressions.Tests.GenericTaskBuilderTests
+﻿module En3Tho.FSharp.ComputationExpressions.Tests.GenericTaskBuilder2Tests
 
 open System
 open System.Collections.Generic
@@ -8,77 +8,20 @@ open System.Runtime.InteropServices
 open System.Threading
 open System.Threading.Tasks
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks
-open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
+open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder2
+open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilders.GenericTaskBuilder2.Tasks
 open En3Tho.FSharp.Xunit
 
-open GenericTaskBuilderExtensionsLowPriority
-open GenericTaskBuilderBasicBindExtensionsLowPriority
-open GenericTaskBuilderBasicBindExtensionsMediumPriority
-open GenericTaskBuilderBasicBindExtensionsHighPriority
-
-open GenericUnitTaskBuilderExtensionsLowPriority
-open GenericUnitTaskBuilderBasicBindExtensionsLowPriority
-open GenericUnitTaskBuilderBasicBindExtensionsMediumPriority
-open GenericUnitTaskBuilderBasicBindExtensionsHighPriority
+open GenericTaskBuilder2WhileAsyncExtensions
+open GenericTaskBuilder2BasicBindExtensionsLowPriority
+open GenericTaskBuilder2BasicBindExtensionsMediumPriority
+open GenericTaskBuilder2BasicBindExtensionsHighPriority
 
 open Xunit
 
-type ValueTaskWrapperBuilder() =
-    inherit GenericTaskBuilder<BasicBindExtensions>()
-    member inline this.Run([<InlineIfLambda>] code: GenericTaskCode<ValueTaskWrapperMethodBuilder<'a>, _, _, _, _>) =
-       this.RunInternal(code)
+let vtask2 = ValueTaskBuilder2()
+let taskSeq = TaskSeqBuilder()
 
-type UnitValueTaskWrapperBuilder() =
-    inherit GenericUnitTaskBuilder<BasicBindExtensions>()
-    member inline this.Run([<InlineIfLambda>] code: GenericUnitTaskCode<ValueTaskWrapperMethodBuilder, _, _, _>) =
-        this.RunInternal(code)
-
-type TaskWrapperBuilder() =
-    inherit GenericTaskBuilder<BasicBindExtensions>()
-    member inline this.Run([<InlineIfLambda>] code: GenericTaskCode<TaskWrapperMethodBuilder<'a>, _, _, _, _>) =
-        this.RunInternal(code)
-
-type UnitTaskWrapperBuilder() =
-    inherit GenericUnitTaskBuilder<BasicBindExtensions>()
-    member inline this.Run([<InlineIfLambda>] code: GenericUnitTaskCode<TaskWrapperMethodBuilder, _, _, _>) =
-        this.RunInternal(code)
-
-type ActivityValueTaskBuilder(activity) =
-    inherit GenericTaskBuilderWithState<BasicBindExtensions, Activity>(activity)
-    member inline this.Run([<InlineIfLambda>] code: GenericTaskCode<ActivityValueTaskMethodBuilder<'a>, _, _, _, _>) =
-        this.RunInternal(code)
-
-type ActivityUnitValueTaskBuilder(activity) =
-    inherit GenericUnitTaskBuilderWithState<BasicBindExtensions, Activity>(activity)
-    member inline this.Run([<InlineIfLambda>] code: GenericUnitTaskCode<ActivityValueTaskMethodBuilder, _, _, _>) =
-        this.RunInternal(code)
-
-type ActivityTaskBuilder(activity) =
-    inherit GenericTaskBuilderWithState<BasicBindExtensions, Activity>(activity)
-    member inline this.Run([<InlineIfLambda>] code: GenericTaskCode<ActivityTaskMethodBuilder<'a>, _, _, _, _>) =
-        this.RunInternal(code)
-
-type ActivityUnitTaskBuilder(activity) =
-    inherit GenericUnitTaskBuilderWithState<BasicBindExtensions, Activity>(activity)
-    member inline this.Run([<InlineIfLambda>] code: GenericUnitTaskCode<ActivityTaskMethodBuilder, _, _, _>) =
-        this.RunInternal(code)
-
-type CancellableTaskBuilder(cancellationToken) =
-    inherit GenericTaskBuilderWithState<BasicBindExtensions, CancellationToken>(cancellationToken)
-    member inline this.Run([<InlineIfLambda>] code: GenericTaskCode<CancellableTaskMethodBuilder<'a>, _, _, _, _>) =
-        this.RunInternal(code)
-
-type CancellableUnitTaskBuilder(cancellationToken) =
-    inherit GenericUnitTaskBuilderWithState<BasicBindExtensions, CancellationToken>(cancellationToken)
-    member inline this.Run([<InlineIfLambda>] code: GenericUnitTaskCode<CancellableTaskMethodBuilder, _, _, _>) =
-        this.RunInternal(code)
-
-type ExnResultValueTaskBuilder() =
-    inherit GenericTaskBuilder<BasicBindExtensions>()
-    member inline this.Run([<InlineIfLambda>] code: GenericTaskCode<ExnResultValueTaskMethodBuilder<'a>, _, _, _, _>) =
-        this.RunInternal(code)
-
-let myValueTask = ValueTaskWrapperBuilder()
 let myUnitValueTask = UnitValueTaskWrapperBuilder()
 let myTask = TaskWrapperBuilder()
 let myUnitTask = UnitTaskWrapperBuilder()
@@ -121,14 +64,14 @@ let ``test that unit is inferred for myTask same as task if no return is called`
 
 // unit auto inference test as xunit doesn't allow generic methods
 [<Fact>]
-let ``test that unit is inferred for myValueTask same as task if no return is called``() = myValueTask {
+let ``test that unit is inferred for myValueTask same as task if no return is called``() = vtask2 {
     let! _ = task { return 1 }
     Assert.True(true)
 }
 
 [<Fact>]
 let ``test that this thing works``() = task {
-    let! z = myValueTask {
+    let! z = vtask2 {
         return 1
     }
 
@@ -137,7 +80,7 @@ let ``test that this thing works``() = task {
 
 [<Fact>]
 let ``test that most basic return works with task``() = task {
-    let! result = myValueTask {
+    let! result = vtask2 {
         return 1
     }
     Assert.Equal(1, result)
@@ -337,10 +280,10 @@ let ``test that exn result task caches exceptions automatically``() = task {
 }
 
 [<Fact>]
-let ``Test array map does not throw with value task CE``() = myValueTask {
+let ``Test array map does not throw with value task CE``() = vtask2 {
     let w = [| 1 |] |> Array.map (fun w -> w + 1) |> Array.head
     let! x = myTask { return 3 }
-    let! y = myValueTask { return 4 }
+    let! y = vtask2 { return 4 }
     let finalResult = w + x + y + 3
     Assert.Equal(11, finalResult)
 }
@@ -360,7 +303,7 @@ let ``Test that non generic value task and task work properly with unitvtask CE`
 }
 
 [<Fact>]
-let ``Test that async disposable works properly with vtask CE``() = myValueTask {
+let ``Test that async disposable works properly with vtask CE``() = vtask2 {
     use _ = { new IAsyncDisposable with member _.DisposeAsync() = ValueTask() }
     ()
 }
@@ -406,7 +349,7 @@ let ``Test that dispose works with task CE``() =
 
 [<Fact>]
 let ``Test that dispose works with vtask CE``() =
-    Assert.ThrowsAsync<ObjectDisposedException>(fun () -> task { return! myValueTask {
+    Assert.ThrowsAsync<ObjectDisposedException>(fun () -> task { return! vtask2 {
         use _ = { new IDisposable with member _.Dispose() = raise (ObjectDisposedException("")) }
         ()
     }})
@@ -416,7 +359,7 @@ type MyAsyncEnumerator(count: int, dispose: unit -> ValueTask) =
 
     interface IAsyncEnumerator<int> with
         member this.DisposeAsync() = dispose()
-        member this.MoveNextAsync() = myValueTask {
+        member this.MoveNextAsync() = vtask2 {
             if counter < count then
                 counter <- counter + 1
                 do! Task.Delay(1)

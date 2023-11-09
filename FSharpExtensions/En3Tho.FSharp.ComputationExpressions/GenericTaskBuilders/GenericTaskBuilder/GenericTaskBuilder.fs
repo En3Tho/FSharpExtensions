@@ -41,7 +41,7 @@ type GenericTaskBuilder<'TExtensionsMarker>() =
                     // Run SetException outside the stack unwind, see https://github.com/dotnet/roslyn/issues/26567
                     match savedExn with
                     | null -> ()
-                    | exn -> sm.Data.MethodBuilder.SetException exn
+                    | exn -> sm.Data.MethodBuilder.SetException(exn)
 
                 member _.SetStateMachine(sm, state) =
                     sm.Data.MethodBuilder.SetStateMachine(state)
@@ -74,7 +74,7 @@ type GenericTaskBuilder<'TExtensionsMarker>() =
                     // Run SetException outside the stack unwind, see https://github.com/dotnet/roslyn/issues/26567
                     match __stack_exn with
                     | null -> ()
-                    | exn -> sm.Data.MethodBuilder.SetException exn
+                    | exn -> sm.Data.MethodBuilder.SetException(exn)
                 ))
                 (SetStateMachineMethodImpl<_>(fun sm state -> sm.Data.MethodBuilder.SetStateMachine(state)))
                 (AfterCode<_,_>(fun sm ->
