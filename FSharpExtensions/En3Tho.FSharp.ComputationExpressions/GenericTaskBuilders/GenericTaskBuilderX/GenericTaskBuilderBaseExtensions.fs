@@ -9,7 +9,7 @@ open Microsoft.FSharp.Core.CompilerServices.StateMachineHelpers
 
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 
-module GenericTaskBuilder2WhileAsyncExtensions =
+module GenericTaskBuilderExtensionsLowPriority =
 
     let rec WhileDynamicAsync<'TData
             when 'TData :> IAsyncMethodBuilderBase
@@ -121,8 +121,6 @@ module GenericTaskBuilder2WhileAsyncExtensions =
                     ))
             )
 
-module GenericTaskBuilder2BasicBindExtensionsLowPriority =
-
     [<AbstractClass; Sealed; Extension>]
     type GenericTaskBuilder2BasicBindExtensionsLowPriorityImpl() =
 
@@ -205,9 +203,9 @@ module GenericTaskBuilder2BasicBindExtensionsLowPriority =
 
         [<Extension>]
         static member inline Yield<'TData, 'TResult
-            when 'TData :> IGenericTaskBuilderStateMachineDataYield<'TResult>
+            when 'TData :> IGenericTaskBuilderStateMachineDataYield<'TData, 'TResult>
             and 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>(_: GenericTaskBuilder2Core<YieldExtensions>, value: 'TResult) =
-                ResumableCode<'TData, 'TResult>(fun sm ->
+                ResumableCode<'TData, unit>(fun sm ->
                     if sm.Data.CheckCanContinueOrThrow() then
                         let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
                         if not __stack_yield_fin then
@@ -220,8 +218,8 @@ module GenericTaskBuilder2BasicBindExtensionsLowPriority =
         static member inline YieldFrom (this: GenericTaskBuilder2Core<YieldExtensions>, task: ^TaskLike) =
             this.Bind(task, (fun v -> this.Yield v))
 
-module GenericTaskBuilder2BasicBindExtensionsHighPriority =
-    open GenericTaskBuilder2BasicBindExtensionsLowPriority
+module GenericTaskBuilder2ExtensionsHighPriority =
+    open GenericTaskBuilderExtensionsLowPriority
 
     [<AbstractClass; Sealed; Extension>]
     type GenericTaskBuilder2BasicBindExtensionsHighPriorityImpl() =
@@ -280,8 +278,8 @@ module GenericTaskBuilder2BasicBindExtensionsHighPriority =
         static member inline YieldFrom (this: GenericTaskBuilder2Core<YieldExtensions>, task: Task<'TResult>) =
             this.Bind(task, (fun v -> this.Yield v))
 
-module GenericTaskBuilder2BasicBindExtensionsMediumPriority =
-    open GenericTaskBuilder2BasicBindExtensionsHighPriority
+module GenericTaskBuilder2ExtensionsMediumPriority =
+    open GenericTaskBuilder2ExtensionsHighPriority
 
     [<AbstractClass; Sealed; Extension>]
     type GenericTaskBuilder2BasicBindExtensionsMediumPriorityImpl() =

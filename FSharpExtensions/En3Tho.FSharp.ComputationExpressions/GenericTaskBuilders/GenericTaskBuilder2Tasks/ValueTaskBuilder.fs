@@ -4,7 +4,7 @@ open System.Runtime.CompilerServices
 open System.Threading.Tasks
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder2
-open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilders.GenericTaskBuilder2.StateMachineDataXX
+open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilders.GenericTaskBuilder2
 
 type [<Struct>] ValueTaskAwaiterWrapper<'a> =
     val mutable private awaiter: ValueTaskAwaiter<'a>
@@ -60,8 +60,8 @@ and [<Struct>] ValueTaskWrapper<'a> =
     interface ITaskLikeTask<ValueTask<'a>> with
         member this.Task = this.task
 
-//
-// type ValueTaskBuilder2() =
-//     inherit GenericTaskBuilder2()
-//     member inline this.Run([<InlineIfLambda>] code) =
-//        this.RunInternal<GenericTaskStateMachineData2<ValueTaskWrapperMethodBuilder<'a>,_,_,_>,_,_,_,_,_>(code)
+
+type ValueTaskBuilder2() =
+    inherit GenericTaskBuilder2Base()
+    member inline this.Run([<InlineIfLambda>] code) =
+       this.RunInternal<StateMachineData<AsyncValueTaskMethodBuilderWrapper<'a>,_,_,_, _>,_,_>(code)

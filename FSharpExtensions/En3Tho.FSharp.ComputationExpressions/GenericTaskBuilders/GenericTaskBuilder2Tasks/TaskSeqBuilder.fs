@@ -3,7 +3,7 @@
 open System.Runtime.CompilerServices
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder2
-open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilders.GenericTaskBuilder2.StateMachineDataXX
+open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilders.GenericTaskBuilder2
 
 type [<Struct>] AsyncIteratorMethodBuilderWrapper =
     val mutable private builder: AsyncIteratorMethodBuilder
@@ -28,8 +28,8 @@ type [<Struct>] AsyncIteratorMethodBuilderWrapper =
 
     interface IAsyncMethodBuilderCreator<AsyncIteratorMethodBuilderWrapper> with
         static member Create() = AsyncIteratorMethodBuilderWrapper.Create()
-//
-// type TaskSeqBuilder() =
-//     inherit GenericTaskSeqBuilder()
-//     member inline this.Run([<InlineIfLambda>] code) =
-//         this.RunInternal<GenericTaskSeqXStateMachineData<AsyncIteratorWrapperMethodBuilder,_>,_,_>(code)
+
+type TaskSeqBuilder() =
+    inherit GenericTaskSeqBuilder2Base()
+    member inline this.Run([<InlineIfLambda>] code) =
+        this.RunInternal<StateMachineSeqData<AsyncIteratorMethodBuilderWrapper, _>, _, _>(code)
