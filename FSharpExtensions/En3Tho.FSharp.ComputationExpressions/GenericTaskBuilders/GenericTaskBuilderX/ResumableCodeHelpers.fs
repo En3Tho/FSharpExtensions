@@ -195,19 +195,6 @@ let inline Combine<'TData, 'TResult when 'TData :> IGenericTaskBuilderStateMachi
         else
             CombineDynamic(&sm, code1, code2))
 
-// TODO: test things out?
-let inline CombineBind<'TData, 'TResult when 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>(code1: ResumableCode<'TData, unit>, code2: ResumableCode<'TData, 'TResult>) : ResumableCode<'TData, 'TResult> =
-    ResumableCode<'TData, 'TResult>(fun sm ->
-        if __useResumableCode then
-            let __stack_fin = code1.Invoke(&sm)
-
-            if __stack_fin then
-                code2.Invoke(&sm)
-            else
-                false
-        else
-            CombineDynamic(&sm, code1, code2))
-
 let rec TryFinallyCompensateDynamic
     (
         sm: byref<ResumableStateMachine<'TData>>,
