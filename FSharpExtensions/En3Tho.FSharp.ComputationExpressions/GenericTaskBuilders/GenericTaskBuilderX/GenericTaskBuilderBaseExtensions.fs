@@ -1,5 +1,6 @@
 ﻿namespace En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder2
 
+open System
 open System.Collections.Generic
 open System.Runtime.CompilerServices
 open System.Threading.Tasks
@@ -11,109 +12,22 @@ open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 
 module GenericTaskBuilderExtensionsLowPriority =
 
-    let rec WhileDynamicAsync<'TData
-            when 'TData :> IAsyncMethodBuilderBase
-            and 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>
-        (
-            sm: byref<ResumableStateMachine<'TData>>,
-            condition: unit -> ValueTask<bool>,
-            body: ResumableCode<'TData, unit>
-        ) : bool =
-
-        if sm.Data.CheckCanContinueOrThrow() then
-
-            let mutable vtTask = condition()
-            let mutable awaiter = vtTask.GetAwaiter()
-
-            let cont =
-                ResumptionFunc(fun sm ->
-                    if awaiter.GetResult() then
-                        if body.Invoke(&sm) then
-                            WhileDynamicAsync(&sm, condition, body)
-                        else
-                            let rf = sm.ResumptionDynamicInfo.ResumptionFunc
-                            sm.ResumptionDynamicInfo.ResumptionFunc <-
-                                ResumptionFunc(fun sm -> WhileBodyDynamicAuxAsync(&sm, condition, body, rf))
-                            false
-                    else
-                        true
-                )
-
-            if awaiter.IsCompleted then
-                cont.Invoke(&sm)
-            else
-                sm.ResumptionDynamicInfo.ResumptionData <- (awaiter :> ICriticalNotifyCompletion)
-                sm.ResumptionDynamicInfo.ResumptionFunc <- cont
-                false
-        else
-            true
-
-    and WhileBodyDynamicAuxAsync
-        (
-            sm: byref<ResumableStateMachine<'TData>>,
-            condition: unit -> ValueTask<bool>,
-            body: ResumableCode<'TData, unit>,
-            rf
-        ) : bool =
-        if rf.Invoke(&sm) then
-            WhileDynamicAsync(&sm, condition, body)
-        else
-            let rf = sm.ResumptionDynamicInfo.ResumptionFunc
-            sm.ResumptionDynamicInfo.ResumptionFunc <-
-                ResumptionFunc(fun sm -> WhileBodyDynamicAuxAsync(&sm, condition, body, rf))
-            false
-
     type GenericTaskBuilder2Core with
-        member inline _.Using(resource, [<InlineIfLambda>] body) =
-            ResumableCode.Using(resource, body)
-
-        member inline this.WhileAsync<'TData
-            when 'TData :> IAsyncMethodBuilderBase
-            and 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>
-            (
-                [<InlineIfLambda>] condition: unit -> ValueTask<bool>,
-                [<InlineIfLambda>] body: ResumableCode<'TData, unit>
-            ) : ResumableCode<'TData, unit> =
-            ResumableCode<'TData, unit>(fun sm ->
-                if __useResumableCode then
-                    let mutable __stack_go = true
-                    let mutable __stack_result = false
-
-                    while __stack_go do
-                        if sm.Data.CheckCanContinueOrThrow() then
-
-                            let mutable __stack_fin = true
-                            let __stack_vt = condition()
-                            let mutable awaiter = __stack_vt.GetAwaiter()
-
-                            if not awaiter.IsCompleted then
-                                let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
-                                __stack_fin <- __stack_yield_fin
-
-                            if __stack_fin then
-                                if awaiter.GetResult() then
-                                    let __stack_body_fin = body.Invoke(&sm)
-                                    __stack_go <- __stack_body_fin
-                                else
-                                    // finally finished
-                                    __stack_go <- false
-                                    __stack_result <- true
-                            else
-                                sm.Data.AwaitUnsafeOnCompleted(&awaiter, &sm)
-                                __stack_go <- false
-                        else
-                            __stack_go <- false
-                            __stack_result <- true
-
-                    __stack_result
+        member inline this.Using<'TData, 'TResult, 'TResource
+            when 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>
+            and 'TResource :> IDisposable>
+            (resource: 'TResource, [<InlineIfLambda>] body: 'TResource -> ResumableCode<'TData, 'TResult>) =
+            ResumableCode.Using(resource, (fun resource -> ResumableCode<'TData, 'TResult>(fun sm ->
+                if sm.Data.CheckCanContinueOrThrow() then
+                    (body(resource)).Invoke(&sm)
                 else
-                    WhileDynamicAsync(&sm, condition, body))
+                    true)))
 
         member inline this.For(sequence: IAsyncEnumerable<'T>, [<InlineIfLambda>] body: 'T -> ResumableCode<'TData, unit>) : ResumableCode<'TData, unit> =
             this.Using(
                 sequence.GetAsyncEnumerator(),
                 (fun e ->
-                    this.WhileAsync(
+                    ResumableCodeHelpers.WhileAsync(
                         (fun () ->
                             __debugPoint "ForLoop.InOrToKeyword"
                             e.MoveNextAsync()),

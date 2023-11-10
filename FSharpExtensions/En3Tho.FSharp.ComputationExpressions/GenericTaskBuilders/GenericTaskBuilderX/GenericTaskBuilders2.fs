@@ -29,22 +29,29 @@ type GenericTaskBuilder2Core<'TState, 'TExtensions>(state: 'TState) =
             { new ResumptionDynamicInfo<'TData>(initialResumptionFunc) with
                 member info.MoveNext(sm) =
                     let mutable savedExn = null
-                    try
-                        sm.ResumptionDynamicInfo.ResumptionData <- null
-                        let step = info.ResumptionFunc.Invoke(&sm)
+                    if sm.Data.CheckCanContinueOrThrow() then
+                        try
+                            sm.ResumptionDynamicInfo.ResumptionData <- null
+                            let step = info.ResumptionFunc.Invoke(&sm)
 
-                        if step then
-                            sm.Data.Finish(&sm)
-                        else
-                            let mutable awaiter = sm.ResumptionDynamicInfo.ResumptionData :?> ICriticalNotifyCompletion
-                            assert not (isNull awaiter)
-                            sm.Data.AwaitUnsafeOnCompleted(&awaiter, &sm)
-                    with exn ->
-                        savedExn <- exn
-                    // Run SetException outside the stack unwind, see https://github.com/dotnet/roslyn/issues/26567
-                    match savedExn with
-                    | null -> ()
-                    | exn -> sm.Data.SetException(exn)
+                            if step then
+                                sm.ResumptionPoint <- -1
+                                sm.Data.Finish(&sm)
+                            else
+                                let mutable awaiter = sm.ResumptionDynamicInfo.ResumptionData :?> ICriticalNotifyCompletion
+                                assert not (isNull awaiter)
+                                sm.Data.AwaitUnsafeOnCompleted(&awaiter, &sm)
+                        with exn ->
+                            savedExn <- exn
+                        // Run SetException outside the stack unwind, see https://github.com/dotnet/roslyn/issues/26567
+                        match savedExn with
+                        | null -> ()
+                        | exn ->
+                            sm.ResumptionPoint <- -1
+                            sm.Data.SetException(exn)
+                    else
+                        sm.ResumptionPoint <- -1
+                        sm.Data.Finish(&sm)
 
                 member _.SetStateMachine(sm, state) =
                     sm.Data.SetStateMachine(state)
@@ -64,15 +71,22 @@ type GenericTaskBuilder2Core<'TState, 'TExtensions>(state: 'TState) =
                     __resumeAt sm.ResumptionPoint
                     let mutable __stack_exn: Exception = null
                     try
-                        let __stack_code_fin = code.Invoke(&sm)
-                        if __stack_code_fin then
+                        if sm.Data.CheckCanContinueOrThrow() then
+                            let __stack_code_fin = code.Invoke(&sm)
+                            if __stack_code_fin then
+                                sm.ResumptionPoint <- -1
+                                sm.Data.Finish(&sm)
+                        else
+                            sm.ResumptionPoint <- -1
                             sm.Data.Finish(&sm)
                     with exn ->
                         __stack_exn <- exn
                     // Run SetException outside the stack unwind, see https://github.com/dotnet/roslyn/issues/26567
                     match __stack_exn with
                     | null -> ()
-                    | exn -> sm.Data.SetException(exn)
+                    | exn ->
+                        sm.ResumptionPoint <- -1
+                        sm.Data.SetException(exn)
                 ))
                 (SetStateMachineMethodImpl<_>(fun sm state -> sm.Data.SetStateMachine(state)))
                 (AfterCode<_,_>(fun sm ->

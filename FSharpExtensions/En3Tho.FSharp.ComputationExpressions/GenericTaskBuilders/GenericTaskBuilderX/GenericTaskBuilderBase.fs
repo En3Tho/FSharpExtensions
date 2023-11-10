@@ -1,7 +1,6 @@
 namespace En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder2
 
 open System
-open System.Runtime.CompilerServices
 open System.Threading.Tasks
 open Microsoft.FSharp.Core
 open Microsoft.FSharp.Core.CompilerServices
@@ -23,79 +22,54 @@ type GenericTaskBuilder2Core() =
         [<InlineIfLambda>] task1: ResumableCode<'TData, unit>,
         [<InlineIfLambda>] task2: ResumableCode<'TData, 'TResult>)
         : ResumableCode<'TData, 'TResult> =
-        ResumableCode.Combine(task1, task2)
+        ResumableCodeHelpers.Combine(task1, task2)
 
     member inline _.While<'TData when 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>(
         [<InlineIfLambda>] condition: unit -> bool,
         [<InlineIfLambda>] body: ResumableCode<'TData, unit>)
         : ResumableCode<'TData, unit> =
-            ResumableCode.While(condition, ResumableCode(fun sm -> if sm.Data.CheckCanContinueOrThrow() then body.Invoke(&sm) else true))
-
-    member inline _.TryWith(
-        [<InlineIfLambda>] body: ResumableCode<'TData, 'TResult>,
-        [<InlineIfLambda>] catch: exn -> ResumableCode<'TData, 'TResult>)
-        : ResumableCode<'TData, 'TResult> =
-        ResumableCode.TryWith(body, catch)
-
-    member inline _.TryFinally(
-        [<InlineIfLambda>] body: ResumableCode<'TData, 'TResult>,
-        [<InlineIfLambda>] compensation: unit -> unit)
-        : ResumableCode<'TData, 'TResult> =
-        ResumableCode.TryFinally(body, ResumableCode(fun _sm -> compensation(); true))
+            ResumableCodeHelpers.While(condition, body)
 
     member inline _.For<'TData, 'T when 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>(
         sequence: seq<'T>,
         [<InlineIfLambda>] body: 'T -> ResumableCode<'TData, unit>)
         : ResumableCode<'TData, unit> =
-        ResumableCode.For(sequence, fun value -> ResumableCode(fun sm -> if sm.Data.CheckCanContinueOrThrow() then (body(value)).Invoke(&sm) else true))
+            ResumableCode.Using(
+                sequence.GetEnumerator(),
+                (fun e ->
+                    ResumableCodeHelpers.While(
+                        (fun () ->
+                            __debugPoint "ForLoop.InOrToKeyword"
+                            e.MoveNext()),
+                        ResumableCode<'TData, unit>(fun sm -> (body e.Current).Invoke(&sm))
+                    ))
+            )
 
-    member inline internal this.TryFinallyAsync<'TData, 'TResult
-        when 'TData :> IAsyncMethodBuilderBase>(
+    member inline _.TryWith<'TData, 'TResult when 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>(
         [<InlineIfLambda>] body: ResumableCode<'TData, 'TResult>,
-        [<InlineIfLambda>] compensation: unit -> ValueTask)
+        [<InlineIfLambda>] catch: exn -> ResumableCode<'TData, 'TResult>)
         : ResumableCode<'TData, 'TResult> =
-        ResumableCode.TryFinallyAsync(body, ResumableCode(fun sm ->
-            if __useResumableCode then
-                let mutable __stack_condition_fin = true
-                let __stack_vtask = compensation()
-                let mutable awaiter = __stack_vtask.GetAwaiter()
-
-                if not awaiter.IsCompleted then
-                    let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
-                    __stack_condition_fin <- __stack_yield_fin
-
-                if __stack_condition_fin then
-                    awaiter.GetResult()
+            ResumableCode(fun sm ->
+                if sm.Data.CheckCanContinueOrThrow() then
+                    ResumableCode.TryWith(body, catch).Invoke(&sm)
                 else
-                    sm.Data.AwaitUnsafeOnCompleted(&awaiter, &sm)
+                    true)
 
-                __stack_condition_fin
-            else
-                let vtask = compensation()
-                let mutable awaiter = vtask.GetAwaiter()
-
-                let cont =
-                    ResumptionFunc(fun sm ->
-                        awaiter.GetResult()
-                        true
-                    )
-
-                if awaiter.IsCompleted then
-                    cont.Invoke(&sm)
-                else
-                    sm.ResumptionDynamicInfo.ResumptionData <- (awaiter :> ICriticalNotifyCompletion)
-                    sm.ResumptionDynamicInfo.ResumptionFunc <- cont
-                    false
-                ))
+    member inline _.TryFinally<'TData, 'TResult when 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>(
+        [<InlineIfLambda>] body: ResumableCode<'TData, 'TResult>,
+        [<InlineIfLambda>] compensation: unit -> unit)
+        : ResumableCode<'TData, 'TResult> =
+           ResumableCodeHelpers.TryFinally(body, ResumableCode(fun _sm -> compensation(); true))
 
     member inline this.Using<'TData, 'TResource, 'TResult
         when 'TData :> IAsyncMethodBuilderBase
+        and 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>
         and 'TResource :> IAsyncDisposable>(
         resource: 'TResource,
         [<InlineIfLambda>] body: 'TResource -> ResumableCode<'TData, 'TResult>)
         : ResumableCode<'TData, 'TResult> =
-        this.TryFinallyAsync<'TData, 'TResult>(
-            (fun sm -> (body resource).Invoke(&sm)),
+        ResumableCodeHelpers.TryFinallyAsync<'TData, 'TResult>(
+            ResumableCode<'TData, 'TResult>(fun sm -> (body resource).Invoke(&sm)),
             (fun () ->
                 if not (isNull (box resource)) then
                     resource.DisposeAsync()

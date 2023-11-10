@@ -39,6 +39,7 @@
         <Compile Include="GenericTaskBuilders\GenericUnitTaskBuilder\GenericUnitTaskBuilderWithState.fs" />
         <Compile Include="GenericTaskBuilders\GenericUnitTaskBuilder\GenericUnitTaskBuilderBaseExtensions.fs" />
         <Compile Include="GenericTaskBuilders\GenericUnitTaskBuilder\GenericUnitTaskBuilderBaseBasicBindExtensions.fs" />
+        <Compile Include="GenericTaskBuilders\GenericTaskBuilderX\ResumableCodeHelpers.fs" />
         <Compile Include="GenericTaskBuilders\GenericTaskBuilderX\GenericTaskBuilderBase.fs" />
         <Compile Include="GenericTaskBuilders\GenericTaskBuilderX\GenericTaskBuilderBaseExtensions.fs" />
         <Compile Include="GenericTaskBuilders\GenericTaskBuilderX\GenericTaskBuilders2.fs" />
