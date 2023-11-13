@@ -60,10 +60,11 @@ type IAsyncMethodBuilder<'TAwaiter, 'TTask, 'TResult when 'TTask :> ITaskLike<'T
     abstract SetResult: data: 'TResult -> unit
     abstract Task: 'TTask
 
-type IGenericTaskBuilderStateMachineDataInitializer<'TData, 'TState, 'TBuilderResult when 'TData :> IGenericTaskBuilderStateMachineDataInitializer<'TData, 'TState, 'TBuilderResult>> =
-    abstract Initialize<'TStateMachine when 'TStateMachine :> IAsyncStateMachine and 'TStateMachine :> IResumableStateMachine<'TData>> : stateMachine: byref<'TStateMachine> * state: 'TState -> 'TBuilderResult
+type IGenericTaskBuilderStateMachineDataInitializer<'TData, 'TState, 'TBuilderResult> =
+    static abstract Initialize<'TStateMachine when 'TStateMachine :> IAsyncStateMachine and 'TStateMachine :> IResumableStateMachine<'TData>> : stateMachine: byref<'TStateMachine> * data: byref<'TData> * state: 'TState -> 'TBuilderResult
 
 type IStateCheck<'TState> =
+
     static abstract CanCheckState: bool
     static abstract CheckState: state: byref<'TState> -> bool
 
@@ -76,11 +77,14 @@ type IStateCheck<'TState> =
 type IGenericTaskBuilderStateMachineDataWithCheck<'TData> =
     abstract CheckCanContinueOrThrow: unit -> bool
 
-type IGenericTaskStateMachineData<'TData, 'TState when 'TData :> IGenericTaskStateMachineData<'TData, 'TState>> =
+type IGenericTaskStateMachineData<'TData when 'TData :> IGenericTaskStateMachineData<'TData>> =
     inherit IGenericTaskBuilderStateMachineDataWithCheck<'TData>
     inherit IAsyncMethodBuilderBase
     abstract Finish<'TStateMachine when 'TStateMachine :> IAsyncStateMachine> : sm: byref<'TStateMachine> -> unit
     abstract SetException: ``exception``: Exception -> unit
+
+type IGenericTaskStateMachineDataWithState<'TData, 'TState when 'TData :> IGenericTaskStateMachineDataWithState<'TData, 'TState>> =
+    abstract State: 'TState
 
 type IGenericTaskBuilderStateMachineDataResult<'TResult> =
     abstract SetResult: result: 'TResult -> unit

@@ -2,10 +2,13 @@
 
 open System
 open System.Collections.Generic
-open System.Linq.Expressions
+open System.Diagnostics
+open System.Runtime.CompilerServices
+open System.Runtime.InteropServices
 open System.Threading.Tasks
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder2
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilders.GenericTaskBuilder2.Tasks
+open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 
 open GenericTaskBuilderExtensionsLowPriority
 open GenericTaskBuilder2ExtensionsMediumPriority
@@ -16,6 +19,21 @@ open Xunit
 let vtask2 = ValueTaskBuilder2()
 let unitvtask2 = UnitValueTaskBuilder2()
 let taskSeq = TaskSeqBuilder()
+
+
+[<AbstractClass; Sealed; AutoOpen>]
+type ActivityBuilders() =
+
+    static member activityTask(activity) = ActivityTaskBuilder2(activity)
+    static member activityTask([<CallerMemberName; Optional; DefaultParameterValue("")>] activityName: string) =
+
+        let activity =
+            match Activity.Current with
+            | null -> null
+            | activity ->
+                activity.Source.StartActivity(activityName)
+
+        activityTask(activity)
 
 module CommonNames =
     let [<Literal>] Delay = "Delay"
@@ -456,4 +474,101 @@ let ``test that simple task seq works``() = task {
     }
 
     Assert.Equal(6, res)
+}
+
+module TestCallerMemberName =
+    let startActivity() =
+        activityTask() {
+        let! activityFromState = getState()
+        Assert.Equal("startActivity", activityFromState.DisplayName)
+    }
+
+[<Fact>]
+let ``test that caller member name works with activity builder``() = task {
+
+    use source = ActivitySource("mySource")
+    use listener = ActivityListener(
+        ShouldListenTo = (fun _ -> true),
+        Sample = (fun _ -> ActivitySamplingResult.AllData)
+    )
+    ActivitySource.AddActivityListener(listener)
+
+    use _ = source.StartActivity("Test")
+
+    do! TestCallerMemberName.startActivity()
+}
+
+[<Fact>]
+let ``test that activity task works``() = task {
+    use source = ActivitySource("mySource")
+    use listener = ActivityListener(
+        ShouldListenTo = (fun _ -> true),
+        Sample = (fun _ -> ActivitySamplingResult.AllData)
+    )
+    ActivitySource.AddActivityListener(listener)
+
+    use _ = source.StartActivity("Test")
+
+    let activity = Activity.Current
+    Assert.NotNull(activity)
+    Assert.Equal("Test", activity.DisplayName)
+
+    let mutable activityFromTask = null
+    let! result = activityTask "NewOne" {
+
+        let activity = Activity.Current
+        Assert.NotNull(activity)
+        Assert.Equal("NewOne", activity.DisplayName)
+
+        let! activityState = getState()
+        Assert.Equal(activityState, activity)
+
+        activityFromTask <- activity
+
+        return 1
+    }
+
+    Assert.Equal(1, result)
+    Assert.True(activityFromTask.IsStopped)
+    Assert.True(activityFromTask.Status = ActivityStatusCode.Ok)
+}
+
+[<Fact>]
+let ``test that activity task returns correct activity as state``() = task {
+    use source = ActivitySource("mySource")
+    use listener = ActivityListener(
+        ShouldListenTo = (fun _ -> true),
+        Sample = (fun _ -> ActivitySamplingResult.AllData)
+    )
+    ActivitySource.AddActivityListener(listener)
+
+    use initial = source.StartActivity("Test")
+
+    do! activityTask "NewOne" {
+        let activityFromCurrent = Activity.Current
+        let! activityFromState = getState()
+        Assert.True(Object.ReferenceEquals(activityFromState, activityFromCurrent))
+    }
+}
+
+[<Fact>]
+let ``test that activity task returns provided activity as state and stops provided activity``() = task {
+    use source = ActivitySource("mySource")
+    use listener = ActivityListener(
+        ShouldListenTo = (fun _ -> true),
+        Sample = (fun _ -> ActivitySamplingResult.AllData)
+    )
+    ActivitySource.AddActivityListener(listener)
+
+    let testActivity = source.StartActivity("Test")
+
+    do! activityTask testActivity {
+        let activityFromCurrent = Activity.Current
+        let! activityFromState = getState()
+        Assert.True(Object.ReferenceEquals(testActivity, activityFromState))
+        Assert.True(Object.ReferenceEquals(activityFromState, activityFromCurrent))
+    }
+
+    Assert.True(testActivity.IsStopped)
+    Assert.True(testActivity.Status = ActivityStatusCode.Ok)
 }

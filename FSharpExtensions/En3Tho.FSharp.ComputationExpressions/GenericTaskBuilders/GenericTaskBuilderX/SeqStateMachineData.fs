@@ -8,11 +8,13 @@ open System.Threading.Tasks.Sources
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 open Microsoft.FSharp.Core.CompilerServices
 
-type internal GenericTaskSeqAsyncEnumerable<'TData, 'TResult, 'TStateMachine
+type internal GenericTaskSeqAsyncEnumerable<'TData, 'TResult, 'TStateMachine, 'TInitializer
     when 'TData :> IGenericTaskBuilderStateMachineDataYield<'TData, 'TResult>
-    and 'TData :> IGenericTaskBuilderStateMachineDataInitializer<'TData, unit, IAsyncEnumerable<'TResult>>
+    and 'TInitializer :> IGenericTaskBuilderStateMachineDataInitializer<'TData, unit, IAsyncEnumerable<'TResult>>
     and 'TStateMachine :> IResumableStateMachine<'TData>
     and 'TStateMachine :> IAsyncStateMachine>(sm: 'TStateMachine) =
+
+    //inherit StateMachineBox<'TStateMachine>()
 
     let mutable stateMachine = sm
 
@@ -41,7 +43,9 @@ type internal GenericTaskSeqAsyncEnumerable<'TData, 'TResult, 'TStateMachine
             // not sure about this and field initialization
             // need to test more?
             let mutable stateMachineCopy = stateMachine
-            stateMachineCopy.Data.Initialize(&stateMachineCopy, ()) :?> IAsyncEnumerator<'TResult>
+            let mutable data = stateMachineCopy.Data
+
+            'TInitializer.Initialize(&stateMachineCopy, &data, ()) :?> IAsyncEnumerator<'TResult>
 
 [<NoComparison; NoEquality>]
 type TaskSeqStateMachineDataRef<'TMethodBuilder, 'TResult
@@ -75,23 +79,14 @@ type TaskSeqStateMachineDataRef<'TMethodBuilder, 'TResult
         member this.OnCompleted(continuation, state, token, flags) = this.ValueTaskSource.OnCompleted(continuation, state, token, flags)
 
 [<Struct; NoComparison; NoEquality>]
-type StateMachineSeqData<'TMethodBuilder, 'TResult
+type SeqStateMachineData<'TMethodBuilder, 'TResult
     when 'TMethodBuilder :> IAsyncIteratorMethodBuilder
     and 'TMethodBuilder :> IAsyncMethodBuilderCreator<'TMethodBuilder>> =
 
     [<DefaultValue(false)>]
     val mutable Data: TaskSeqStateMachineDataRef<'TMethodBuilder, 'TResult>
 
-    interface IGenericTaskBuilderStateMachineDataInitializer<StateMachineSeqData<'TMethodBuilder, 'TResult>, unit, IAsyncEnumerable<'TResult>> with
-        member this.Initialize(stateMachine, _) =
-            // this is somewhat tricky: we have to make sure state machine already has a proper ref when being promoted to the heap
-            this.Data <- TaskSeqStateMachineDataRef(MethodBuilder = 'TMethodBuilder.Create())
-            stateMachine.Data <- this
-            let result = GenericTaskSeqAsyncEnumerable<StateMachineSeqData<'TMethodBuilder, 'TResult>, 'TResult, 'TStateMachine>(stateMachine)
-            this.Data.AsyncStateMachine <- result
-            result
-
-    interface IGenericTaskStateMachineData<StateMachineSeqData<'TMethodBuilder, 'TResult>, unit> with
+    interface IGenericTaskStateMachineData<SeqStateMachineData<'TMethodBuilder, 'TResult>> with
 
         member this.CheckCanContinueOrThrow() = not this.Data.DisposeMode
         member this.AwaitOnCompleted(awaiter, _) = this.Data.MethodBuilder.AwaitOnCompleted(&awaiter, &this.Data.AsyncStateMachine)
@@ -108,7 +103,7 @@ type StateMachineSeqData<'TMethodBuilder, 'TResult
             data.ValueTaskSource.SetException(``exception``)
         member this.SetStateMachine(stateMachine) = ()
 
-    interface IGenericTaskBuilderStateMachineDataYield<StateMachineSeqData<'TMethodBuilder, 'TResult>, 'TResult> with
+    interface IGenericTaskBuilderStateMachineDataYield<SeqStateMachineData<'TMethodBuilder, 'TResult>, 'TResult> with
         member this.Dispose() =
             let data = this.Data
             data.DisposeMode <- true
@@ -135,3 +130,20 @@ type StateMachineSeqData<'TMethodBuilder, 'TResult
             let data = this.Data
             data.Current <- result
             data.ValueTaskSource.SetResult(true)
+
+// open UnsafeEx
+type [<Struct>] DefaultSeqStateMachineDataInitializer<'TMethodBuilder, 'TResult
+    when 'TMethodBuilder :> IAsyncIteratorMethodBuilder
+    and 'TMethodBuilder :> IAsyncMethodBuilderCreator<'TMethodBuilder>> =
+
+    interface IGenericTaskBuilderStateMachineDataInitializer<SeqStateMachineData<'TMethodBuilder, 'TResult>, unit, IAsyncEnumerable<'TResult>> with
+        static member Initialize(stateMachine, data, _) =
+            // this is somewhat tricky: we have to make sure state machine already has a proper ref when being promoted to the heap
+            // let box = StateMachineBox(StateMachine = stateMachine, DataFieldOffset = Unsafe.ByteOffset(&stateMachine, &data))
+            // TODO: remove data ref and use only box?
+
+            data.Data <- TaskSeqStateMachineDataRef(MethodBuilder = 'TMethodBuilder.Create())
+            stateMachine.Data <- data
+            let result = GenericTaskSeqAsyncEnumerable<SeqStateMachineData<'TMethodBuilder, 'TResult>, 'TResult, 'TStateMachine, DefaultSeqStateMachineDataInitializer<'TMethodBuilder, 'TResult>>(stateMachine)
+            data.Data.AsyncStateMachine <- result
+            result

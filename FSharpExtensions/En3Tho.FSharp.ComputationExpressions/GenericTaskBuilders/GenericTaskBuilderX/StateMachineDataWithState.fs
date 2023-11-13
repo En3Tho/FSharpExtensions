@@ -1,6 +1,9 @@
 ﻿namespace En3Tho.FSharp.ComputationExpressions.GenericTaskBuilders.GenericTaskBuilder2
 
+open System.Runtime.CompilerServices
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
+
+open UnsafeEx
 
 [<Struct; NoComparison; NoEquality>]
 type StateMachineDataWithState<'TMethodBuilder, 'TAwaiter, 'TTask, 'TState, 'TStateCheck, 'TResult, 'TBuilderResult
@@ -20,14 +23,7 @@ type StateMachineDataWithState<'TMethodBuilder, 'TAwaiter, 'TTask, 'TState, 'TSt
     [<DefaultValue(false)>]
     val mutable Result: 'TResult
 
-    interface IGenericTaskBuilderStateMachineDataInitializer<StateMachineDataWithState<'TMethodBuilder, 'TAwaiter, 'TTask, 'TState, 'TStateCheck, 'TResult, 'TBuilderResult>, 'TState, 'TBuilderResult> with
-        member this.Initialize(stateMachine, state) =
-            this.State <- state
-            this.MethodBuilder <- 'TMethodBuilder.Create()
-            this.MethodBuilder.Start(&stateMachine)
-            this.MethodBuilder.Task.Task
-
-    interface IGenericTaskStateMachineData<StateMachineDataWithState<'TMethodBuilder, 'TAwaiter, 'TTask, 'TState, 'TStateCheck, 'TResult, 'TBuilderResult>, 'TState> with
+    interface IGenericTaskStateMachineData<StateMachineDataWithState<'TMethodBuilder, 'TAwaiter, 'TTask, 'TState, 'TStateCheck, 'TResult, 'TBuilderResult>> with
 
         member this.CheckCanContinueOrThrow() =
             if 'TStateCheck.CanCheckState then
@@ -49,5 +45,23 @@ type StateMachineDataWithState<'TMethodBuilder, 'TAwaiter, 'TTask, 'TState, 'TSt
         member this.AwaitUnsafeOnCompleted(awaiter, stateMachine) = this.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &stateMachine)
         member this.SetStateMachine(stateMachine) = this.MethodBuilder.SetStateMachine(stateMachine)
 
+    interface IGenericTaskStateMachineDataWithState<StateMachineDataWithState<'TMethodBuilder, 'TAwaiter, 'TTask, 'TState, 'TStateCheck, 'TResult, 'TBuilderResult>, 'TState> with
+        member this.State = this.State
+
     interface IGenericTaskBuilderStateMachineDataResult<'TResult> with
         member this.SetResult(result) = this.Result <- result
+
+type [<Struct>] DefaultStateMachineDataWithStateInitializer<'TMethodBuilder, 'TAwaiter, 'TTask, 'TState, 'TStateCheck, 'TResult, 'TBuilderResult
+    when 'TMethodBuilder :> IAsyncMethodBuilder<'TAwaiter, 'TTask, 'TResult>
+    and 'TMethodBuilder :> IAsyncMethodBuilderCreator<'TMethodBuilder>
+    and 'TAwaiter :> ITaskAwaiter<'TResult>
+    and 'TTask :> ITaskLike<'TAwaiter, 'TResult>
+    and 'TTask :> ITaskLikeTask<'TBuilderResult>
+    and 'TStateCheck :> IStateCheck<'TState>> =
+
+    interface IGenericTaskBuilderStateMachineDataInitializer<StateMachineDataWithState<'TMethodBuilder, 'TAwaiter, 'TTask, 'TState, 'TStateCheck, 'TResult, 'TBuilderResult>, 'TState, 'TBuilderResult> with
+        static member Initialize(sm, data, state) =
+            data.State <- state
+            data.MethodBuilder <- 'TMethodBuilder.Create()
+            data.MethodBuilder.Start(&sm)
+            data.MethodBuilder.Task.Task

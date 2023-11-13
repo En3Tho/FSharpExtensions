@@ -170,6 +170,28 @@ let ``test that most basic return works from results``() = task {
     Assert.Equal(1, result)
 }
 
+module TestCallerMemberName =
+    let startActivity() =
+        activityTask() {
+        let! activityFromState = getState()
+        Assert.Equal("startActivity", activityFromState.DisplayName)
+    }
+
+[<Fact>]
+let ``test that caller member name works with activity builder``() = task {
+
+    use source = ActivitySource("mySource")
+    use listener = ActivityListener(
+        ShouldListenTo = (fun _ -> true),
+        Sample = (fun _ -> ActivitySamplingResult.AllData)
+    )
+    ActivitySource.AddActivityListener(listener)
+
+    use _ = source.StartActivity("Test")
+
+    do! TestCallerMemberName.startActivity()
+}
+
 [<Fact>]
 let ``test that activity task works``() = task {
     use source = ActivitySource("mySource")
@@ -223,27 +245,7 @@ let ``test that activity task returns correct activity as state``() = task {
     }
 }
 
-module TestCallerMemberName =
-    let startActivity() =
-        activityTask() {
-        let! activityFromState = getState()
-        Assert.Equal("startActivity", activityFromState.DisplayName)
-    }
 
-[<Fact>]
-let ``test that caller member name works with activity builder``() = task {
-
-    use source = ActivitySource("mySource")
-    use listener = ActivityListener(
-        ShouldListenTo = (fun _ -> true),
-        Sample = (fun _ -> ActivitySamplingResult.AllData)
-    )
-    ActivitySource.AddActivityListener(listener)
-
-    use _ = source.StartActivity("Test")
-
-    do! TestCallerMemberName.startActivity()
-}
 
 [<Fact>]
 let ``test that activity task returns provided activity as state and stops provided activity``() = task {

@@ -13,14 +13,15 @@ type GenericTaskBuilder2Core<'TState, 'TExtensions>(state: 'TState) =
     
     member _.State = state
     
-    member inline this.Bind(_: StateIntrinsic, [<InlineIfLambda>] continuation: 'TState -> ResumableCode<'TData, 'TResult>) =
-        ResumableCode(fun sm ->
-            (continuation this.State).Invoke(&sm)
+    member inline this.Bind<'TData, 'TResult when 'TData :> IGenericTaskStateMachineDataWithState<'TData, 'TState>>(_: StateIntrinsic, [<InlineIfLambda>] continuation: 'TState -> ResumableCode<'TData, 'TResult>) =
+        ResumableCode<'TData, 'TResult>(fun sm ->
+            let state: 'TState = sm.Data.State
+            (continuation state).Invoke(&sm)
         )
 
-    static member inline RunDynamic<'TData, 'TResult, 'TBuilderResult
-        when 'TData :> IGenericTaskStateMachineData<'TData, 'TState>
-        and 'TData :> IGenericTaskBuilderStateMachineDataInitializer<'TData, 'TState, 'TBuilderResult>>
+    static member inline RunDynamic<'TData, 'TResult, 'TBuilderResult, 'TInitializer
+        when 'TData :> IGenericTaskStateMachineData<'TData>
+        and 'TInitializer :> IGenericTaskBuilderStateMachineDataInitializer<'TData, 'TState, 'TBuilderResult>>
         ([<InlineIfLambda>] code: ResumableCode<'TData, 'TResult>, state: 'TState) : 'TBuilderResult =
 
         let mutable sm = ResumableStateMachine<'TData>()
@@ -58,11 +59,11 @@ type GenericTaskBuilder2Core<'TState, 'TExtensions>(state: 'TState) =
             }
 
         sm.ResumptionDynamicInfo <- resumptionInfo
-        sm.Data.Initialize(&sm, state)
+        'TInitializer.Initialize(&sm, &sm.Data, state)
 
-    member inline this.RunInternal<'TData, 'TResult, 'TBuilderResult
-        when 'TData :> IGenericTaskStateMachineData<'TData, 'TState>
-        and 'TData :> IGenericTaskBuilderStateMachineDataInitializer<'TData, 'TState, 'TBuilderResult>>
+    member inline this.RunInternal<'TData, 'TResult, 'TBuilderResult, 'TInitializer
+        when 'TData :> IGenericTaskStateMachineData<'TData>
+        and 'TInitializer :> IGenericTaskBuilderStateMachineDataInitializer<'TData, 'TState, 'TBuilderResult>>
         ([<InlineIfLambda>] code: ResumableCode<'TData, 'TResult>) : 'TBuilderResult =
 
         (if __useResumableCode then
@@ -90,7 +91,7 @@ type GenericTaskBuilder2Core<'TState, 'TExtensions>(state: 'TState) =
                 ))
                 (SetStateMachineMethodImpl<_>(fun sm state -> sm.Data.SetStateMachine(state)))
                 (AfterCode<_,_>(fun sm ->
-                    sm.Data.Initialize(&sm, this.State)))
+                    'TInitializer.Initialize(&sm, &sm.Data, this.State)))
         else
             GenericTaskBuilder2Core<'TState, 'TExtensions>.RunDynamic(code, this.State))
 
@@ -103,5 +104,5 @@ type GenericTaskBuilder2WithStateBase<'TState>(state: 'TState) =
 type GenericTaskSeqBuilder2Base() =
     inherit GenericTaskBuilder2Core<unit, YieldExtensions>()
 
-type GenericTaskSeqBuilder2WithStateBase<'TState>(state: 'TState) =
-    inherit GenericTaskBuilder2Core<'TState, YieldExtensions>(state)
+// type GenericTaskSeqBuilder2WithStateBase<'TState>(state: 'TState) =
+//     inherit GenericTaskBuilder2Core<'TState, YieldExtensions>(state)

@@ -47,10 +47,14 @@
         <Compile Include="GenericTaskBuilders\GenericTaskBuilderX\StateMachineDataWithState.fs" />
         <Compile Include="GenericTaskBuilders\GenericTaskBuilderX\UnitStateMachineData.fs" />
         <Compile Include="GenericTaskBuilders\GenericTaskBuilderX\UnitStateMachineDataWithState.fs" />
-        <Compile Include="GenericTaskBuilders\GenericTaskBuilderX\StateMachineSeqData.fs" />
-        <Compile Include="GenericTaskBuilders\GenericTaskBuilder2Tasks\ValueTaskBuilder.fs" />
-        <Compile Include="GenericTaskBuilders\GenericTaskBuilder2Tasks\UnitValueTaskBuilder.fs" />
+        <Compile Include="GenericTaskBuilders\GenericTaskBuilderX\SeqStateMachineData.fs" />
+        <Compile Include="GenericTaskBuilders\GenericTaskBuilder2Tasks\ValueTaskMethodBuilderWrappers.fs" />
+        <Compile Include="GenericTaskBuilders\GenericTaskBuilder2Tasks\TaskMethodBuilderWrappers.fs" />
+        <Compile Include="GenericTaskBuilders\GenericTaskBuilder2Tasks\ValueTaskBuilders.fs" />
+        <Compile Include="GenericTaskBuilders\GenericTaskBuilder2Tasks\TaskBuilders.fs" />
         <Compile Include="GenericTaskBuilders\GenericTaskBuilder2Tasks\TaskSeqBuilder.fs" />
+        <Compile Include="GenericTaskBuilders\GenericTaskBuilder2Tasks\ActivityValueTask2.fs" />
+        <Compile Include="GenericTaskBuilders\GenericTaskBuilder2Tasks\SyncContextTask.fs" />
         <Compile Include="Tasks\ValueTaskWrapper.fs" />
         <Compile Include="Tasks\TaskWrapper.fs" />
         <Compile Include="Tasks\ExnResultValueTask.fs" />

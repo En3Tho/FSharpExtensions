@@ -16,13 +16,7 @@ type StateMachineData<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult, 'TBuilderRes
     [<DefaultValue(false)>]
     val mutable Result: 'TResult
 
-    interface IGenericTaskBuilderStateMachineDataInitializer<StateMachineData<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult, 'TBuilderResult>, unit, 'TBuilderResult> with
-        member this.Initialize(stateMachine, _) =
-            this.MethodBuilder <- 'TMethodBuilder.Create()
-            this.MethodBuilder.Start(&stateMachine)
-            this.MethodBuilder.Task.Task
-
-    interface IGenericTaskStateMachineData<StateMachineData<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult, 'TBuilderResult>, unit> with
+    interface IGenericTaskStateMachineData<StateMachineData<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult, 'TBuilderResult>> with
 
         member this.CheckCanContinueOrThrow() = true
         member this.AwaitOnCompleted(awaiter, stateMachine) = this.MethodBuilder.AwaitOnCompleted(&awaiter, &stateMachine)
@@ -33,3 +27,15 @@ type StateMachineData<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult, 'TBuilderRes
 
     interface IGenericTaskBuilderStateMachineDataResult<'TResult> with
         member this.SetResult(result) = this.Result <- result
+
+type [<Struct>] DefaultStateMachineDataInitializer<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult, 'TBuilderResult
+    when 'TMethodBuilder :> IAsyncMethodBuilder<'TAwaiter, 'TTask, 'TResult>
+    and 'TMethodBuilder :> IAsyncMethodBuilderCreator<'TMethodBuilder>
+    and 'TAwaiter :> ITaskAwaiter<'TResult>
+    and 'TTask :> ITaskLike<'TAwaiter, 'TResult>
+    and 'TTask :> ITaskLikeTask<'TBuilderResult>> =
+    interface IGenericTaskBuilderStateMachineDataInitializer<StateMachineData<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult, 'TBuilderResult>, unit, 'TBuilderResult> with
+        static member Initialize(sm, data, _) =
+            data.MethodBuilder <- 'TMethodBuilder.Create()
+            data.MethodBuilder.Start(&sm)
+            data.MethodBuilder.Task.Task
