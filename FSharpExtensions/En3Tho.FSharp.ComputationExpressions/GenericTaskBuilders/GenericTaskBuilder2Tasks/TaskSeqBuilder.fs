@@ -32,4 +32,4 @@ type [<Struct>] AsyncIteratorMethodBuilderWrapper =
 type TaskSeqBuilder() =
     inherit GenericTaskSeqBuilder2Base()
     member inline this.Run([<InlineIfLambda>] code) =
-        this.RunInternal<SeqStateMachineData<AsyncIteratorMethodBuilderWrapper, _>, _, _, DefaultSeqStateMachineDataInitializer<_,_>>(code)
+        this.RunInternal<GenericTaskSeqAsyncEnumerableData<AsyncIteratorMethodBuilderWrapper,_,_>, _, _, DefaultSeqStateMachineDataInitializer<_,_>>(code)

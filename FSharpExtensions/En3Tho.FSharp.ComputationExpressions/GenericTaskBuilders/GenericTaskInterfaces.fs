@@ -92,5 +92,15 @@ type IGenericTaskBuilderStateMachineDataResult<'TResult> =
 type IGenericTaskBuilderStateMachineDataYield<'TData, 'TResult when 'TData :> IGenericTaskBuilderStateMachineDataYield<'TData, 'TResult>> =
     inherit IGenericTaskBuilderStateMachineDataResult<'TResult>
     abstract GetResult: unit -> 'TResult
-    abstract MoveNext: unit -> ValueTask<bool>
+    abstract MoveNextAsync: unit -> ValueTask<bool>
     abstract Dispose: unit -> ValueTask
+
+module GenericTaskBuilderStateMachineDataYield =
+    let inline getResult<'TData, 'TResult when 'TData :> IGenericTaskBuilderStateMachineDataYield<'TData, 'TResult>>(data: 'TData) =
+        data.GetResult()
+
+    let inline moveNext<'TData, 'TResult when 'TData :> IGenericTaskBuilderStateMachineDataYield<'TData, 'TResult>>(data: 'TData) =
+        data.MoveNextAsync()
+
+    let inline dispose<'TData, 'TResult when 'TData :> IGenericTaskBuilderStateMachineDataYield<'TData, 'TResult>>(data: 'TData) =
+        data.Dispose()

@@ -13,7 +13,9 @@ type BasicBindExtensions = struct end
 type YieldExtensions = struct end
 type ReturnExtensions = struct end
 
-type internal StateMachineBox<'TStateMachine when 'TStateMachine :> IAsyncStateMachine>() =
+// TODO: can state machine box from the runtime be used for this?
+// need to capture execution context and restore it there?
+type StateMachineBox<'TStateMachine when 'TStateMachine :> IAsyncStateMachine>() =
 
     [<DefaultValue(false)>]
     val mutable StateMachine: 'TStateMachine
@@ -37,7 +39,7 @@ module internal UnsafeEx =
 
         [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
         static member As<'T, 'U>(origin: byref<'T>, offset: nativeint) =
-            Unsafe.As<'T, 'U>(&Unsafe.Add(&origin, offset))
+            &Unsafe.As<'T, 'U>(&Unsafe.AddByteOffset(&origin, offset))
 
         [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
         static member Return<'T>(origin: byref<'T>) = &origin

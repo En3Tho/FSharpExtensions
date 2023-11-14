@@ -5,6 +5,7 @@ open System.Collections.Generic
 open System.Diagnostics
 open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
+open System.Threading
 open System.Threading.Tasks
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder2
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilders.GenericTaskBuilder2.Tasks
@@ -19,7 +20,7 @@ open Xunit
 let vtask2 = ValueTaskBuilder2()
 let unitvtask2 = UnitValueTaskBuilder2()
 let taskSeq = TaskSeqBuilder()
-
+let syncCtxTask ctx = SyncContextTask(ctx)
 
 [<AbstractClass; Sealed; AutoOpen>]
 type ActivityBuilders() =
@@ -571,4 +572,49 @@ let ``test that activity task returns provided activity as state and stops provi
 
     Assert.True(testActivity.IsStopped)
     Assert.True(testActivity.Status = ActivityStatusCode.Ok)
+}
+
+//[<Fact>]
+let ``test that synccontext task works for default sync context``() = task {
+    // default is sending to the thread pool
+    let syncContext = SynchronizationContext()
+    let sncTask = syncCtxTask(syncContext)
+    let! x = sncTask {
+        let currentCtx = SynchronizationContext.Current
+        // threadpool threads should have no ctx context
+        Assert.Equal(null, currentCtx)
+        return 1
+    }
+    Assert.Equal(1, x)
+}
+
+//[<Fact>]
+let ``test that synccontext task works for custom syn context``() = task {
+    let collection = List()
+    let mutable spinThread = true
+
+    let syncContext = {
+        new SynchronizationContext() with
+            member _.Post(cb, o) = collection.Add((cb, o))
+    }
+
+    let th = Thread(fun() ->
+        while spinThread do
+            Thread.Sleep(1)
+            let cb, o = collection[0]
+            collection.RemoveAt(0)
+            cb.Invoke(o)
+        )
+
+    th.Start()
+
+    let sncTask = syncCtxTask(syncContext)
+    let! x = sncTask {
+        let currentCtx = SynchronizationContext.Current
+        Assert.True(Object.ReferenceEquals(syncContext, currentCtx))
+        return 1
+    }
+
+    Assert.Equal(1, x)
+    spinThread <- false
 }

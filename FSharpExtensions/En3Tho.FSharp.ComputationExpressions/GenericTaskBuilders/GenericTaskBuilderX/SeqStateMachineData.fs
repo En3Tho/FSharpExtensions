@@ -8,48 +8,63 @@ open System.Threading.Tasks.Sources
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 open Microsoft.FSharp.Core.CompilerServices
 
-type internal GenericTaskSeqAsyncEnumerable<'TData, 'TResult, 'TStateMachine, 'TInitializer
-    when 'TData :> IGenericTaskBuilderStateMachineDataYield<'TData, 'TResult>
-    and 'TInitializer :> IGenericTaskBuilderStateMachineDataInitializer<'TData, unit, IAsyncEnumerable<'TResult>>
-    and 'TStateMachine :> IResumableStateMachine<'TData>
-    and 'TStateMachine :> IAsyncStateMachine>(sm: 'TStateMachine) =
+#if StructData
+[<Struct>]
+type GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer
+    when 'TInitializer :> IGenericTaskBuilderStateMachineDataInitializer<GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>, unit, IAsyncEnumerable<'TResult>>
+    and 'TMethodBuilder :> IAsyncIteratorMethodBuilder> =
 
-    //inherit StateMachineBox<'TStateMachine>()
+    [<DefaultValue(false)>]
+    val mutable Data: GenericTaskSeqAsyncEnumerableBase<'TMethodBuilder, 'TResult>
 
-    let mutable stateMachine = sm
+    interface IGenericTaskBuilderStateMachineDataYield<GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>, 'TResult> with
+        member this.Dispose() =
+            this.Data.DisposeMode <- true
+            this.Data.ValueTaskSource.Reset()
+            this.Data.MethodBuilder.MoveNext(&this.Data)
+            ValueTask(this.Data, this.Data.ValueTaskSource.Version)
 
-    interface IAsyncStateMachine with
-        member this.MoveNext() = stateMachine.MoveNext()
+        member this.MoveNextAsync() =
+            this.Data.ValueTaskSource.Reset()
+            this.Data.MethodBuilder.MoveNext(&this.Data)
+
+            let version = this.Data.ValueTaskSource.Version
+            if (this.Data.ValueTaskSource.GetStatus(version) = ValueTaskSourceStatus.Succeeded) then
+                ValueTask.FromResult(this.Data.ValueTaskSource.GetResult(version))
+            else
+                ValueTask<bool>(this.Data, version)
+
+        member this.GetResult() =
+            this.Data.Current
+
+        member this.SetResult(result) =
+            this.Data.Current <- result
+            this.Data.ValueTaskSource.SetResult(true)
+
+    interface IGenericTaskStateMachineData<GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>> with
+
+        member this.CheckCanContinueOrThrow() = not this.Data.DisposeMode
+        member this.AwaitOnCompleted(awaiter, _) =
+            this.Data.MethodBuilder.AwaitOnCompleted(&awaiter, &this.Data)
+        member this.AwaitUnsafeOnCompleted(awaiter, _) =
+            this.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &this.Data)
+
+        member this.Finish(sm) =
+            this.Data.MethodBuilder.Complete()
+            this.Data.ValueTaskSource.SetResult(false)
+
+        member this.SetException(``exception``: exn) =
+            this.Data.MethodBuilder.Complete()
+            this.Data.ValueTaskSource.SetException(``exception``)
         member this.SetStateMachine(_) = ()
 
-    interface IAsyncEnumerator<'TResult> with
-        member this.MoveNextAsync() =
-            if stateMachine.ResumptionPoint = -1 then
-                ValueTask.FromResult(false)
-            else
-                stateMachine.Data.MoveNext()
-
-        member this.DisposeAsync() =
-            if stateMachine.ResumptionPoint = -1 then
-                ValueTask()
-            else
-                stateMachine.Data.Dispose()
-
-        member this.Current =
-            stateMachine.Data.GetResult()
-
-    interface IAsyncEnumerable<'TResult> with
-        member this.GetAsyncEnumerator(_: CancellationToken) =
-            // not sure about this and field initialization
-            // need to test more?
-            let mutable stateMachineCopy = stateMachine
-            let mutable data = stateMachineCopy.Data
-
-            'TInitializer.Initialize(&stateMachineCopy, &data, ()) :?> IAsyncEnumerator<'TResult>
-
-[<NoComparison; NoEquality>]
-type TaskSeqStateMachineDataRef<'TMethodBuilder, 'TResult
+and [<AbstractClass>] GenericTaskSeqAsyncEnumerableBase<'TMethodBuilder, 'TResult
     when 'TMethodBuilder :> IAsyncIteratorMethodBuilder>() =
+#else
+type [<AbstractClass>] GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer
+    when 'TInitializer :> IGenericTaskBuilderStateMachineDataInitializer<GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>, unit, IAsyncEnumerable<'TResult>>
+    and 'TMethodBuilder :> IAsyncIteratorMethodBuilder>() =
+#endif
 
     [<DefaultValue(false)>]
     val mutable Current: 'TResult
@@ -62,12 +77,56 @@ type TaskSeqStateMachineDataRef<'TMethodBuilder, 'TResult
 
     [<DefaultValue(false)>]
     val mutable DisposeMode: bool
+    abstract member MoveNext: unit -> unit
 
-    // TODO: find a way to access 'TData ref on state machine
-    // This way this field and a copy of state machine could be avoided
-    [<DefaultValue(false)>]
-    val mutable AsyncStateMachine: IAsyncStateMachine
+#if !StructData
 
+    interface IGenericTaskBuilderStateMachineDataYield<GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>, 'TResult> with
+        member this.Dispose() =
+            let mutable this = this
+            this.DisposeMode <- true
+            this.ValueTaskSource.Reset()
+            this.MethodBuilder.MoveNext(&this)
+            ValueTask(this, this.ValueTaskSource.Version)
+
+        member this.MoveNextAsync() =
+            let mutable this = this
+            this.ValueTaskSource.Reset()
+            this.MethodBuilder.MoveNext(&this)
+
+            let version = this.ValueTaskSource.Version
+            if (this.ValueTaskSource.GetStatus(version) = ValueTaskSourceStatus.Succeeded) then
+                ValueTask.FromResult(this.ValueTaskSource.GetResult(version))
+            else
+                ValueTask<bool>(this, version)
+
+        member this.GetResult() =
+            this.Current
+
+        member this.SetResult(result) =
+            this.Current <- result
+            this.ValueTaskSource.SetResult(true)
+
+    interface IGenericTaskStateMachineData<GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>> with
+
+        member this.CheckCanContinueOrThrow() = not this.DisposeMode
+        member this.AwaitOnCompleted(awaiter, _) =
+            let mutable this = this
+            this.MethodBuilder.AwaitOnCompleted(&awaiter, &this)
+        member this.AwaitUnsafeOnCompleted(awaiter, _) =
+            let mutable this = this
+            this.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &this)
+
+        member this.Finish(sm) =
+            this.MethodBuilder.Complete()
+            this.ValueTaskSource.SetResult(false)
+
+        member this.SetException(``exception``: exn) =
+            this.MethodBuilder.Complete()
+            this.ValueTaskSource.SetException(``exception``)
+        member this.SetStateMachine(_) = ()
+
+#endif
     interface IValueTaskSource<bool> with
         member this.GetResult(token) = this.ValueTaskSource.GetResult(token)
         member this.GetStatus(token) = this.ValueTaskSource.GetStatus(token)
@@ -78,72 +137,76 @@ type TaskSeqStateMachineDataRef<'TMethodBuilder, 'TResult
         member this.GetStatus(token) = this.ValueTaskSource.GetStatus(token)
         member this.OnCompleted(continuation, state, token, flags) = this.ValueTaskSource.OnCompleted(continuation, state, token, flags)
 
-[<Struct; NoComparison; NoEquality>]
-type SeqStateMachineData<'TMethodBuilder, 'TResult
-    when 'TMethodBuilder :> IAsyncIteratorMethodBuilder
-    and 'TMethodBuilder :> IAsyncMethodBuilderCreator<'TMethodBuilder>> =
+    interface IAsyncStateMachine with
+        member this.MoveNext() = this.MoveNext()
+        member this.SetStateMachine(_) = ()
+
+type internal GenericTaskSeqAsyncEnumerable<'TMethodBuilder, 'TResult, 'TStateMachine, 'TInitializer
+    when 'TStateMachine :> IAsyncStateMachine
+    and 'TMethodBuilder :> IAsyncIteratorMethodBuilder
+#if StructData
+    and 'TInitializer :> IGenericTaskBuilderStateMachineDataInitializer<GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>, unit, IAsyncEnumerable<'TResult>>
+    and 'TStateMachine :> IResumableStateMachine<GenericTaskSeqAsyncEnumerableData<'TMethodBuilder,'TResult, 'TInitializer>>>() =
+    inherit GenericTaskSeqAsyncEnumerableBase<'TMethodBuilder, 'TResult>()
+#else
+    and 'TInitializer :> IGenericTaskBuilderStateMachineDataInitializer<GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>, unit, IAsyncEnumerable<'TResult>>
+    and 'TStateMachine :> IResumableStateMachine<GenericTaskSeqAsyncEnumerableData<'TMethodBuilder,'TResult, 'TInitializer>>>() =
+
+    inherit GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>()
+#endif
 
     [<DefaultValue(false)>]
-    val mutable Data: TaskSeqStateMachineDataRef<'TMethodBuilder, 'TResult>
+    val mutable StateMachine: 'TStateMachine
 
-    interface IGenericTaskStateMachineData<SeqStateMachineData<'TMethodBuilder, 'TResult>> with
+    override this.MoveNext() = this.StateMachine.MoveNext()
 
-        member this.CheckCanContinueOrThrow() = not this.Data.DisposeMode
-        member this.AwaitOnCompleted(awaiter, _) = this.Data.MethodBuilder.AwaitOnCompleted(&awaiter, &this.Data.AsyncStateMachine)
-        member this.AwaitUnsafeOnCompleted(awaiter, _) = this.Data.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &this.Data.AsyncStateMachine)
-
-        member this.Finish(sm) =
-            let data = this.Data
-            data.MethodBuilder.Complete()
-            data.ValueTaskSource.SetResult(false)
-
-        member this.SetException(``exception``: exn) =
-            let data = this.Data
-            data.MethodBuilder.Complete()
-            data.ValueTaskSource.SetException(``exception``)
-        member this.SetStateMachine(stateMachine) = ()
-
-    interface IGenericTaskBuilderStateMachineDataYield<SeqStateMachineData<'TMethodBuilder, 'TResult>, 'TResult> with
-        member this.Dispose() =
-            let data = this.Data
-            data.DisposeMode <- true
-            data.ValueTaskSource.Reset()
-            data.MethodBuilder.MoveNext(&data.AsyncStateMachine)
-            ValueTask(data, data.ValueTaskSource.Version)
-
-        member this.MoveNext() =
-            let data = this.Data
-
-            data.ValueTaskSource.Reset()
-            data.MethodBuilder.MoveNext(&data.AsyncStateMachine)
-
-            let version = data.ValueTaskSource.Version
-            if (data.ValueTaskSource.GetStatus(version) = ValueTaskSourceStatus.Succeeded) then
-                ValueTask.FromResult(data.ValueTaskSource.GetResult(version))
+    interface IAsyncEnumerator<'TResult> with
+        member this.MoveNextAsync() =
+            if this.StateMachine.ResumptionPoint = -1 then
+                ValueTask.FromResult(false)
             else
-                ValueTask<bool>(data, version)
+#if StructData
+                GenericTaskBuilderStateMachineDataYield.moveNext this.StateMachine.Data
+#else
+                GenericTaskBuilderStateMachineDataYield.moveNext (this :> GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>)
+#endif
 
-        member this.GetResult() =
-            this.Data.Current
+        member this.DisposeAsync() =
+            if this.StateMachine.ResumptionPoint = -1 then
+                ValueTask()
+            else
+#if StructData
+                GenericTaskBuilderStateMachineDataYield.dispose this.StateMachine.Data
+#else
+                GenericTaskBuilderStateMachineDataYield.dispose (this :> GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>)
+#endif
 
-        member this.SetResult(result) =
-            let data = this.Data
-            data.Current <- result
-            data.ValueTaskSource.SetResult(true)
+        member this.Current =
+#if StructData
+                GenericTaskBuilderStateMachineDataYield.getResult this.StateMachine.Data
+#else
+                GenericTaskBuilderStateMachineDataYield.getResult (this :> GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>)
+#endif
 
-// open UnsafeEx
-type [<Struct>] DefaultSeqStateMachineDataInitializer<'TMethodBuilder, 'TResult
-    when 'TMethodBuilder :> IAsyncIteratorMethodBuilder
-    and 'TMethodBuilder :> IAsyncMethodBuilderCreator<'TMethodBuilder>> =
+    interface IAsyncEnumerable<'TResult> with
+        member this.GetAsyncEnumerator(_: CancellationToken) =
+            let mutable stateMachineCopy = this.StateMachine
+            let mutable data = stateMachineCopy.Data
+            'TInitializer.Initialize(&stateMachineCopy, &data, ()) :?> IAsyncEnumerator<'TResult>
 
-    interface IGenericTaskBuilderStateMachineDataInitializer<SeqStateMachineData<'TMethodBuilder, 'TResult>, unit, IAsyncEnumerable<'TResult>> with
-        static member Initialize(stateMachine, data, _) =
-            // this is somewhat tricky: we have to make sure state machine already has a proper ref when being promoted to the heap
-            // let box = StateMachineBox(StateMachine = stateMachine, DataFieldOffset = Unsafe.ByteOffset(&stateMachine, &data))
-            // TODO: remove data ref and use only box?
+type [<Struct>] DefaultSeqStateMachineDataInitializer<'TResult, 'TMethodBuilder
+    when 'TMethodBuilder :> IAsyncMethodBuilderCreator<'TMethodBuilder>
+    and 'TMethodBuilder :> IAsyncIteratorMethodBuilder> =
 
-            data.Data <- TaskSeqStateMachineDataRef(MethodBuilder = 'TMethodBuilder.Create())
-            stateMachine.Data <- data
-            let result = GenericTaskSeqAsyncEnumerable<SeqStateMachineData<'TMethodBuilder, 'TResult>, 'TResult, 'TStateMachine, DefaultSeqStateMachineDataInitializer<'TMethodBuilder, 'TResult>>(stateMachine)
-            data.Data.AsyncStateMachine <- result
-            result
+    interface IGenericTaskBuilderStateMachineDataInitializer<GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, DefaultSeqStateMachineDataInitializer<'TResult, 'TMethodBuilder>>, unit, IAsyncEnumerable<'TResult>> with
+        static member Initialize(stateMachine: byref<'TStateMachine>, _, _) =
+            let box = GenericTaskSeqAsyncEnumerable<'TMethodBuilder, 'TResult, 'TStateMachine, DefaultSeqStateMachineDataInitializer<'TResult, 'TMethodBuilder>>(
+                MethodBuilder = 'TMethodBuilder.Create(),
+                StateMachine = stateMachine
+            )
+#if StructData
+            box.StateMachine.Data <- GenericTaskSeqAsyncEnumerableData(Data = box)
+#else
+            box.StateMachine.Data <- box
+#endif
+            box :> IAsyncEnumerable<'TResult>

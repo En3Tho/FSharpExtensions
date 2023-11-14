@@ -5,6 +5,10 @@
         <Description>A set of computation expressions for F# base library</Description>
     </PropertyGroup>
 
+    <PropertyGroup>
+      <DefineConstants>TRACE</DefineConstants>
+    </PropertyGroup>
+
     <ItemGroup>
         <Compile Include="GenericUnitBuilderBase.fs" />
         <Compile Include="GenericCollectionCodeExtensions.fs" />

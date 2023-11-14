@@ -27,12 +27,12 @@ type [<Struct>] SyncContextTaskStateMachineDataInitializer<'TMethodBuilder, 'TAw
             else
                 let fieldOffset = Unsafe.ByteOffset(&sm, &data)
                 let box = StateMachineBox(StateMachine = sm, DataFieldOffset = fieldOffset)
-                state.Post((fun o ->
+                state.Post((fun o -> // TODO: static callback
                     let mutable box = o :?> StateMachineBox<'a>
-                    let data = Unsafe.As<'a, StateMachineData<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult, 'TBuilderResult>>(&Unsafe.Add(&box.StateMachine, box.DataFieldOffset))
+                    let mutable data = &Unsafe.As<'a, StateMachineData<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult, 'TBuilderResult>>(&box.StateMachine, box.DataFieldOffset)
                     data.MethodBuilder.Start(&box)
                 ), box)
-                let data = Unsafe.As<'a, StateMachineData<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult, 'TBuilderResult>>(&box.StateMachine, fieldOffset)
+                let data = &Unsafe.As<'a, StateMachineData<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult, 'TBuilderResult>>(&box.StateMachine, fieldOffset)
                 data.MethodBuilder.Task.Task
 
 type SyncContextTask(state) =
