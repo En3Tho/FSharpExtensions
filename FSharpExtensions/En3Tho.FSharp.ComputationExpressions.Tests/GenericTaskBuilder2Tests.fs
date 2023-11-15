@@ -3,38 +3,13 @@
 open System
 open System.Collections.Generic
 open System.Diagnostics
-open System.Runtime.CompilerServices
-open System.Runtime.InteropServices
 open System.Threading
 open System.Threading.Tasks
-open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder2
-open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilders.GenericTaskBuilder2.Tasks
-open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
-
-open GenericTaskBuilderExtensionsLowPriority
-open GenericTaskBuilder2ExtensionsMediumPriority
-open GenericTaskBuilder2ExtensionsHighPriority
+open En3Tho.FSharp.ComputationExpressions.Tasks2.GenericTaskBuilders
 
 open Xunit
+open En3Tho.FSharp.Xunit
 
-let vtask2 = ValueTaskBuilder2()
-let unitvtask2 = UnitValueTaskBuilder2()
-let taskSeq = TaskSeqBuilder()
-let syncCtxTask ctx = SyncContextTask(ctx)
-
-[<AbstractClass; Sealed; AutoOpen>]
-type ActivityBuilders() =
-
-    static member activityTask(activity) = ActivityTaskBuilder2(activity)
-    static member activityTask([<CallerMemberName; Optional; DefaultParameterValue("")>] activityName: string) =
-
-        let activity =
-            match Activity.Current with
-            | null -> null
-            | activity ->
-                activity.Source.StartActivity(activityName)
-
-        activityTask(activity)
 
 module CommonNames =
     let [<Literal>] Delay = "Delay"
@@ -270,7 +245,7 @@ let ``test inner fields of iasyncenumerable are reinitialized properly``() = tas
         do! delay(messages)
     }
 
-    let testInnerFields() = vtask2 {
+    let testInnerFields() = vtask {
         let mutable x = 0
         for i in ts do
             x <- x + i
@@ -296,7 +271,7 @@ let ``test inner fields with capture of iasyncenumerable are reinitialized prope
         do! delay(messages)
     }
 
-    let testInnerFields() = vtask2 {
+    let testInnerFields() = vtask {
         let mutable x = 0
         for i in ts(0) do
             x <- x + i
@@ -324,7 +299,7 @@ let ``test inner fields with capture of iasyncenumerable are reinitialized prope
         do! delay(messages)
     }
 
-    let testInnerFields(ts: IAsyncEnumerable<int>) = vtask2 {
+    let testInnerFields(ts: IAsyncEnumerable<int>) = vtask {
         let mutable x = 0
         for i in ts do
             x <- x + i
@@ -420,7 +395,7 @@ let ``test that simple task seq can be partially consumed``() = task {
         do! delay(messages)
     }
 
-    let! res = vtask2 {
+    let! res = vtask {
         let mutable result = 0
         use e = ts.GetAsyncEnumerator()
         let mutable i = 2
@@ -445,11 +420,11 @@ let ``test that simple task seq works``() = task {
         1
         do! Task.Delay(1)
         2
-        do! unitvtask2 { do! Task.Delay(1) }
+        do! unitvtask { do! Task.Delay(1) }
         3
     }
 
-    let! res = vtask2 {
+    let! res = vtask {
         let mutable result = 0
         for v in ts do
             result <- result + v
@@ -458,7 +433,7 @@ let ``test that simple task seq works``() = task {
 
     Assert.Equal(6, res)
 
-    let! res = vtask2 {
+    let! res = vtask {
         let mutable result = 0
         for v in ts do
             result <- result + v
@@ -467,7 +442,7 @@ let ``test that simple task seq works``() = task {
 
     Assert.Equal(6, res)
 
-    let! res = vtask2 {
+    let! res = vtask {
         let mutable result = 0
         for v in ts do
             result <- result + v
@@ -802,4 +777,26 @@ let ``test that background task propagates execution context just like default t
             Assert.Equal(2, TestAsyncLocal.X.Value)
         }
     }
+}
+
+[<Fact>]
+let ``test that etasks automatically catches exceptions``() = task {
+    let! x = etask {
+        do! Task.Delay(1)
+        failwith "Boom"
+        return Ok 1
+    }
+
+    Assert.IsErrorWithMessage("Boom", x)
+}
+
+[<Fact>]
+let ``test that evtasks automatically catches exceptions``() = task {
+    let! x = evtask {
+        do! Task.Delay(1)
+        failwith "Boom"
+        return Ok 1
+    }
+
+    Assert.IsErrorWithMessage("Boom", x)
 }
