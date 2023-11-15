@@ -59,7 +59,7 @@ type GenericTaskBuilder2Core<'TState, 'TExtensions>(state: 'TState) =
             }
 
         sm.ResumptionDynamicInfo <- resumptionInfo
-        'TInitializer.Initialize(&sm, &sm.Data, state)
+        'TInitializer.Initialize<_, 'TData, 'TState>(&sm, &sm.Data, state)
 
     member inline this.RunInternal<'TData, 'TResult, 'TBuilderResult, 'TInitializer
         when 'TData :> IGenericTaskStateMachineData<'TData>
@@ -91,7 +91,7 @@ type GenericTaskBuilder2Core<'TState, 'TExtensions>(state: 'TState) =
                 ))
                 (SetStateMachineMethodImpl<_>(fun sm state -> sm.Data.SetStateMachine(state)))
                 (AfterCode<_,_>(fun sm ->
-                    'TInitializer.Initialize(&sm, &sm.Data, this.State)))
+                    'TInitializer.Initialize<_, 'TData, 'TState>(&sm, &sm.Data, this.State)))
         else
             GenericTaskBuilder2Core<'TState, 'TExtensions>.RunDynamic(code, this.State))
 

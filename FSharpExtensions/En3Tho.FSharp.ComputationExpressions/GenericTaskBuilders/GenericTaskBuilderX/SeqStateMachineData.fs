@@ -107,8 +107,6 @@ type [<AbstractClass>] GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResu
             this.Current <- result
             this.ValueTaskSource.SetResult(true)
 
-    interface IGenericTaskStateMachineData<GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>> with
-
         member this.CheckCanContinueOrThrow() = not this.DisposeMode
         member this.AwaitOnCompleted(awaiter, _) =
             let mutable this = this
@@ -185,7 +183,7 @@ type internal GenericTaskSeqAsyncEnumerable<'TMethodBuilder, 'TResult, 'TStateMa
 #if StructData
                 GenericTaskBuilderStateMachineDataYield.getResult this.StateMachine.Data
 #else
-                GenericTaskBuilderStateMachineDataYield.getResult (this :> GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>)
+            GenericTaskBuilderStateMachineDataYield.getResult (this :> GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>)
 #endif
 
     interface IAsyncEnumerable<'TResult> with

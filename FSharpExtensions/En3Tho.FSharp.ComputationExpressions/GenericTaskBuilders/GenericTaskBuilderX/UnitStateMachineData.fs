@@ -5,7 +5,6 @@ open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 [<Struct; NoComparison; NoEquality>]
 type UnitStateMachineData<'TMethodBuilder, 'TAwaiter, 'TTask, 'TBuilderResult
     when 'TMethodBuilder :> IAsyncMethodBuilder<'TAwaiter, 'TTask>
-    and 'TMethodBuilder :> IAsyncMethodBuilderCreator<'TMethodBuilder>
     and 'TAwaiter :> ITaskAwaiter
     and 'TTask :> ITaskLike<'TAwaiter>
     and 'TTask :> ITaskLikeTask<'TBuilderResult>> =

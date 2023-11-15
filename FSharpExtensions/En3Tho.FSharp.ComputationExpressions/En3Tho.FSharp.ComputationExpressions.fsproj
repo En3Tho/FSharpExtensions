@@ -28,7 +28,7 @@
         <Compile Include="TaskBuilders\ValueTaskResultBuilder.fs" />
         <Compile Include="TaskBuilders\ValueTaskExnResultBuilder.fs" />
         <Compile Include="TaskBuilders\TaskBuilders.fs" />
-        <Compile Include="GenericTaskBuilders\GenericTaskInterfaces.fs" />
+        <Compile Include="GenericTaskBuilders\GenericTaskBuilderIntrinsics.fs" />
         <Compile Include="GenericTaskBuilders\GenericTaskBuilderInterfaces.fs" />
         <Compile Include="GenericTaskBuilders\TaskLikeBuilderBase.fs" />
         <Compile Include="GenericTaskBuilders\GenericTaskBuilder\GenericTaskBuilderData.fs" />

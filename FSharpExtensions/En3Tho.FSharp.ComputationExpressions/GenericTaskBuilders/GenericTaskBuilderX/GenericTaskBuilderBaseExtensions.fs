@@ -105,7 +105,7 @@ module GenericTaskBuilderExtensionsLowPriority =
 
         [<Extension>]
         static member inline Return<'TData, 'TResult
-            when 'TData :> IGenericTaskBuilderStateMachineDataResult<'TResult>
+            when 'TData :> IGenericTaskBuilderStateMachineDataSetResult<'TResult>
             and 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>(_: GenericTaskBuilder2Core<ReturnExtensions>, value: 'TResult) =
             ResumableCode<'TData, 'TResult>(fun sm ->
                 sm.Data.SetResult(value)
@@ -138,7 +138,8 @@ module GenericTaskBuilder2ExtensionsHighPriority =
     [<AbstractClass; Sealed; Extension>]
     type GenericTaskBuilder2BasicBindExtensionsHighPriorityImpl() =
 
-        static member BindDynamic<'TData, 'TResult1, 'TResult2 when 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>
+        static member BindDynamic<'TData, 'TResult1, 'TResult2
+            when 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>
             (sm: byref<ResumableStateMachine<'TData>>, task: Task<'TResult1>, continuation: 'TResult1 -> ResumableCode<'TData, 'TResult2>) : bool =
             if sm.Data.CheckCanContinueOrThrow() then
                 let mutable awaiter = task.GetAwaiter()

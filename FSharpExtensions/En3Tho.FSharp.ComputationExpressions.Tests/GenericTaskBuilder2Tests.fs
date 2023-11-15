@@ -574,47 +574,232 @@ let ``test that activity task returns provided activity as state and stops provi
     Assert.True(testActivity.Status = ActivityStatusCode.Ok)
 }
 
-//[<Fact>]
+[<Fact>]
 let ``test that synccontext task works for default sync context``() = task {
+
+    let testSyncContext = SynchronizationContext.Current
+    // make sure we have a test sync context here
+    Assert.True(not (Object.ReferenceEquals(null, testSyncContext)))
+
     // default is sending to the thread pool
     let syncContext = SynchronizationContext()
     let sncTask = syncCtxTask(syncContext)
+
     let! x = sncTask {
-        let currentCtx = SynchronizationContext.Current
-        // threadpool threads should have no ctx context
-        Assert.Equal(null, currentCtx)
+        // assert we've jumped
+        Assert.False(Object.ReferenceEquals(testSyncContext, SynchronizationContext.Current))
+        Assert.Equal(null, SynchronizationContext.Current)
+
+        do! Task.Delay(1)
+        Assert.Equal(null, SynchronizationContext.Current)
         return 1
     }
+
     Assert.Equal(1, x)
 }
 
-//[<Fact>]
-let ``test that synccontext task works for custom syn context``() = task {
-    let collection = List()
-    let mutable spinThread = true
+type BoolBox() =
+    let mutable value = true
+    member _.Value = value
 
-    let syncContext = {
+    interface IDisposable with
+        member _.Dispose() = value <- false
+
+[<Fact>]
+let ``test that synccontext task works for custom sync context``() = task {
+
+    let collection = Queue()
+
+    use spinThead = BoolBox()
+
+    let singleThreadSyncContext = {
         new SynchronizationContext() with
-            member _.Post(cb, o) = collection.Add((cb, o))
+            member _.Post(cb, o) = collection.Enqueue((cb, o))
     }
 
     let th = Thread(fun() ->
-        while spinThread do
+        SynchronizationContext.SetSynchronizationContext(singleThreadSyncContext)
+        while spinThead.Value do
             Thread.Sleep(1)
-            let cb, o = collection[0]
-            collection.RemoveAt(0)
-            cb.Invoke(o)
-        )
+            match collection.TryDequeue() with
+            | true, (cb, o) ->
+                cb.Invoke(o)
+            | _ ->
+                ()
+    )
 
     th.Start()
 
-    let sncTask = syncCtxTask(syncContext)
+    let sncTask = syncCtxTask(singleThreadSyncContext)
+
+    let testSyncContext = SynchronizationContext.Current
+
+    let _ = sncTask {
+        Assert.True(Object.ReferenceEquals(singleThreadSyncContext, SynchronizationContext.Current))
+    }
+
+    // test that snc task does not change the context just by the fact of running
+    Assert.True(Object.ReferenceEquals(testSyncContext, SynchronizationContext.Current))
+
     let! x = sncTask {
-        let currentCtx = SynchronizationContext.Current
-        Assert.True(Object.ReferenceEquals(syncContext, currentCtx))
+        Assert.True(Object.ReferenceEquals(singleThreadSyncContext, SynchronizationContext.Current))
+        do! Task.Delay(5)
+        Assert.True(Object.ReferenceEquals(singleThreadSyncContext, SynchronizationContext.Current))
         return 1
     }
 
     Assert.Equal(1, x)
-    spinThread <- false
+}
+
+[<Fact>]
+let ``test that synccontext task works for multiple custom sync contexts``() = task {
+
+    use spinThead = BoolBox()
+    let collection1 = Queue()
+
+    let singleThreadSyncContext1 = {
+        new SynchronizationContext() with
+            member _.Post(cb, o) = collection1.Enqueue((cb, o))
+    }
+
+    let th1 = Thread(fun() ->
+        SynchronizationContext.SetSynchronizationContext(singleThreadSyncContext1)
+        while spinThead.Value do
+            Thread.Sleep(1)
+            match collection1.TryDequeue() with
+            | true, (cb, o) ->
+                cb.Invoke(o)
+            | _ ->
+                ()
+    )
+
+    let collection2 = Queue()
+
+    let singleThreadSyncContext2 = {
+        new SynchronizationContext() with
+            member _.Post(cb, o) = collection2.Enqueue((cb, o))
+    }
+
+    let th2 = Thread(fun() ->
+        SynchronizationContext.SetSynchronizationContext(singleThreadSyncContext2)
+        while spinThead.Value do
+            Thread.Sleep(1)
+            match collection2.TryDequeue() with
+            | true, (cb, o) ->
+                cb.Invoke(o)
+            | _ ->
+                ()
+    )
+
+    th1.Start()
+    th2.Start()
+
+    let sncTask1 = syncCtxTask(singleThreadSyncContext1)
+    let sncTask2 = syncCtxTask(singleThreadSyncContext2)
+
+    let! x = sncTask1 {
+        Assert.True(Object.ReferenceEquals(singleThreadSyncContext1, SynchronizationContext.Current))
+        do! Task.Delay(5)
+        Assert.True(Object.ReferenceEquals(singleThreadSyncContext1, SynchronizationContext.Current))
+
+        let! y = sncTask2 {
+            Assert.True(Object.ReferenceEquals(singleThreadSyncContext2, SynchronizationContext.Current))
+            do! Task.Delay(5)
+            Assert.True(Object.ReferenceEquals(singleThreadSyncContext2, SynchronizationContext.Current))
+            return 1
+        }
+
+        Assert.True(Object.ReferenceEquals(singleThreadSyncContext1, SynchronizationContext.Current))
+
+        let! z = backgroundTask {
+            Assert.True(Object.ReferenceEquals(null, SynchronizationContext.Current))
+            do! Task.Delay(5)
+            Assert.True(Object.ReferenceEquals(null, SynchronizationContext.Current))
+            return 1
+        }
+
+        Assert.True(Object.ReferenceEquals(singleThreadSyncContext1, SynchronizationContext.Current))
+
+        return y + z
+    }
+
+    Assert.Equal(2, x)
+}
+
+[<AbstractClass; Sealed>]
+type TestAsyncLocal() =
+
+    [<DefaultValue(false)>]
+    static val mutable private s_X: AsyncLocal<int>
+
+    static do
+        TestAsyncLocal.s_X <- AsyncLocal()
+
+    static member X = TestAsyncLocal.s_X
+
+
+[<Fact>]
+let ``test that synccontext task propagates execution context just like default tasks``() = task {
+
+    use spinThead = BoolBox()
+
+    let collection = Queue()
+    let singleThreadSyncContext = {
+        new SynchronizationContext() with
+            member _.Post(cb, o) = collection.Enqueue((cb, o))
+    }
+
+    let th = Thread(fun() ->
+        SynchronizationContext.SetSynchronizationContext(singleThreadSyncContext)
+        while spinThead.Value do
+            Thread.Sleep(1)
+            match collection.TryDequeue() with
+            | true, (cb, o) ->
+                cb.Invoke(o)
+            | _ ->
+                ()
+    )
+
+    th.Start()
+
+    let sncTask = syncCtxTask(singleThreadSyncContext)
+
+    TestAsyncLocal.X.Value <- 1
+
+    let! y = sncTask {
+        return TestAsyncLocal.X.Value
+    }
+
+    Assert.Equal(1, y)
+
+    do! sncTask {
+        TestAsyncLocal.X.Value <- 2
+
+        do! backgroundTask {
+            do! Task.Delay(1)
+            Assert.Equal(2, TestAsyncLocal.X.Value)
+        }
+
+    }
+}
+
+// just for the reference to myself
+[<Fact>]
+let ``test that background task propagates execution context just like default tasks``() = task {
+    TestAsyncLocal.X.Value <- 1
+
+    let! y = backgroundTask {
+        return TestAsyncLocal.X.Value
+    }
+
+    Assert.Equal(1, y)
+
+    do! backgroundTask {
+        TestAsyncLocal.X.Value <- 2
+
+        do! backgroundTask {
+            do! Task.Delay(1)
+            Assert.Equal(2, TestAsyncLocal.X.Value)
+        }
+    }
 }

@@ -19,7 +19,19 @@ type [<Struct>] TaskAwaiterWrapper<'a> =
         member this.OnCompleted(continuation) = this.OnCompleted(continuation)
         member this.UnsafeOnCompleted(continuation) = this.UnsafeOnCompleted(continuation)
 
-and [<Struct>] AsyncTaskMethodBuilderWrapper<'a> =
+type [<Struct>] TaskWrapper<'a> =
+    val mutable private task: Task<'a>
+    new(task) = { task = task }
+
+    member this.GetAwaiter() = TaskAwaiterWrapper(this.task.GetAwaiter())
+
+    interface ITaskLike<TaskAwaiterWrapper<'a>, 'a> with
+        member this.GetAwaiter() = this.GetAwaiter()
+
+    interface ITaskLikeTask<Task<'a>> with
+        member this.Task = this.task
+
+type [<Struct>] AsyncTaskMethodBuilderWrapper<'a> =
     val mutable private builder: AsyncTaskMethodBuilder<'a>
     new(builder) = { builder = builder }
 
@@ -46,18 +58,6 @@ and [<Struct>] AsyncTaskMethodBuilderWrapper<'a> =
         member this.Start(stateMachine: byref<#IAsyncStateMachine>) = this.Start(&stateMachine)
         member this.Task = this.Task
 
-and [<Struct>] TaskWrapper<'a> =
-    val mutable private task: Task<'a>
-    new(task) = { task = task }
-
-    member this.GetAwaiter() = TaskAwaiterWrapper(this.task.GetAwaiter())
-
-    interface ITaskLike<TaskAwaiterWrapper<'a>, 'a> with
-        member this.GetAwaiter() = this.GetAwaiter()
-
-    interface ITaskLikeTask<Task<'a>> with
-        member this.Task = this.task
-
 type [<Struct>] TaskAwaiterWrapper(awaiter: TaskAwaiter) =
 
     member _.IsCompleted = awaiter.IsCompleted
@@ -71,7 +71,19 @@ type [<Struct>] TaskAwaiterWrapper(awaiter: TaskAwaiter) =
         member this.OnCompleted(continuation) = this.OnCompleted(continuation)
         member this.UnsafeOnCompleted(continuation) = this.UnsafeOnCompleted(continuation)
 
-and [<Struct>] AsyncTaskMethodBuilderWrapper =
+type [<Struct>] TaskWrapper =
+    val mutable private task: Task
+    new(task) = { task = task }
+
+    member this.GetAwaiter() = TaskAwaiterWrapper(this.task.GetAwaiter())
+
+    interface ITaskLike<TaskAwaiterWrapper> with
+        member this.GetAwaiter() = this.GetAwaiter()
+
+    interface ITaskLikeTask<Task> with
+        member this.Task = this.task
+
+type [<Struct>] AsyncTaskMethodBuilderWrapper =
     val mutable private builder: AsyncTaskMethodBuilder
     new(builder) = { builder = builder }
 
@@ -97,15 +109,3 @@ and [<Struct>] AsyncTaskMethodBuilderWrapper =
         member this.SetStateMachine(stateMachine) = this.SetStateMachine(stateMachine)
         member this.Start(stateMachine) = this.Start(&stateMachine)
         member this.Task = this.Task
-
-and [<Struct>] TaskWrapper =
-    val mutable private task: Task
-    new(task) = { task = task }
-
-    member this.GetAwaiter() = TaskAwaiterWrapper(this.task.GetAwaiter())
-
-    interface ITaskLike<TaskAwaiterWrapper> with
-        member this.GetAwaiter() = this.GetAwaiter()
-
-    interface ITaskLikeTask<Task> with
-        member this.Task = this.task
