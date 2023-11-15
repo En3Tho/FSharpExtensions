@@ -50,33 +50,26 @@ type [<Struct>] SyncContextTaskStateMachineDataInitializer<'TMethodBuilder, 'TAw
     and 'TTask :> ITaskLike<'TAwaiter, 'TResult>
     and 'TTask :> ITaskLikeTask<'TBuilderResult>> =
 
-    interface IGenericTaskBuilderStateMachineDataInitializer<StateMachineRefDataBase<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult, 'TBuilderResult>, SynchronizationContext, 'TBuilderResult> with
+    interface IGenericTaskBuilderStateMachineDataInitializer<StateMachineData<'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult, 'TBuilderResult>, SynchronizationContext, 'TBuilderResult> with
         static member Initialize(sm: byref<'a>, data, state) =
-            let mutable syncContextData = SyncContextData<'a, 'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult, 'TBuilderResult>()
-            data <- syncContextData
-
-            syncContextData.MethodBuilder <- 'TMethodBuilder.Create()
-            syncContextData.StateMachine <- sm
+            data.MethodBuilder <- 'TMethodBuilder.Create()
 
             let currentSyncContext = SynchronizationContext.Current
             if Object.ReferenceEquals(state, currentSyncContext) then
-                // ideally this could use struct state machine data and not ref one
-                // but I'm not sure how to do this split thingy
-                // maybe a struct field with an action will suffice?
-                syncContextData.MethodBuilder.Start(&syncContextData)
+                data.MethodBuilder.Start(&sm)
             else
                 // force state machine box creation with traditional async method builders
                 // this is a total AsyncTaskMethodBuilder implementation detail hack -_-
                 // but it will initialize task field properly
-                syncContextData.MethodBuilder.AwaitUnsafeOnCompleted(&syncContextData, &syncContextData)
-                state.Post((fun syncContextData ->
-                    let mutable syncContextData = syncContextData :?> SyncContextData<'a, 'TMethodBuilder, 'TAwaiter, 'TTask, 'TResult, 'TBuilderResult>
-                    syncContextData.Continuation.Invoke()
-                ), syncContextData)
+                let mutable fakeAwaiter = FakeAwaiter()
+                data.MethodBuilder.AwaitUnsafeOnCompleted(&fakeAwaiter, &sm)
+                state.Post((fun continuation ->
+                    (continuation :?> Action).Invoke()
+                ), fakeAwaiter.Continuation)
 
-            syncContextData.MethodBuilder.Task.Task
+            data.MethodBuilder.Task.Task
 
 type SyncContextTask(state) =
     inherit GenericTaskBuilder2WithStateBase<SynchronizationContext>(state)
     member inline this.Run([<InlineIfLambda>] code) =
-        this.RunInternal<StateMachineRefDataBase<AsyncTaskMethodBuilderWrapper<'a>,_,_,_,_>,_,_,SyncContextTaskStateMachineDataInitializer<_,_,_,_,_>>(code)
+        this.RunInternal<StateMachineData<AsyncTaskMethodBuilderWrapper<'a>,_,_,_,_>,_,_,SyncContextTaskStateMachineDataInitializer<_,_,_,_,_>>(code)
