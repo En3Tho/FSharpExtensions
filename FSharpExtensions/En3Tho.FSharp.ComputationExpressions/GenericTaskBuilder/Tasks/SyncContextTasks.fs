@@ -1,41 +1,9 @@
 ﻿namespace En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks
 
 open System
-open System.Runtime.CompilerServices
 open System.Threading
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 open Microsoft.FSharp.Core
-
-type SyncContextData<'TStateMachine, 'TMethodBuilder, 'TTask, 'TResult
-    when 'TMethodBuilder :> IAsyncMethodBuilder<'TTask, 'TResult>
-    and 'TStateMachine :> IAsyncStateMachine>() =
-        inherit StateMachineRefDataBase<'TMethodBuilder, 'TTask, 'TResult>()
-
-        [<DefaultValue(false)>]
-        val mutable StateMachine: 'TStateMachine
-
-        [<DefaultValue(false)>]
-        val mutable Continuation: Action
-
-        override this.MoveNext() = this.StateMachine.MoveNext()
-
-        interface ICriticalNotifyCompletion with
-            member this.OnCompleted(continuation) = this.Continuation <- continuation
-            member this.UnsafeOnCompleted(continuation) = this.Continuation <- continuation
-
-        interface IGenericTaskStateMachineData<StateMachineRefDataBase<'TMethodBuilder, 'TTask, 'TResult>> with
-
-            member this.CheckCanContinueOrThrow() = true
-            member this.AwaitOnCompleted(awaiter, arg) =
-                let mutable this = this
-                this.MethodBuilder.AwaitOnCompleted(&awaiter, &this)
-            member this.AwaitUnsafeOnCompleted(awaiter, arg) =
-                let mutable this = this
-                this.MethodBuilder.AwaitUnsafeOnCompleted(&awaiter, &this)
-            member this.Finish(sm) =
-                this.MethodBuilder.SetResult(this.Result)
-            member this.SetException(``exception``: exn) = this.MethodBuilder.SetException(``exception``)
-            member this.SetStateMachine(stateMachine) = this.MethodBuilder.SetStateMachine(stateMachine)
 
 type [<Struct>] SyncContextTaskStateMachineDataInitializer<'TMethodBuilder, 'TTask, 'TResult
     when 'TMethodBuilder :> IAsyncMethodBuilder<'TTask, 'TResult>
