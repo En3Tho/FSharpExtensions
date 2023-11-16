@@ -618,9 +618,12 @@ let ``test that synccontext task works for custom sync context``() = task {
 
     let! x = sncTask {
         Assert.True(Object.ReferenceEquals(singleThreadSyncContext, SynchronizationContext.Current))
-        do! Task.Delay(5)
+        let! x = task {
+            do! Task.Delay(5)
+            return 1
+        }
         Assert.True(Object.ReferenceEquals(singleThreadSyncContext, SynchronizationContext.Current))
-        return 1
+        return x
     }
 
     Assert.Equal(1, x)

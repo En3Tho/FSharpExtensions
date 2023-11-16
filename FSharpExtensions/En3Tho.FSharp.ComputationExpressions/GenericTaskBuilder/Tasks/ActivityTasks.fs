@@ -30,7 +30,12 @@ type ActivityStateCheck =
             | activity ->
                 activity.SetStatus(ActivityStatusCode.Ok).Dispose()
 
+type ActivityTaskBuilder(state) =
+    inherit GenericTaskBuilderWithStateBase<Activity>(state)
+    member inline this.Run([<InlineIfLambda>] code) =
+       this.RunInternal<StateMachineDataWithState<AsyncTaskMethodBuilderWrapper<'a, DefaultAsyncTaskMethodBuilderBehavior<_>>, ActivityStateCheck,_,_,_>,_,_, DefaultStateMachineDataWithStateInitializer<_,_,_,_,_>>(code)
+
 type ActivityValueTaskBuilder(state) =
     inherit GenericTaskBuilderWithStateBase<Activity>(state)
     member inline this.Run([<InlineIfLambda>] code) =
-       this.RunInternal<StateMachineDataWithState<AsyncValueTaskMethodBuilderWrapper<'a, DefaultAsyncValueTaskMethodBuilderBehavior<_>>, ActivityStateCheck,_,_,_>,_,_, DefaultStateMachineDataWithStateInitializer<_,_,_,_,_>>(code)
+       this.RunInternal<StateMachineDataWithState<AsyncValueTaskMethodBuilderWrapper<'a, DefaultAsyncTaskMethodBuilderBehavior<_>>, ActivityStateCheck,_,_,_>,_,_, DefaultStateMachineDataWithStateInitializer<_,_,_,_,_>>(code)

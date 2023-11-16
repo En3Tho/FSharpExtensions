@@ -11,6 +11,37 @@ open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 
 module LowPriority =
 
+    [<NoEagerConstraintApplication>]
+    let inline BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TData
+        when ^TaskLike: (member GetAwaiter: unit -> ^Awaiter)
+        and 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>
+        and ^Awaiter :> ICriticalNotifyCompletion
+        and ^Awaiter: (member get_IsCompleted: unit -> bool)
+        and ^Awaiter: (member GetResult: unit -> 'TResult1)>
+        (sm: byref<ResumableStateMachine<'TData>>,
+         task: ^TaskLike,
+         [<InlineIfLambda>] continuation: 'TResult1 -> ResumableCode<'TData, 'TResult2>)
+        : bool =
+
+        if sm.Data.CheckCanContinueOrThrow() then
+
+            let mutable awaiter = (^TaskLike: (member GetAwaiter: unit -> ^Awaiter) task)
+
+            let cont =
+                ResumptionFunc<'TData>(fun sm ->
+                   let result = (^Awaiter: (member GetResult: unit -> 'TResult1) awaiter)
+                   (continuation result).Invoke(&sm))
+
+            // shortcut to continue immediately
+            if (^Awaiter: (member get_IsCompleted: unit -> bool) awaiter) then
+                cont.Invoke(&sm)
+            else
+                sm.ResumptionDynamicInfo.ResumptionData <- (awaiter :> ICriticalNotifyCompletion)
+                sm.ResumptionDynamicInfo.ResumptionFunc <- cont
+                false
+        else
+            true
+
     type GenericTaskBuilderCore with
         member inline this.Using<'TData, 'TResult, 'TResource
             when 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>
@@ -34,49 +65,15 @@ module LowPriority =
                     ))
             )
 
-    [<AbstractClass; Sealed; Extension>]
-    type LowPriorityImpl() =
-
         [<NoEagerConstraintApplication>]
-        static member inline BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TData
-            when ^TaskLike: (member GetAwaiter: unit -> ^Awaiter)
-            and 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>
-            and ^Awaiter :> ICriticalNotifyCompletion
-            and ^Awaiter: (member get_IsCompleted: unit -> bool)
-            and ^Awaiter: (member GetResult: unit -> 'TResult1)>
-            (sm: byref<ResumableStateMachine<'TData>>,
-             task: ^TaskLike,
-             [<InlineIfLambda>] continuation: 'TResult1 -> ResumableCode<'TData, 'TResult2>)
-            : bool =
-            
-            if sm.Data.CheckCanContinueOrThrow() then
-            
-                let mutable awaiter = (^TaskLike: (member GetAwaiter: unit -> ^Awaiter) task)
-
-                let cont =
-                    ResumptionFunc<'TData>(fun sm ->
-                       let result = (^Awaiter: (member GetResult: unit -> 'TResult1) awaiter)
-                       (continuation result).Invoke(&sm))
-
-                // shortcut to continue immediately
-                if (^Awaiter: (member get_IsCompleted: unit -> bool) awaiter) then
-                    cont.Invoke(&sm)
-                else
-                    sm.ResumptionDynamicInfo.ResumptionData <- (awaiter :> ICriticalNotifyCompletion)
-                    sm.ResumptionDynamicInfo.ResumptionFunc <- cont
-                    false
-            else
-                true
-
-        [<NoEagerConstraintApplication; Extension>]
-        static member inline Bind< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TMethodBuilder, 'TData
+        member inline _.Bind<^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TMethodBuilder, 'TData
             when 'TData :> IAsyncMethodBuilderBase
             and 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>
             and ^TaskLike: (member GetAwaiter: unit -> ^Awaiter)
             and ^Awaiter :> ICriticalNotifyCompletion
             and ^Awaiter: (member get_IsCompleted: unit -> bool)
             and ^Awaiter: (member GetResult: unit -> 'TResult1)>
-            (_: GenericTaskBuilderCore, task: ^TaskLike,
+            (task: ^TaskLike,
              [<InlineIfLambda>] continuation: 'TResult1 -> ResumableCode<'TData, 'TResult2>)
             : ResumableCode<'TData, 'TResult2> =
 
@@ -99,8 +96,11 @@ module LowPriority =
                     else
                         true
                 else
-                    LowPriorityImpl.BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TData>(&sm, task, continuation)
+                    BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TData>(&sm, task, continuation)
             )
+
+    [<AbstractClass; Sealed; Extension>]
+    type LowPriorityImpl() =
 
         [<Extension>]
         static member inline Return<'TData, 'TResult
@@ -137,52 +137,12 @@ module HighPriority =
     [<AbstractClass; Sealed; Extension>]
     type HighPriorityImpl() =
 
-        static member BindDynamic<'TData, 'TResult1, 'TResult2
-            when 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>
-            (sm: byref<ResumableStateMachine<'TData>>, task: Task<'TResult1>, continuation: 'TResult1 -> ResumableCode<'TData, 'TResult2>) : bool =
-            if sm.Data.CheckCanContinueOrThrow() then
-                let mutable awaiter = task.GetAwaiter()
-
-                let cont =
-                    ResumptionFunc<'TData>(fun sm ->
-                       let result = awaiter.GetResult()
-                       (continuation result).Invoke(&sm))
-
-                if awaiter.IsCompleted then
-                    cont.Invoke(&sm)
-                else
-                    sm.ResumptionDynamicInfo.ResumptionData <- (awaiter :> ICriticalNotifyCompletion)
-                    sm.ResumptionDynamicInfo.ResumptionFunc <- cont
-                    false
-            else
-                true
-
         [<Extension>]
         static member inline Bind<'TData, 'TResult1, 'TResult2
             when 'TData :> IAsyncMethodBuilderBase
             and 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>
-            (_: GenericTaskBuilderCore, task: Task<'TResult1>, [<InlineIfLambda>] continuation: 'TResult1 -> ResumableCode<'TData, 'TResult2>) =
-            ResumableCode<'TData, 'TResult2>(fun sm ->
-                if __useResumableCode then
-                    if sm.Data.CheckCanContinueOrThrow() then
-                        let mutable awaiter = task.GetAwaiter()
-
-                        let mutable __stack_fin = true
-                        if not awaiter.IsCompleted then
-                            let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
-                            __stack_fin <- __stack_yield_fin
-
-                        if __stack_fin then
-                            let result = awaiter.GetResult()
-                            (continuation result).Invoke(&sm)
-                        else
-                            sm.Data.AwaitUnsafeOnCompleted(&awaiter, &sm)
-                            false
-                    else
-                        true
-                else
-                    HighPriorityImpl.BindDynamic(&sm, task, continuation)
-            )
+            (this: GenericTaskBuilderCore, task: Task<'TResult1>, [<InlineIfLambda>] continuation: 'TResult1 -> ResumableCode<'TData, 'TResult2>) =
+                this.Bind(TaskBindWrapper(task), continuation)
 
         [<Extension>]
         static member inline ReturnFrom(this: GenericTaskBuilderCore<ReturnExtensions>, task: Task<'TResult>) =

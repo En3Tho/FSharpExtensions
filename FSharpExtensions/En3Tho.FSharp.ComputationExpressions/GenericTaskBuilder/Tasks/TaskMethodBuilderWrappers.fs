@@ -4,34 +4,6 @@ open System.Runtime.CompilerServices
 open System.Threading.Tasks
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 
-type IAsyncTaskMethodBuilderBehavior<'TResult> =
-    static abstract SetException: builder: byref<AsyncTaskMethodBuilder<'TResult>> * ``exception``: exn -> unit
-    static abstract SetResult: builder: byref<AsyncTaskMethodBuilder<'TResult>> * result: 'TResult -> unit
-
-type IAsyncTaskMethodBuilderBehavior =
-    static abstract SetException: builder: byref<AsyncTaskMethodBuilder> * ``exception``: exn -> unit
-    static abstract SetResult: builder: byref<AsyncTaskMethodBuilder> -> unit
-
-[<Struct>]
-type DefaultAsyncTaskMethodBuilderBehavior<'TResult> =
-    interface IAsyncTaskMethodBuilderBehavior<'TResult> with
-
-        [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-        static member SetException(builder, ``exception``) = builder.SetException(``exception``)
-
-        [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-        static member SetResult(builder, result) = builder.SetResult(result)
-
-[<Struct>]
-type DefaultAsyncTaskMethodBuilderBehavior =
-    interface IAsyncTaskMethodBuilderBehavior with
-
-        [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-        static member SetException(builder, ``exception``) = builder.SetException(``exception``)
-
-        [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-        static member SetResult(builder) = builder.SetResult()
-
 type [<Struct>] AsyncTaskMethodBuilderWrapper<'TResult, 'TBehavior
     when 'TBehavior :> IAsyncTaskMethodBuilderBehavior<'TResult>> =
 

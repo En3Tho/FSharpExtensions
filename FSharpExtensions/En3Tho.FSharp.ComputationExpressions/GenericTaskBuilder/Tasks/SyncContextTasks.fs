@@ -37,7 +37,6 @@ type SyncContextData<'TStateMachine, 'TMethodBuilder, 'TTask, 'TResult
             member this.SetException(``exception``: exn) = this.MethodBuilder.SetException(``exception``)
             member this.SetStateMachine(stateMachine) = this.MethodBuilder.SetStateMachine(stateMachine)
 
-
 type [<Struct>] SyncContextTaskStateMachineDataInitializer<'TMethodBuilder, 'TTask, 'TResult
     when 'TMethodBuilder :> IAsyncMethodBuilder<'TTask, 'TResult>
     and 'TMethodBuilder :> IAsyncMethodBuilderCreator<'TMethodBuilder>> =
@@ -65,3 +64,8 @@ type SyncContextTask(state) =
     inherit GenericTaskBuilderWithStateBase<SynchronizationContext>(state)
     member inline this.Run([<InlineIfLambda>] code) =
         this.RunInternal<StateMachineData<AsyncTaskMethodBuilderWrapper<'a, DefaultAsyncTaskMethodBuilderBehavior<_>>,_,_>,_,_,SyncContextTaskStateMachineDataInitializer<_,_,_>>(code)
+
+type SyncContextValueTask(state) =
+    inherit GenericTaskBuilderWithStateBase<SynchronizationContext>(state)
+    member inline this.Run([<InlineIfLambda>] code) =
+        this.RunInternal<StateMachineData<AsyncValueTaskMethodBuilderWrapper<'a, DefaultAsyncTaskMethodBuilderBehavior<_>>,_,_>,_,_,SyncContextTaskStateMachineDataInitializer<_,_,_>>(code)

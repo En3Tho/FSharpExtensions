@@ -2,31 +2,17 @@
 
 open System
 open System.Runtime.CompilerServices
-open Microsoft.FSharp.Core.CompilerServices
+open System.Threading.Tasks
 
 type StateIntrinsic = struct end
 type BasicBindExtensions = struct end
 type YieldExtensions = struct end
 type ReturnExtensions = struct end
 
-type GetStateMachineData<'TStateMachine, 'TData> = delegate of sm: byref<'TStateMachine> -> byref<'TData>
-
-type StateMachineBox<'TStateMachine, 'TData
-    when 'TStateMachine :> IAsyncStateMachine
-    and 'TStateMachine :> IResumableStateMachine<'TData>>() =
-
-    [<DefaultValue(false)>]
-    val mutable StateMachine: 'TStateMachine
-
-    [<DefaultValue(false)>]
-    val mutable GetDataRef: GetStateMachineData<'TStateMachine, 'TData>
-
-    member this.Data: byref<'TData> =
-        &this.GetDataRef.Invoke(&this.StateMachine)
-
-    interface IAsyncStateMachine with
-        member this.MoveNext() = this.StateMachine.MoveNext()
-        member this.SetStateMachine(stateMachine) = this.StateMachine.SetStateMachine(stateMachine)
+[<Struct>]
+type TaskBindWrapper<'a>(task: Task<'a>) =
+    member this.Task = task
+    member inline this.GetAwaiter() = this.Task.GetAwaiter()
 
 [<Struct>]
 type internal FakeAwaiter =

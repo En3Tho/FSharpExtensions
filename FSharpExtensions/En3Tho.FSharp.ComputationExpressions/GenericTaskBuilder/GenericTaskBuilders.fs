@@ -15,12 +15,13 @@ do()
 let inline getState() = StateIntrinsic()
 
 let vtask = ValueTaskBuilder()
-
 let unitvtask = UnitValueTaskBuilder()
+let unittask = UnitTaskBuilder()
 
 let taskSeq = TaskSeq()
 
 let syncCtxTask ctx = SyncContextTask(ctx)
+let syncCtxValueTask ctx = SyncContextValueTask(ctx)
 
 let etask = ExnResultTaskBuilder()
 let evtask = ExnResultValueTaskBuilder()
@@ -51,5 +52,31 @@ type ActivityBuilders() =
         activityTask(activity)
 
     static member activityTask(
+        [<CallerMemberName; Optional; DefaultParameterValue("")>] activityName: string) =
+        activityTask(ActivityKind.Internal, activityName)
+
+    static member activityValueTask(activity) = ActivityValueTaskBuilder(activity)
+
+    static member activityValueTask(
+        source: ActivitySource,
+        [<Optional; DefaultParameterValue(ActivityKind.Internal)>] kind: ActivityKind,
+        [<CallerMemberName; Optional; DefaultParameterValue("")>] activityName: string) =
+
+        let activity = source.StartActivity(activityName, kind)
+        activityTask(activity)
+
+    static member activityValueTask(
+        kind: ActivityKind,
+        [<CallerMemberName; Optional; DefaultParameterValue("")>] activityName: string) =
+
+        let activity =
+            match Activity.Current with
+            | null -> null
+            | activity ->
+                activity.Source.StartActivity(activityName, kind)
+
+        activityTask(activity)
+
+    static member activityValueTask(
         [<CallerMemberName; Optional; DefaultParameterValue("")>] activityName: string) =
         activityTask(ActivityKind.Internal, activityName)

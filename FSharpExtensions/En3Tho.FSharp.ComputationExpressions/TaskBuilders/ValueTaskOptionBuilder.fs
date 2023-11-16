@@ -43,6 +43,11 @@ type ValueTaskValueOptionBuilderBase() =
             sm.Data.Result <- ValueSome value
             true)
 
+    member inline _.ReturnOption (value) : ValueTaskValueOptionCode<'T, 'T> =
+        ValueTaskValueOptionCode<'T, _>(fun sm ->
+            sm.Data.Result <- value
+            true)
+
     /// Chains together a step with its following step.
     /// Note that this requires that the first step has no result.
     /// This prevents constructs like `task { return 1; return 2; }`.
