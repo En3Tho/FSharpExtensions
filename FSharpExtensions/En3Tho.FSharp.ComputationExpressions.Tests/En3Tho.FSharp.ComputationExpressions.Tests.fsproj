@@ -16,6 +16,7 @@
         <Compile Include="TryExprBuilderTests.fs" />
         <Compile Include="GenericTaskBuilderTests.fs" />
         <Compile Include="TaskResultOverloadingTests.fs" />
+        <Compile Include="CancellableTaskTests.fs" />
     </ItemGroup>
 
     <ItemGroup>

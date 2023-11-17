@@ -6,6 +6,7 @@ open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
 
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
+open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.CancellableTask
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.Native
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.AsyncEnumerable
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ActivityTask
@@ -57,10 +58,13 @@ let resultValueTask = ResultValueTaskBuilder()
 let voptionTask = ValueOptionTaskBuilder()
 let voptionValueTask = ValueOptionValueTaskBuilder()
 
+let cancellableTask(cancellationToken) = CancellableTaskBuilder(cancellationToken)
+let cancellableValueTask(cancellationToken) = CancellableValueTaskBuilder(cancellationToken)
+
 [<AbstractClass; Sealed; AutoOpen>]
 type ActivityBuilders() =
 
-    static member activityTask(activity) = ActivityValueTaskBuilder(activity)
+    static member activityTask(activity) = ActivityTaskBuilder(activity)
 
     static member activityTask(
         source: ActivitySource,

@@ -188,7 +188,7 @@ let inline Combine<'TData, 'TResult when 'TData :> IStateMachineDataWithCheck<'T
             let __stack_fin = code1.Invoke(&sm)
 
             if __stack_fin then
-                if sm.Data.CheckCanContinueOrThrow() then // TODO: fix awaits, change this
+                if sm.Data.CheckCanContinueOrThrow() then
                     code2.Invoke(&sm)
                 else
                     true
@@ -425,25 +425,23 @@ let inline BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TData
      task: ^TaskLike,
      [<InlineIfLambda>] continuation: 'TResult1 -> ResumableCode<'TData, 'TResult2>)
     : bool =
-
-    if sm.Data.CheckCanContinueOrThrow() then
-
         let mutable awaiter = (^TaskLike: (member GetAwaiter: unit -> ^Awaiter) task)
 
         let cont =
             ResumptionFunc<'TData>(fun sm ->
-               let result = (^Awaiter: (member GetResult: unit -> 'TResult1) awaiter)
-               (continuation result).Invoke(&sm))
+                let result = (^Awaiter: (member GetResult: unit -> 'TResult1) awaiter)
+                if sm.Data.CheckCanContinueOrThrow() then
+                    (continuation result).Invoke(&sm)
+                else
+                    true
+            )
 
-        // shortcut to continue immediately
         if (^Awaiter: (member get_IsCompleted: unit -> bool) awaiter) then
             cont.Invoke(&sm)
         else
             sm.ResumptionDynamicInfo.ResumptionData <- (awaiter :> ICriticalNotifyCompletion)
             sm.ResumptionDynamicInfo.ResumptionFunc <- cont
             false
-    else
-        true
 
 [<NoEagerConstraintApplication>]
 let inline Bind< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TData, 'TDataResult
@@ -459,22 +457,22 @@ let inline Bind< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TData, 'TDataResult
 
     ResumableCode<'TData, 'TResult2>(fun sm ->
         if __useResumableCode then
-            if sm.Data.CheckCanContinueOrThrow() then
-                let mutable awaiter = (^TaskLike: (member GetAwaiter: unit -> ^Awaiter) task)
+            let mutable awaiter = (^TaskLike: (member GetAwaiter: unit -> ^Awaiter) task)
 
-                let mutable __stack_fin = true
-                if not (^Awaiter: (member get_IsCompleted: unit -> bool) awaiter) then
-                    let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
-                    __stack_fin <- __stack_yield_fin
+            let mutable __stack_fin = true
+            if not (^Awaiter: (member get_IsCompleted: unit -> bool) awaiter) then
+                let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
+                __stack_fin <- __stack_yield_fin
 
-                if __stack_fin then
-                    let result = (^Awaiter: (member GetResult: unit -> 'TResult1) awaiter)
+            if __stack_fin then
+                let result = (^Awaiter: (member GetResult: unit -> 'TResult1) awaiter)
+                if sm.Data.CheckCanContinueOrThrow() then
                     (continuation result).Invoke(&sm)
                 else
-                    sm.Data.AwaitUnsafeOnCompleted(&awaiter, &sm)
-                    false
+                    true
             else
-                true
+                sm.Data.AwaitUnsafeOnCompleted(&awaiter, &sm)
+                false
         else
             BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TData>(&sm, task, continuation)
     )
