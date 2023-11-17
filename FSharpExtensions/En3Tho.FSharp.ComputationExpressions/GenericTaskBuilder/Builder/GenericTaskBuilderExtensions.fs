@@ -16,7 +16,7 @@ module Low =
             when 'TData :> IStateMachineDataWithCheck<'TData>
             and 'TResource :> IDisposable>
             (resource: 'TResource, [<InlineIfLambda>] body: 'TResource -> ResumableCode<'TData, 'TResult>) =
-            ResumableCode.Using(resource, (fun resource -> ResumableCode<'TData, 'TResult>(fun sm ->
+            ResumableCodeHelpers.Using(resource, (fun resource -> ResumableCode<'TData, 'TResult>(fun sm ->
                 if sm.Data.CheckCanContinueOrThrow() then
                     (body(resource)).Invoke(&sm)
                 else

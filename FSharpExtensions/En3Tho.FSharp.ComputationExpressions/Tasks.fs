@@ -37,6 +37,9 @@ do()
 
 let inline getState() = StateIntrinsic()
 
+// expected warning for builders, should be only respected when actual state machine is not generated
+#nowarn "3511"
+
 let vtask = ValueTaskBuilder()
 let uvtask = UnitValueTaskBuilder()
 let utask = UnitTaskBuilder()

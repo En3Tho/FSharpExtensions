@@ -218,6 +218,33 @@ let rec TryFinallyCompensateDynamic
 
         false
 
+let rec TryFinallyAsyncDynamicUsing<'TData, 'TResult
+    when 'TData :> IStateMachineDataWithCheck<'TData>>
+        (
+            sm: byref<ResumableStateMachine<'TData>>,
+            body: ResumableCode<'TData, 'TResult>,
+            compensation: ResumableCode<'TData, unit>
+        ) : bool =
+            let mutable fin = false
+            let mutable savedExn = None
+
+            try
+                fin <- sm.Data.CheckCanContinueOrThrow() && body.Invoke(&sm)
+            with exn ->
+                savedExn <- Some exn
+                fin <- true
+
+            if fin then
+                TryFinallyCompensateDynamic(&sm, ResumptionFunc<'TData>(fun sm -> compensation.Invoke(&sm)), savedExn)
+            else
+                let rf = sm.ResumptionDynamicInfo.ResumptionFunc
+
+                sm.ResumptionDynamicInfo.ResumptionFunc <-
+                    (ResumptionFunc<'TData>(fun sm ->
+                        TryFinallyAsyncDynamicUsing(&sm, ResumableCode<'TData, 'TResult>(fun sm -> rf.Invoke(&sm)), compensation)))
+
+                false
+
 let rec TryFinallyAsyncDynamic<'TData, 'TResult
     when 'TData :> IStateMachineDataWithCheck<'TData>>
         (
@@ -248,7 +275,7 @@ let rec TryFinallyAsyncDynamic<'TData, 'TResult
         else
             true
 
-let inline TryFinallyAsyncEx<'TData, 'TResult
+let inline TryFinallyAsyncUsingImpl<'TData, 'TResult
     when 'TData :> IAsyncMethodBuilderBase
     and 'TData :> IStateMachineDataWithCheck<'TData>>
     (
@@ -257,39 +284,39 @@ let inline TryFinallyAsyncEx<'TData, 'TResult
     ) : ResumableCode<'TData, 'TResult> =
     ResumableCode<'TData, 'TResult>(fun sm ->
         if __useResumableCode then
-            if sm.Data.CheckCanContinueOrThrow() then
-                let mutable __stack_fin = false
-                let mutable __stack_exn = Unchecked.defaultof<_>
+            let mutable __stack_fin = false
+            let mutable savedExn = Unchecked.defaultof<_>
 
-                try
+            try
+                if sm.Data.CheckCanContinueOrThrow() then
                     let __stack_body_fin = body.Invoke(&sm)
                     __stack_fin <- __stack_body_fin
-                with exn ->
-                    __stack_exn <- exn
+                else
                     __stack_fin <- true
+            with exn ->
+                savedExn <- exn
+                __stack_fin <- true
 
-                if __stack_fin then
-                    let __stack_compensation_fin = compensation.Invoke(&sm)
-                    __stack_fin <- __stack_compensation_fin
+            if __stack_fin then
+                let __stack_compensation_fin = compensation.Invoke(&sm)
+                __stack_fin <- __stack_compensation_fin
 
-                if __stack_fin then
-                    match __stack_exn with
-                    | null -> ()
-                    | exn -> ExceptionDispatchInfo.Throw(exn)
+            if __stack_fin then
+                match savedExn with
+                | null -> ()
+                | exn -> ExceptionDispatchInfo.Throw(exn)
 
-                __stack_fin
-            else
-                true
+            __stack_fin
         else
-            TryFinallyAsyncDynamic(&sm, body, compensation))
+            TryFinallyAsyncDynamicUsing(&sm, body, compensation))
 
-let inline TryFinallyAsync<'TData, 'TResult
+let inline TryFinallyAsyncUsing<'TData, 'TResult
     when 'TData :> IAsyncMethodBuilderBase
     and 'TData :> IStateMachineDataWithCheck<'TData>>(
     [<InlineIfLambda>] body: ResumableCode<'TData, 'TResult>,
     [<InlineIfLambda>] compensation: unit -> ValueTask)
     : ResumableCode<'TData, 'TResult> =
-    TryFinallyAsyncEx(body, ResumableCode(fun sm ->
+    TryFinallyAsyncUsingImpl(body, ResumableCode(fun sm ->
         if __useResumableCode then
             let mutable __stack_condition_fin = true
             let __stack_vtask = compensation()
@@ -347,17 +374,40 @@ let inline TryFinally<'TData, 'TResult when 'TData :> IStateMachineDataWithCheck
         else
             TryFinallyAsyncDynamic(&sm, body, ResumableCode<_, _>(fun sm -> compensation.Invoke(&sm))))
 
+let inline TryFinallyUsing<'TData, 'TResult when 'TData :> IStateMachineDataWithCheck<'TData>>
+    ([<InlineIfLambda>] body: ResumableCode<'TData, 'TResult>, [<InlineIfLambda>] compensation: ResumableCode<'TData, unit>) =
+    ResumableCode<'TData, 'TResult>(fun sm ->
+        if __useResumableCode then
+            let mutable __stack_fin = false
+
+            try
+                if sm.Data.CheckCanContinueOrThrow() then
+                    let __stack_body_fin = body.Invoke(&sm)
+                    __stack_fin <- __stack_body_fin
+                else
+                    __stack_fin <- true
+            with _exn ->
+                let __stack_ignore = compensation.Invoke(&sm)
+                reraise ()
+
+            if __stack_fin then
+                let __stack_ignore = compensation.Invoke(&sm)
+                ()
+
+            __stack_fin
+        else
+            TryFinallyAsyncDynamicUsing(&sm, body, ResumableCode<_, _>(fun sm -> compensation.Invoke(&sm))))
+
 let inline Using
     (
         resource: 'Resource,
         [<InlineIfLambda>] body: 'Resource -> ResumableCode<'TData, 'TResult>
     ) : ResumableCode<'TData, 'TResult> when 'Resource :> IDisposable =
-    TryFinally(
+    TryFinallyUsing(
         ResumableCode<'TData, 'TResult>(fun sm -> (body resource).Invoke(&sm)),
         ResumableCode<'TData, unit>(fun sm ->
             if not (isNull (box resource)) then
                 resource.Dispose()
-
             true)
     )
     

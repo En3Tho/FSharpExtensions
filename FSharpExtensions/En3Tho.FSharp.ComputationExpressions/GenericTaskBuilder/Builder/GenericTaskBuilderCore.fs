@@ -65,7 +65,7 @@ type GenericTaskBuilderCore() =
         resource: 'TResource,
         [<InlineIfLambda>] body: 'TResource -> ResumableCode<'TData, 'TResult>)
         : ResumableCode<'TData, 'TResult> =
-        ResumableCodeHelpers.TryFinallyAsync<'TData, 'TResult>(
+        ResumableCodeHelpers.TryFinallyAsyncUsing<'TData, 'TResult>(
             ResumableCode<'TData, 'TResult>(fun sm -> (body resource).Invoke(&sm)),
             (fun () ->
                 if not (isNull (box resource)) then
