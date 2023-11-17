@@ -8,7 +8,7 @@ open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 open Microsoft.FSharp.Core.CompilerServices
 open Microsoft.FSharp.Core.CompilerServices.StateMachineHelpers
 
-let rec WhileDynamic<'TData when 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>
+let rec WhileDynamic<'TData when 'TData :> IStateMachineDataWithCheck<'TData>>
     (
         sm: byref<ResumableStateMachine<'TData>>,
         condition: unit -> bool,
@@ -49,7 +49,7 @@ and WhileBodyDynamicAux
 
 let rec WhileDynamicAsync<'TData
         when 'TData :> IAsyncMethodBuilderBase
-        and 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>
+        and 'TData :> IStateMachineDataWithCheck<'TData>>
     (
         sm: byref<ResumableStateMachine<'TData>>,
         condition: unit -> ValueTask<bool>,
@@ -99,7 +99,7 @@ and WhileBodyDynamicAuxAsync
             ResumptionFunc(fun sm -> WhileBodyDynamicAuxAsync(&sm, condition, body, rf))
         false
 
-let inline While<'TData when 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>
+let inline While<'TData when 'TData :> IStateMachineDataWithCheck<'TData>>
     (
         [<InlineIfLambda>] condition: unit -> bool,
         body: ResumableCode<'TData, unit>
@@ -118,7 +118,7 @@ let inline While<'TData when 'TData :> IGenericTaskStateMachineDataWithCheck<'TD
 
 let inline WhileAsync<'TData
     when 'TData :> IAsyncMethodBuilderBase
-    and 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>
+    and 'TData :> IStateMachineDataWithCheck<'TData>>
     (
         [<InlineIfLambda>] condition: unit -> ValueTask<bool>,
         [<InlineIfLambda>] body: ResumableCode<'TData, unit>
@@ -158,7 +158,7 @@ let inline WhileAsync<'TData
         else
             WhileDynamicAsync(&sm, condition, body))
     
-let CombineDynamic<'TData, 'TResult when 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>
+let CombineDynamic<'TData, 'TResult when 'TData :> IStateMachineDataWithCheck<'TData>>
     (
         sm: byref<ResumableStateMachine<'TData>>,
         code1: ResumableCode<'TData, unit>,
@@ -181,7 +181,7 @@ let CombineDynamic<'TData, 'TResult when 'TData :> IGenericTaskStateMachineDataW
             sm.ResumptionDynamicInfo.ResumptionFunc <- (resume (sm.ResumptionDynamicInfo.ResumptionFunc))
             false
 
-let inline Combine<'TData, 'TResult when 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>
+let inline Combine<'TData, 'TResult when 'TData :> IStateMachineDataWithCheck<'TData>>
     (code1: ResumableCode<'TData, unit>, code2: ResumableCode<'TData, 'TResult>) : ResumableCode<'TData, 'TResult> =
     ResumableCode<'TData, 'TResult>(fun sm ->
         if __useResumableCode then
@@ -219,7 +219,7 @@ let rec TryFinallyCompensateDynamic
         false
 
 let rec TryFinallyAsyncDynamic<'TData, 'TResult
-    when 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>
+    when 'TData :> IStateMachineDataWithCheck<'TData>>
         (
             sm: byref<ResumableStateMachine<'TData>>,
             body: ResumableCode<'TData, 'TResult>,
@@ -250,7 +250,7 @@ let rec TryFinallyAsyncDynamic<'TData, 'TResult
 
 let inline TryFinallyAsyncEx<'TData, 'TResult
     when 'TData :> IAsyncMethodBuilderBase
-    and 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>
+    and 'TData :> IStateMachineDataWithCheck<'TData>>
     (
         body: ResumableCode<'TData, 'TResult>,
         compensation: ResumableCode<'TData, unit>
@@ -285,7 +285,7 @@ let inline TryFinallyAsyncEx<'TData, 'TResult
 
 let inline TryFinallyAsync<'TData, 'TResult
     when 'TData :> IAsyncMethodBuilderBase
-    and 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>(
+    and 'TData :> IStateMachineDataWithCheck<'TData>>(
     [<InlineIfLambda>] body: ResumableCode<'TData, 'TResult>,
     [<InlineIfLambda>] compensation: unit -> ValueTask)
     : ResumableCode<'TData, 'TResult> =
@@ -323,7 +323,7 @@ let inline TryFinallyAsync<'TData, 'TResult
                 false
         ))
 
-let inline TryFinally<'TData, 'TResult when 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>
+let inline TryFinally<'TData, 'TResult when 'TData :> IStateMachineDataWithCheck<'TData>>
     ([<InlineIfLambda>] body: ResumableCode<'TData, 'TResult>, [<InlineIfLambda>] compensation: ResumableCode<'TData, unit>) =
     ResumableCode<'TData, 'TResult>(fun sm ->
         if __useResumableCode then
@@ -361,7 +361,7 @@ let inline Using
             true)
     )
     
-let rec TryWithDynamic<'TData, 'TResult when 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>
+let rec TryWithDynamic<'TData, 'TResult when 'TData :> IStateMachineDataWithCheck<'TData>>
     (
         sm: byref<ResumableStateMachine<'TData>>,
         body: ResumableCode<'TData, 'TResult>,
@@ -384,7 +384,7 @@ let rec TryWithDynamic<'TData, 'TResult when 'TData :> IGenericTaskStateMachineD
         else
             true
 
-let inline TryWith<'TData, 'TResult when 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>
+let inline TryWith<'TData, 'TResult when 'TData :> IStateMachineDataWithCheck<'TData>>
     (
         body: ResumableCode<'TData, 'TResult>,
         catch: exn -> ResumableCode<'TData, 'TResult>
@@ -417,7 +417,7 @@ let inline TryWith<'TData, 'TResult when 'TData :> IGenericTaskStateMachineDataW
 [<NoEagerConstraintApplication>]
 let inline BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TData
     when ^TaskLike: (member GetAwaiter: unit -> ^Awaiter)
-    and 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>
+    and 'TData :> IStateMachineDataWithCheck<'TData>
     and ^Awaiter :> ICriticalNotifyCompletion
     and ^Awaiter: (member get_IsCompleted: unit -> bool)
     and ^Awaiter: (member GetResult: unit -> 'TResult1)>
@@ -448,7 +448,7 @@ let inline BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TData
 [<NoEagerConstraintApplication>]
 let inline Bind< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TData, 'TDataResult
     when 'TData :> IAsyncMethodBuilderBase
-    and 'TData :> IGenericTaskStateMachineData<'TData, 'TDataResult>
+    and 'TData :> IStateMachineData<'TData, 'TDataResult>
     and ^TaskLike: (member GetAwaiter: unit -> ^Awaiter)
     and ^Awaiter :> ICriticalNotifyCompletion
     and ^Awaiter: (member get_IsCompleted: unit -> bool)

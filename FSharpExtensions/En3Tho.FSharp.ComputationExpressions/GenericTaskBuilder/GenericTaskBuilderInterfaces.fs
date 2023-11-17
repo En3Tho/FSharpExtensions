@@ -39,7 +39,7 @@ type IAsyncMethodBuilder<'TTask, 'TResult> =
     abstract SetResult: data: 'TResult -> unit
     abstract Task: 'TTask
 
-type IGenericTaskStateMachineDataInitializer<'TData, 'TState, 'TBuilderResult> =
+type IStateMachineDataInitializer<'TData, 'TState, 'TBuilderResult> =
     static abstract Initialize<'TStateMachine, 'TData, 'TState when 'TStateMachine :> IAsyncStateMachine and 'TStateMachine :> IResumableStateMachine<'TData>>
         : stateMachine: byref<'TStateMachine> * data: byref<'TData> * state: 'TState  -> 'TBuilderResult
 
@@ -54,39 +54,38 @@ type IStateCheck<'TState> =
     static abstract CanProcessSuccess: bool
     static abstract ProcessSuccess: state: byref<'TState> -> unit
 
-type IGenericTaskStateMachineDataWithCheck<'TData> =
+type IStateMachineDataWithCheck<'TData> =
     abstract CheckCanContinueOrThrow: unit -> bool
 
-type IGenericTaskStateMachineData<'TData, 'TResult when 'TData :> IGenericTaskStateMachineData<'TData, 'TResult>> =
-    inherit IGenericTaskStateMachineDataWithCheck<'TData>
+type IStateMachineData<'TData, 'TResult when 'TData :> IStateMachineData<'TData, 'TResult>> =
+    inherit IStateMachineDataWithCheck<'TData>
     inherit IAsyncMethodBuilderBase
     abstract Finish<'TStateMachine when 'TStateMachine :> IAsyncStateMachine> : sm: byref<'TStateMachine> -> unit
     abstract SetException: ``exception``: Exception -> unit
     abstract SetResult: result: 'TResult -> unit
 
-type IGenericTaskStateMachineDataGetResult<'TData, 'TResult
-    when 'TData :> IGenericTaskStateMachineDataGetResult<'TData, 'TResult>> =
+type IStateMachineDataGetResult<'TData, 'TResult
+    when 'TData :> IStateMachineDataGetResult<'TData, 'TResult>> =
     abstract GetResult: unit -> 'TResult
 
-type IGenericTaskStateMachineDataWithState<'TData, 'TState
-    when 'TData :> IGenericTaskStateMachineDataWithState<'TData, 'TState>> =
+type IStateMachineDataWithState<'TData, 'TState
+    when 'TData :> IStateMachineDataWithState<'TData, 'TState>> =
     abstract State: 'TState
 
-type IGenericTaskStateMachineDataYield<'TData, 'TResult
-    when 'TData :> IGenericTaskStateMachineDataYield<'TData, 'TResult>> =
-    inherit IGenericTaskStateMachineData<'TData, 'TResult>
-    inherit IGenericTaskStateMachineDataGetResult<'TData, 'TResult>
+type IStateMachineDataYield<'TData, 'TResult
+    when 'TData :> IStateMachineDataYield<'TData, 'TResult>> =
+    inherit IStateMachineData<'TData, 'TResult>
+    inherit IStateMachineDataGetResult<'TData, 'TResult>
 
     abstract MoveNextAsync: unit -> ValueTask<bool>
     abstract Dispose: unit -> ValueTask
 
-
-module GenericTaskBuilderStateMachineData =
-    let inline getResult<'TData, 'TResult when 'TData :> IGenericTaskStateMachineDataGetResult<'TData, 'TResult>>(data: 'TData) =
+module StateMachineData =
+    let inline getResult<'TData, 'TResult when 'TData :> IStateMachineDataGetResult<'TData, 'TResult>>(data: 'TData) =
         data.GetResult()
 
-    let inline moveNext<'TData, 'TResult when 'TData :> IGenericTaskStateMachineDataYield<'TData, 'TResult>>(data: 'TData) =
+    let inline moveNext<'TData, 'TResult when 'TData :> IStateMachineDataYield<'TData, 'TResult>>(data: 'TData) =
         data.MoveNextAsync()
 
-    let inline dispose<'TData, 'TResult when 'TData :> IGenericTaskStateMachineDataYield<'TData, 'TResult>>(data: 'TData) =
+    let inline dispose<'TData, 'TResult when 'TData :> IStateMachineDataYield<'TData, 'TResult>>(data: 'TData) =
         data.Dispose()

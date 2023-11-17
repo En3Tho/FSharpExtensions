@@ -10,7 +10,7 @@ type [<Struct>] SyncContextTaskStateMachineDataInitializer<'TMethodBuilder, 'TTa
     when 'TMethodBuilder :> IAsyncMethodBuilder<'TTask, 'TResult>
     and 'TMethodBuilder :> IAsyncMethodBuilderCreator<'TMethodBuilder>> =
 
-    interface IGenericTaskStateMachineDataInitializer<StateMachineData<'TMethodBuilder, 'TTask, 'TResult>, SynchronizationContext, 'TTask> with
+    interface IStateMachineDataInitializer<StateMachineData<'TMethodBuilder, 'TTask, 'TResult>, SynchronizationContext, 'TTask> with
         static member Initialize(sm: byref<'a>, data, state) =
             data.MethodBuilder <- 'TMethodBuilder.Create()
 

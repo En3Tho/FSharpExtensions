@@ -23,7 +23,7 @@ module TaskLikeLow =
     type OptionTaskBuilderBase with
 
         member inline this.Return<'TData, 'TResult
-            when 'TData :> IGenericTaskStateMachineData<'TData, ValueOption<'TResult>>>(value: 'TResult) =
+            when 'TData :> IStateMachineData<'TData, ValueOption<'TResult>>>(value: 'TResult) =
             ResumableCode<'TData, ValueOption<'TResult>>(fun sm ->
                 sm.Data.SetResult(ValueSome value)
                 true
@@ -58,7 +58,7 @@ module TaskLikeHighValueOption =
             this.Bind(taskLike, fun v -> this.Return(v))
 
         member inline this.Bind<'TResult1, 'TResult2, ^Awaiter, 'TData, 'TResult
-            when 'TData :> IGenericTaskStateMachineData<'TData, ValueOption<'TResult>>>
+            when 'TData :> IStateMachineData<'TData, ValueOption<'TResult>>>
             (result: ValueOption<'TResult1>, [<InlineIfLambda>] continuation: 'TResult1 -> ResumableCode<'TData, 'TResult2>) =
             ResumableCode<'TData, 'TResult2>(fun sm ->
                 match result with
@@ -70,7 +70,7 @@ module TaskLikeHighValueOption =
             )
 
         member inline this.ReturnFrom<'TData, 'TResult
-            when 'TData :> IGenericTaskStateMachineData<'TData, ValueOption<'TResult>>>(result: ValueOption<'TResult>) =
+            when 'TData :> IStateMachineData<'TData, ValueOption<'TResult>>>(result: ValueOption<'TResult>) =
             ResumableCode<'TData, ValueOption<'TResult>>(fun sm ->
                 sm.Data.SetResult(result)
                 true
@@ -98,7 +98,7 @@ module TaskLikeHighOption =
             this.Bind(taskLike, fun v -> this.Return(v))
 
         member inline this.Bind<'TResult1, 'TResult2, ^Awaiter, 'TData, 'TResult
-            when 'TData :> IGenericTaskStateMachineData<'TData, Option<'TResult>>>
+            when 'TData :> IStateMachineData<'TData, Option<'TResult>>>
             (result: Option<'TResult1>, [<InlineIfLambda>] continuation: 'TResult1 -> ResumableCode<'TData, 'TResult2>) =
             ResumableCode<'TData, 'TResult2>(fun sm ->
                 match result with
@@ -110,7 +110,7 @@ module TaskLikeHighOption =
             )
 
         member inline this.ReturnFrom<'TData, 'TResult
-            when 'TData :> IGenericTaskStateMachineData<'TData, Option<'TResult>>>(result: Option<'TResult>) =
+            when 'TData :> IStateMachineData<'TData, Option<'TResult>>>(result: Option<'TResult>) =
             ResumableCode<'TData, Option<'TResult>>(fun sm ->
                 sm.Data.SetResult(result)
                 true

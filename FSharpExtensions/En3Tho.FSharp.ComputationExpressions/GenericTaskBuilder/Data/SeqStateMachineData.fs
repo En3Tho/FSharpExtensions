@@ -62,7 +62,7 @@ and [<AbstractClass>] GenericTaskSeqAsyncEnumerableBase<'TMethodBuilder, 'TResul
     when 'TMethodBuilder :> IAsyncIteratorMethodBuilder>() =
 #else
 type [<AbstractClass>] GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer
-    when 'TInitializer :> IGenericTaskStateMachineDataInitializer<GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>, unit, IAsyncEnumerable<'TResult>>
+    when 'TInitializer :> IStateMachineDataInitializer<GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>, unit, IAsyncEnumerable<'TResult>>
     and 'TMethodBuilder :> IAsyncIteratorMethodBuilder>() =
 #endif
 
@@ -81,7 +81,7 @@ type [<AbstractClass>] GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResu
 
 #if !StructData
 
-    interface IGenericTaskStateMachineDataYield<GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>, 'TResult> with
+    interface IStateMachineDataYield<GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>, 'TResult> with
         member this.Dispose() =
             let mutable this = this
             this.DisposeMode <- true
@@ -147,7 +147,7 @@ type internal GenericTaskSeqAsyncEnumerable<'TMethodBuilder, 'TResult, 'TStateMa
     and 'TStateMachine :> IResumableStateMachine<GenericTaskSeqAsyncEnumerableData<'TMethodBuilder,'TResult, 'TInitializer>>>() =
     inherit GenericTaskSeqAsyncEnumerableBase<'TMethodBuilder, 'TResult>()
 #else
-    and 'TInitializer :> IGenericTaskStateMachineDataInitializer<GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>, unit, IAsyncEnumerable<'TResult>>
+    and 'TInitializer :> IStateMachineDataInitializer<GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>, unit, IAsyncEnumerable<'TResult>>
     and 'TStateMachine :> IResumableStateMachine<GenericTaskSeqAsyncEnumerableData<'TMethodBuilder,'TResult, 'TInitializer>>>() =
 
     inherit GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>()
@@ -166,7 +166,7 @@ type internal GenericTaskSeqAsyncEnumerable<'TMethodBuilder, 'TResult, 'TStateMa
 #if StructData
                 GenericTaskBuilderStateMachineDataYield.moveNext this.StateMachine.Data
 #else
-                GenericTaskBuilderStateMachineData.moveNext (this :> GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>)
+                StateMachineData.moveNext (this :> GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>)
 #endif
 
         member this.DisposeAsync() =
@@ -176,14 +176,14 @@ type internal GenericTaskSeqAsyncEnumerable<'TMethodBuilder, 'TResult, 'TStateMa
 #if StructData
                 GenericTaskBuilderStateMachineDataYield.dispose this.StateMachine.Data
 #else
-                GenericTaskBuilderStateMachineData.dispose (this :> GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>)
+                StateMachineData.dispose (this :> GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>)
 #endif
 
         member this.Current =
 #if StructData
                 GenericTaskBuilderStateMachineDataYield.getResult this.StateMachine.Data
 #else
-            GenericTaskBuilderStateMachineData.getResult (this :> GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>)
+            StateMachineData.getResult (this :> GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer>)
 #endif
 
     interface IAsyncEnumerable<'TResult> with
@@ -196,7 +196,7 @@ type [<Struct>] DefaultSeqStateMachineDataInitializer<'TResult, 'TMethodBuilder
     when 'TMethodBuilder :> IAsyncMethodBuilderCreator<'TMethodBuilder>
     and 'TMethodBuilder :> IAsyncIteratorMethodBuilder> =
 
-    interface IGenericTaskStateMachineDataInitializer<GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, DefaultSeqStateMachineDataInitializer<'TResult, 'TMethodBuilder>>, unit, IAsyncEnumerable<'TResult>> with
+    interface IStateMachineDataInitializer<GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, DefaultSeqStateMachineDataInitializer<'TResult, 'TMethodBuilder>>, unit, IAsyncEnumerable<'TResult>> with
         static member Initialize(stateMachine: byref<'TStateMachine>, _, _) =
             let box = GenericTaskSeqAsyncEnumerable<'TMethodBuilder, 'TResult, 'TStateMachine, DefaultSeqStateMachineDataInitializer<'TResult, 'TMethodBuilder>>(
                 MethodBuilder = 'TMethodBuilder.Create(),

@@ -23,7 +23,7 @@ module TaskLikeLow =
     type ResultTaskBuilderBase with
 
         member inline this.Return<'TData, 'TResult, 'TError
-            when 'TData :> IGenericTaskStateMachineData<'TData, Result<'TResult, 'TError>>>(value: 'TResult) =
+            when 'TData :> IStateMachineData<'TData, Result<'TResult, 'TError>>>(value: 'TResult) =
             ResumableCode<'TData, Result<'TResult, 'TError>>(fun sm ->
                 sm.Data.SetResult(Ok value)
                 true
@@ -54,7 +54,7 @@ module TaskLikeHigh =
             ))
 
         member inline this.Bind<'TData, 'TResult, 'TResult1, 'TResult2, 'TError
-            when 'TData :> IGenericTaskStateMachineData<'TData, Result<'TResult, 'TError>>>
+            when 'TData :> IStateMachineData<'TData, Result<'TResult, 'TError>>>
             (result: Result<'TResult1, 'TError>, [<InlineIfLambda>] continuation: 'TResult1 -> ResumableCode<'TData, 'TResult2>) =
             ResumableCode<'TData, 'TResult2>(fun sm ->
                 match result with
@@ -67,7 +67,7 @@ module TaskLikeHigh =
             )
 
         member inline this.ReturnFrom<'TData, 'TResult, 'TError
-            when 'TData :> IGenericTaskStateMachineData<'TData, Result<'TResult, 'TError>>>
+            when 'TData :> IStateMachineData<'TData, Result<'TResult, 'TError>>>
             (result: Result<'TResult, 'TError>) =
             ResumableCode<'TData, Result<'TResult, 'TError>>(fun sm ->
                 match result with

@@ -13,7 +13,7 @@ module Low =
 
     type GenericTaskBuilderCore with
         member inline this.Using<'TData, 'TResult, 'TResource
-            when 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>
+            when 'TData :> IStateMachineDataWithCheck<'TData>
             and 'TResource :> IDisposable>
             (resource: 'TResource, [<InlineIfLambda>] body: 'TResource -> ResumableCode<'TData, 'TResult>) =
             ResumableCode.Using(resource, (fun resource -> ResumableCode<'TData, 'TResult>(fun sm ->
@@ -45,7 +45,7 @@ module Low =
 
         [<Extension>]
         static member inline Return<'TData, 'TResult, 'TExtensions
-            when 'TData :> IGenericTaskStateMachineData<'TData, 'TResult>
+            when 'TData :> IStateMachineData<'TData, 'TResult>
             and 'TExtensions :> IReturnExtensions>(_: 'TExtensions, value: 'TResult) =
             ResumableCode<'TData, 'TResult>(fun sm ->
                 sm.Data.SetResult(value)
@@ -57,7 +57,7 @@ module Low =
 
         [<Extension>]
         static member inline Yield<'TData, 'TResult, 'TExtensions
-            when 'TData :> IGenericTaskStateMachineDataYield<'TData, 'TResult>
+            when 'TData :> IStateMachineDataYield<'TData, 'TResult>
             and 'TExtensions :> IYieldExtensions>(_: 'TExtensions, value: 'TResult) =
                 ResumableCode<'TData, unit>(fun sm ->
                     if sm.Data.CheckCanContinueOrThrow() then
@@ -81,7 +81,7 @@ module High =
         [<Extension>]
         static member inline Bind<'TData, 'TResult1, 'TResult2, 'TExtensions, 'TDataResult
             when 'TData :> IAsyncMethodBuilderBase
-            and 'TData :> IGenericTaskStateMachineData<'TData, 'TDataResult>
+            and 'TData :> IStateMachineData<'TData, 'TDataResult>
             and 'TExtensions :> IBindExtensions>
             (this: 'TExtensions, task: Task<'TResult1>, [<InlineIfLambda>] continuation: 'TResult1 -> ResumableCode<'TData, 'TResult2>) =
                 this.Bind(TaskBindWrapper(task), continuation)

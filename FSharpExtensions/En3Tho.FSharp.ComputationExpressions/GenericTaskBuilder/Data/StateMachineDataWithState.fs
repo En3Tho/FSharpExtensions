@@ -16,7 +16,7 @@ type StateMachineDataWithState<'TMethodBuilder, 'TStateCheck, 'TTask, 'TState, '
     [<DefaultValue(false)>]
     val mutable Result: 'TResult
 
-    interface IGenericTaskStateMachineData<StateMachineDataWithState<'TMethodBuilder, 'TStateCheck, 'TTask, 'TState, 'TResult>, 'TResult> with
+    interface IStateMachineData<StateMachineDataWithState<'TMethodBuilder, 'TStateCheck, 'TTask, 'TState, 'TResult>, 'TResult> with
 
         member this.CheckCanContinueOrThrow() =
             if 'TStateCheck.CanCheckState then
@@ -39,7 +39,7 @@ type StateMachineDataWithState<'TMethodBuilder, 'TStateCheck, 'TTask, 'TState, '
         member this.SetStateMachine(stateMachine) = this.MethodBuilder.SetStateMachine(stateMachine)
         member this.SetResult(result) = this.Result <- result
 
-    interface IGenericTaskStateMachineDataWithState<StateMachineDataWithState<'TMethodBuilder, 'TStateCheck, 'TTask, 'TState, 'TResult>, 'TState> with
+    interface IStateMachineDataWithState<StateMachineDataWithState<'TMethodBuilder, 'TStateCheck, 'TTask, 'TState, 'TResult>, 'TState> with
         member this.State = this.State
 
 type [<Struct>] DefaultStateMachineDataWithStateInitializer<'TMethodBuilder, 'TTask, 'TState, 'TStateCheck, 'TResult
@@ -47,7 +47,7 @@ type [<Struct>] DefaultStateMachineDataWithStateInitializer<'TMethodBuilder, 'TT
     and 'TMethodBuilder :> IAsyncMethodBuilderCreator<'TMethodBuilder>
     and 'TStateCheck :> IStateCheck<'TState>> =
 
-    interface IGenericTaskStateMachineDataInitializer<StateMachineDataWithState<'TMethodBuilder, 'TStateCheck, 'TTask, 'TState, 'TResult>, 'TState, 'TTask> with
+    interface IStateMachineDataInitializer<StateMachineDataWithState<'TMethodBuilder, 'TStateCheck, 'TTask, 'TState, 'TResult>, 'TState, 'TTask> with
         static member Initialize(sm, data, state) =
             data.State <- state
             data.MethodBuilder <- 'TMethodBuilder.Create()

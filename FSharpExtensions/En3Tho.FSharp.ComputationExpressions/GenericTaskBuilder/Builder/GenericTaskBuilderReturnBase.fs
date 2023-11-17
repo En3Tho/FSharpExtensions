@@ -13,15 +13,15 @@ type GenericTaskBuilderCore<'TState>(state: 'TState) =
     
     member _.State = state
     
-    member inline this.Bind<'TData, 'TResult when 'TData :> IGenericTaskStateMachineDataWithState<'TData, 'TState>>(_: StateIntrinsic, [<InlineIfLambda>] continuation: 'TState -> ResumableCode<'TData, 'TResult>) =
+    member inline this.Bind<'TData, 'TResult when 'TData :> IStateMachineDataWithState<'TData, 'TState>>(_: StateIntrinsic, [<InlineIfLambda>] continuation: 'TState -> ResumableCode<'TData, 'TResult>) =
         ResumableCode<'TData, 'TResult>(fun sm ->
             let state: 'TState = sm.Data.State
             (continuation state).Invoke(&sm)
         )
 
     static member inline RunDynamic<'TData, 'TResult, 'TBuilderResult, 'TInitializer
-        when 'TData :> IGenericTaskStateMachineData<'TData, 'TResult>
-        and 'TInitializer :> IGenericTaskStateMachineDataInitializer<'TData, 'TState, 'TBuilderResult>>
+        when 'TData :> IStateMachineData<'TData, 'TResult>
+        and 'TInitializer :> IStateMachineDataInitializer<'TData, 'TState, 'TBuilderResult>>
         ([<InlineIfLambda>] code: ResumableCode<'TData, 'TResult>, state: 'TState) : 'TBuilderResult =
 
         let mutable sm = ResumableStateMachine<'TData>()
@@ -62,8 +62,8 @@ type GenericTaskBuilderCore<'TState>(state: 'TState) =
         'TInitializer.Initialize<_, 'TData, 'TState>(&sm, &sm.Data, state)
 
     member inline this.RunInternal<'TData, 'TResult, 'TBuilderResult, 'TInitializer
-        when 'TData :> IGenericTaskStateMachineData<'TData, 'TResult>
-        and 'TInitializer :> IGenericTaskStateMachineDataInitializer<'TData, 'TState, 'TBuilderResult>>
+        when 'TData :> IStateMachineData<'TData, 'TResult>
+        and 'TInitializer :> IStateMachineDataInitializer<'TData, 'TState, 'TBuilderResult>>
         ([<InlineIfLambda>] code: ResumableCode<'TData, 'TResult>) : 'TBuilderResult =
 
         (if __useResumableCode then

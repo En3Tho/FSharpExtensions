@@ -27,7 +27,7 @@ type GenericTaskBuilderCore() =
         : ResumableCode<'TData, unit> =
             ResumableCodeHelpers.While(condition, body)
 
-    member inline _.For<'TData, 'T when 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>(
+    member inline _.For<'TData, 'T when 'TData :> IStateMachineDataWithCheck<'TData>>(
         sequence: seq<'T>,
         [<InlineIfLambda>] body: 'T -> ResumableCode<'TData, unit>)
         : ResumableCode<'TData, unit> =
@@ -42,7 +42,7 @@ type GenericTaskBuilderCore() =
                     ))
             )
 
-    member inline _.TryWith<'TData, 'TResult when 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>(
+    member inline _.TryWith<'TData, 'TResult when 'TData :> IStateMachineDataWithCheck<'TData>>(
         [<InlineIfLambda>] body: ResumableCode<'TData, 'TResult>,
         [<InlineIfLambda>] catch: exn -> ResumableCode<'TData, 'TResult>)
         : ResumableCode<'TData, 'TResult> =
@@ -52,7 +52,7 @@ type GenericTaskBuilderCore() =
                 else
                     true)
 
-    member inline _.TryFinally<'TData, 'TResult when 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>(
+    member inline _.TryFinally<'TData, 'TResult when 'TData :> IStateMachineDataWithCheck<'TData>>(
         [<InlineIfLambda>] body: ResumableCode<'TData, 'TResult>,
         [<InlineIfLambda>] compensation: unit -> unit)
         : ResumableCode<'TData, 'TResult> =
@@ -60,7 +60,7 @@ type GenericTaskBuilderCore() =
 
     member inline this.Using<'TData, 'TResource, 'TResult
         when 'TData :> IAsyncMethodBuilderBase
-        and 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>
+        and 'TData :> IStateMachineDataWithCheck<'TData>
         and 'TResource :> IAsyncDisposable>(
         resource: 'TResource,
         [<InlineIfLambda>] body: 'TResource -> ResumableCode<'TData, 'TResult>)
