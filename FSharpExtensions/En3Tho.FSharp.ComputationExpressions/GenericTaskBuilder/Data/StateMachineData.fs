@@ -13,7 +13,7 @@ type StateMachineData<'TMethodBuilder, 'TTask, 'TResult
     [<DefaultValue(false)>]
     val mutable Result: 'TResult
 
-    interface IGenericTaskBuilderStateMachineDataResult<StateMachineData<'TMethodBuilder, 'TTask, 'TResult>, 'TResult> with
+    interface IGenericTaskStateMachineData<StateMachineData<'TMethodBuilder, 'TTask, 'TResult>, 'TResult> with
 
         member this.CheckCanContinueOrThrow() = true
         member this.AwaitOnCompleted(awaiter, stateMachine) = this.MethodBuilder.AwaitOnCompleted(&awaiter, &stateMachine)
@@ -27,7 +27,7 @@ type [<Struct>] DefaultStateMachineDataInitializer<'TMethodBuilder, 'TTask, 'TRe
     when 'TMethodBuilder :> IAsyncMethodBuilder<'TTask, 'TResult>
     and 'TMethodBuilder :> IAsyncMethodBuilderCreator<'TMethodBuilder>> =
 
-    interface IGenericTaskBuilderStateMachineDataInitializer<StateMachineData<'TMethodBuilder, 'TTask, 'TResult>, unit, 'TTask> with
+    interface IGenericTaskStateMachineDataInitializer<StateMachineData<'TMethodBuilder, 'TTask, 'TResult>, unit, 'TTask> with
         static member Initialize(sm, data, _) =
             data.MethodBuilder <- 'TMethodBuilder.Create()
             data.MethodBuilder.Start(&sm)
@@ -50,7 +50,7 @@ type StateMachineRefDataBase<'TMethodBuilder, 'TTask, 'TResult
         member this.MoveNext() = this.MoveNext()
         member this.SetStateMachine(stateMachine) = this.MethodBuilder.SetStateMachine(stateMachine)
 
-    interface IGenericTaskBuilderStateMachineDataResult<StateMachineRefDataBase<'TMethodBuilder, 'TTask, 'TResult>, 'TResult> with
+    interface IGenericTaskStateMachineData<StateMachineRefDataBase<'TMethodBuilder, 'TTask, 'TResult>, 'TResult> with
 
         member this.CheckCanContinueOrThrow() = true
         member this.AwaitOnCompleted(awaiter, arg) =

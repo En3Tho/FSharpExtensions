@@ -1,3 +1,5 @@
-﻿open CentralPackageManagementMigrationTool
+﻿open System
+open CentralPackageManagementMigrationTool
 
-MigrationTool.run @"G:\source\repos\En3Tho\PoshRedisViewer\PoshRedisViewer\PoshRedisViewer.sln"
+let args = Environment.GetCommandLineArgs()[1]
+MigrationTool.run args

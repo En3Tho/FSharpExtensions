@@ -1,9 +1,10 @@
-namespace En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks
+namespace En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ActivityTask
 
 open System
 open System.Diagnostics
 open System.Runtime.CompilerServices
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
+open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks
 open Microsoft.FSharp.Core
 
 [<Struct>]
@@ -31,11 +32,11 @@ type ActivityStateCheck =
                 activity.SetStatus(ActivityStatusCode.Ok).Dispose()
 
 type ActivityTaskBuilder(state) =
-    inherit GenericTaskBuilderWithStateBase<Activity>(state)
+    inherit GenericTaskBuilderWithStateReturnBase<Activity>(state)
     member inline this.Run([<InlineIfLambda>] code) =
-       this.RunInternal<StateMachineDataWithState<AsyncTaskMethodBuilderWrapper<'a, DefaultAsyncTaskMethodBuilderBehavior<_>>, ActivityStateCheck,_,_,_>,_,_, DefaultStateMachineDataWithStateInitializer<_,_,_,_,_>>(code)
+        this.RunInternal<StateMachineDataWithState<AsyncTaskMethodBuilderWrapper<'a, DefaultAsyncTaskMethodBuilderBehavior<_>>, ActivityStateCheck,_,_,_>,_,_, DefaultStateMachineDataWithStateInitializer<_,_,_,_,_>>(code)
 
 type ActivityValueTaskBuilder(state) =
-    inherit GenericTaskBuilderWithStateBase<Activity>(state)
+    inherit GenericTaskBuilderWithStateReturnBase<Activity>(state)
     member inline this.Run([<InlineIfLambda>] code) =
-       this.RunInternal<StateMachineDataWithState<AsyncValueTaskMethodBuilderWrapper<'a, DefaultAsyncTaskMethodBuilderBehavior<_>>, ActivityStateCheck,_,_,_>,_,_, DefaultStateMachineDataWithStateInitializer<_,_,_,_,_>>(code)
+        this.RunInternal<StateMachineDataWithState<AsyncValueTaskMethodBuilderWrapper<'a, DefaultAsyncTaskMethodBuilderBehavior<_>>, ActivityStateCheck,_,_,_>,_,_, DefaultStateMachineDataWithStateInitializer<_,_,_,_,_>>(code)

@@ -3,538 +3,779 @@
 open System
 open System.Collections.Generic
 open System.Diagnostics
-open System.Runtime.CompilerServices
-open System.Runtime.InteropServices
 open System.Threading
 open System.Threading.Tasks
-open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks
-open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
-open En3Tho.FSharp.Xunit
-//
-// open Xunit
-//
-// type ValueTaskWrapperBuilder() =
-//     inherit GenericTaskBuilder<BasicBindExtensions>()
-//     member inline this.Run([<InlineIfLambda>] code: GenericTaskCode<ValueTaskWrapperMethodBuilder<'a>, _, _, _, _>) =
-//        this.RunInternal(code)
-//
-// type UnitValueTaskWrapperBuilder() =
-//     inherit GenericUnitTaskBuilder<BasicBindExtensions>()
-//     member inline this.Run([<InlineIfLambda>] code: GenericUnitTaskCode<ValueTaskWrapperMethodBuilder, _, _, _>) =
-//         this.RunInternal(code)
-//
-// type TaskWrapperBuilder() =
-//     inherit GenericTaskBuilder<BasicBindExtensions>()
-//     member inline this.Run([<InlineIfLambda>] code: GenericTaskCode<TaskWrapperMethodBuilder<'a>, _, _, _, _>) =
-//         this.RunInternal(code)
-//
-// type UnitTaskWrapperBuilder() =
-//     inherit GenericUnitTaskBuilder<BasicBindExtensions>()
-//     member inline this.Run([<InlineIfLambda>] code: GenericUnitTaskCode<TaskWrapperMethodBuilder, _, _, _>) =
-//         this.RunInternal(code)
-//
-// type ActivityValueTaskBuilder(activity) =
-//     inherit GenericTaskBuilderWithState<BasicBindExtensions, Activity>(activity)
-//     member inline this.Run([<InlineIfLambda>] code: GenericTaskCode<ActivityValueTaskMethodBuilder<'a>, _, _, _, _>) =
-//         this.RunInternal(code)
-//
-// type ActivityUnitValueTaskBuilder(activity) =
-//     inherit GenericUnitTaskBuilderWithState<BasicBindExtensions, Activity>(activity)
-//     member inline this.Run([<InlineIfLambda>] code: GenericUnitTaskCode<ActivityValueTaskMethodBuilder, _, _, _>) =
-//         this.RunInternal(code)
-//
-// type ActivityTaskBuilder(activity) =
-//     inherit GenericTaskBuilderWithState<BasicBindExtensions, Activity>(activity)
-//     member inline this.Run([<InlineIfLambda>] code: GenericTaskCode<ActivityTaskMethodBuilder<'a>, _, _, _, _>) =
-//         this.RunInternal(code)
-//
-// type ActivityUnitTaskBuilder(activity) =
-//     inherit GenericUnitTaskBuilderWithState<BasicBindExtensions, Activity>(activity)
-//     member inline this.Run([<InlineIfLambda>] code: GenericUnitTaskCode<ActivityTaskMethodBuilder, _, _, _>) =
-//         this.RunInternal(code)
-//
-// type CancellableTaskBuilder(cancellationToken) =
-//     inherit GenericTaskBuilderWithState<BasicBindExtensions, CancellationToken>(cancellationToken)
-//     member inline this.Run([<InlineIfLambda>] code: GenericTaskCode<CancellableTaskMethodBuilder<'a>, _, _, _, _>) =
-//         this.RunInternal(code)
-//
-// type CancellableUnitTaskBuilder(cancellationToken) =
-//     inherit GenericUnitTaskBuilderWithState<BasicBindExtensions, CancellationToken>(cancellationToken)
-//     member inline this.Run([<InlineIfLambda>] code: GenericUnitTaskCode<CancellableTaskMethodBuilder, _, _, _>) =
-//         this.RunInternal(code)
-//
-// type ExnResultValueTaskBuilder() =
-//     inherit GenericTaskBuilder<BasicBindExtensions>()
-//     member inline this.Run([<InlineIfLambda>] code: GenericTaskCode<ExnResultValueTaskMethodBuilder<'a>, _, _, _, _>) =
-//         this.RunInternal(code)
-//
-// let myValueTask = ValueTaskWrapperBuilder()
-// let myUnitValueTask = UnitValueTaskWrapperBuilder()
-// let myTask = TaskWrapperBuilder()
-// let myUnitTask = UnitTaskWrapperBuilder()
-//
-// let myExnResultValueTask = ExnResultValueTaskBuilder()
-//
-// [<AbstractClass; Sealed; AutoOpen>]
-// type ActivityBuilders() =
-//     static member inline activityValueTask(activity) = ActivityValueTaskBuilder(activity)
-//     static member inline activityValueTask([<CallerMemberName; Optional; DefaultParameterValue("")>] activityName: string) =
-//
-//         let activity =
-//             match Activity.Current with
-//             | null -> null
-//             | activity ->
-//                 activity.Source.StartActivity(activityName)
-//
-//         activityValueTask(activity)
-//
-//     static member inline activityTask(activity) = ActivityTaskBuilder(activity)
-//     static member inline activityTask([<CallerMemberName; Optional; DefaultParameterValue("")>] activityName: string) =
-//
-//         let activity =
-//             match Activity.Current with
-//             | null -> null
-//             | activity ->
-//                 activity.Source.StartActivity(activityName)
-//
-//         activityTask(activity)
-//
-// let inline cancellableTask cancellationToken = CancellableTaskBuilder(cancellationToken)
-// let inline cancellableUnitTask cancellationToken = CancellableUnitTaskBuilder(cancellationToken)
-//
-// // unit auto inference test as xunit doesn't allow generic methods
-// [<Fact>]
-// let ``test that unit is inferred for myTask same as task if no return is called``() = myTask {
-//     let! _ = task { return 1 }
-//     Assert.True(true)
-// }
-//
-// // unit auto inference test as xunit doesn't allow generic methods
-// [<Fact>]
-// let ``test that unit is inferred for myValueTask same as task if no return is called``() = myValueTask {
-//     let! _ = task { return 1 }
-//     Assert.True(true)
-// }
-//
-// [<Fact>]
-// let ``test that this thing works``() = task {
-//     let! z = myValueTask {
-//         return 1
-//     }
-//
-//     Assert.Equal(1, z)
-// }
-//
-// [<Fact>]
-// let ``test that most basic return works with task``() = task {
-//     let! result = myValueTask {
-//         return 1
-//     }
-//     Assert.Equal(1, result)
-//
-//     let! result = myTask {
-//         return 1
-//     }
-//     Assert.Equal(1, result)
-// }
-//
-// [<Fact>]
-// let ``test that most basic return works with mytask``() = myTask {
-//     let! result = myValueTask {
-//         return 1
-//     }
-//     Assert.Equal(1, result)
-//
-//     let! result = myTask {
-//         return 1
-//     }
-//     Assert.Equal(1, result)
-// }
-//
-// [<Fact>]
-// let ``test that most basic return works from results``() = task {
-//     let! result = ValueTaskWrapper<int>(ValueTask.FromResult(1))
-//     Assert.Equal(1, result)
-//
-//     let! result = TaskWrapper<int>(Task.FromResult(1))
-//     Assert.Equal(1, result)
-// }
-//
-// module TestCallerMemberName =
-//     let startActivity() =
-//         activityTask() {
-//         let! activityFromState = getState()
-//         Assert.Equal("startActivity", activityFromState.DisplayName)
-//     }
-//
-// [<Fact>]
-// let ``test that caller member name works with activity builder``() = task {
-//
-//     use source = ActivitySource("mySource")
-//     use listener = ActivityListener(
-//         ShouldListenTo = (fun _ -> true),
-//         Sample = (fun _ -> ActivitySamplingResult.AllData)
-//     )
-//     ActivitySource.AddActivityListener(listener)
-//
-//     use _ = source.StartActivity("Test")
-//
-//     do! TestCallerMemberName.startActivity()
-// }
-//
-// [<Fact>]
-// let ``test that activity task works``() = task {
-//     use source = ActivitySource("mySource")
-//     use listener = ActivityListener(
-//         ShouldListenTo = (fun _ -> true),
-//         Sample = (fun _ -> ActivitySamplingResult.AllData)
-//     )
-//     ActivitySource.AddActivityListener(listener)
-//
-//     use _ = source.StartActivity("Test")
-//
-//     let activity = Activity.Current
-//     Assert.NotNull(activity)
-//     Assert.Equal("Test", activity.DisplayName)
-//
-//     let mutable activityFromTask = null
-//     let! result = activityTask "NewOne" {
-//
-//         let activity = Activity.Current
-//         Assert.NotNull(activity)
-//         Assert.Equal("NewOne", activity.DisplayName)
-//
-//         let! activityState = getState()
-//         Assert.Equal(activityState, activity)
-//
-//         activityFromTask <- activity
-//
-//         return 1
-//     }
-//
-//     Assert.Equal(1, result)
-//     Assert.True(activityFromTask.IsStopped)
-//     Assert.True(activityFromTask.Status = ActivityStatusCode.Ok)
-// }
-//
-// [<Fact>]
-// let ``test that activity task returns correct activity as state``() = task {
-//     use source = ActivitySource("mySource")
-//     use listener = ActivityListener(
-//         ShouldListenTo = (fun _ -> true),
-//         Sample = (fun _ -> ActivitySamplingResult.AllData)
-//     )
-//     ActivitySource.AddActivityListener(listener)
-//
-//     use _ = source.StartActivity("Test")
-//
-//     do! activityTask "NewOne" {
-//         let activityFromCurrent = Activity.Current
-//         let! activityFromState = getState()
-//         Assert.True(Object.ReferenceEquals(activityFromState, activityFromCurrent))
-//     }
-// }
-//
-//
-//
-// [<Fact>]
-// let ``test that activity task returns provided activity as state and stops provided activity``() = task {
-//     use source = ActivitySource("mySource")
-//     use listener = ActivityListener(
-//         ShouldListenTo = (fun _ -> true),
-//         Sample = (fun _ -> ActivitySamplingResult.AllData)
-//     )
-//     ActivitySource.AddActivityListener(listener)
-//
-//     let testActivity = source.StartActivity("Test")
-//
-//     do! activityTask testActivity {
-//         let activityFromCurrent = Activity.Current
-//         let! activityFromState = getState()
-//         Assert.True(Object.ReferenceEquals(testActivity, activityFromState))
-//         Assert.True(Object.ReferenceEquals(activityFromState, activityFromCurrent))
-//     }
-//
-//     Assert.True(testActivity.IsStopped)
-//     Assert.True(testActivity.Status = ActivityStatusCode.Ok)
-// }
-//
-// [<Fact>]
-// let ``test that activity task sets activity error code``() = task {
-//     use source = ActivitySource("mySource")
-//     use listener = ActivityListener(
-//         ShouldListenTo = (fun _ -> true),
-//         Sample = (fun _ -> ActivitySamplingResult.AllData)
-//     )
-//     ActivitySource.AddActivityListener(listener)
-//
-//     use _ = source.StartActivity("Test")
-//
-//     let mutable activityFromTask = null
-//
-//     let! _ = myExnResultValueTask {
-//         let! _ = activityTask "NewOne" {
-//             activityFromTask <- Activity.Current
-//             failwith "boom"
-//         }
-//         return Ok()
-//     }
-//
-//     Assert.True(activityFromTask.IsStopped)
-//     Assert.True(activityFromTask.Status = ActivityStatusCode.Error)
-//     Assert.Equal("boom", activityFromTask.StatusDescription)
-// }
-//
-// [<Fact>]
-// let ``test that activity value task works``() = task {
-//     use source = ActivitySource("mySource")
-//     use listener = ActivityListener(
-//         ShouldListenTo = (fun _ -> true),
-//         Sample = (fun _ -> ActivitySamplingResult.AllData)
-//     )
-//     ActivitySource.AddActivityListener(listener)
-//
-//     use _ = source.StartActivity("Test")
-//
-//     let activity = Activity.Current
-//     Assert.NotNull(activity)
-//     Assert.Equal("Test", activity.DisplayName)
-//
-//     let! result = activityValueTask "NewOne" {
-//
-//         let activity = Activity.Current
-//         Assert.NotNull(activity)
-//         Assert.Equal("NewOne", activity.DisplayName)
-//
-//         return 1
-//     }
-//     Assert.Equal(1, result)
-// }
-//
-// [<Fact>]
-// let ``test that exn result task caches exceptions automatically``() = task {
-//     let! ok = myExnResultValueTask {
-//         return Ok 1
-//     }
-//
-//     Assert.IsOk(1, ok)
-//
-//     let! err = myExnResultValueTask {
-//         failwith "test"
-//         return Ok 1
-//     }
-//
-//     Assert.IsErrorOfType<Exception, _>(err)
-//     Assert.IsErrorWithMessage("test", err)
-// }
-//
-// [<Fact>]
-// let ``Test array map does not throw with value task CE``() = myValueTask {
-//     let w = [| 1 |] |> Array.map (fun w -> w + 1) |> Array.head
-//     let! x = myTask { return 3 }
-//     let! y = myValueTask { return 4 }
-//     let finalResult = w + x + y + 3
-//     Assert.Equal(11, finalResult)
-// }
-//
-// [<Fact>]
-// let ``Test that non generic value task and task work properly with unittask CE``() = myUnitTask {
-//     do! task { () }
-//     do! Task.CompletedTask
-//     do! ValueTask()
-// }
-//
-// [<Fact>]
-// let ``Test that non generic value task and task work properly with unitvtask CE``() = myUnitValueTask {
-//     do! task { () }
-//     do! Task.CompletedTask
-//     do! ValueTask()
-// }
-//
-// [<Fact>]
-// let ``Test that async disposable works properly with vtask CE``() = myValueTask {
-//     use _ = { new IAsyncDisposable with member _.DisposeAsync() = ValueTask() }
-//     ()
-// }
-//
-// [<Fact>]
-// let ``Test that async disposable works properly with unitvtask CE``() = myUnitValueTask {
-//     use _ = { new IAsyncDisposable with member _.DisposeAsync() = ValueTask() }
-//     ()
-// }
-//
-// [<Fact>]
-// let ``Test that async disposable works properly with task CE``() = myTask {
-//     use _ = { new IAsyncDisposable with member _.DisposeAsync() = ValueTask() }
-//     ()
-// }
-//
-// [<Fact>]
-// let ``Test that async disposable works properly with unittask CE``() = myUnitTask {
-//     use _ = { new IAsyncDisposable with member _.DisposeAsync() = ValueTask() }
-//     ()
-// }
-//
-// [<Fact>]
-// let ``Test that dispose works with unittask CE``() =
-//     Assert.ThrowsAsync<ObjectDisposedException>(fun () -> task { return! myUnitTask {
-//         use _ = { new IDisposable with member _.Dispose() = raise (ObjectDisposedException("")) }
-//         ()
-//     }})
-//
-// [<Fact>]
-// let ``Test that dispose works with unitvtask CE``() =
-//     Assert.ThrowsAsync<ObjectDisposedException>(fun () -> task { return! myUnitValueTask {
-//         use _ = { new IDisposable with member _.Dispose() = raise (ObjectDisposedException("")) }
-//         ()
-//     }})
-//
-// [<Fact>]
-// let ``Test that dispose works with task CE``() =
-//     Assert.ThrowsAsync<ObjectDisposedException>(fun () -> task { return! myTask {
-//         use _ = { new IDisposable with member _.Dispose() = raise (ObjectDisposedException("")) }
-//         ()
-//     }})
-//
-// [<Fact>]
-// let ``Test that dispose works with vtask CE``() =
-//     Assert.ThrowsAsync<ObjectDisposedException>(fun () -> task { return! myValueTask {
-//         use _ = { new IDisposable with member _.Dispose() = raise (ObjectDisposedException("")) }
-//         ()
-//     }})
-//
-// type MyAsyncEnumerator(count: int, dispose: unit -> ValueTask) =
-//     let mutable counter = 0
-//
-//     interface IAsyncEnumerator<int> with
-//         member this.DisposeAsync() = dispose()
-//         member this.MoveNextAsync() = myValueTask {
-//             if counter < count then
-//                 counter <- counter + 1
-//                 do! Task.Delay(1)
-//                 return true
-//             else
-//                 return false
-//         }
-//
-//         member this.Current = counter
-//
-// type MyAsyncEnumerable(count, dispose) =
-//
-//     interface IAsyncEnumerable<int> with
-//         member this.GetAsyncEnumerator(_) = MyAsyncEnumerator(count, dispose)
-//
-// [<Fact>]
-// let ``test IAsyncEnumerable support for generic task builder``() = task {
-//     let count = 10
-//     let mutable testCounter = 0
-//
-//     let dispose() = ValueTask(task = task {
-//         testCounter <- testCounter + 1
-//         do! Task.Delay(1)
-//     })
-//
-//     do! myTask {
-//         for _ in MyAsyncEnumerable(count, dispose) do
-//             testCounter <- testCounter + 1
-//     }
-//
-//     Assert.Equal(11, testCounter)
-//
-//     let! testCounterCopy = myTask {
-//         for _ in MyAsyncEnumerable(count, dispose) do
-//             testCounter <- testCounter + 1
-//
-//         return testCounter
-//     }
-//
-//     Assert.Equal(22, testCounterCopy)
-//     Assert.Equal(22, testCounter)
-// }
-//
-// [<Fact>]
-// let ``test that cancellable task cancels in move next calls``() = task {
-//     use cts = CancellationTokenSource()
-//
-//     let stateCancellableTask() = cancellableTask cts.Token {
-//         do! Task.Delay(5)
-//         do! Task.Delay(5)
-//     }
-//
-//     let cancellable = stateCancellableTask()
-//
-//     cts.CancelAfter(2)
-//
-//     let f() =
-//         task {
-//             let! _ = cancellable
-//             ()
-//         } :> Task
-//
-//     return! Assert.ThrowsAsync<TaskCanceledException>(f)
-// }
-//
-// [<Fact>]
-// let ``test that cancellable task propagates cancellation token correctly``() = task {
-//     use cts = CancellationTokenSource()
-//
-//     let stateCancellableTask() = cancellableTask cts.Token {
-//         let! token = getState()
-//         do! Task.Delay(5, token)
-//     }
-//
-//     let cancellable = stateCancellableTask()
-//
-//     cts.Cancel()
-//
-//     let f() =
-//         task {
-//             let! _ = cancellable
-//             ()
-//         } :> Task
-//
-//     return! Assert.ThrowsAsync<TaskCanceledException>(f)
-// }
-//
-// [<Fact>]
-// let ``test IAsyncEnumerable support for generic task builder fails if exception is thrown in finally``() = task {
-//     let count = 10
-//     let mutable testCounter = 0
-//
-//     let dispose() = ValueTask(task = task {
-//         do! Task.Delay(1)
-//         return failwith "abc"
-//     })
-//
-//     let fail() = myUnitTask {
-//         for _ in MyAsyncEnumerable(count, dispose) do
-//             testCounter <- testCounter + 1
-//     }
-//
-//     do! Assert.ThrowsAsync<Exception>(fail) :> Task
-//
-//     let fail() =
-//         myTask {
-//             for _ in MyAsyncEnumerable(count, dispose) do
-//                 testCounter <- testCounter + 1
-//         } :> Task
-//
-//     do! Assert.ThrowsAsync<Exception>(fail) :> Task
-// }
-//
-// [<Fact>]
-// let ``test IAsyncEnumerable support for generic unit task builder``() = task {
-//     let count = 10
-//     let mutable testCounter = 0
-//
-//     let dispose() =
-//         testCounter <- testCounter + 1
-//         ValueTask.CompletedTask
-//
-//     do! myUnitTask {
-//         for _ in MyAsyncEnumerable(count, dispose) do
-//             testCounter <- testCounter + 1
-//     }
-//
-//     Assert.Equal(11, testCounter)
-// }
+open En3Tho.FSharp.ComputationExpressions.Tasks
+
+open Xunit
+
+module CommonNames =
+    let [<Literal>] Delay = "Delay"
+    let [<Literal>] Try = "Try"
+    let [<Literal>] Finally = "Finally"
+    let [<Literal>] Catch = "Catch"
+    let [<Literal>] While = "While"
+    let [<Literal>] For = "For"
+    let [<Literal>] Use = "Use"
+    let [<Literal>] Yield = "Yield"
+
+let delay(messages: List<string>) = task {
+    do! Task.Delay(1)
+    messages.Add(CommonNames.Delay)
+}
+
+let test (messages: List<string>) moveNext (ts: IAsyncEnumerable<'T>) = task {
+    messages.Clear()
+    use e = ts.GetAsyncEnumerator()
+    if moveNext then
+        let! _ = e.MoveNextAsync()
+        ()
+    do! Task.Delay(1)
+}
+
+let testCatch messages moveNext ts = task {
+    try
+        do! test messages moveNext ts
+    with _ ->
+        ()
+}
+
+[<Fact>]
+let ``test that finally block executes and exception is never thrown if not yielded``() = task {
+    let messages = List()
+
+    let ts = taskSeq {
+        try
+            messages.Add(CommonNames.Try)
+            0
+            failwith "boom"
+        finally
+            messages.Add(CommonNames.Finally)
+        do! delay(messages)
+    }
+
+    do! ts |> test messages false
+    Assert.Equal(0, messages.Count)
+
+    do! ts |> test messages true
+    Assert.Equal(2, messages.Count)
+    Assert.Equal(CommonNames.Try, messages[0])
+    Assert.Equal(CommonNames.Finally, messages[1])
+}
+
+[<Fact>]
+let ``test that finally block executes and message is not added if not yielded``() = task {
+    let messages = List()
+
+    let ts = taskSeq {
+        try
+            0
+            messages.Add(CommonNames.Try)
+        finally
+            messages.Add(CommonNames.Finally)
+        do! delay(messages)
+    }
+
+    do! ts |> test messages false
+    Assert.Equal(0, messages.Count)
+
+    do! ts |> test messages true
+    Assert.Equal(1, messages.Count)
+    Assert.Equal(CommonNames.Finally, messages[0])
+}
+
+[<Fact>]
+let ``test how try catch works and sync catch block works even if disposed``() = task {
+    let messages = List()
+
+    let ts = taskSeq {
+        try
+            messages.Add(CommonNames.Try)
+            failwith "boom"
+        with _ ->
+            messages.Add(CommonNames.Catch)
+    }
+
+    do! ts |> testCatch messages false
+    Assert.Equal(0, messages.Count)
+
+    do! ts |> testCatch messages true
+    Assert.Equal(2, messages.Count)
+    Assert.Equal(CommonNames.Try, messages[0])
+    Assert.Equal(CommonNames.Catch, messages[1])
+}
+
+[<Fact>]
+let ``test how try catch works and async catch block works even if disposed``() = task {
+    let messages = List()
+
+    let ts = taskSeq {
+        try
+            messages.Add(CommonNames.Try)
+            failwith "boom"
+        with _ ->
+            messages.Add(CommonNames.Catch)
+            do! delay(messages)
+    }
+
+    do! ts |> testCatch messages false
+    Assert.Equal(0, messages.Count)
+
+    do! ts |> testCatch messages true
+    Assert.Equal(3, messages.Count)
+    Assert.Equal(CommonNames.Try, messages[0])
+    Assert.Equal(CommonNames.Catch, messages[1])
+    Assert.Equal(CommonNames.Delay, messages[2])
+}
+
+[<Fact>]
+let ``test how try catch works and exception is never thrown if not yielded``() = task {
+    let messages = List()
+
+    let ts = taskSeq {
+        try
+            messages.Add(CommonNames.Try)
+            0
+            failwith "boom"
+        with _ ->
+            messages.Add(CommonNames.Catch)
+            do! delay(messages)
+    }
+
+    do! ts |> testCatch messages false
+    Assert.Equal(0, messages.Count)
+
+    do! ts |> testCatch messages true
+    Assert.Equal(1, messages.Count)
+    Assert.Equal(CommonNames.Try, messages[0])
+}
+
+[<Fact>]
+let ``test how try catch works and message is not added if not yielded``() = task {
+    let messages = List()
+
+    let ts = taskSeq {
+        try
+            0
+            messages.Add(CommonNames.Try)
+        with _ ->
+            messages.Add(CommonNames.Catch)
+            do! delay(messages)
+    }
+
+    do! ts |> testCatch messages false
+    Assert.Equal(0, messages.Count)
+
+    do! ts |> testCatch messages true
+    Assert.Equal(0, messages.Count)
+}
+
+[<Fact>]
+let ``test how try catch works and catch block is properly executed even if disposed``() = task {
+    let messages = List()
+
+    let ts = taskSeq {
+        try
+            failwith "woops"
+            messages.Add(CommonNames.Try)
+        with e ->
+            messages.Add(CommonNames.Catch)
+            do! delay(messages)
+    }
+
+    do! ts |> testCatch messages false
+    Assert.Equal(0, messages.Count)
+
+    do! ts |> testCatch messages true
+    Assert.Equal(2, messages.Count)
+    Assert.Equal(CommonNames.Catch, messages[0])
+    Assert.Equal(CommonNames.Delay, messages[1])
+}
+
+[<Fact>]
+let ``test how while works``() = task {
+    let messages = List()
+
+    let ts = taskSeq {
+        let mutable i = 0
+        while i < 10 do
+            messages.Add(CommonNames.While)
+            i
+            do! delay(messages)
+    }
+
+    do! ts |> test messages false
+    Assert.Equal(0, messages.Count)
+
+    do! ts |> test messages true
+    Assert.Equal(1, messages.Count)
+    Assert.Equal(CommonNames.While, messages[0])
+}
+
+[<Fact>]
+let ``test how for works``() = task {
+    let messages = List()
+
+    let ts = taskSeq {
+        for i = 0 to 10 do
+            messages.Add(CommonNames.For)
+            i
+            do! delay(messages)
+    }
+
+    do! ts |> test messages false
+    Assert.Equal(0, messages.Count)
+
+    do! ts |> test messages true
+    Assert.Equal(1, messages.Count)
+    Assert.Equal(CommonNames.For, messages[0])
+}
+
+[<Fact>]
+let ``test inner fields of iasyncenumerable are reinitialized properly``() = task {
+    let messages = List()
+
+    let ts = taskSeq {
+        let list = List()
+        for i = 0 to 9 do
+            list.Add(i)
+        list.Count
+        do! delay(messages)
+    }
+
+    let testInnerFields() = vtask {
+        let mutable x = 0
+        for i in ts do
+            x <- x + i
+
+        Assert.Equal(10, x)
+    }
+
+    do! testInnerFields()
+    do! testInnerFields()
+}
+
+[<Fact>]
+let ``test inner fields with capture of iasyncenumerable are reinitialized properly``() = task {
+    let messages = List()
+
+    let ts(initial) = taskSeq {
+        let mutable initial = initial
+        let list = List()
+        for i = 0 to 9 do
+            list.Add(i)
+        initial <- list.Count
+        initial
+        do! delay(messages)
+    }
+
+    let testInnerFields() = vtask {
+        let mutable x = 0
+        for i in ts(0) do
+            x <- x + i
+
+        Assert.Equal(10, x)
+    }
+
+    do! testInnerFields()
+    do! testInnerFields()
+}
+
+[<Fact>]
+let ``test inner fields with capture of iasyncenumerable are reinitialized properly2``() = task {
+    let messages = List()
+
+    let ts(initial) = taskSeq {
+        let mutable initial = initial
+        let list = List()
+        for i = 0 to 9 do
+            list.Add(i)
+
+        do! delay(messages)
+        initial <- initial + list.Count
+        initial
+        do! delay(messages)
+    }
+
+    let testInnerFields(ts: IAsyncEnumerable<int>) = vtask {
+        let mutable x = 0
+        for i in ts do
+            x <- x + i
+
+        Assert.Equal(10, x)
+    }
+
+    let ts = ts(0)
+    do! testInnerFields(ts)
+    do! testInnerFields(ts)
+}
+
+[<Fact>]
+let ``test use won't run if not yielded``() = task {
+    let messages = List()
+
+    let ts(x: IDisposable) = taskSeq {
+        0
+        use x = x
+        do! delay(messages)
+    }
+
+    let d = { new IDisposable with member _.Dispose() = messages.Add(CommonNames.Use) }
+
+    do! ts(d) |> test messages false
+    Assert.Equal(0, messages.Count)
+
+    do! ts(d) |> test messages true
+    Assert.Equal(0, messages.Count)
+}
+
+[<Fact>]
+let ``test sync use will run if yielded``() = task {
+    let messages = List()
+
+    let ts(x: IDisposable) = taskSeq {
+        use x = x
+        0
+        do! delay(messages)
+    }
+
+    let d = { new IDisposable with member _.Dispose() = messages.Add(CommonNames.Use) }
+
+    do! ts(d) |> test messages false
+    Assert.Equal(0, messages.Count)
+
+    do! ts(d) |> test messages true
+    Assert.Equal(1, messages.Count)
+    Assert.Equal(CommonNames.Use, messages[0])
+}
+
+[<Fact>]
+let ``test async use will run if yielded``() = task {
+    let messages = List()
+
+    let ts(x: IAsyncDisposable) = taskSeq {
+        use x = x
+        0
+        do! delay(messages)
+    }
+
+    let d() = ValueTask(task {
+            do! Task.Delay(1)
+            messages.Add(CommonNames.Use)
+        })
+
+    let d = { new IAsyncDisposable with member _.DisposeAsync() = d() }
+
+    do! ts(d) |> test messages false
+    Assert.Equal(0, messages.Count)
+
+    do! ts(d) |> test messages true
+    Assert.Equal(1, messages.Count)
+    Assert.Equal(CommonNames.Use, messages[0])
+}
+
+[<Fact>]
+let ``test that simple task seq can be partially consumed``() = task {
+
+    let messages = List()
+
+    let ts = taskSeq {
+        messages.Add(CommonNames.Yield)
+        1
+        do! delay(messages)
+
+        messages.Add(CommonNames.Yield)
+        2
+        do! delay(messages)
+
+        messages.Add(CommonNames.Yield)
+        3
+        do! delay(messages)
+    }
+
+    let! res = vtask {
+        let mutable result = 0
+        use e = ts.GetAsyncEnumerator()
+        let mutable i = 2
+        while i > 0 do
+            let! _ = e.MoveNextAsync()
+            result <- result + e.Current
+            i <- i - 1
+        return result
+    }
+
+    Assert.Equal(3, messages.Count)
+    Assert.Equal(CommonNames.Yield, messages[0])
+    Assert.Equal(CommonNames.Delay, messages[1])
+    Assert.Equal(CommonNames.Yield, messages[0])
+    Assert.Equal(3, res)
+}
+
+[<Fact>]
+let ``test that simple task seq works``() = task {
+
+    let ts = taskSeq {
+        1
+        do! Task.Delay(1)
+        2
+        do! uvtask { do! Task.Delay(1) }
+        3
+    }
+
+    let! res = vtask {
+        let mutable result = 0
+        for v in ts do
+            result <- result + v
+        return result
+    }
+
+    Assert.Equal(6, res)
+
+    let! res = vtask {
+        let mutable result = 0
+        for v in ts do
+            result <- result + v
+        return result
+    }
+
+    Assert.Equal(6, res)
+
+    let! res = vtask {
+        let mutable result = 0
+        for v in ts do
+            result <- result + v
+        return result
+    }
+
+    Assert.Equal(6, res)
+}
+
+module TestCallerMemberName =
+    let startActivity() =
+        activityTask() {
+        let! activityFromState = getState()
+        Assert.Equal("startActivity", activityFromState.DisplayName)
+    }
+
+[<Fact>]
+let ``test that caller member name works with activity builder``() = task {
+
+    use source = ActivitySource("mySource")
+    use listener = ActivityListener(
+        ShouldListenTo = (fun _ -> true),
+        Sample = (fun _ -> ActivitySamplingResult.AllData)
+    )
+    ActivitySource.AddActivityListener(listener)
+
+    use _ = source.StartActivity("Test")
+
+    do! TestCallerMemberName.startActivity()
+}
+
+[<Fact>]
+let ``test that activity task works``() = task {
+    use source = ActivitySource("mySource")
+    use listener = ActivityListener(
+        ShouldListenTo = (fun _ -> true),
+        Sample = (fun _ -> ActivitySamplingResult.AllData)
+    )
+    ActivitySource.AddActivityListener(listener)
+
+    use _ = source.StartActivity("Test")
+
+    let activity = Activity.Current
+    Assert.NotNull(activity)
+    Assert.Equal("Test", activity.DisplayName)
+
+    let mutable activityFromTask = null
+    let! result = activityTask "NewOne" {
+
+        let activity = Activity.Current
+        Assert.NotNull(activity)
+        Assert.Equal("NewOne", activity.DisplayName)
+
+        let! activityState = getState()
+        Assert.Equal(activityState, activity)
+
+        activityFromTask <- activity
+
+        return 1
+    }
+
+    Assert.Equal(1, result)
+    Assert.True(activityFromTask.IsStopped)
+    Assert.True(activityFromTask.Status = ActivityStatusCode.Ok)
+}
+
+[<Fact>]
+let ``test that activity task returns correct activity as state``() = task {
+    use source = ActivitySource("mySource")
+    use listener = ActivityListener(
+        ShouldListenTo = (fun _ -> true),
+        Sample = (fun _ -> ActivitySamplingResult.AllData)
+    )
+    ActivitySource.AddActivityListener(listener)
+
+    use initial = source.StartActivity("Test")
+
+    do! activityTask "NewOne" {
+        let activityFromCurrent = Activity.Current
+        let! activityFromState = getState()
+        Assert.True(Object.ReferenceEquals(activityFromState, activityFromCurrent))
+    }
+}
+
+[<Fact>]
+let ``test that activity task returns provided activity as state and stops provided activity``() = task {
+    use source = ActivitySource("mySource")
+    use listener = ActivityListener(
+        ShouldListenTo = (fun _ -> true),
+        Sample = (fun _ -> ActivitySamplingResult.AllData)
+    )
+    ActivitySource.AddActivityListener(listener)
+
+    let testActivity = source.StartActivity("Test")
+
+    do! activityTask testActivity {
+        let activityFromCurrent = Activity.Current
+        let! activityFromState = getState()
+        Assert.True(Object.ReferenceEquals(testActivity, activityFromState))
+        Assert.True(Object.ReferenceEquals(activityFromState, activityFromCurrent))
+    }
+
+    Assert.True(testActivity.IsStopped)
+    Assert.True(testActivity.Status = ActivityStatusCode.Ok)
+}
+
+[<Fact>]
+let ``test that synccontext task works for default sync context``() = task {
+
+    let testSyncContext = SynchronizationContext.Current
+    // make sure we have a test sync context here
+    Assert.True(not (Object.ReferenceEquals(null, testSyncContext)))
+
+    // default is sending to the thread pool
+    let syncContext = SynchronizationContext()
+    let sncTask = synchronizationContextTask(syncContext)
+
+    let! x = sncTask {
+        // assert we've jumped
+        Assert.False(Object.ReferenceEquals(testSyncContext, SynchronizationContext.Current))
+        Assert.Equal(null, SynchronizationContext.Current)
+
+        do! Task.Delay(1)
+        Assert.Equal(null, SynchronizationContext.Current)
+        return 1
+    }
+
+    Assert.Equal(1, x)
+}
+
+type BoolBox() =
+    let mutable value = true
+    member _.Value = value
+
+    interface IDisposable with
+        member _.Dispose() = value <- false
+
+[<Fact>]
+let ``test that synccontext task works for custom sync context``() = task {
+
+    let collection = Queue()
+
+    use spinThead = BoolBox()
+
+    let singleThreadSyncContext = {
+        new SynchronizationContext() with
+            member _.Post(cb, o) = collection.Enqueue((cb, o))
+    }
+
+    let th = Thread(fun() ->
+        SynchronizationContext.SetSynchronizationContext(singleThreadSyncContext)
+        while spinThead.Value do
+            Thread.Sleep(1)
+            match collection.TryDequeue() with
+            | true, (cb, o) ->
+                cb.Invoke(o)
+            | _ ->
+                ()
+    )
+
+    th.Start()
+
+    let sncTask = synchronizationContextTask(singleThreadSyncContext)
+
+    let testSyncContext = SynchronizationContext.Current
+
+    let _ = sncTask {
+        Assert.True(Object.ReferenceEquals(singleThreadSyncContext, SynchronizationContext.Current))
+    }
+
+    // test that snc task does not change the context just by the fact of running
+    Assert.True(Object.ReferenceEquals(testSyncContext, SynchronizationContext.Current))
+
+    let! x = sncTask {
+        Assert.True(Object.ReferenceEquals(singleThreadSyncContext, SynchronizationContext.Current))
+        let! x = task {
+            do! Task.Delay(5)
+            return 1
+        }
+        Assert.True(Object.ReferenceEquals(singleThreadSyncContext, SynchronizationContext.Current))
+        return x
+    }
+
+    Assert.Equal(1, x)
+}
+
+[<Fact>]
+let ``test that synccontext task works for multiple custom sync contexts``() = task {
+
+    use spinThead = BoolBox()
+    let collection1 = Queue()
+
+    let singleThreadSyncContext1 = {
+        new SynchronizationContext() with
+            member _.Post(cb, o) = collection1.Enqueue((cb, o))
+    }
+
+    let th1 = Thread(fun() ->
+        SynchronizationContext.SetSynchronizationContext(singleThreadSyncContext1)
+        while spinThead.Value do
+            Thread.Sleep(1)
+            match collection1.TryDequeue() with
+            | true, (cb, o) ->
+                cb.Invoke(o)
+            | _ ->
+                ()
+    )
+
+    let collection2 = Queue()
+
+    let singleThreadSyncContext2 = {
+        new SynchronizationContext() with
+            member _.Post(cb, o) = collection2.Enqueue((cb, o))
+    }
+
+    let th2 = Thread(fun() ->
+        SynchronizationContext.SetSynchronizationContext(singleThreadSyncContext2)
+        while spinThead.Value do
+            Thread.Sleep(1)
+            match collection2.TryDequeue() with
+            | true, (cb, o) ->
+                cb.Invoke(o)
+            | _ ->
+                ()
+    )
+
+    th1.Start()
+    th2.Start()
+
+    let sncTask1 = synchronizationContextTask(singleThreadSyncContext1)
+    let sncTask2 = synchronizationContextTask(singleThreadSyncContext2)
+
+    let! x = sncTask1 {
+        Assert.True(Object.ReferenceEquals(singleThreadSyncContext1, SynchronizationContext.Current))
+        do! Task.Delay(5)
+        Assert.True(Object.ReferenceEquals(singleThreadSyncContext1, SynchronizationContext.Current))
+
+        let! y = sncTask2 {
+            Assert.True(Object.ReferenceEquals(singleThreadSyncContext2, SynchronizationContext.Current))
+            do! Task.Delay(5)
+            Assert.True(Object.ReferenceEquals(singleThreadSyncContext2, SynchronizationContext.Current))
+            return 1
+        }
+
+        Assert.True(Object.ReferenceEquals(singleThreadSyncContext1, SynchronizationContext.Current))
+
+        let! z = backgroundTask {
+            Assert.True(Object.ReferenceEquals(null, SynchronizationContext.Current))
+            do! Task.Delay(5)
+            Assert.True(Object.ReferenceEquals(null, SynchronizationContext.Current))
+            return 1
+        }
+
+        Assert.True(Object.ReferenceEquals(singleThreadSyncContext1, SynchronizationContext.Current))
+
+        return y + z
+    }
+
+    Assert.Equal(2, x)
+}
+
+[<AbstractClass; Sealed>]
+type TestAsyncLocal() =
+
+    [<DefaultValue(false)>]
+    static val mutable private s_X: AsyncLocal<int>
+
+    static do
+        TestAsyncLocal.s_X <- AsyncLocal()
+
+    static member X = TestAsyncLocal.s_X
+
+
+[<Fact>]
+let ``test that synccontext task propagates execution context just like default tasks``() = task {
+
+    use spinThead = BoolBox()
+
+    let collection = Queue()
+    let singleThreadSyncContext = {
+        new SynchronizationContext() with
+            member _.Post(cb, o) = collection.Enqueue((cb, o))
+    }
+
+    let th = Thread(fun() ->
+        SynchronizationContext.SetSynchronizationContext(singleThreadSyncContext)
+        while spinThead.Value do
+            Thread.Sleep(1)
+            match collection.TryDequeue() with
+            | true, (cb, o) ->
+                cb.Invoke(o)
+            | _ ->
+                ()
+    )
+
+    th.Start()
+
+    let sncTask = synchronizationContextTask(singleThreadSyncContext)
+
+    TestAsyncLocal.X.Value <- 1
+
+    let! y = sncTask {
+        return TestAsyncLocal.X.Value
+    }
+
+    Assert.Equal(1, y)
+
+    do! sncTask {
+        TestAsyncLocal.X.Value <- 2
+
+        do! backgroundTask {
+            do! Task.Delay(1)
+            Assert.Equal(2, TestAsyncLocal.X.Value)
+        }
+
+    }
+}
+
+// just for the reference to myself
+[<Fact>]
+let ``test that background task propagates execution context just like default tasks``() = task {
+    TestAsyncLocal.X.Value <- 1
+
+    let! y = backgroundTask {
+        return TestAsyncLocal.X.Value
+    }
+
+    Assert.Equal(1, y)
+
+    do! backgroundTask {
+        TestAsyncLocal.X.Value <- 2
+
+        do! backgroundTask {
+            do! Task.Delay(1)
+            Assert.Equal(2, TestAsyncLocal.X.Value)
+        }
+    }
+}

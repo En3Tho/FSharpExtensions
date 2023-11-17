@@ -8,8 +8,8 @@ open Microsoft.FSharp.Core.CompilerServices
 open Microsoft.FSharp.Core.CompilerServices.StateMachineHelpers
 open Microsoft.FSharp.Core.LanguagePrimitives.IntrinsicOperators
 
-type GenericTaskBuilderCore<'TState, 'TExtensions>(state: 'TState) =
-    inherit GenericTaskBuilderCore<'TExtensions>()
+type GenericTaskBuilderCore<'TState>(state: 'TState) =
+    inherit GenericTaskBuilderCore()
     
     member _.State = state
     
@@ -20,8 +20,8 @@ type GenericTaskBuilderCore<'TState, 'TExtensions>(state: 'TState) =
         )
 
     static member inline RunDynamic<'TData, 'TResult, 'TBuilderResult, 'TInitializer
-        when 'TData :> IGenericTaskStateMachineData<'TData>
-        and 'TInitializer :> IGenericTaskBuilderStateMachineDataInitializer<'TData, 'TState, 'TBuilderResult>>
+        when 'TData :> IGenericTaskStateMachineData<'TData, 'TResult>
+        and 'TInitializer :> IGenericTaskStateMachineDataInitializer<'TData, 'TState, 'TBuilderResult>>
         ([<InlineIfLambda>] code: ResumableCode<'TData, 'TResult>, state: 'TState) : 'TBuilderResult =
 
         let mutable sm = ResumableStateMachine<'TData>()
@@ -36,7 +36,7 @@ type GenericTaskBuilderCore<'TState, 'TExtensions>(state: 'TState) =
                             let step = info.ResumptionFunc.Invoke(&sm)
 
                             if step then
-                                sm.ResumptionPoint <- -1
+                                sm.ResumptionPoint <- StateMachineCodes.Finished
                                 sm.Data.Finish(&sm)
                             else
                                 let mutable awaiter = sm.ResumptionDynamicInfo.ResumptionData :?> ICriticalNotifyCompletion
@@ -48,10 +48,10 @@ type GenericTaskBuilderCore<'TState, 'TExtensions>(state: 'TState) =
                         match savedExn with
                         | null -> ()
                         | exn ->
-                            sm.ResumptionPoint <- -1
+                            sm.ResumptionPoint <- StateMachineCodes.Finished
                             sm.Data.SetException(exn)
                     else
-                        sm.ResumptionPoint <- -1
+                        sm.ResumptionPoint <- StateMachineCodes.Finished
                         sm.Data.Finish(&sm)
 
                 member _.SetStateMachine(sm, state) =
@@ -62,8 +62,8 @@ type GenericTaskBuilderCore<'TState, 'TExtensions>(state: 'TState) =
         'TInitializer.Initialize<_, 'TData, 'TState>(&sm, &sm.Data, state)
 
     member inline this.RunInternal<'TData, 'TResult, 'TBuilderResult, 'TInitializer
-        when 'TData :> IGenericTaskStateMachineData<'TData>
-        and 'TInitializer :> IGenericTaskBuilderStateMachineDataInitializer<'TData, 'TState, 'TBuilderResult>>
+        when 'TData :> IGenericTaskStateMachineData<'TData, 'TResult>
+        and 'TInitializer :> IGenericTaskStateMachineDataInitializer<'TData, 'TState, 'TBuilderResult>>
         ([<InlineIfLambda>] code: ResumableCode<'TData, 'TResult>) : 'TBuilderResult =
 
         (if __useResumableCode then
@@ -75,10 +75,10 @@ type GenericTaskBuilderCore<'TState, 'TExtensions>(state: 'TState) =
                         if sm.Data.CheckCanContinueOrThrow() then
                             let __stack_code_fin = code.Invoke(&sm)
                             if __stack_code_fin then
-                                sm.ResumptionPoint <- -1
+                                sm.ResumptionPoint <- StateMachineCodes.Finished
                                 sm.Data.Finish(&sm)
                         else
-                            sm.ResumptionPoint <- -1
+                            sm.ResumptionPoint <- StateMachineCodes.Finished
                             sm.Data.Finish(&sm)
                     with exn ->
                         __stack_exn <- exn
@@ -86,23 +86,45 @@ type GenericTaskBuilderCore<'TState, 'TExtensions>(state: 'TState) =
                     match __stack_exn with
                     | null -> ()
                     | exn ->
-                        sm.ResumptionPoint <- -1
+                        sm.ResumptionPoint <- StateMachineCodes.Finished
                         sm.Data.SetException(exn)
                 ))
                 (SetStateMachineMethodImpl<_>(fun sm state -> sm.Data.SetStateMachine(state)))
                 (AfterCode<_,_>(fun sm ->
                     'TInitializer.Initialize<_, 'TData, 'TState>(&sm, &sm.Data, this.State)))
         else
-            GenericTaskBuilderCore<'TState, 'TExtensions>.RunDynamic(code, this.State))
+            GenericTaskBuilderCore<'TState>.RunDynamic(code, this.State))
 
-type GenericTaskBuilderBase() =
-    inherit GenericTaskBuilderCore<unit, ReturnExtensions>()
+// these names are retarded
+type  GenericTaskBuilderDelayReturnCore<'TState>(state: 'TState) =
+    inherit GenericTaskBuilderCore<'TState>(state)
+    member inline _.Delay([<InlineIfLambda>] generator: unit -> ResumableCode<'TData, 'TResult>) =
+        ResumableCode<'TData, 'TResult>(fun sm -> (generator()).Invoke(&sm))
 
-type GenericTaskBuilderWithStateBase<'TState>(state: 'TState) =
-    inherit GenericTaskBuilderCore<'TState, ReturnExtensions>(state)
+type GenericTaskBuilderReturnCore<'TState>(state: 'TState) =
+    inherit GenericTaskBuilderDelayReturnCore<'TState>(state)
+    interface IBindExtensions
+    interface IReturnExtensions
 
-type GenericTaskSeqBuilderBase() =
-    inherit GenericTaskBuilderCore<unit, YieldExtensions>()
+type GenericTaskBuilderReturnBase() =
+    inherit GenericTaskBuilderReturnCore<unit>()
 
-// type GenericTaskSeqBuilderWithStateBase<'TState>(state: 'TState) =
-//     inherit GenericTaskBuilderCore<'TState, YieldExtensions>(state)
+type GenericTaskBuilderWithStateReturnBase<'TState>(state: 'TState) =
+    inherit GenericTaskBuilderReturnCore<'TState>(state)
+
+type GenericTaskBuilderDelayYieldCore<'TState>(state: 'TState) =
+    inherit GenericTaskBuilderCore<'TState>(state)
+
+    member inline _.Delay([<InlineIfLambda>] generator: unit -> ResumableCode<'TData, 'TResult>) =
+        ResumableCode<'TData, _>(fun sm -> (generator()).Invoke(&sm))
+
+type GenericTaskBuilderYieldCore<'TState>(state: 'TState) =
+    inherit GenericTaskBuilderDelayYieldCore<'TState>(state)
+    interface IBindExtensions
+    interface IYieldExtensions
+
+type GenericTaskBuilderYieldBase() =
+    inherit GenericTaskBuilderYieldCore<unit>()
+
+type GenericTaskSeqBuilderWithStateBase<'TState>(state: 'TState) =
+    inherit GenericTaskBuilderYieldCore<'TState>(state)

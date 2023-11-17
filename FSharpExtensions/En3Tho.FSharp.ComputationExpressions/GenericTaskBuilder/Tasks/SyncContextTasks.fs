@@ -1,15 +1,16 @@
-﻿namespace En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks
+﻿namespace En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.SynchronizationContextTask
 
 open System
 open System.Threading
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
+open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks
 open Microsoft.FSharp.Core
 
 type [<Struct>] SyncContextTaskStateMachineDataInitializer<'TMethodBuilder, 'TTask, 'TResult
     when 'TMethodBuilder :> IAsyncMethodBuilder<'TTask, 'TResult>
     and 'TMethodBuilder :> IAsyncMethodBuilderCreator<'TMethodBuilder>> =
 
-    interface IGenericTaskBuilderStateMachineDataInitializer<StateMachineData<'TMethodBuilder, 'TTask, 'TResult>, SynchronizationContext, 'TTask> with
+    interface IGenericTaskStateMachineDataInitializer<StateMachineData<'TMethodBuilder, 'TTask, 'TResult>, SynchronizationContext, 'TTask> with
         static member Initialize(sm: byref<'a>, data, state) =
             data.MethodBuilder <- 'TMethodBuilder.Create()
 
@@ -28,12 +29,12 @@ type [<Struct>] SyncContextTaskStateMachineDataInitializer<'TMethodBuilder, 'TTa
 
             data.MethodBuilder.Task
 
-type SyncContextTask(state) =
-    inherit GenericTaskBuilderWithStateBase<SynchronizationContext>(state)
+type SynchronizationContextTask(state) =
+    inherit GenericTaskBuilderWithStateReturnBase<SynchronizationContext>(state)
     member inline this.Run([<InlineIfLambda>] code) =
         this.RunInternal<StateMachineData<AsyncTaskMethodBuilderWrapper<'a, DefaultAsyncTaskMethodBuilderBehavior<_>>,_,_>,_,_,SyncContextTaskStateMachineDataInitializer<_,_,_>>(code)
 
-type SyncContextValueTask(state) =
-    inherit GenericTaskBuilderWithStateBase<SynchronizationContext>(state)
+type SynchronizationContextValueTask(state) =
+    inherit GenericTaskBuilderWithStateReturnBase<SynchronizationContext>(state)
     member inline this.Run([<InlineIfLambda>] code) =
         this.RunInternal<StateMachineData<AsyncValueTaskMethodBuilderWrapper<'a, DefaultAsyncTaskMethodBuilderBehavior<_>>,_,_>,_,_,SyncContextTaskStateMachineDataInitializer<_,_,_>>(code)

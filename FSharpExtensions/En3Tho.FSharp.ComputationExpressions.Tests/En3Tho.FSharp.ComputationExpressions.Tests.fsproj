@@ -9,15 +9,13 @@
         <Compile Include="ArrayPoolBasedBuilderTests.fs" />
         <Compile Include="StringBuilderBuilderTests.fs" />
         <Compile Include="OptionsAndResults.fs" />
-        <Compile Include="VerbatimTasks.fs" />
         <Compile Include="Tasks.fs" />
         <Compile Include="TaskOptionAndResult.fs" />
-        <Compile Include="TaskResultOverloadingTests.fs" />
         <Compile Include="HttpBuilderTests.fs" />
         <Compile Include="CodeBuilderTests.fs" />
         <Compile Include="TryExprBuilderTests.fs" />
         <Compile Include="GenericTaskBuilderTests.fs" />
-        <Compile Include="GenericTaskBuilder2Tests.fs" />
+        <Compile Include="TaskResultOverloadingTests.fs" />
     </ItemGroup>
 
     <ItemGroup>

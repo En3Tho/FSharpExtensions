@@ -8,8 +8,8 @@ open System.Text.Json
 open System.Threading.Tasks
 open En3Tho.FSharp.Extensions
 open En3Tho.FSharp.ComputationExpressions.Tasks
-open En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions.LowPriority
-open En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions.HighPriority
+open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Extensions.Low
+open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Extensions.High
 
 /// Serializer is responsible for cleanup unless serialization is bypassed
 type IResponseSerializer<'a> =

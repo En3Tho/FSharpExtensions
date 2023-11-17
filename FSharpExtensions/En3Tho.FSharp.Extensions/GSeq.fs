@@ -11,7 +11,7 @@ module GSeq =
     let inline getEnumerator<'i, 'e, ^seq when 'e: struct
                                            and 'e :> IEnumerator<'i>
                                            and ^seq: (member GetEnumerator: unit -> SStructEnumerator<'i, 'e>)> (seq: ^seq) =
-        (^seq: (member GetEnumerator: unit ->  SStructEnumerator<'i, 'e>) seq)
+        (^seq: (member GetEnumerator: unit -> SStructEnumerator<'i, 'e>) seq)
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let ofIEnumerator enumerator = StructIEnumeratorWrapper(enumerator)

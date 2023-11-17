@@ -28,6 +28,11 @@ type Assert with
     static member IsError<'a, 'b>(expected: 'b, value: Result<'a, 'b>) =
         match value with | Error result -> Assert.Equal(result, expected) | Ok result -> Assert.Fail($"Expected Error, got Ok: {result}")
 
+    static member IsErrorWithMessage<'a>(expected: string, value: Result<'a, exn>) =
+        match value with
+        | Error result -> Assert.Equal(expected, result.Message)
+        | Ok result -> Assert.Fail($"Expected Error, got Ok: {result}")
+
     static member IsErrorOfType<'a, 'b when 'a :> exn>(value: Result<'b, exn>) =
         match value with
         | Error (:? 'a as _) -> ()

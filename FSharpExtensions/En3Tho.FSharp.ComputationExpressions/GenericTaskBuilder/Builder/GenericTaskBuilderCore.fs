@@ -11,9 +11,6 @@ open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 
 type GenericTaskBuilderCore() =
 
-    member inline _.Delay([<InlineIfLambda>] generator: unit -> ResumableCode<'TData, 'TResult>) =
-        ResumableCode(fun sm -> (generator()).Invoke(&sm))
-
     [<DefaultValue>]
     member inline _.Zero() : ResumableCode<'TData, unit> =
         ResumableCode.Zero()
@@ -24,13 +21,13 @@ type GenericTaskBuilderCore() =
         : ResumableCode<'TData, 'TResult> =
         ResumableCodeHelpers.Combine(task1, task2)
 
-    member inline _.While<'TData when 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>(
+    member inline _.While(
         [<InlineIfLambda>] condition: unit -> bool,
         [<InlineIfLambda>] body: ResumableCode<'TData, unit>)
         : ResumableCode<'TData, unit> =
             ResumableCodeHelpers.While(condition, body)
 
-    member inline _.For<'TData, 'T when 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>(
+    member inline _.For<'TData, 'T when 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>(
         sequence: seq<'T>,
         [<InlineIfLambda>] body: 'T -> ResumableCode<'TData, unit>)
         : ResumableCode<'TData, unit> =
@@ -45,7 +42,7 @@ type GenericTaskBuilderCore() =
                     ))
             )
 
-    member inline _.TryWith<'TData, 'TResult when 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>(
+    member inline _.TryWith<'TData, 'TResult when 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>(
         [<InlineIfLambda>] body: ResumableCode<'TData, 'TResult>,
         [<InlineIfLambda>] catch: exn -> ResumableCode<'TData, 'TResult>)
         : ResumableCode<'TData, 'TResult> =
@@ -55,7 +52,7 @@ type GenericTaskBuilderCore() =
                 else
                     true)
 
-    member inline _.TryFinally<'TData, 'TResult when 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>(
+    member inline _.TryFinally<'TData, 'TResult when 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>(
         [<InlineIfLambda>] body: ResumableCode<'TData, 'TResult>,
         [<InlineIfLambda>] compensation: unit -> unit)
         : ResumableCode<'TData, 'TResult> =
@@ -63,7 +60,7 @@ type GenericTaskBuilderCore() =
 
     member inline this.Using<'TData, 'TResource, 'TResult
         when 'TData :> IAsyncMethodBuilderBase
-        and 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>
+        and 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>
         and 'TResource :> IAsyncDisposable>(
         resource: 'TResource,
         [<InlineIfLambda>] body: 'TResource -> ResumableCode<'TData, 'TResult>)
@@ -75,6 +72,3 @@ type GenericTaskBuilderCore() =
                     resource.DisposeAsync()
                 else
                     ValueTask()))
-
-type GenericTaskBuilderCore<'TExtensionsMarker>() =
-    inherit GenericTaskBuilderCore()

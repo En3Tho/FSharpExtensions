@@ -2,12 +2,13 @@ module En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.ResumableCodeHelp
 
 open System
 open System.Runtime.CompilerServices
+open System.Runtime.ExceptionServices
 open System.Threading.Tasks
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 open Microsoft.FSharp.Core.CompilerServices
 open Microsoft.FSharp.Core.CompilerServices.StateMachineHelpers
 
-let rec WhileDynamic<'TData when 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>
+let rec WhileDynamic<'TData when 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>
     (
         sm: byref<ResumableStateMachine<'TData>>,
         condition: unit -> bool,
@@ -48,7 +49,7 @@ and WhileBodyDynamicAux
 
 let rec WhileDynamicAsync<'TData
         when 'TData :> IAsyncMethodBuilderBase
-        and 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>
+        and 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>
     (
         sm: byref<ResumableStateMachine<'TData>>,
         condition: unit -> ValueTask<bool>,
@@ -98,7 +99,7 @@ and WhileBodyDynamicAuxAsync
             ResumptionFunc(fun sm -> WhileBodyDynamicAuxAsync(&sm, condition, body, rf))
         false
 
-let inline While<'TData when 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>
+let inline While<'TData when 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>
     (
         [<InlineIfLambda>] condition: unit -> bool,
         body: ResumableCode<'TData, unit>
@@ -117,7 +118,7 @@ let inline While<'TData when 'TData :> IGenericTaskBuilderStateMachineDataWithCh
 
 let inline WhileAsync<'TData
     when 'TData :> IAsyncMethodBuilderBase
-    and 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>
+    and 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>
     (
         [<InlineIfLambda>] condition: unit -> ValueTask<bool>,
         [<InlineIfLambda>] body: ResumableCode<'TData, unit>
@@ -157,7 +158,7 @@ let inline WhileAsync<'TData
         else
             WhileDynamicAsync(&sm, condition, body))
     
-let CombineDynamic<'TData, 'TResult when 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>
+let CombineDynamic<'TData, 'TResult when 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>
     (
         sm: byref<ResumableStateMachine<'TData>>,
         code1: ResumableCode<'TData, unit>,
@@ -180,13 +181,14 @@ let CombineDynamic<'TData, 'TResult when 'TData :> IGenericTaskBuilderStateMachi
             sm.ResumptionDynamicInfo.ResumptionFunc <- (resume (sm.ResumptionDynamicInfo.ResumptionFunc))
             false
 
-let inline Combine<'TData, 'TResult when 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>(code1: ResumableCode<'TData, unit>, code2: ResumableCode<'TData, 'TResult>) : ResumableCode<'TData, 'TResult> =
+let inline Combine<'TData, 'TResult when 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>
+    (code1: ResumableCode<'TData, unit>, code2: ResumableCode<'TData, 'TResult>) : ResumableCode<'TData, 'TResult> =
     ResumableCode<'TData, 'TResult>(fun sm ->
         if __useResumableCode then
             let __stack_fin = code1.Invoke(&sm)
 
             if __stack_fin then
-                if sm.Data.CheckCanContinueOrThrow() then
+                if sm.Data.CheckCanContinueOrThrow() then // TODO: fix awaits, change this
                     code2.Invoke(&sm)
                 else
                     true
@@ -217,7 +219,7 @@ let rec TryFinallyCompensateDynamic
         false
 
 let rec TryFinallyAsyncDynamic<'TData, 'TResult
-    when 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>
+    when 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>
         (
             sm: byref<ResumableStateMachine<'TData>>,
             body: ResumableCode<'TData, 'TResult>,
@@ -248,7 +250,7 @@ let rec TryFinallyAsyncDynamic<'TData, 'TResult
 
 let inline TryFinallyAsyncEx<'TData, 'TResult
     when 'TData :> IAsyncMethodBuilderBase
-    and 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>
+    and 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>
     (
         body: ResumableCode<'TData, 'TResult>,
         compensation: ResumableCode<'TData, unit>
@@ -273,7 +275,7 @@ let inline TryFinallyAsyncEx<'TData, 'TResult
                 if __stack_fin then
                     match __stack_exn with
                     | null -> ()
-                    | exn -> raise exn
+                    | exn -> ExceptionDispatchInfo.Throw(exn)
 
                 __stack_fin
             else
@@ -283,7 +285,7 @@ let inline TryFinallyAsyncEx<'TData, 'TResult
 
 let inline TryFinallyAsync<'TData, 'TResult
     when 'TData :> IAsyncMethodBuilderBase
-    and 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>(
+    and 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>(
     [<InlineIfLambda>] body: ResumableCode<'TData, 'TResult>,
     [<InlineIfLambda>] compensation: unit -> ValueTask)
     : ResumableCode<'TData, 'TResult> =
@@ -321,7 +323,7 @@ let inline TryFinallyAsync<'TData, 'TResult
                 false
         ))
 
-let inline TryFinally<'TData, 'TResult when 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>
+let inline TryFinally<'TData, 'TResult when 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>
     ([<InlineIfLambda>] body: ResumableCode<'TData, 'TResult>, [<InlineIfLambda>] compensation: ResumableCode<'TData, unit>) =
     ResumableCode<'TData, 'TResult>(fun sm ->
         if __useResumableCode then
@@ -359,7 +361,7 @@ let inline Using
             true)
     )
     
-let rec TryWithDynamic<'TData, 'TResult when 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>
+let rec TryWithDynamic<'TData, 'TResult when 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>
     (
         sm: byref<ResumableStateMachine<'TData>>,
         body: ResumableCode<'TData, 'TResult>,
@@ -382,7 +384,7 @@ let rec TryWithDynamic<'TData, 'TResult when 'TData :> IGenericTaskBuilderStateM
         else
             true
 
-let inline TryWith<'TData, 'TResult when 'TData :> IGenericTaskBuilderStateMachineDataWithCheck<'TData>>
+let inline TryWith<'TData, 'TResult when 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>>
     (
         body: ResumableCode<'TData, 'TResult>,
         catch: exn -> ResumableCode<'TData, 'TResult>
@@ -411,3 +413,68 @@ let inline TryWith<'TData, 'TResult when 'TData :> IGenericTaskBuilderStateMachi
 
         else
             TryWithDynamic(&sm, body, catch))
+
+[<NoEagerConstraintApplication>]
+let inline BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TData
+    when ^TaskLike: (member GetAwaiter: unit -> ^Awaiter)
+    and 'TData :> IGenericTaskStateMachineDataWithCheck<'TData>
+    and ^Awaiter :> ICriticalNotifyCompletion
+    and ^Awaiter: (member get_IsCompleted: unit -> bool)
+    and ^Awaiter: (member GetResult: unit -> 'TResult1)>
+    (sm: byref<ResumableStateMachine<'TData>>,
+     task: ^TaskLike,
+     [<InlineIfLambda>] continuation: 'TResult1 -> ResumableCode<'TData, 'TResult2>)
+    : bool =
+
+    if sm.Data.CheckCanContinueOrThrow() then
+
+        let mutable awaiter = (^TaskLike: (member GetAwaiter: unit -> ^Awaiter) task)
+
+        let cont =
+            ResumptionFunc<'TData>(fun sm ->
+               let result = (^Awaiter: (member GetResult: unit -> 'TResult1) awaiter)
+               (continuation result).Invoke(&sm))
+
+        // shortcut to continue immediately
+        if (^Awaiter: (member get_IsCompleted: unit -> bool) awaiter) then
+            cont.Invoke(&sm)
+        else
+            sm.ResumptionDynamicInfo.ResumptionData <- (awaiter :> ICriticalNotifyCompletion)
+            sm.ResumptionDynamicInfo.ResumptionFunc <- cont
+            false
+    else
+        true
+
+[<NoEagerConstraintApplication>]
+let inline Bind< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TData, 'TDataResult
+    when 'TData :> IAsyncMethodBuilderBase
+    and 'TData :> IGenericTaskStateMachineData<'TData, 'TDataResult>
+    and ^TaskLike: (member GetAwaiter: unit -> ^Awaiter)
+    and ^Awaiter :> ICriticalNotifyCompletion
+    and ^Awaiter: (member get_IsCompleted: unit -> bool)
+    and ^Awaiter: (member GetResult: unit -> 'TResult1)>
+    (task: ^TaskLike,
+     [<InlineIfLambda>] continuation: 'TResult1 -> ResumableCode<'TData, 'TResult2>)
+    : ResumableCode<'TData, 'TResult2> =
+
+    ResumableCode<'TData, 'TResult2>(fun sm ->
+        if __useResumableCode then
+            if sm.Data.CheckCanContinueOrThrow() then
+                let mutable awaiter = (^TaskLike: (member GetAwaiter: unit -> ^Awaiter) task)
+
+                let mutable __stack_fin = true
+                if not (^Awaiter: (member get_IsCompleted: unit -> bool) awaiter) then
+                    let __stack_yield_fin = ResumableCode.Yield().Invoke(&sm)
+                    __stack_fin <- __stack_yield_fin
+
+                if __stack_fin then
+                    let result = (^Awaiter: (member GetResult: unit -> 'TResult1) awaiter)
+                    (continuation result).Invoke(&sm)
+                else
+                    sm.Data.AwaitUnsafeOnCompleted(&awaiter, &sm)
+                    false
+            else
+                true
+        else
+            BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TData>(&sm, task, continuation)
+    )
