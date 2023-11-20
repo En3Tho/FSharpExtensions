@@ -22,7 +22,6 @@
         <Compile Include="TaskBuilders\AwaiterHelper.fs" />
         <Compile Include="GenericTaskBuilder\GenericTaskBuilderInterfaces.fs" />
         <Compile Include="GenericTaskBuilder\GenericTaskBuilderIntrinsics.fs" />
-        <Compile Include="GenericTaskBuilder\TaskLikeBuilderBase.fs" />
         <Compile Include="GenericTaskBuilder\Builder\ResumableCodeHelpers.fs" />
         <Compile Include="GenericTaskBuilder\Builder\GenericTaskBuilderCore.fs" />
         <Compile Include="GenericTaskBuilder\Builder\GenericTaskBuilderReturnBase.fs" />
