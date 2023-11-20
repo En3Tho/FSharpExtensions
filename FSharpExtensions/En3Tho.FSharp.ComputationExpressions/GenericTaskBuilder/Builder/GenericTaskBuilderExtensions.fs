@@ -16,11 +16,7 @@ module Low =
             when 'TData :> IStateMachineDataWithCheck<'TData>
             and 'TResource :> IDisposable>
             (resource: 'TResource, [<InlineIfLambda>] body: 'TResource -> ResumableCode<'TData, 'TResult>) =
-            ResumableCodeHelpers.Using(resource, (fun resource -> ResumableCode<'TData, 'TResult>(fun sm ->
-                if sm.Data.CheckCanContinueOrThrow() then
-                    (body(resource)).Invoke(&sm)
-                else
-                    true)))
+            ResumableCodeHelpers.Using(resource, body)
 
         member inline this.For(sequence: IAsyncEnumerable<'T>, [<InlineIfLambda>] body: 'T -> ResumableCode<'TData, unit>) : ResumableCode<'TData, unit> =
             this.Using(

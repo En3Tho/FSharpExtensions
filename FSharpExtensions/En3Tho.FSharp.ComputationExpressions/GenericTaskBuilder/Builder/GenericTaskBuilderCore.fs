@@ -31,7 +31,7 @@ type GenericTaskBuilderCore() =
         sequence: seq<'T>,
         [<InlineIfLambda>] body: 'T -> ResumableCode<'TData, unit>)
         : ResumableCode<'TData, unit> =
-            ResumableCode.Using(
+            ResumableCodeHelpers.Using(
                 sequence.GetEnumerator(),
                 (fun e ->
                     ResumableCodeHelpers.While(
@@ -46,11 +46,7 @@ type GenericTaskBuilderCore() =
         [<InlineIfLambda>] body: ResumableCode<'TData, 'TResult>,
         [<InlineIfLambda>] catch: exn -> ResumableCode<'TData, 'TResult>)
         : ResumableCode<'TData, 'TResult> =
-            ResumableCode(fun sm ->
-                if sm.Data.CheckCanContinueOrThrow() then
-                    ResumableCode.TryWith(body, catch).Invoke(&sm)
-                else
-                    true)
+            ResumableCodeHelpers.TryWith(body, catch)
 
     member inline _.TryFinally<'TData, 'TResult when 'TData :> IStateMachineDataWithCheck<'TData>>(
         [<InlineIfLambda>] body: ResumableCode<'TData, 'TResult>,

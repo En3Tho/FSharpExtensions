@@ -442,22 +442,20 @@ let inline TryWith<'TData, 'TResult when 'TData :> IStateMachineDataWithCheck<'T
     ResumableCode<'TData, 'TResult>(fun sm ->
         if __useResumableCode then
             if sm.Data.CheckCanContinueOrThrow() then
-                //-- RESUMABLE CODE START
                 let mutable __stack_fin = false
-                let mutable __stack_caught = false
                 let mutable __stack_savedExn = Unchecked.defaultof<_>
 
                 try
                     let __stack_body_fin = body.Invoke(&sm)
                     __stack_fin <- __stack_body_fin
                 with exn ->
-                    __stack_caught <- true
                     __stack_savedExn <- exn
 
-                if __stack_caught then
-                    (catch __stack_savedExn).Invoke(&sm)
-                else
+                match __stack_savedExn with
+                | null ->
                     __stack_fin
+                | exn ->
+                    (catch exn).Invoke(&sm)
             else
                 true
 
