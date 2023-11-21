@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "CPM": {
+      "commandName": "Project",
+      "commandLineArgs": "\"X:\\Sources\\En3Tho\\AspireApp1\\AspireApp1.sln\"",
+      "environmentVariables": {
+      }
+    }
+  }
+}
