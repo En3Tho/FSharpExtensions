@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <NugetVersion>8.0.0</NugetVersion>
+        <NugetVersion>8.0.1</NugetVersion>
         <Description>Small set of extensions based on XUnit.DependencyInjection library</Description>
     </PropertyGroup>
 
