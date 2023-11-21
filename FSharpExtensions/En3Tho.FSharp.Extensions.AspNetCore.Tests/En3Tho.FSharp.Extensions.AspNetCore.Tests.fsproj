@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <ProjectType>UnitTest</ProjectType>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="WebApplicationTests.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\En3Tho.FSharp.ComputationExpressions\En3Tho.FSharp.ComputationExpressions.fsproj" />
+      <ProjectReference Include="..\En3Tho.FSharp.Extensions.AspNetCore\En3Tho.FSharp.Extensions.AspNetCore.fsproj" />
+    </ItemGroup>
+
+</Project>

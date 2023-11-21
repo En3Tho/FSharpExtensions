@@ -18,12 +18,12 @@ public static partial class IServiceCollectionExtensions
         return collection.AddSingleton(implementationFactory);
     }
 
-    public static IServiceCollection TryAddSingletonOrFail<TService, TImpl>(this IServiceCollection collection, Func<IServiceProvider, TImpl> implementationFactory)
+    public static IServiceCollection TryAddSingletonOrFail<TService, TImplementation>(this IServiceCollection collection, Func<IServiceProvider, TImplementation> implementationFactory)
         where TService : class
-        where TImpl : class, TService
+        where TImplementation : class, TService
     {
         collection.EnsureNotImplemented(typeof(TService));
-        return collection.AddSingleton<TService, TImpl>(implementationFactory);
+        return collection.AddSingleton<TService, TImplementation>(implementationFactory);
     }
 
     public static IServiceCollection TryAddSingletonOrFail<TService>(this IServiceCollection collection, TService implementationInstance)
@@ -33,12 +33,12 @@ public static partial class IServiceCollectionExtensions
         return collection.AddSingleton(implementationInstance);
     }
 
-    public static IServiceCollection TryAddSingletonOrFail<TService, TImpl>(this IServiceCollection collection)
+    public static IServiceCollection TryAddSingletonOrFail<TService, TImplementation>(this IServiceCollection collection)
         where TService : class
-        where TImpl : class, TService
+        where TImplementation : class, TService
     {
         collection.EnsureNotImplemented(typeof(TService));
-        return collection.AddSingleton<TService, TImpl>();
+        return collection.AddSingleton<TService, TImplementation>();
     }
 
     public static IServiceCollection TryAddScopedOrFail<TService>(this IServiceCollection collection)
@@ -55,20 +55,20 @@ public static partial class IServiceCollectionExtensions
         return collection.AddScoped(implementationFactory);
     }
 
-    public static IServiceCollection TryAddScopedOrFail<TService, TImpl>(this IServiceCollection collection, Func<IServiceProvider, TImpl> implementationFactory)
+    public static IServiceCollection TryAddScopedOrFail<TService, TImplementation>(this IServiceCollection collection, Func<IServiceProvider, TImplementation> implementationFactory)
         where TService : class
-        where TImpl : class, TService
+        where TImplementation : class, TService
     {
         collection.EnsureNotImplemented(typeof(TService));
-        return collection.AddScoped<TService, TImpl>(implementationFactory);
+        return collection.AddScoped<TService, TImplementation>(implementationFactory);
     }
 
-    public static IServiceCollection TryAddScopedOrFail<TService, TImpl>(this IServiceCollection collection)
+    public static IServiceCollection TryAddScopedOrFail<TService, TImplementation>(this IServiceCollection collection)
         where TService : class
-        where TImpl : class, TService
+        where TImplementation : class, TService
     {
         collection.EnsureNotImplemented(typeof(TService));
-        return collection.AddScoped<TService, TImpl>();
+        return collection.AddScoped<TService, TImplementation>();
     }
 
     public static IServiceCollection TryAddTransientOrFail<TService>(this IServiceCollection collection)
@@ -85,19 +85,19 @@ public static partial class IServiceCollectionExtensions
         return collection.AddTransient(implementationFactory);
     }
 
-    public static IServiceCollection TryAddTransientOrFail<TService, TImpl>(this IServiceCollection collection, Func<IServiceProvider, TImpl> implementationFactory)
+    public static IServiceCollection TryAddTransientOrFail<TService, TImplementation>(this IServiceCollection collection, Func<IServiceProvider, TImplementation> implementationFactory)
         where TService : class
-        where TImpl : class, TService
+        where TImplementation : class, TService
     {
         collection.EnsureNotImplemented(typeof(TService));
-        return collection.AddTransient<TService, TImpl>(implementationFactory);
+        return collection.AddTransient<TService, TImplementation>(implementationFactory);
     }
 
-    public static IServiceCollection TryAddTransientOrFail<TService, TImpl>(this IServiceCollection collection)
+    public static IServiceCollection TryAddTransientOrFail<TService, TImplementation>(this IServiceCollection collection)
         where TService : class
-        where TImpl : class, TService
+        where TImplementation : class, TService
     {
         collection.EnsureNotImplemented(typeof(TService));
-        return collection.AddTransient<TService, TImpl>();
+        return collection.AddTransient<TService, TImplementation>();
     }
 }

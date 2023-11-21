@@ -59,61 +59,60 @@ let private scanfInternal strict (memory: ReadOnlyMemory<char>) (fmt: Printf.Str
         if strict && charCounter = 0 then
             success <- false
         else
+            let value = valueSpan.Slice(0, charCounter)
 
-        let value = valueSpan.Slice(0, charCounter)
-
-        match currentCapture with
-        | :? Ref<string> as ref ->
-            if formatSpan.IsEmpty && capturesSpan.IsEmpty then
-                ref.Value <- valueSpan.ToString()
-                valueSpan <- ReadOnlySpan()
-            else
-                ref.Value <- value.ToString()
-        | :? Ref<ReadOnlyMemory<char>> as ref ->
-            if formatSpan.IsEmpty && capturesSpan.IsEmpty then
-                ref.Value <- memory.Slice(memory.Length - valueSpan.Length, valueSpan.Length)
-                valueSpan <- ReadOnlySpan()
-            else
-                ref.Value <- memory.Slice(memory.Length - valueSpan.Length, valueSpan.Length).Slice(0, charCounter)
-        | :? Ref<char> as ref ->
-            if value.Length = 1 then
-                ref.Value <- value[0]
-            else
+            match currentCapture with
+            | :? Ref<string> as ref ->
+                if formatSpan.IsEmpty && capturesSpan.IsEmpty then
+                    ref.Value <- valueSpan.ToString()
+                    valueSpan <- ReadOnlySpan()
+                else
+                    ref.Value <- value.ToString()
+            | :? Ref<ReadOnlyMemory<char>> as ref ->
+                if formatSpan.IsEmpty && capturesSpan.IsEmpty then
+                    ref.Value <- memory.Slice(memory.Length - valueSpan.Length, valueSpan.Length)
+                    valueSpan <- ReadOnlySpan()
+                else
+                    ref.Value <- memory.Slice(memory.Length - valueSpan.Length, valueSpan.Length).Slice(0, charCounter)
+            | :? Ref<char> as ref ->
+                if value.Length = 1 then
+                    ref.Value <- value[0]
+                else
+                    success <- false
+            | :? Ref<DateTime> as ref ->
+                success <- DateTime.TryParse(value, ref)
+            | :? Ref<TimeSpan> as ref ->
+                success <- TimeSpan.TryParse(value, ref)
+            | :? Ref<int> as ref ->
+                success <- Int32.TryParse(value, ref)
+            | :? Ref<int8> as ref ->
+                success <- SByte.TryParse(value, ref)
+            | :? Ref<int16> as ref ->
+                success <- Int16.TryParse(value, ref)
+            | :? Ref<int64> as ref ->
+                success <- Int64.TryParse(value, ref)
+            | :? Ref<uint> as ref ->
+                success <- UInt32.TryParse(value, ref)
+            | :? Ref<Byte> as ref ->
+                success <- Byte.TryParse(value, ref)
+            | :? Ref<uint16> as ref ->
+                success <- UInt16.TryParse(value, ref)
+            | :? Ref<uint64> as ref ->
+                success <- UInt64.TryParse(value, ref)
+            | :? Ref<float> as ref ->
+                success <- Double.TryParse(value, ref)
+            | :? Ref<float32> as ref ->
+                success <- Single.TryParse(value, ref)
+            | :? Ref<bool> as ref ->
+                success <- Boolean.TryParse(value, ref)
+            | :? Ref<Guid> as ref ->
+                success <- Guid.TryParse(value, ref)
+            | _ ->
+                Debug.Fail("Only Ref<PrimitiveType> is supported")
                 success <- false
-        | :? Ref<DateTime> as ref ->
-            success <- DateTime.TryParse(value, ref)
-        | :? Ref<TimeSpan> as ref ->
-            success <- TimeSpan.TryParse(value, ref)
-        | :? Ref<int> as ref ->
-            success <- Int32.TryParse(value, ref)
-        | :? Ref<int8> as ref ->
-            success <- SByte.TryParse(value, ref)
-        | :? Ref<int16> as ref ->
-            success <- Int16.TryParse(value, ref)
-        | :? Ref<int64> as ref ->
-            success <- Int64.TryParse(value, ref)
-        | :? Ref<uint> as ref ->
-            success <- UInt32.TryParse(value, ref)
-        | :? Ref<Byte> as ref ->
-            success <- Byte.TryParse(value, ref)
-        | :? Ref<uint16> as ref ->
-            success <- UInt16.TryParse(value, ref)
-        | :? Ref<uint64> as ref ->
-            success <- UInt64.TryParse(value, ref)
-        | :? Ref<float> as ref ->
-            success <- Double.TryParse(value, ref)
-        | :? Ref<float32> as ref ->
-            success <- Single.TryParse(value, ref)
-        | :? Ref<bool> as ref ->
-            success <- Boolean.TryParse(value, ref)
-        | :? Ref<Guid> as ref ->
-            success <- Guid.TryParse(value, ref)
-        | _ ->
-            Debug.Fail("Only Ref<PrimitiveType> is supported")
-            success <- false
 
-        formatSpan <- formatSpan.Advance (literalAfterFormat.Length + 4)
-        valueSpan <- valueSpan.Advance (charCounter + literalAfterFormat.Length)
+            formatSpan <- formatSpan.Advance (literalAfterFormat.Length + 4)
+            valueSpan <- valueSpan.Advance (charCounter + literalAfterFormat.Length)
 
     if success && strict then
         success <- formatSpan.IsEmpty && valueSpan.IsEmpty

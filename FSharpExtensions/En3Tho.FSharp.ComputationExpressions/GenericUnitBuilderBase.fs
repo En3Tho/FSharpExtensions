@@ -44,9 +44,7 @@ type UnitBuilderBase<'Builder>() =
             )
         )
 
-    member inline _.Zero() : UnitBuilderCode<'Builder> = fun (builder) -> ()
+    member inline _.Zero() : UnitBuilderCode<'Builder> = fun _ -> ()
 
     member inline _.Delay([<InlineIfLambda>] delay: unit -> UnitBuilderCode<'Builder>) =
         fun (builder) -> (delay())(builder)
-        // Note, not "f()()" - the F# compiler optimizer likes arguments to match lambdas in order to preserve
-        // argument evaluation order, so for "(f())()" the optimizer reduces one lambda then another, while "f()()" doesn't

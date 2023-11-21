@@ -4,8 +4,6 @@ open System
 
 type ResultCode<'a, 'b> = unit -> Result<'a, 'b>
 
-// TODO: /v/task/e/result
-
 type ResultBuilderBase() =
 
     member inline _.Zero() : ResultCode<unit, 'b> =
@@ -13,8 +11,6 @@ type ResultBuilderBase() =
 
     member inline _.Delay([<InlineIfLambda>] f: unit -> ResultCode<'a, 'b>) : ResultCode<'a, 'b> =
         fun () -> (f())()
-        // Note, not "f()()" - the F# compiler optimizer likes arguments to match lambdas in order to preserve
-        // argument evaluation order, so for "(f())()" the optimizer reduces one lambda then another, while "f()()" doesn't
 
     member inline _.Combine([<InlineIfLambda>] task1: ResultCode<unit, 'b>, [<InlineIfLambda>] task2: ResultCode<'a, 'b>) : ResultCode<'a, 'b> =
         fun () ->
@@ -170,10 +166,10 @@ type ExnResultBuilder() =
 
     // TODO: A less allocating way
 
-    member inline _.Bind(res1: Result<'a, exn>, [<InlineIfLambda>] task2: 'a -> ResultCode<'c, exn>) : ResultCode<'c, exn> =
+    member inline _.Bind(res1: Result<'a, #exn>, [<InlineIfLambda>] task2: 'a -> ResultCode<'c, exn>) : ResultCode<'c, exn> =
         fun () ->
             match res1 with
-            | Error error -> Error (error)
+            | Error error -> Error (error :> exn)
             | Ok v -> (task2 v)()
 
     member inline this.Bind2(value: Result<'a, #exn>, value2: Result<'b, #exn>, [<InlineIfLambda>] next: 'a * 'b -> ResultCode<'c, exn>) =

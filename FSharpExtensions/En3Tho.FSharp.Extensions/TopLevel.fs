@@ -139,9 +139,9 @@ module IEquatableEqualityOperatorEx =
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     let inline callIEquatableEqualsOnILists<'a when 'a :> IEquatable<'a>> (left: 'a IList) (right: 'a IList) =
-        left.Count = right.Count
+        let count = left.Count
+        count = right.Count
         && (
-            let count = left.Count
             let rec go index =
                 if uint index >= uint count then
                     true
@@ -200,38 +200,40 @@ module IEquatableEqualityOperatorEx =
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     let inline callIEquatableEqualsOnHashSets<'a when 'a :> IEquatable<'a>> (left: 'a HashSet) (right: 'a HashSet) =
-        left.Count = right.Count
+        let count = left.Count
+        count = right.Count
         && Object.ReferenceEquals(left.Comparer, right.Comparer)
         && (let mutable leftEnumerator = left.GetEnumerator()
-            let rec go rightCount =
+            let rec go count =
                 if leftEnumerator.MoveNext() then
-                    if rightCount = 0 then
+                    if count = 0 then
                         false
                     else
                         right.Contains(leftEnumerator.Current)
-                        && go (rightCount - 1)
+                        && go (count - 1)
                 else
-                    rightCount = 0
-            go right.Count)
+                    count = 0
+            go count)
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     let inline callIEquatableEqualsOnDictionaries<'a, 'b when 'a :> IEquatable<'a> and 'b :> IEquatable<'b>> (left: Dictionary<'a, 'b>) (right: Dictionary<'a, 'b>) =
-        left.Count = right.Count
+        let count = left.Count
+        count = right.Count
         && Object.ReferenceEquals(left.Comparer, right.Comparer)
         && (let mutable leftEnumerator = left.GetEnumerator()
-            let rec go rightCount =
+            let rec go count =
                 if leftEnumerator.MoveNext() then
-                    if rightCount = 0 then
+                    if count = 0 then
                         false
                     else
                         let leftValue = leftEnumerator.Current
                         let mutable rightValue = Unchecked.defaultof<_>
                         right.TryGetValue(leftValue.Key, &rightValue)
                         && callIEquatableEqualsOnValues leftValue.Value rightValue
-                        && go (rightCount - 1)
+                        && go (count - 1)
                 else
-                    rightCount = 0
-            go right.Count)
+                    count = 0
+            go count)
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     type ValueEquality = ValueEquality with
@@ -240,6 +242,9 @@ module IEquatableEqualityOperatorEx =
     let inline (==) a b = (ValueEquality $ a) b
 
     let inline (!=) a b = not (a == b)
+
+    let inline (&&&==) a b = a &&& b == b
+    let inline (|||==) a b = a ||| b == b
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     type CollectionEquality = CollectionEquality with

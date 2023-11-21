@@ -61,11 +61,11 @@ public static partial class IServiceCollectionExtensions
 
     internal static void EnsureNotImplementedNoMoreThan(this IServiceCollection collection, Type serviceType, int times)
     {
-        var descriptors = collection.Where(d => d.ServiceType == serviceType).ToArray();
-        if (descriptors.Length > times)
+        var descriptors = collection.Where(d => d.ServiceType == serviceType);
+        if (descriptors.Count() > times)
         {
             var message =
-                $"Service type {serviceType.FullName} is already implemented by {string.Join(", ", descriptors.Select(d => (d.ImplementationType ?? serviceType).FullName))}";
+                $"Service type {serviceType.FullName} is already implemented more than {times} times by {string.Join(", ", descriptors.Select(d => (d.ImplementationType ?? serviceType).FullName))}";
             throw new InvalidOperationException(message);
         }
     }

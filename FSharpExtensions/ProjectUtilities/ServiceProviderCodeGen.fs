@@ -10,7 +10,7 @@ module ServiceProviderCodeGen =
             Array.init genericArgsCount ^ fun index -> $"T{index + 1}"
             |> String.concat ", "
 
-        code {
+        codeBlock {
             $"public static void Run<{typeArgs}>(this IServiceProvider provider, Action<{typeArgs}> action)"
             indent {
                 for i = 1 to genericArgsCount do
@@ -34,7 +34,7 @@ module ServiceProviderCodeGen =
 
         let returnType = "TOut"
 
-        code {
+        codeBlock {
             $"public static {returnType} Run<{typeArgs}, {returnType}>(this IServiceProvider provider, Func<{typeArgs}, {returnType}> func)"
             indent {
                 for i = 1 to genericArgsCount do
@@ -58,7 +58,7 @@ module ServiceProviderCodeGen =
 
         let returnType = if isValueTask then "ValueTask" else "Task"
 
-        code {
+        codeBlock {
             $"public static {returnType} RunAsync<{typeArgs}>(this IServiceProvider provider, Func<{typeArgs}, {returnType}> func)"
             indent {
                 for i = 1 to genericArgsCount do
@@ -82,7 +82,7 @@ module ServiceProviderCodeGen =
 
         let returnType = if isValueTask then "ValueTask<TOut>" else "Task<TOut>"
 
-        code {
+        codeBlock {
             $"public static {returnType} RunAsync<{typeArgs}, TOut>(this IServiceProvider provider, Func<{typeArgs}, {returnType}> func)"
             indent {
                for i = 1 to genericArgsCount do
@@ -106,7 +106,7 @@ module ServiceScopeCodeGen =
             Array.init genericArgsCount ^ fun index -> $"T{index + 1}"
             |> String.concat ", "
 
-        code {
+        codeBlock {
             $"public static void Run<{typeArgs}>(this IServiceScope scope, Action<{typeArgs}> action)"
             indent {
                 for i = 1 to genericArgsCount do
@@ -124,7 +124,7 @@ module ServiceScopeCodeGen =
 
         let returnType = "TOut"
 
-        code {
+        codeBlock {
             $"public static {returnType} Run<{typeArgs}, {returnType}>(this IServiceScope scope, Func<{typeArgs}, {returnType}> func)"
             indent {
                 for i = 1 to genericArgsCount do
@@ -142,7 +142,7 @@ module ServiceScopeCodeGen =
 
         let returnType = if isValueTask then "ValueTask" else "Task"
 
-        code {
+        codeBlock {
             $"public static {returnType} RunAsync<{typeArgs}>(this IServiceScope scope, Func<{typeArgs}, {returnType}> func)"
             indent {
                 for i = 1 to genericArgsCount do
@@ -160,7 +160,7 @@ module ServiceScopeCodeGen =
 
         let returnType = if isValueTask then "ValueTask<TOut>" else "Task<TOut>"
 
-        code {
+        codeBlock {
             $"public static {returnType} RunAsync<{typeArgs}, TOut>(this IServiceScope scope, Func<{typeArgs}, {returnType}> func)"
             indent {
                 for i = 1 to genericArgsCount do
@@ -186,7 +186,7 @@ module ServiceProviderAndScopeCodeGen =
             ServiceProviderCodeGen.makeFuncGenericTaskCode true
         |]
 
-        code {
+        codeBlock {
             "public static class IServiceProviderExtensions"
             braceBlock {
                 for generator in generators do
@@ -210,7 +210,7 @@ module ServiceProviderAndScopeCodeGen =
             ServiceScopeCodeGen.makeFuncGenericTaskCode true
         |]
 
-        code {
+        codeBlock {
             "public static class IServiceScopeExtensions"
             braceBlock {
                 for generator in generators do
@@ -221,7 +221,7 @@ module ServiceProviderAndScopeCodeGen =
             }
         }
 
-    let generateFileCode (codeBlock: CodeBuilderImpl.CodeBuilder) =
+    let generateFileCode (codeBlock: CodeBuilderImpl.CodeBuilderCode) =
         code {
             "// auto-generated"
             "using Microsoft.Extensions.DependencyInjection;"

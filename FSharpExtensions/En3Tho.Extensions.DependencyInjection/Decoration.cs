@@ -14,7 +14,7 @@ public static partial class IServiceCollectionExtensions
     /// <exception cref="InvalidOperationException"></exception>
     public static IServiceCollection Decorate<TService, TImpl>(this IServiceCollection collection) where TImpl : TService
     {
-        if (!collection.TryFindServiceDescriptor<TService>(out ServiceDescriptorEnvelope possibleDescriptor))
+        if (!collection.TryFindServiceDescriptor<TService>(out var possibleDescriptor))
             throw new InvalidOperationException(
                 $"Service {typeof(TService).FullName} was not found among registered services");
 
