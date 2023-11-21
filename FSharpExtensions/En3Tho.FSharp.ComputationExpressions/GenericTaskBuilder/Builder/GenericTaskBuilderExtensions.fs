@@ -68,6 +68,24 @@ module Low =
         static member inline YieldFrom (this: #IYieldExtensions, task: ^TaskLike) =
             this.Bind(task, (fun v -> this.Yield v))
 
+        [<NoEagerConstraintApplication; Extension>]
+        static member inline YieldFrom<'TBuilder, 'TResult, 'TData
+            when 'TBuilder :> GenericTaskBuilderCore
+            and 'TBuilder :> IYieldExtensions
+            and 'TData :> IAsyncMethodBuilderBase
+            and 'TData :> IStateMachineDataWithCheck<'TData>
+            and 'TData :> IStateMachineDataYield<'TData,'TResult>>(this: 'TBuilder, asyncSeq: IAsyncEnumerable<'TResult>) =
+            this.For<'TResult, 'TData>(asyncSeq, (fun v -> this.Yield v))
+
+        [<NoEagerConstraintApplication; Extension>]
+        static member inline YieldFrom<'TBuilder, 'TResult, 'TData
+            when 'TBuilder :> GenericTaskBuilderCore
+            and 'TBuilder :> IYieldExtensions
+            and 'TData :> IAsyncMethodBuilderBase
+            and 'TData :> IStateMachineDataWithCheck<'TData>
+            and 'TData :> IStateMachineDataYield<'TData,'TResult>>(this: 'TBuilder, seq: IEnumerable<'TResult>) =
+            this.For<'TData, 'TResult>(seq, (fun v -> this.Yield v))
+
 module High =
     open Low
 

@@ -13,10 +13,14 @@ module Core =
 
     [<AbstractClass; AutoOpen>]
     type Defer =
-        static member inline defer ([<InlineIfLambda>] disposer) = UnitAsyncDisposable(disposer)
-        static member inline defer ([<InlineIfLambda>] disposer) = new UnitDisposable(disposer)
-        static member inline deferv ([<InlineIfLambda>] disposer) = fun value -> ValueAsyncDisposable<_>(value, disposer)
-        static member inline deferv ([<InlineIfLambda>] disposer) = fun value -> new ValueDisposable<_>(value, disposer)
+        static member inline defer([<InlineIfLambda>] disposer) = UnitAsyncDisposable(disposer)
+        static member inline defer([<InlineIfLambda>] disposer) = UnitDisposable(disposer)
+        static member inline defer(value, [<InlineIfLambda>] disposer) = ValueAsyncDisposable(value, disposer)
+        static member inline defer(value, value2, [<InlineIfLambda>] disposer) = ValueAsyncDisposable2(value, value2, disposer)
+        static member inline defer(value, value2, value3, [<InlineIfLambda>] disposer) = ValueAsyncDisposable3(value, value2, value3, disposer)
+        static member inline defer(value, [<InlineIfLambda>] disposer) = ValueDisposable(value, disposer)
+        static member inline defer(value, value2, [<InlineIfLambda>] disposer) = ValueDisposable2(value, value2, disposer)
+        static member inline defer(value, value2, value3, [<InlineIfLambda>] disposer) = ValueDisposable3(value, value2, value3, disposer)
 
     /// cast via op_Implicit
     let inline icast< ^a, ^b when (^a or ^b): (static member op_Implicit: ^a -> ^b)> (value: ^a): ^b = ((^a or ^b): (static member op_Implicit: ^a -> ^b) value)

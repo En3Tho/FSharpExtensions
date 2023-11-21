@@ -1,10 +1,10 @@
 ﻿namespace En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Extensions
 
-open System.Runtime.CompilerServices
-open En3Tho.FSharp.ComputationExpressions.Tasks
-open Microsoft.FSharp.Core
-open Microsoft.FSharp.Core.CompilerServices
-open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
+// open System.Runtime.CompilerServices
+// open En3Tho.FSharp.ComputationExpressions.Tasks
+// open Microsoft.FSharp.Core
+// open Microsoft.FSharp.Core.CompilerServices
+// open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 
 // this is quite painful with tasks actually, I'm not sure I want to expose this
 // module MultiBind =

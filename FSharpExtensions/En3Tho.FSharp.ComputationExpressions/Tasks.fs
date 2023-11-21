@@ -10,6 +10,7 @@ open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.CancellableTa
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.Native
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.AsyncEnumerable
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ActivityTask
+open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.SemaphoreSlimTask
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.SynchronizationContextTask
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ResultTask
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ExceptionResultTask
@@ -46,8 +47,8 @@ let utask = UnitTaskBuilder()
 
 let taskSeq = TaskSeq()
 
-let synchronizationContextTask ctx = SynchronizationContextTask(ctx)
-let synchronizationContextValueTask ctx = SynchronizationContextValueTask(ctx)
+let synchronizationContextTask ctx = SynchronizationContextTaskBuilder(ctx)
+let synchronizationContextValueTask ctx = SynchronizationContextValueTaskBuilder(ctx)
 
 let exnResultTask = ExceptionResultTaskBuilder()
 let exnResultValueTask = ExceptionResultValueTaskBuilder()
@@ -63,6 +64,9 @@ let voptionValueTask = ValueOptionValueTaskBuilder()
 
 let cancellableTask(cancellationToken) = CancellableTaskBuilder(cancellationToken)
 let cancellableValueTask(cancellationToken) = CancellableValueTaskBuilder(cancellationToken)
+
+let semaphoreSlimTask(semaphore) = SemaphoreSlimTaskBuilder(semaphore)
+let semaphoreSlimValueTask(semaphore) = SemaphoreSlimValueTaskBuilder(semaphore)
 
 [<AbstractClass; Sealed; AutoOpen>]
 type ActivityBuilders() =

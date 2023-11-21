@@ -16,11 +16,11 @@ let ``Test that defer properly works with both disposable and iasyncdisposable``
         use _ = defer dispose
         use _ = (fun() -> &disposeCounter +<- 1) |> defer
         use _ = defer (fun() -> &disposeCounter +<- 1)
-        use _ = 1 |> deferv disposev
+        use _ = defer(1, disposev)
 
-        use _ = defer (fun() -> &disposeCounter +<- 1)
-        use _ = 1 |> deferv (fun _ -> &disposeCounter +<- 1)
-        use _ = deferv (fun _ -> &disposeCounter +<- 1) 1
+        use _ = defer(fun() -> &disposeCounter +<- 1)
+        use _ = defer(1, fun _ -> &disposeCounter +<- 1)
+        use _ = defer(1, fun _ -> &disposeCounter +<- 1)
 
         let disposeAsync = fun() -> &disposeCounter +<- 1; ValueTask()
         let disposevAsync = fun _ -> &disposeCounter +<- 1; ValueTask()
@@ -28,8 +28,8 @@ let ``Test that defer properly works with both disposable and iasyncdisposable``
         use _ = Defer.defer disposeAsync
         use _ = (fun() -> &disposeCounter +<- 1; ValueTask()) |> defer
         use _ = defer (fun() -> &disposeCounter +<- 1; ValueTask())
-        use _ = 1 |> deferv disposevAsync
-        use _ = deferv disposevAsync 1
+        use _ = defer(1, disposevAsync)
+        use _ = defer(1, disposevAsync)
         ()
     }
 
@@ -47,11 +47,11 @@ let ``Test that defer properly works with both disposable and iasyncdisposable2`
         use _ = defer dispose
         use _ = (fun() -> &disposeCounter +<- 1) |> defer
         use _ = defer (fun() -> &disposeCounter +<- 1)
-        use _ = 1 |> deferv disposev
+        use _ = defer(1, disposev)
 
         use _ = defer (fun() -> &disposeCounter +<- 1)
-        use _ = 1 |> deferv (fun _ -> &disposeCounter +<- 1)
-        use _ = deferv (fun _ -> &disposeCounter +<- 1) 1
+        use _ = defer(1, fun _ -> &disposeCounter +<- 1)
+        use _ = defer(1,fun _ -> &disposeCounter +<- 1)
 
         let disposeAsync = fun() -> &disposeCounter +<- 1; ValueTask()
         let disposevAsync = fun _ -> &disposeCounter +<- 1; ValueTask()
@@ -59,8 +59,8 @@ let ``Test that defer properly works with both disposable and iasyncdisposable2`
         use _ = Defer.defer disposeAsync
         use _ = (fun() -> &disposeCounter +<- 1; ValueTask()) |> defer
         use _ = defer (fun() -> &disposeCounter +<- 1; ValueTask())
-        use _ = 1 |> deferv disposevAsync
-        use _ = deferv disposevAsync 1
+        use _ = defer(1, disposevAsync)
+        use _ = defer(1, disposevAsync)
         ()
     }
 

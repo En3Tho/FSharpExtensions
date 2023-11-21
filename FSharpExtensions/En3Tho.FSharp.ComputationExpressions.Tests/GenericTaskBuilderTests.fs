@@ -779,3 +779,21 @@ let ``test that background task propagates execution context just like default t
         }
     }
 }
+
+[<Fact>]
+let ``test that iasyncenumerable and ienumerable can be properly consumed``() = vtask {
+    let t = taskSeq {
+        yield! [| 1; 2; 3 |]
+    }
+
+    let u = taskSeq {
+        yield! t
+    }
+
+    let list = List()
+
+    for v in u do
+        list.Add(v)
+
+    Assert.Equal(3, list.Count)
+}

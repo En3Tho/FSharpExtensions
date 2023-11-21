@@ -29,12 +29,12 @@ type [<Struct>] SyncContextTaskStateMachineDataInitializer<'TMethodBuilder, 'TTa
 
             data.MethodBuilder.Task
 
-type SynchronizationContextTask(state) =
+type SynchronizationContextTaskBuilder(state) =
     inherit GenericTaskBuilderWithStateReturnBase<SynchronizationContext>(state)
     member inline this.Run([<InlineIfLambda>] code) =
         this.RunInternal<StateMachineData<AsyncTaskMethodBuilderWrapper<'a, DefaultAsyncTaskMethodBuilderBehavior<_>>,_,_>,_,_,SyncContextTaskStateMachineDataInitializer<_,_,_>>(code)
 
-type SynchronizationContextValueTask(state) =
+type SynchronizationContextValueTaskBuilder(state) =
     inherit GenericTaskBuilderWithStateReturnBase<SynchronizationContext>(state)
     member inline this.Run([<InlineIfLambda>] code) =
         this.RunInternal<StateMachineData<AsyncValueTaskMethodBuilderWrapper<'a, DefaultAsyncTaskMethodBuilderBehavior<_>>,_,_>,_,_,SyncContextTaskStateMachineDataInitializer<_,_,_>>(code)
