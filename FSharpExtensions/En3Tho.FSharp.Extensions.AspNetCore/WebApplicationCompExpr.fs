@@ -36,7 +36,6 @@ type [<Struct>] EndpointInfo(type': EndpointType, route: string, handler: Delega
          member this.Register(webApplication) =
              this.Register(webApplication)
 
-
 and [<Struct>] ConfiguredEndpointInfo<'a when 'a :> IEndpointInfo>(endpointInfo: 'a, configure: Func<RouteHandlerBuilder, RouteHandlerBuilder>) =
     member _.Register(webApplication) =
         let routeHandlerBuilder = endpointInfo.Register(webApplication)

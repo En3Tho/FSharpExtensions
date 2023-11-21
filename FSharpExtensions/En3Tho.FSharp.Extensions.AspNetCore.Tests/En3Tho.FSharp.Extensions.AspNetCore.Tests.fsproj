@@ -10,7 +10,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\En3Tho.FSharp.ComputationExpressions\En3Tho.FSharp.ComputationExpressions.fsproj" />
-      <ProjectReference Include="..\En3Tho.FSharp.Extensions.AspNetCore\En3Tho.FSharp.Extensions.AspNetCore.fsproj" />
     </ItemGroup>
 
 </Project>
