@@ -530,7 +530,7 @@ let inline Bind< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TData, 'TDataResult
 
     ResumableCode<'TData, 'TResult2>(fun sm ->
         if __useResumableCode then
-            let mutable awaiter = getAwaiter task
+            let mutable awaiter = (^TaskLike: (member GetAwaiter: unit -> ^Awaiter) task)
 
             let mutable __stack_fin = true
             if not (^Awaiter: (member get_IsCompleted: unit -> bool) awaiter) then

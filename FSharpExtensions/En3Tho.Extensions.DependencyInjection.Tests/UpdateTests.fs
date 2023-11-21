@@ -1,7 +1,5 @@
 module En3Tho.Extensions.DependencyInjection.Tests.ConfigureTests
 
-open System
-open En3Tho.FSharp.Extensions
 open En3Tho.Extensions.DependencyInjection
 open Microsoft.Extensions.DependencyInjection
 open Xunit

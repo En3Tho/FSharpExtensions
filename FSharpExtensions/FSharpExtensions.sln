@@ -25,8 +25,6 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.Validation.Te
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "En3Tho.Extensions.DependencyInjection", "En3Tho.Extensions.DependencyInjection\En3Tho.Extensions.DependencyInjection.csproj", "{4FB173BC-563B-40B8-8E2C-DE092453FFF9}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.Extensions.DependencyInjection.AspNetCore", "En3Tho.Extensions.DependencyInjection.AspNetCore\En3Tho.Extensions.DependencyInjection.AspNetCore.fsproj", "{AAF499B8-A890-45B8-B680-FA7401EFC467}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks.CSharp", "Benchmarks.CSharp\Benchmarks.CSharp.csproj", "{C0271E8E-4FCF-407E-9154-503012658ECA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "En3Tho.Extensions.DependencyInjection.XUnit", "En3Tho.Extensions.DependencyInjection.XUnit\En3Tho.Extensions.DependencyInjection.XUnit.csproj", "{3A742F60-CCFF-4F57-A40F-3446DFC35021}"
@@ -48,8 +46,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{BE43B714-9BA0-4F36-97D1-D3C9791CE693}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.Extensions.Logging", "En3Tho.FSharp.Extensions.Logging\En3Tho.FSharp.Extensions.Logging.fsproj", "{AAB9517C-A75C-44CF-9411-2770D4A51583}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TestTool", "TestTool\TestTool.fsproj", "{A71F5998-E89E-47F0-9A73-EBE73AB45FAC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -85,10 +81,6 @@ Global
 		{4FB173BC-563B-40B8-8E2C-DE092453FFF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4FB173BC-563B-40B8-8E2C-DE092453FFF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4FB173BC-563B-40B8-8E2C-DE092453FFF9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AAF499B8-A890-45B8-B680-FA7401EFC467}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AAF499B8-A890-45B8-B680-FA7401EFC467}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AAF499B8-A890-45B8-B680-FA7401EFC467}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AAF499B8-A890-45B8-B680-FA7401EFC467}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C0271E8E-4FCF-407E-9154-503012658ECA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C0271E8E-4FCF-407E-9154-503012658ECA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C0271E8E-4FCF-407E-9154-503012658ECA}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -121,10 +113,6 @@ Global
 		{AAB9517C-A75C-44CF-9411-2770D4A51583}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AAB9517C-A75C-44CF-9411-2770D4A51583}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AAB9517C-A75C-44CF-9411-2770D4A51583}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A71F5998-E89E-47F0-9A73-EBE73AB45FAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A71F5998-E89E-47F0-9A73-EBE73AB45FAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A71F5998-E89E-47F0-9A73-EBE73AB45FAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A71F5998-E89E-47F0-9A73-EBE73AB45FAC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{ED4D366B-0F29-4095-A8C8-EFED608A547B} = {3F96FD51-137E-4572-A477-35B7F5F653DA}
@@ -135,6 +123,5 @@ Global
 		{73FE40B4-55FF-4758-AE4A-53709E398543} = {3F96FD51-137E-4572-A477-35B7F5F653DA}
 		{600E3DE8-B214-48DD-A25A-8BA167BCB49F} = {BE43B714-9BA0-4F36-97D1-D3C9791CE693}
 		{0E898CE9-0FA1-40C3-BFA9-2094F4C8B09E} = {BE43B714-9BA0-4F36-97D1-D3C9791CE693}
-		{A71F5998-E89E-47F0-9A73-EBE73AB45FAC} = {BE43B714-9BA0-4F36-97D1-D3C9791CE693}
 	EndGlobalSection
 EndGlobal

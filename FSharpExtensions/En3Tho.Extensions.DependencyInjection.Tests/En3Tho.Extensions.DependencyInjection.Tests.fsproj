@@ -16,7 +16,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\En3Tho.Extensions.DependencyInjection.AspNetCore\En3Tho.Extensions.DependencyInjection.AspNetCore.fsproj" />
       <ProjectReference Include="..\En3Tho.Extensions.DependencyInjection.XUnit\En3Tho.Extensions.DependencyInjection.XUnit.csproj" />
       <ProjectReference Include="..\En3Tho.Extensions.DependencyInjection\En3Tho.Extensions.DependencyInjection.csproj" />
     </ItemGroup>

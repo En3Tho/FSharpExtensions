@@ -48,14 +48,14 @@ type Benchmark() =
         return x + y + z
     }
 
-    let runVTaskAndTaskAsUnitTask() = unittask {
+    let runVTaskAndTaskAsUnitTask() = utask {
         let! x = returnSomeValueAsValueTask 5
         let! y = returnSomeValueAsValueTask 10
         let! z = returnSomeValueAsTask 15
         return ()
     }
 
-    let runVTaskAndTaskAsUnitVTask() = unitvtask {
+    let runVTaskAndTaskAsUnitVTask() = uvtask {
         let! x = returnSomeValueAsValueTask 5
         let! y = returnSomeValueAsValueTask 10
         let! z = returnSomeValueAsTask 15

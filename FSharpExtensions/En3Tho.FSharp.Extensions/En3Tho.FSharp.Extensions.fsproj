@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <NugetVersion>1.2.2</NugetVersion>
+        <NugetVersion>8.0.0</NugetVersion>
         <Description>A set of extensions for F# base library</Description>
     </PropertyGroup>
 
