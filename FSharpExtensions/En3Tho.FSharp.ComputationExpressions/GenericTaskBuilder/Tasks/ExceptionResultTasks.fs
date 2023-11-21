@@ -39,7 +39,7 @@ type ExceptionValueTaskBuilder() =
         this.RunInternal<StateMachineData<AsyncValueTaskMethodBuilderWrapper<Result<'TResult, exn>, ExnResultAsyncTaskMethodBuilderBehavior<_>>,_,_>,_,_,DefaultStateMachineDataInitializer<_,_,_>>(code)
 
 type ExceptionResultTaskBuilderBase() =
-    inherit GenericTaskBuilderDelayReturnCore<unit>()
+    inherit GenericTaskBuilderReturnCore<unit>()
 
 type ExceptionResultTaskBuilder() =
     inherit ExceptionResultTaskBuilderBase()

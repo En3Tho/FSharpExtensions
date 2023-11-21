@@ -491,6 +491,31 @@ let inline BindDynamic< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TData
             sm.ResumptionDynamicInfo.ResumptionFunc <- cont
             false
 
+// let inline getAwaiter<'TData, ^TaskLike, ^Awaiter
+//     when ^TaskLike: (member GetAwaiter: unit -> ^Awaiter)
+//     and ^Awaiter :> ICriticalNotifyCompletion
+//     and ^Awaiter: (member get_IsCompleted: unit -> bool)
+//     and ^Awaiter: (member GetResult: unit -> 'TData)>
+//     (task: ^TaskLike)
+//     : ^Awaiter =
+//     (^TaskLike: (member GetAwaiter: unit -> ^Awaiter) task)
+//
+// let inline isCompleted<'TData, ^Awaiter
+//     when ^Awaiter :> ICriticalNotifyCompletion
+//     and ^Awaiter: (member get_IsCompleted: unit -> bool)
+//     and ^Awaiter: (member GetResult: unit -> 'TData)>
+//     (awaiter: ^Awaiter)
+//     : bool =
+//     (^Awaiter: (member get_IsCompleted: unit -> bool) awaiter)
+//
+// let inline getResult<'TData, ^Awaiter
+//     when ^Awaiter :> ICriticalNotifyCompletion
+//     and ^Awaiter: (member get_IsCompleted: unit -> bool)
+//     and ^Awaiter: (member GetResult: unit -> 'TData)>
+//     (awaiter: ^Awaiter)
+//     : 'TData =
+//     (^Awaiter: (member GetResult: unit -> 'TData) awaiter)
+
 [<NoEagerConstraintApplication>]
 let inline Bind< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TData, 'TDataResult
     when 'TData :> IAsyncMethodBuilderBase
@@ -505,7 +530,7 @@ let inline Bind< ^TaskLike, 'TResult1, 'TResult2, ^Awaiter, 'TData, 'TDataResult
 
     ResumableCode<'TData, 'TResult2>(fun sm ->
         if __useResumableCode then
-            let mutable awaiter = (^TaskLike: (member GetAwaiter: unit -> ^Awaiter) task)
+            let mutable awaiter = getAwaiter task
 
             let mutable __stack_fin = true
             if not (^Awaiter: (member get_IsCompleted: unit -> bool) awaiter) then

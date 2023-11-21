@@ -6,7 +6,7 @@ let go() =
 
     let sw = Stopwatch.StartNew()
 
-    ServiceCollectionCodeGen.generateFiles()
+    AddFunc.generateFiles()
     ServiceProviderAndScopeCodeGen.generateFiles()
     WebApplicationsExtensionsCodeGen.generateFiles()
     ILoggerExtensionsCodeGen.generateFiles()

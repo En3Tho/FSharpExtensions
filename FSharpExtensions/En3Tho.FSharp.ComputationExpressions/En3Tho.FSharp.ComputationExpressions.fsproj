@@ -24,8 +24,9 @@
         <Compile Include="GenericTaskBuilder\GenericTaskBuilderIntrinsics.fs" />
         <Compile Include="GenericTaskBuilder\Builder\ResumableCodeHelpers.fs" />
         <Compile Include="GenericTaskBuilder\Builder\GenericTaskBuilderCore.fs" />
-        <Compile Include="GenericTaskBuilder\Builder\GenericTaskBuilderReturnBase.fs" />
+        <Compile Include="GenericTaskBuilder\Builder\GenericTaskBuilderBase.fs" />
         <Compile Include="GenericTaskBuilder\Builder\GenericTaskBuilderExtensions.fs" />
+        <Compile Include="GenericTaskBuilder\Builder\GenericTaskBuilderExtensions2.fs" />
         <Compile Include="GenericTaskBuilder\Data\StateMachineData.fs" />
         <Compile Include="GenericTaskBuilder\Data\StateMachineDataWithState.fs" />
         <Compile Include="GenericTaskBuilder\Data\UnitStateMachineData.fs" />

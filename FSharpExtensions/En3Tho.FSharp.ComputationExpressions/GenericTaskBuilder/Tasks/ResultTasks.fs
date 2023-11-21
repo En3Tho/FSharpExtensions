@@ -6,7 +6,7 @@ open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks
 open Microsoft.FSharp.Core.CompilerServices
 
 type ResultTaskBuilderBase() =
-    inherit GenericTaskBuilderDelayReturnCore<unit>()
+    inherit GenericTaskBuilderReturnCore<unit>()
 
 type ResultTaskBuilder() =
     inherit ResultTaskBuilderBase()
