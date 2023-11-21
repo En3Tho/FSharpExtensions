@@ -4,15 +4,13 @@ open System
 
 type OptionCode<'T> = unit -> 'T voption
 
-type OptionBuilderUsingInlineIfLambdaBase() =
+type OptionBuilderBase() =
 
     member inline _.Zero() : OptionCode<unit> =
         fun() -> ValueSome ()
 
     member inline _.Delay([<InlineIfLambda>] f: unit -> OptionCode<'T>) : OptionCode<'T> =
         fun () -> (f())()
-        // Note, not "f()()" - the F# compiler optimizer likes arguments to match lambdas in order to preserve
-        // argument evaluation order, so for "(f())()" the optimizer reduces one lambda then another, while "f()()" doesn't
 
     member inline _.Combine([<InlineIfLambda>] task1: OptionCode<unit>, [<InlineIfLambda>] task2: OptionCode<'T>) : OptionCode<'T> =
         fun () ->
@@ -79,19 +77,19 @@ type OptionBuilderUsingInlineIfLambdaBase() =
         fun () ->
             source
 
-type OptionBuilderUsingInlineIfLambda() =
-    inherit OptionBuilderUsingInlineIfLambdaBase()
+type OptionBuilder() =
+    inherit OptionBuilderBase()
 
     member inline _.Run([<InlineIfLambda>] code: OptionCode<'T>) : 'T option =
-         match code () with
+         match code() with
          | ValueNone -> None
          | ValueSome v -> Some v
 
-type ValueOptionBuilderUsingInlineIfLambda() =
-    inherit OptionBuilderUsingInlineIfLambdaBase()
+type ValueOptionBuilder() =
+    inherit OptionBuilderBase()
 
     member inline _.Run([<InlineIfLambda>] code: OptionCode<'T>) : 'T voption =
         code()
 
-let option = OptionBuilderUsingInlineIfLambda()
-let voption = ValueOptionBuilderUsingInlineIfLambda()
+let option = OptionBuilder()
+let voption = ValueOptionBuilder()

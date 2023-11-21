@@ -1,4 +1,4 @@
-module ProjectUtilities.ServiceCollectionCodeGen
+module ProjectUtilities.AddFunc
 
 open System
 open En3Tho.FSharp.Extensions

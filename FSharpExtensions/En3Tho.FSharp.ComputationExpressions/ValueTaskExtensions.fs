@@ -2,11 +2,12 @@ namespace En3Tho.FSharp.Extensions
 
 open En3Tho.FSharp.ComputationExpressions.Tasks
 open System.Threading.Tasks
-open En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions.LowPriority
-open En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskBuilderExtensions.HighPriority
-open En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskExnResultBuilderExtensions.TaskLikeLowPriority
-open En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskExnResultBuilderExtensions.TaskLikeHighPriority
-open En3Tho.FSharp.ComputationExpressions.Tasks.ValueTaskExnResultBuilderExtensions.LowPriority
+open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Extensions.Low
+open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Extensions.High
+
+open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ExceptionResultTask.TaskLikeLow
+open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ExceptionResultTask.Low
+open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ExceptionResultTask.High
 
 module ValueTask =
     let inline map ([<InlineIfLambda>] mapper) (job: ValueTask<'a>) =
@@ -28,35 +29,37 @@ module ValueTask =
 [<AutoOpen>]
 module TaskExtensions =
     type Task with
-        member this.AsResult() =
+        member inline this.AsResult() =
             if this.IsCompletedSuccessfully then ValueTask<_>(result = Ok())
             else
-                evtask {
+                exnResultValueTask {
                     do! this
+                    return ()
                 }
 
     type Task<'a> with
-        member this.AsResult() =
+        member inline this.AsResult() =
             if this.IsCompletedSuccessfully then ValueTask<_>(result = Ok this.Result)
             else
-                evtask {
+                exnResultValueTask {
                     let! (v: 'a) = this
                     return v
                 }
 
     type ValueTask with
-        member this.AsResult() =
+        member inline this.AsResult() =
             if
                 this.IsCompletedSuccessfully then ValueTask<_>(result = Ok())
             else
-                evtask {
+                exnResultValueTask {
                     do! this
+                    return ()
                 }
     type ValueTask<'a> with
-        member this.AsResult() =
+        member inline this.AsResult() =
             if
                 this.IsCompletedSuccessfully then ValueTask<_>(result = Ok this.Result)
             else
-                evtask {
+                exnResultValueTask {
                     return! this
                 }

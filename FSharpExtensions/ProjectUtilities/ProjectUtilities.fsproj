@@ -6,7 +6,8 @@
 
     <ItemGroup>
         <Compile Include="Code.fs" />
-        <Compile Include="ServiceCollectionCodeGen.fs" />
+        <Compile Include="AddFunc.fs" />
+        <Compile Include="TryAddAsSelfAnd.fs" />
         <Compile Include="ServiceProviderCodeGen.fs" />
         <Compile Include="ActivePatternsCodeGen.fs" />
         <Compile Include="WebApplicationsExtensionsCodeGen.fs" />

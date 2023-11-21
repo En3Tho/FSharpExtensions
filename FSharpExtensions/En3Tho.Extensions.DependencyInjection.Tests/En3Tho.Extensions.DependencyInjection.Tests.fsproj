@@ -12,6 +12,7 @@
         <Compile Include="Module2DependencyInjectionTest.fs" />
         <Compile Include="ServiceCollectionExtensionsTests.fs" />
         <Compile Include="AddFuncTests.fs" />
+        <Compile Include="AddSingletonAsSelfAndInjectionTests.fs" />
     </ItemGroup>
 
     <ItemGroup>

@@ -22,4 +22,6 @@ let ``test that try expr works correctly on failure cases``() =
     Assert.Equal(0, try' { inc() })
     Assert.Equal(2, tryWith(2) { inc() })
 
-    Assert.Equal(2, x)
+    try' { x <- x + 1; failwith "boom" }
+
+    Assert.Equal(3, x)

@@ -16,13 +16,13 @@ type [<Struct; IsReadOnly>] HttpRequestMessageContentStage(client: HttpClient, r
 type HttpRequestMessageResponseStageCode = delegate of HttpRequestMessage -> unit
 type [<Struct; IsReadOnly; EditorBrowsable(EditorBrowsableState.Value)>] GetRequestIntrinsic = struct end
 type [<Struct; IsReadOnly>] HttpRequestMessageResponseStage<'TResponseSerializer, 'TResult
-                                                    when 'TResponseSerializer :> IResponseSerializer<'TResult>>
+    when 'TResponseSerializer :> IResponseSerializer<'TResult>>
     (client: HttpClient, request: HttpRequestMessage, serializer: 'TResponseSerializer) =
     member _.Client = client
     member _.Request = request
     member _.Serializer = serializer
 
-    member this.SendRequest() =
+    member this.Send() =
         let request = this.Request
         let client = this.Client
         let serializer = this.Serializer
@@ -32,7 +32,7 @@ type [<Struct; IsReadOnly>] HttpRequestMessageResponseStage<'TResponseSerializer
             return! serializer.Serialize(response)
         }
 
-    member this.GetAwaiter() = this.SendRequest().GetAwaiter()
+    member this.GetAwaiter() = this.Send().GetAwaiter()
 
     member inline this.Bind(_: GetRequestIntrinsic, [<InlineIfLambda>] code: HttpRequestMessage -> HttpRequestMessageResponseStageCode) : HttpRequestMessageResponseStageCode =
         HttpRequestMessageResponseStageCode(fun request -> (code request).Invoke request)

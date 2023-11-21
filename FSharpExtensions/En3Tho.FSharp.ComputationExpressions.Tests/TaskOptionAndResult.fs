@@ -11,7 +11,7 @@ let ``Test that option builder is working properly`` () = vtask {
     let first = 10
     let second = 10
 
-    let! opt = voptionvtask {
+    let! opt = voptionValueTask {
         let! x = ValueSome first |> ValueTask.FromResult
         let! y = ValueSome second |> ValueTask.FromResult
         return x + y
@@ -19,7 +19,7 @@ let ``Test that option builder is working properly`` () = vtask {
 
     Assert.Equal(opt, ValueSome (first + second))
 
-    let! opt2 = voptionvtask {
+    let! opt2 = voptionValueTask {
         let! x = ValueSome first |> ValueTask.FromResult
         let! y = ValueSome second |> ValueTask.FromResult
         let! z = ValueNone |> ValueTask.FromResult
@@ -28,21 +28,25 @@ let ``Test that option builder is working properly`` () = vtask {
 
     Assert.Equal(opt2, ValueNone)
 
-//    let! opt3 = voptionvtask {
-//
-//        let mutable i = 0
-//        while i < 10 do
-//            let! _ = ValueNone |> ValueTask.FromResult
-//            i <- i + 1
-//
-//        let! x = ValueSome first |> ValueTask.FromResult
-//        let! y = ValueSome second |> ValueTask.FromResult
-//        return x + y + i
-//    }
-//
-//    Assert.Equal(opt3, ValueSome (first + second))
+    let! opt3 = voptionValueTask {
+        let mutable i = 0
+        let mutable a = 0
 
-    let! opt3 = voptionvtask {
+        while i < 10 do
+            i <- i + 1
+            let! _ = ValueNone |> ValueTask.FromResult
+            // this part won't be executed
+            a <- 1
+
+        Assert.Equal(0, a)
+        let! x = ValueSome first |> ValueTask.FromResult
+        let! y = ValueSome second |> ValueTask.FromResult
+        return x + y + i
+    }
+
+    Assert.Equal(opt3, ValueSome (first + second))
+
+    let! opt3 = voptionValueTask {
 
         let mutable i = 0
 
@@ -59,14 +63,14 @@ let ``Test that option builder is working properly`` () = vtask {
         return x + y + i
     }
 
-    Assert.Equal(opt3, ValueSome (first + second + 10))
+    return Assert.Equal(opt3, ValueSome (first + second + 10))
 }
 
 [<Fact>]
-let ``Test that async disposable works properly with voptionvtask CE``() = vtask {
+let ``Test that async disposable works properly with voptionValueTask CE``() = vtask {
     let mutable disposalCounter = 0
     let inc() = disposalCounter <- disposalCounter + 1
-    let! x = voptionvtask {
+    let! x = voptionValueTask {
         use _ = { new IDisposable with member _.Dispose() = inc() }
         use _ = { new IAsyncDisposable with member _.DisposeAsync() = inc(); ValueTask() }
         return 1
@@ -76,23 +80,23 @@ let ``Test that async disposable works properly with voptionvtask CE``() = vtask
 }
 
 [<Fact>]
-let ``Test that async disposable works properly with resultvtask CE``() = vtask {
+let ``Test that async disposable works properly with resultValueTask CE``() = vtask {
     let mutable disposalCounter = 0
     let inc() = disposalCounter <- disposalCounter + 1
-    let! x = resultvtask {
+    let! x = resultValueTask {
         use _ = { new IDisposable with member _.Dispose() = inc() }
         use _ = { new IAsyncDisposable with member _.DisposeAsync() = inc(); ValueTask() }
         return 1
     }
     Assert.Equal(Ok 1, x)
-    Assert.Equal(disposalCounter, 2)
+    return Assert.Equal(disposalCounter, 2)
 }
 
 [<Fact>]
 let ``Test that result builder can process errors`` () = vtask {
     let exn = Exception()
 
-    let! res1 = resultvtask {
+    let! res1 = resultValueTask {
         let! a = Error exn
         let! b = Ok 10
         let! c = Ok 15
@@ -106,16 +110,16 @@ let ``Test that result builder can process errors`` () = vtask {
         Assert.True(false, "Result should not be OK here")
 
     let exn = Exception()
-    let! res2 = resultvtask {
+    let! res2 = resultValueTask {
         return! Error exn
     }
-    Assert.Equal(res2, Error exn)
+    return Assert.Equal(res2, Error exn)
 }
 
 [<Fact>]
 let ``Test that exnresult properly catches exceptions`` () = vtask {
     let exn = Exception()
-    let! res1 = evtask {
+    let! res1 = exnResultValueTask {
         let! a = Error exn // exits here
         let! b = Ok 10
         let! c = Ok 15
@@ -129,7 +133,7 @@ let ``Test that exnresult properly catches exceptions`` () = vtask {
     | _ ->
         Assert.True(false, "Result should not be OK here")
 
-    let! res2 = evtask {
+    let! res2 = exnResultValueTask {
         failwith "Exn"
         let! a = Error exn
         let! b = Ok 10
@@ -144,7 +148,7 @@ let ``Test that exnresult properly catches exceptions`` () = vtask {
         Assert.True(false, "Result should not be OK here")
 
     let exn = Exception()
-    let! res3 = evtask {
+    let! res3 = exnResultValueTask {
         return! Error exn
     }
 
@@ -152,7 +156,7 @@ let ``Test that exnresult properly catches exceptions`` () = vtask {
 }
 
 [<Fact>]
-let ``test that exnresultvtask properly works with exceptions of different types``() = evtask {
+let ``test that exnresultValueTask properly works with exceptions of different types``() = exnResultValueTask {
     let exnTask = task { failwith "" }
     let tryExnTask (t: Task<_>) = task {
         try
@@ -172,59 +176,13 @@ let ``test that exnresultvtask properly works with exceptions of different types
 [<Fact>]
 let ``test that explicit type does not exit early``() = vtask {
     let mutable x = 0
-    let t = evtask {
+    let t = exnResultValueTask {
         let! (v: Result<int, exn>) = Error (Exception())
         x <- 1
         let! _ = v
         x <- 2
+        return ()
     }
     let! _ = t
-    Assert.Equal(1, x)
-}
-
-[<Fact>]
-let ``test verbatim handling works properly for error case``() = vtask {
-    let mutable x = 0
-    let t = evtask {
-        match! (Task.FromResult(Error(Exception()))) with
-        | Error _ ->
-            x <- 2
-        | Ok _ ->
-            ()
-        Assert.Equal(2, x)
-
-        match! verb (ValueTask.FromResult(Error(Exception()))) with
-        | Error _ ->
-            x <- 3
-        | Ok _ ->
-            ()
-
-        Assert.Equal(3, x)
-    }
-    let! _ = t
-    ()
-}
-
-[<Fact>]
-let ``test verbatim handling works properly for ok case``() = vtask {
-    let mutable x = 0
-    let t = evtask {
-
-        match! verb (Task.FromResult(Ok 1)) with
-        | Ok _ ->
-            x <- 2
-        | Error _ ->
-            ()
-        Assert.Equal(2, x)
-
-        match! verb (ValueTask.FromResult(Ok 1)) with
-        | Ok _ ->
-            x <- 3
-        | Error _ ->
-            ()
-
-        Assert.Equal(3, x)
-    }
-    let! _ = t
-    ()
+    return Assert.Equal(1, x)
 }

@@ -5,6 +5,10 @@
         <Description>A set of computation expressions for F# base library</Description>
     </PropertyGroup>
 
+    <PropertyGroup>
+      <DefineConstants>TRACE</DefineConstants>
+    </PropertyGroup>
+
     <ItemGroup>
         <Compile Include="GenericUnitBuilderBase.fs" />
         <Compile Include="GenericCollectionCodeExtensions.fs" />
@@ -14,15 +18,33 @@
         <Compile Include="OptionBuilder.fs" />
         <Compile Include="ResultBuilder.fs" />
         <Compile Include="CodeBuilder.fs" />
+        <Compile Include="TryExprBuilder.fs" />
         <Compile Include="TaskBuilders\AwaiterHelper.fs" />
-        <Compile Include="TaskBuilders\TaskBuilderExtensions.fs" />
-        <Compile Include="TaskBuilders\UnitTaskBuilder.fs" />
-        <Compile Include="TaskBuilders\UnitValueTaskBuilder.fs" />
-        <Compile Include="TaskBuilders\ValueTaskBuilder.fs" />
-        <Compile Include="TaskBuilders\ValueTaskOptionBuilder.fs" />
-        <Compile Include="TaskBuilders\ValueTaskResultBuilder.fs" />
-        <Compile Include="TaskBuilders\ValueTaskExnResultBuilder.fs" />
-        <Compile Include="TaskBuilders\TaskBuilders.fs" />
+        <Compile Include="GenericTaskBuilder\GenericTaskBuilderInterfaces.fs" />
+        <Compile Include="GenericTaskBuilder\GenericTaskBuilderIntrinsics.fs" />
+        <Compile Include="GenericTaskBuilder\Builder\ResumableCodeHelpers.fs" />
+        <Compile Include="GenericTaskBuilder\Builder\GenericTaskBuilderCore.fs" />
+        <Compile Include="GenericTaskBuilder\Builder\GenericTaskBuilderBase.fs" />
+        <Compile Include="GenericTaskBuilder\Builder\GenericTaskBuilderExtensions.fs" />
+        <Compile Include="GenericTaskBuilder\Builder\GenericTaskBuilderExtensions2.fs" />
+        <Compile Include="GenericTaskBuilder\Data\StateMachineData.fs" />
+        <Compile Include="GenericTaskBuilder\Data\StateMachineDataWithState.fs" />
+        <Compile Include="GenericTaskBuilder\Data\UnitStateMachineData.fs" />
+        <Compile Include="GenericTaskBuilder\Data\UnitStateMachineDataWithState.fs" />
+        <Compile Include="GenericTaskBuilder\Data\SeqStateMachineData.fs" />
+        <Compile Include="GenericTaskBuilder\Tasks\MethodBuilderBehaviors.fs" />
+        <Compile Include="GenericTaskBuilder\Tasks\ValueTaskMethodBuilderWrappers.fs" />
+        <Compile Include="GenericTaskBuilder\Tasks\TaskMethodBuilderWrappers.fs" />
+        <Compile Include="GenericTaskBuilder\Tasks\AsyncIteratorMethodBuilderWrapper.fs" />
+        <Compile Include="GenericTaskBuilder\Tasks\Tasks.fs" />
+        <Compile Include="GenericTaskBuilder\Tasks\TaskSeq.fs" />
+        <Compile Include="GenericTaskBuilder\Tasks\ActivityTasks.fs" />
+        <Compile Include="GenericTaskBuilder\Tasks\SyncContextTasks.fs" />        
+        <Compile Include="GenericTaskBuilder\Tasks\ResultTasks.fs" />        
+        <Compile Include="GenericTaskBuilder\Tasks\ExceptionResultTasks.fs" />
+        <Compile Include="GenericTaskBuilder\Tasks\ValueOptionTasks.fs" />
+        <Compile Include="GenericTaskBuilder\Tasks\CancellableTasks.fs" />
+        <Compile Include="Tasks.fs" />        
         <Compile Include="ValueTaskExtensions.fs" />
         <Compile Include="HttpBuilder\Serializers.fs" />
         <Compile Include="HttpBuilder\HeadersBuilders.fs" />

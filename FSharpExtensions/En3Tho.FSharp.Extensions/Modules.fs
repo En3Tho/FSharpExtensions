@@ -238,7 +238,7 @@ module EqualityComparer =
 
     type EqualityComparer<'a> with
         static member Create(eq, ghc) = DelegateEqualityComparer(eq, ghc) :> EqualityComparer<'a>
-        static member Create<'b when 'b: equality>(map: 'a -> 'b) = MapEqualityComparer map :> EqualityComparer<'a>
+        static member Create<'b when 'b: equality>(map: 'a -> 'b) = MapEqualityComparer(map) :> EqualityComparer<'a>
 
 module Array =
     let inline isNullOrEmpty (arr: 'a[]) =
@@ -619,7 +619,7 @@ module Seq =
     open EqualityComparer
     let inline intersect left right = Enumerable.Intersect(left, right)
     let inline intersectBy<'a, 'b when 'b: equality> ([<InlineIfLambda>] map: 'a -> 'b) left right =
-        Enumerable.Intersect(left, right, EqualityComparer<'a>.Create map)
+        Enumerable.Intersect(left, right, EqualityComparer.Create(map))
     let inline toResizeArray seq = Enumerable.ToList seq
     let inline ofType<'a> seq = Enumerable.OfType<'a> seq
     let inline isNotEmpty seq = Enumerable.Any seq

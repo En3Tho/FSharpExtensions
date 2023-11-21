@@ -28,12 +28,12 @@ let addSomeStuffToWebApplicationViaExtensions(webApp: WebApplication) =
 
 let addComplexObject(webApp: WebApplication) = webApp {
     Get("Get", fun () -> "Hello World!")
-    // Get("Get", fun ([<FromServices>] logger: ILogger) -> logger.LogInformation("Hello world")) // not sure how to fix that?
-    Post("Post", fun (logger: ILogger) -> logger.LogInformation("Hello world"))
-    Put("Put", fun (logger: ILogger) -> logger.LogInformation("Hello world"))
+    // Get("Get", fun ([<FromServices>] logger: ILogger) -> logger.LogInformation("Hello world")) // requires new feature
+    Post("Post", fun (logger: ILogger) -> logger.LogInformation("Hello world")) // inferred from body?
+    Put("Put", fun (logger: ILogger) -> logger.LogInformation("Hello world")) // inferred from body?
     Delete("Delete", fun () -> "Hello World!")
-    // Delete("Delete", fun ([<FromServices>] logger: ILogger) -> logger.LogInformation("Hello world")) // not sure how to fix that?
-    Patch("Patch", fun (logger: ILogger) -> logger.LogInformation("Hello world"))
+    // Delete("Delete", fun ([<FromServices>] logger: ILogger) -> logger.LogInformation("Hello world")) // requires new feature
+    Patch("Patch", fun (logger: ILogger) -> logger.LogInformation("Hello world")) // inferred from body?
 }
 
 let testWebAppContainsValidValues(webApp: WebApplication) =
@@ -45,7 +45,7 @@ let testWebAppContainsValidValues(webApp: WebApplication) =
     let checkEndpoint(name, verb) =
         builder.DataSources
         |> Seq.exists (fun endpointDataSource ->
-            endpointDataSource.Endpoints
+            endpointDataSource.Endpoints // calling this does the actual validation
             |> Seq.exists (fun endpoint ->
                 endpoint.DisplayName.Equals($"HTTP: {verb} {name} => Invoke")))
 

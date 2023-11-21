@@ -10,6 +10,10 @@ open En3Tho.FSharp.Extensions
 open Microsoft.Build.Construction
 open Microsoft.Build.Evaluation
 open Microsoft.Build.Utilities
+open CentralPackageManagementMigrationTool.XmlNodeBuilder
+open En3Tho.FSharp.ComputationExpressions
+open En3Tho.FSharp.ComputationExpressions.SCollectionBuilder
+
 
 let initEnvironmentVariables (globalProperties: Dictionary<string, string>) =
     for prop in globalProperties do
@@ -19,6 +23,7 @@ let initEnvironmentVariables (globalProperties: Dictionary<string, string>) =
 // TODO: find a way to pass toolsPath as msbuild property or something?
 let copyRelevantFiles toolsPath =
     File.Copy(Path.Combine(toolsPath, "Microsoft.Build.NuGetSdkResolver.dll"), "Microsoft.Build.NuGetSdkResolver.dll", true)
+    File.Copy(Path.Combine(toolsPath, "NuGet.Common.dll"), "NuGet.Common.dll", true)
 
 let prepareEnvironment toolsPath solutionPath =
     let globalProperties = initGlobalProperties solutionPath toolsPath
@@ -60,16 +65,16 @@ let getOrCreateDirectoryTargetsProps (filePath: string) =
     if File.Exists(filePath) then
         document.Load(filePath)
 
-    let mutable projectNode = document["Project"]
-    if projectNode &== null then
+    if document["Project"] &== null then
         let newProjectNode = document.CreateElement(Sdk.Project)
         document.AppendChild(newProjectNode) |> ignore
-        projectNode <- newProjectNode
 
     document
 
 let updateDirectoryTargetProps (document: XmlDocument) (allPackageVersions: IReadOnlyDictionary<string, string>) =
+    let xml = xml document
     let project = document[Sdk.Project]
+    let projectNode = XmlElementBuilder(project)
 
     let managePackagesCentrally =
         project.PropertyGroups
@@ -80,10 +85,13 @@ let updateDirectoryTargetProps (document: XmlDocument) (allPackageVersions: IRea
     | Some managePackagesCentrally ->
         managePackagesCentrally.InnerText <- "true"
     | _ ->
-        let propertyGroup = document.CreateElement(Properties.PropertyGroup)
-        let managePackagesCentrally = document.CreateElement(Properties.ManagePackageVersionsCentrally, InnerText = "true")
-        propertyGroup.AppendChild(managePackagesCentrally) |> ignore
-        project.AppendChild(propertyGroup) |> ignore
+        projectNode {
+            xml Properties.PropertyGroup {
+                xml Properties.ManagePackageVersionsCentrally {
+                    "true"
+                }
+            }
+        }
 
     let packageReferencesToAdd = Dictionary(allPackageVersions)
     for itemGroup in project.ItemGroups do
@@ -100,19 +108,15 @@ let updateDirectoryTargetProps (document: XmlDocument) (allPackageVersions: IRea
             | _ ->
                 ()
 
-    let packageReferences = document.CreateElement(Items.ItemGroup)
-    for packageReference in packageReferencesToAdd do
-        let include' = packageReference.Key
-        let version = packageReference.Value
-
-        let packageReference = document.CreateElement(Items.PackageVersion)
-        let includeAttribute = document.CreateAttribute(Items.Metadata.Include, Value = include')
-        let versionAttribute = document.CreateAttribute(Items.Metadata.Version, Value = version)
-        packageReference.Attributes.Append(includeAttribute) |> ignore
-        packageReference.Attributes.Append(versionAttribute) |> ignore
-        packageReferences.AppendChild(packageReference) |> ignore
-
-    project.AppendChild(packageReferences) |> ignore
+    projectNode {
+        xml Items.ItemGroup {
+            for packageReference in packageReferencesToAdd do
+                xml Items.PackageVersion {
+                    Items.Metadata.Include -- packageReference.Key
+                    Items.Metadata.Version -- packageReference.Value
+                }
+        }
+    }
 
 let analyzeSolution toolsPath solutionPath =
     let solution = SolutionFile.Parse(solutionPath)
@@ -152,5 +156,9 @@ let analyzeSolution toolsPath solutionPath =
     document.WriteToFile(filePath)
 
 let run solutionPath =
+    Console.WriteLine($"Running migration tool... {solutionPath}")
+
     let toolsPath = DotnetInfo.getCoreBasePath solutionPath
+    Console.WriteLine($"Tools path: {toolsPath}")
+
     analyzeSolution toolsPath solutionPath
