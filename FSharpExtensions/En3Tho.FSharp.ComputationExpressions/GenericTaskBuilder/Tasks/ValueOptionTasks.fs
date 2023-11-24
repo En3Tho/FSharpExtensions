@@ -48,7 +48,6 @@ module TaskLikeHighValueOption =
                     match res with
                     | ValueSome value -> (continuation(value)).Invoke(&sm)
                     | ValueNone ->
-                        sm.ResumptionPoint <- StateMachineCodes.ShouldStop
                         sm.Data.SetResult(ValueNone)
                         true
             ))
@@ -64,7 +63,6 @@ module TaskLikeHighValueOption =
                 match result with
                 | ValueSome value -> (continuation(value)).Invoke(&sm)
                 | ValueNone ->
-                    sm.ResumptionPoint <- StateMachineCodes.ShouldStop
                     sm.Data.SetResult(ValueNone)
                     true
             )
@@ -88,7 +86,6 @@ module TaskLikeHighOption =
                     match res with
                     | Some value -> (continuation(value)).Invoke(&sm)
                     | None ->
-                        sm.ResumptionPoint <- StateMachineCodes.ShouldStop
                         sm.Data.SetResult(ValueNone)
                         true
             ))
@@ -104,7 +101,6 @@ module TaskLikeHighOption =
                 match result with
                 | Some value -> (continuation(value)).Invoke(&sm)
                 | None ->
-                    sm.ResumptionPoint <- StateMachineCodes.ShouldStop
                     sm.Data.SetResult(None)
                     true
             )

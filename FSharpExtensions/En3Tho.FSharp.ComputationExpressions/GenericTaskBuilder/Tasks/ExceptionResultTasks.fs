@@ -82,7 +82,6 @@ module TaskLikeHigh =
                     match res with
                     | Ok value -> (continuation(value)).Invoke(&sm)
                     | Error exn ->
-                        sm.ResumptionPoint <- StateMachineCodes.ShouldStop
                         sm.Data.SetResult(Error (exn :> exn))
                         true
             ))
@@ -96,7 +95,6 @@ module TaskLikeHigh =
                 | Ok value ->
                     (continuation value).Invoke(&sm)
                 | Error exn ->
-                     sm.ResumptionPoint <- StateMachineCodes.ShouldStop
                      sm.Data.SetResult(Error (exn :> exn))
                      true
             )

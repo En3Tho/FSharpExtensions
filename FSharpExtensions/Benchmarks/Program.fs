@@ -10,5 +10,5 @@ BenchmarkRunner.Run<
     // NodeCode.ReturnBenchmark,
     // FSharpOptimizer.Benchmark,
     // FSharpOptimizerWithExperimentalPipe.Benchmark,
-    GSeq.Benchmark
+    GenericTaskBuilder.AsyncSeqBenchmark
     >() |> ignore

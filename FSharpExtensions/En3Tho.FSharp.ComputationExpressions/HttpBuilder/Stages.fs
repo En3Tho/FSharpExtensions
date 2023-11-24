@@ -3,18 +3,22 @@
 open System.ComponentModel
 open System.Net.Http
 open System.Runtime.CompilerServices
-open En3Tho.FSharp.ComputationExpressions
 
-type [<Struct; IsReadOnly>] HttpRequestMessageStage(client: HttpClient, request: HttpRequestMessage) =
+[<Struct; IsReadOnly; EditorBrowsable(EditorBrowsableState.Never)>]
+type HttpRequestMessageStage(client: HttpClient, request: HttpRequestMessage) =
     member _.Client = client
     member _.Request = request
 
-type [<Struct; IsReadOnly>] HttpRequestMessageContentStage(client: HttpClient, request: HttpRequestMessage) =
+[<Struct; IsReadOnly; EditorBrowsable(EditorBrowsableState.Never)>]
+type HttpRequestMessageContentStage(client: HttpClient, request: HttpRequestMessage) =
     member _.Client = client
     member _.Request = request
 
+[<EditorBrowsable(EditorBrowsableState.Never)>]
 type HttpRequestMessageResponseStageCode = delegate of HttpRequestMessage -> unit
-type [<Struct; IsReadOnly; EditorBrowsable(EditorBrowsableState.Value)>] GetRequestIntrinsic = struct end
+
+[<Struct; IsReadOnly; EditorBrowsable(EditorBrowsableState.Never)>]
+type GetRequestIntrinsic = struct end
 type [<Struct; IsReadOnly>] HttpRequestMessageResponseStage<'TResponseSerializer, 'TResult
     when 'TResponseSerializer :> IResponseSerializer<'TResult>>
     (client: HttpClient, request: HttpRequestMessage, serializer: 'TResponseSerializer) =
@@ -22,6 +26,7 @@ type [<Struct; IsReadOnly>] HttpRequestMessageResponseStage<'TResponseSerializer
     member _.Request = request
     member _.Serializer = serializer
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.Send() =
         let request = this.Request
         let client = this.Client
@@ -32,6 +37,7 @@ type [<Struct; IsReadOnly>] HttpRequestMessageResponseStage<'TResponseSerializer
             return! serializer.Serialize(response)
         }
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.GetAwaiter() = this.Send().GetAwaiter()
 
     member inline this.Bind(_: GetRequestIntrinsic, [<InlineIfLambda>] code: HttpRequestMessage -> HttpRequestMessageResponseStageCode) : HttpRequestMessageResponseStageCode =

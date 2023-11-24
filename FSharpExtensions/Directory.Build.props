@@ -12,6 +12,8 @@
 
     <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.fsproj'">
         <Tailcalls>false</Tailcalls>
+        <OtherFlags>$(OtherFlags) --test:GraphBasedChecking --test:ParallelOptimization --test:ParallelIlxGen</OtherFlags>
+        <WarnOn>FS3559</WarnOn>
         <NoWarn>
             <!--Unverifiable IL--> 9,
             <!--explicit new IDisposable--> 0760,

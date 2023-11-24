@@ -2,6 +2,7 @@
 
 open System
 open System.Collections.Generic
+open System.ComponentModel
 open System.Runtime.CompilerServices
 open System.Threading.Tasks
 open Microsoft.FSharp.Core
@@ -30,16 +31,16 @@ module Low =
                     ))
             )
 
-    [<AbstractClass; Sealed; Extension>]
+    [<AbstractClass; Sealed; Extension; EditorBrowsable(EditorBrowsableState.Never)>]
     type LowPriorityImpl() =
 
         [<NoEagerConstraintApplication>]
-        [<Extension>]
+        [<Extension; EditorBrowsable(EditorBrowsableState.Never)>]
         static member inline Bind(_: #IBindExtensions, task: ^TaskLike, [<InlineIfLambda>] continuation: 'TResult1 -> ResumableCode<'TData, 'TResult2>)
             : ResumableCode<'TData, 'TResult2> =
             ResumableCodeHelpers.Bind(task, continuation)
 
-        [<Extension>]
+        [<Extension; EditorBrowsable(EditorBrowsableState.Never)>]
         static member inline Return<'TData, 'TResult, 'TExtensions
             when 'TData :> IStateMachineData<'TData, 'TResult>
             and 'TExtensions :> IReturnExtensions>(_: 'TExtensions, value: 'TResult) =
@@ -47,11 +48,11 @@ module Low =
                 sm.Data.SetResult(value)
                 true)
 
-        [<NoEagerConstraintApplication; Extension>]
+        [<NoEagerConstraintApplication; Extension; EditorBrowsable(EditorBrowsableState.Never)>]
         static member inline ReturnFrom(this: #IReturnExtensions, task: ^TaskLike) =
             this.Bind(task, (fun v -> this.Return v))
 
-        [<Extension>]
+        [<Extension; EditorBrowsable(EditorBrowsableState.Never)>]
         static member inline Yield<'TData, 'TResult, 'TExtensions
             when 'TData :> IStateMachineDataYield<'TData, 'TResult>
             and 'TExtensions :> IYieldExtensions>(_: 'TExtensions, value: 'TResult) =
@@ -64,11 +65,11 @@ module Low =
                     else
                         true)
 
-        [<NoEagerConstraintApplication; Extension>]
+        [<NoEagerConstraintApplication; Extension; EditorBrowsable(EditorBrowsableState.Never)>]
         static member inline YieldFrom (this: #IYieldExtensions, task: ^TaskLike) =
             this.Bind(task, (fun v -> this.Yield v))
 
-        [<NoEagerConstraintApplication; Extension>]
+        [<NoEagerConstraintApplication; Extension; EditorBrowsable(EditorBrowsableState.Never)>]
         static member inline YieldFrom<'TBuilder, 'TResult, 'TData
             when 'TBuilder :> GenericTaskBuilderCore
             and 'TBuilder :> IYieldExtensions
@@ -77,7 +78,7 @@ module Low =
             and 'TData :> IStateMachineDataYield<'TData,'TResult>>(this: 'TBuilder, asyncSeq: IAsyncEnumerable<'TResult>) =
             this.For<'TResult, 'TData>(asyncSeq, (fun v -> this.Yield v))
 
-        [<NoEagerConstraintApplication; Extension>]
+        [<NoEagerConstraintApplication; Extension; EditorBrowsable(EditorBrowsableState.Never)>]
         static member inline YieldFrom<'TBuilder, 'TResult, 'TData
             when 'TBuilder :> GenericTaskBuilderCore
             and 'TBuilder :> IYieldExtensions
@@ -89,10 +90,10 @@ module Low =
 module High =
     open Low
 
-    [<AbstractClass; Sealed; Extension>]
+    [<AbstractClass; Sealed; Extension; EditorBrowsable(EditorBrowsableState.Never)>]
     type HighPriorityImpl() =
 
-        [<Extension>]
+        [<Extension; EditorBrowsable(EditorBrowsableState.Never)>]
         static member inline Bind<'TData, 'TResult1, 'TResult2, 'TExtensions, 'TDataResult
             when 'TData :> IAsyncMethodBuilderBase
             and 'TData :> IStateMachineData<'TData, 'TDataResult>
@@ -100,22 +101,22 @@ module High =
             (this: 'TExtensions, task: Task<'TResult1>, [<InlineIfLambda>] continuation: 'TResult1 -> ResumableCode<'TData, 'TResult2>) =
                 this.Bind(TaskBindWrapper(task), continuation)
 
-        [<Extension>]
+        [<Extension; EditorBrowsable(EditorBrowsableState.Never)>]
         static member inline ReturnFrom(this: #IReturnExtensions, task: Task<'TResult>) =
             this.Bind(task, (fun v -> this.Return v))
 
-        [<NoEagerConstraintApplication; Extension>]
+        [<NoEagerConstraintApplication; Extension; EditorBrowsable(EditorBrowsableState.Never)>]
         static member inline YieldFrom (this: #IYieldExtensions, task: Task<'TResult>) =
             this.Bind(task, (fun v -> this.Yield v))
 
-        [<Extension>]
+        [<Extension; EditorBrowsable(EditorBrowsableState.Never)>]
         static member inline Bind(this: #IBindExtensions, computation: Async<'TResult1>, [<InlineIfLambda>] continuation: 'TResult1 -> ResumableCode<'TData, 'TResult2>) =
             this.Bind (Async.StartAsTask computation, continuation)
 
-        [<Extension>]
+        [<Extension; EditorBrowsable(EditorBrowsableState.Never)>]
         static member inline ReturnFrom(this: #IReturnExtensions, computation: Async<'TResult>) =
             this.ReturnFrom (Async.StartAsTask computation)
 
-        [<Extension>]
+        [<Extension; EditorBrowsable(EditorBrowsableState.Never)>]
         static member inline YieldFrom (this: #IYieldExtensions, computation: Async<'TResult>) =
             this.YieldFrom (Async.StartAsTask computation)

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <NugetVersion>8.0.1</NugetVersion>
+        <NugetVersion>8.1.0</NugetVersion>
         <Description>A set of computation expressions for F# base library</Description>
     </PropertyGroup>
 
@@ -13,7 +13,6 @@
         <Compile Include="GenericUnitBuilderBase.fs" />
         <Compile Include="GenericCollectionCodeExtensions.fs" />
         <Compile Include="ArrayPoolBasedBuilders.fs" />
-        <Compile Include="GSeqExtensions.fs" />
         <Compile Include="CollectionBuilderExtensions.fs" />
         <Compile Include="OptionBuilder.fs" />
         <Compile Include="ResultBuilder.fs" />
@@ -47,6 +46,7 @@
         <Compile Include="GenericTaskBuilder\Tasks\SemaphoreSlimTask.fs" />
         <Compile Include="Tasks.fs" />        
         <Compile Include="ValueTaskExtensions.fs" />
+        <Compile Include="GSeqExtensions.fs" />
         <Compile Include="HttpBuilder\Serializers.fs" />
         <Compile Include="HttpBuilder\HeadersBuilders.fs" />
         <Compile Include="HttpBuilder\Stages.fs" />

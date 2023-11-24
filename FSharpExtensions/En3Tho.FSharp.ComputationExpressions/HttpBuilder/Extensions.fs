@@ -46,44 +46,48 @@ type HttpRequestMessageContentStage with
     member inline this.AsString() =
         HttpRequestMessageResponseStage(this.Client, this.Request, StringResponseSerializer())
 
-    member inline this.AsStringOrResponse() =
+    member inline this.AsStringResult() =
         HttpRequestMessageResponseStage(this.Client, this.Request, ValueOrResponseSerializer(StringResponseSerializer()))
 
     member inline this.AsStream() =
         HttpRequestMessageResponseStage(this.Client, this.Request, StreamResponseSerializer())
 
-    member inline this.AsStreamOrResponse() =
+    member inline this.AsStreamResult() =
         HttpRequestMessageResponseStage(this.Client, this.Request, ValueOrResponseSerializer(StreamResponseSerializer()))
 
     member inline this.AsByteArray() =
         HttpRequestMessageResponseStage(this.Client, this.Request, ByteArrayResponseSerializer())
 
-    member inline this.AsByteArrayOrResponse() =
+    member inline this.AsByteArrayResult() =
         HttpRequestMessageResponseStage(this.Client, this.Request, ValueOrResponseSerializer(ByteArrayResponseSerializer()))
 
     member inline this.AsResponse() =
         HttpRequestMessageResponseStage(this.Client, this.Request, RawResponseSerializer())
 
-    member inline this.AsNoResponse() =
+    member inline this.AsUnit() =
         HttpRequestMessageResponseStage(this.Client, this.Request, UnitResponseSerializer())
+
+    member inline this.AsUnitResult() =
+        HttpRequestMessageResponseStage(this.Client, this.Request, ValueOrResponseSerializer(UnitResponseSerializer()))
 
     member inline this.AsJson<'a>(options: JsonSerializerOptions) =
         HttpRequestMessageResponseStage(this.Client, this.Request, JsonResponseSerializer<'a>(options))
 
-    member inline this.AsJsonOrResponse<'a>(options: JsonSerializerOptions) =
+    member inline this.AsJsonResult<'a>(options: JsonSerializerOptions) =
         HttpRequestMessageResponseStage(this.Client, this.Request, ValueOrResponseSerializer(JsonResponseSerializer<'a>(options)))
 
     member inline this.AsJson<'a>() = this.AsJson<'a>(null)
 
-    member inline this.AsJsonOrResponse<'a>() = this.AsJsonOrResponse<'a>(null)
+    member inline this.AsJsonResult<'a>() = this.AsJsonResult<'a>(null)
 
-    member inline this.AsJsonResult<'a, 'b>(options: JsonSerializerOptions) =
+    member inline this.AsJsonEither<'a, 'b>(options: JsonSerializerOptions) =
         HttpRequestMessageResponseStage(this.Client, this.Request, JsonResultResponseSerializer<'a, 'b>(options))
 
-    member inline this.AsJsonResult<'a, 'b>() = this.AsJson<'a>(null)
+    member inline this.AsJsonEither<'a, 'b>() = this.AsJsonEither<'a, 'b>(null)
 
 type HttpClient with
     member inline this.Get(url: string) = HttpRequestMessageContentStage(this, HttpRequestMessage(HttpMethod.Get, url))
     member inline this.Post(url: string) = HttpRequestMessageStage(this, HttpRequestMessage(HttpMethod.Post, url))
     member inline this.Put(url: string) = HttpRequestMessageStage(this, HttpRequestMessage(HttpMethod.Put, url))
     member inline this.Delete(url: string) = HttpRequestMessageStage(this, HttpRequestMessage(HttpMethod.Delete, url))
+    member inline this.Patch(url: string) = HttpRequestMessageStage(this, HttpRequestMessage(HttpMethod.Patch, url))

@@ -47,25 +47,25 @@ let callGuidParseToString4Unrolled (str : string) =
 
 let plus1 x = x + 1
 
-let callSeq2<'a> = Seq.map plus1 >> Seq.map plus1
-let callSeq2Unrolled<'a> values = values |> Seq.map plus1 |> Seq.map plus1
+let callSeq2 = Seq.map plus1 >> Seq.map plus1
+let callSeq2Unrolled values = values |> Seq.map plus1 |> Seq.map plus1
 
-let callSeq3<'a> =
+let callSeq3 =
     Seq.map plus1 >> Seq.map plus1 >> Seq.map plus1
 
-let callSeq3Unrolled<'a> values =
+let callSeq3Unrolled values =
     values
     |> Seq.map plus1
     |> fun x -> Seq.map plus1 x
     |> Seq.map plus1
 
-let callSeq4<'a> =
+let callSeq4 =
     Seq.map plus1
     >> Seq.map plus1
     >> Seq.map plus1
     >> Seq.map plus1
 
-let callSeq4Unrolled<'a> values =
+let callSeq4Unrolled values =
     values
     |> Seq.map plus1
     |> fun x -> Seq.map plus1 x

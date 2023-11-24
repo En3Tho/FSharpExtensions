@@ -34,11 +34,11 @@ module Span =
         Span<'a>(Array.zeroCreate<'a> len)
 
     let inline malloc<'a when 'a: unmanaged> len =
-        let ptr = NativeMemory.Alloc (ecast<_, unativeint> (Unsafe.SizeOf<'a>()) * ecast<_, unativeint> len)
+        let ptr = NativeMemory.Alloc(ecast<_, unativeint> (Unsafe.SizeOf<'a>()) * ecast<_, unativeint> len)
         Span<'a>(ptr, len)
 
     let inline mfree<'a when 'a: unmanaged> (span: Span<'a>) =
-        NativeMemory.Free (Unsafe.AsPointer(&span.GetPinnableReference()))
+        NativeMemory.Free(Unsafe.AsPointer(&span.GetPinnableReference()))
 
 module ReadOnlySpan =
     let inline isEmpty (span: ReadOnlySpan<_>) = span.Length = 0

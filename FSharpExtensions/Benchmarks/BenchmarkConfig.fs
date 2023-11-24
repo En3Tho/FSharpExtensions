@@ -51,7 +51,6 @@ module JitEnv =
         static member All = EnvironmentVariable(Env.JitOptRepeat, "*")
         static member Count(count: int) = EnvironmentVariable(Env.JitOptRepeatCount, count.ToString())
 
-
 type Job with
     static member Net5 = Job.Default.WithRuntime(CoreRuntime.Core50).WithId("Net5")
     static member Net6 = Job.Default.WithRuntime(CoreRuntime.Core60).WithId("Net6")

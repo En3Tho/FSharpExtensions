@@ -23,6 +23,7 @@
         <Compile Include="MathematicalOperatorsBenchmarks.fs" />
         <Compile Include="NodeCode.fs" />
         <Compile Include="GSeq.fs" />
+        <Compile Include="GenericTaskBuilder.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 

@@ -4,13 +4,15 @@ open System.Collections.Generic
 open System.ComponentModel
 open System.Net.Http.Headers
 open System.Runtime.CompilerServices
-open En3Tho.FSharp.ComputationExpressions
 
-type [<Struct; IsReadOnly; EditorBrowsable(EditorBrowsableState.Value)>] GetHeadersIntrinsic = struct end
+type [<Struct; IsReadOnly; EditorBrowsable(EditorBrowsableState.Never)>]
+GetHeadersIntrinsic = struct end
 
+[<EditorBrowsable(EditorBrowsableState.Never)>]
 type ContentHeadersBuilderCode = delegate of HttpContentHeaders -> unit
 
-type [<Struct; IsReadOnly>] ContentHeadersBuilder =
+[<Struct; IsReadOnly; EditorBrowsable(EditorBrowsableState.Never)>]
+type ContentHeadersBuilder =
 
     member inline _.Bind(_: GetHeadersIntrinsic, [<InlineIfLambda>] builderCode: HttpContentHeaders -> ContentHeadersBuilderCode) : ContentHeadersBuilderCode =
         ContentHeadersBuilderCode(fun builder ->
@@ -35,9 +37,11 @@ type [<Struct; IsReadOnly>] ContentHeadersBuilder =
     member inline this.Run([<InlineIfLambda>] code: ContentHeadersBuilderCode) =
         ContentHeadersBuilderCode(fun builder -> code.Invoke(builder))
 
+[<EditorBrowsable(EditorBrowsableState.Never)>]
 type RequestHeadersBuilderCode = delegate of HttpRequestHeaders -> unit
 
-type [<Struct; IsReadOnly>] RequestHeadersBuilder =
+[<Struct; IsReadOnly; EditorBrowsable(EditorBrowsableState.Never)>]
+type RequestHeadersBuilder =
 
     member inline _.Bind(_: GetHeadersIntrinsic, [<InlineIfLambda>] builderCode: HttpRequestHeaders -> RequestHeadersBuilderCode) : RequestHeadersBuilderCode =
         RequestHeadersBuilderCode(fun builder ->

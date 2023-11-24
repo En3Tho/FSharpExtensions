@@ -13,7 +13,6 @@ type IReturnExtensions = interface end
 
 module StateMachineCodes =
     let [<Literal>] Finished = -1
-    let [<Literal>] ShouldStop = -2
 
 [<Struct>]
 type TaskBindWrapper<'a>(task: Task<'a>) =
