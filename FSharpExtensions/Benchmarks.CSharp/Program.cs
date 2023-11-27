@@ -3,4 +3,4 @@
 using BenchmarkDotNet.Running;
 using Benchmarks.CSharp;
 
-BenchmarkRunner.Run<ScanfBenchmark>();
+BenchmarkRunner.Run<TryCatchBenchmark>();

@@ -21,6 +21,7 @@ type ActivityStateCheck =
             | null -> ()
             | activity ->
                 activity.SetStatus(ActivityStatusCode.Error, ``exception``.Message).Dispose()
+                // TODO: OpenTelemetry integration or a specialized state check?
                 // activity.RecordException?
             
         static member CanProcessSuccess = true
