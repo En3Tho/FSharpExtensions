@@ -7,7 +7,7 @@ open En3Tho.FSharp.ComputationExpressions.CodeBuilder
 open Microsoft.Extensions.Logging
 
 let renameParamNameIfException(paramName: string) =
-    if paramName.Equals("exception") then "exn" else paramName
+    if paramName.Equals("exception") then "``exception``" else paramName
 
 let parametersToArgsString (parameters: ParameterInfo[]) =
     parameters

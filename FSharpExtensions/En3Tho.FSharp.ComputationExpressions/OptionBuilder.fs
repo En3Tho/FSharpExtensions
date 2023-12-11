@@ -54,7 +54,6 @@ type OptionBuilderBase() =
                 compensation()
 
     member inline this.Using(disp: #IDisposable, [<InlineIfLambda>] body: #IDisposable -> OptionCode<'T>) : OptionCode<'T> =
-        // A using statement is just a try/finally with the finally block disposing if non-null.
         this.TryFinally(
             (fun () -> (body disp)()),
             (fun () -> if not (isNull (box disp)) then disp.Dispose()))

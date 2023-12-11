@@ -7,7 +7,6 @@ open En3Tho.FSharp.Extensions
 
 type CollectionCode = UnitBuilderCode<unit>
 
-
 [<AbstractClass; Extension>]
 type UnitLikeCodeExtensions() =
 
@@ -57,5 +56,3 @@ type UnitLikeCodeExtensions() =
     [<Extension; EditorBrowsable(EditorBrowsableState.Never)>]
     static member inline Delay(_, [<InlineIfLambda>] delay: unit -> CollectionCode) =
         fun () -> (delay())()
-        // Note, not "f()()" - the F# compiler optimizer likes arguments to match lambdas in order to preserve
-        // argument evaluation order, so for "(f())()" the optimizer reduces one lambda then another, while "f()()" doesn't
