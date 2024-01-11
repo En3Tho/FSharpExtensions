@@ -44,6 +44,7 @@
         <Compile Include="GenericTaskBuilder\Tasks\ValueOptionTasks.fs" />
         <Compile Include="GenericTaskBuilder\Tasks\CancellableTasks.fs" />
         <Compile Include="GenericTaskBuilder\Tasks\SemaphoreSlimTask.fs" />
+        <Compile Include="GenericTaskBuilder\Tasks\LazyTask.fs" />
         <Compile Include="Tasks.fs" />        
         <Compile Include="ValueTaskExtensions.fs" />
         <Compile Include="GSeqExtensions.fs" />
