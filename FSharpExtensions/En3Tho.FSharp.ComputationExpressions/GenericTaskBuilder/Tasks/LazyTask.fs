@@ -47,7 +47,7 @@ type [<Struct>] AsyncTaskMethodBuilderWrapperForLazyTask<'TResult, 'TBehavior
     member this.SetStateMachine(stateMachine) = this.builder.SetStateMachine(stateMachine)
     member this.Start(stateMachine: byref<#IAsyncStateMachine>) =
         let mutable fakeAwaiter = FakeAwaiter()
-        this.builder.AwaitOnCompleted(&fakeAwaiter, &stateMachine)
+        this.builder.AwaitUnsafeOnCompleted(&fakeAwaiter, &stateMachine)
         this.task <- LazyTask<'TResult>(this.builder.Task, fakeAwaiter.Continuation)
     member this.Task = this.task
 
@@ -81,7 +81,7 @@ type [<Struct>] AsyncTaskMethodBuilderWrapperForLazyTask<'TBehavior
     member this.SetStateMachine(stateMachine) = this.builder.SetStateMachine(stateMachine)
     member this.Start(stateMachine: byref<#IAsyncStateMachine>) =
         let mutable fakeAwaiter = FakeAwaiter()
-        this.builder.AwaitOnCompleted(&fakeAwaiter, &stateMachine)
+        this.builder.AwaitUnsafeOnCompleted(&fakeAwaiter, &stateMachine)
         this.task <- LazyTask(this.builder.Task, fakeAwaiter.Continuation)
     member this.Task = this.task
 

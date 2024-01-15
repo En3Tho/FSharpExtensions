@@ -1,27 +1,24 @@
-module En3Tho.FSharp.ComputationExpressions.Tests.LazyTaskTests
+module En3Tho.FSharp.ComputationExpressions.Tests.RepeatableTaskTests
 
 open System.Threading.Tasks
 open Xunit
 open En3Tho.FSharp.ComputationExpressions.Tasks
 
 [<Fact>]
-let ``test that lazy task doesn't start until awaited``() = task {
+let ``test that repeatable task doesn't start until awaited``() = task {
     let mutable counter = 0
-    let lz = lazyTask {
+    let lz = repeatableTask {
         counter <- 1
     }
     Assert.Equal(0, counter)
     do! lz
     Assert.Equal(1, counter)
-
-    do! lz
-    Assert.Equal(1, counter)
 }
 
 [<Fact>]
-let ``test that lazy task doesn't execute move next multiple times``() = task {
+let ``test that repeatable task repeats itself``() = task {
     let mutable counter = 0
-    let lz = lazyTask {
+    let lz = repeatableTask {
         do! Task.Delay(100)
         counter <- counter + 1
     }
@@ -30,19 +27,21 @@ let ``test that lazy task doesn't execute move next multiple times``() = task {
         do! lz
     }))
 
-    Assert.Equal(1, counter)
+    Assert.Equal(100, counter)
 }
 
 [<Fact>]
-let ``test that lazy task correctly awaits multiple times``() = task {
+let ``test that repeatable task correctly awaits multiple times``() = task {
     let mutable counter = 0
-    let lz = lazyTask {
+    let lz = repeatableTask {
         do! Task.Delay(100)
-        counter <- 1
+        counter <- counter + 1
         do! Task.Delay(100)
-        counter <- 2
+        counter <- counter + 1
     }
     Assert.Equal(0, counter)
     do! lz
     Assert.Equal(2, counter)
+    do! lz
+    Assert.Equal(4, counter)
 }

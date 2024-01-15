@@ -11,6 +11,7 @@ open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.LazyTask
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.Native
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.AsyncEnumerable
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ActivityTask
+open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.RepeatableTask
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.SemaphoreSlimTask
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.SynchronizationContextTask
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ResultTask
@@ -74,6 +75,9 @@ let semaphoreSlimValueTask semaphore = SemaphoreSlimValueTaskBuilder(semaphore)
 
 let lazyTask = LazyTaskBuilder()
 let lazyUnitTask = LazyUnitTaskBuilder()
+
+let repeatableTask = RepeatableTaskBuilder()
+let repeatableUnitTask = RepeatableUnitTaskBuilder()
 
 [<AbstractClass; Sealed; AutoOpen>]
 type ActivityBuilders() =

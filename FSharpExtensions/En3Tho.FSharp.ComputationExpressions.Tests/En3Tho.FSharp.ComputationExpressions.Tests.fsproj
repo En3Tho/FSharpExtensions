@@ -18,6 +18,7 @@
         <Compile Include="TaskResultOverloadingTests.fs" />
         <Compile Include="CancellableTaskTests.fs" />
         <Compile Include="LazyTaskTests.fs" />
+        <Compile Include="RepeatableTaskTests.fs" />
     </ItemGroup>
 
     <ItemGroup>
