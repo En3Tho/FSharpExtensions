@@ -42,7 +42,6 @@ type ResultBuilderBase() =
                 compensation()
 
     member inline this.Using(disp: #IDisposable, [<InlineIfLambda>] body: #IDisposable -> ResultCode<'a, 'b>) : ResultCode<'a, 'b> =
-        // A using statement is just a try/finally with the finally block disposing if non-null.
         this.TryFinally(
             (fun () -> (body disp)()),
             (fun () -> if not (isNull (box disp)) then disp.Dispose()))

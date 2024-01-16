@@ -19,8 +19,6 @@ type [<Struct>] SyncContextTaskStateMachineDataInitializer<'TMethodBuilder, 'TTa
                 data.MethodBuilder.Start(&sm)
             else
                 // force state machine box creation with traditional async method builders
-                // this is a total AsyncTaskMethodBuilder implementation detail hack -_-
-                // but it will initialize task field properly
                 let mutable fakeAwaiter = FakeAwaiter()
                 data.MethodBuilder.AwaitUnsafeOnCompleted(&fakeAwaiter, &sm)
                 state.Post((fun continuation ->

@@ -2,25 +2,23 @@ module En3Tho.FSharp.ComputationExpressions.ArrayPoolBasedBuilders
 
 open System
 open System.Buffers
-open System.Collections
-open System.Collections.Generic
 open System.Collections.Immutable
-open System.Linq
 open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
 
 module ArrayPoolList =
     type ArrayPool<'a> with
         member this.ReRent (array: 'a[] byref, newLength) =
-            let newArray = this.Rent newLength
+            let newArray = this.Rent(newLength)
             Array.Copy(array, newArray, array.Length)
-            this.Return array
+            this.Return(array)
             array <- newArray
+
     let [<Literal>] private InitialSize = 256
     let [<Literal>] private GrowMultiplier = 2
 
-    type [<NoComparison;NoEquality>] ArrayPoolList<'a>(initialSize) =
-        let mutable array = ArrayPool.Shared.Rent initialSize
+    type [<NoComparison; NoEquality>] ArrayPoolList<'a>(initialSize) =
+        let mutable array = ArrayPool.Shared.Rent(initialSize)
         let mutable count = 0
 
         new () = new ArrayPoolList<'a>(InitialSize)
@@ -54,31 +52,6 @@ module ArrayPoolList =
     
 open ArrayPoolList
 
-// This is needed to set ResizeArray to initial count and get span from it
-type private FakeCollection<'a>(count) =
-
-    member val Count = count with get, set
-
-    [<DefaultValue; ThreadStatic>]
-    static val mutable private threadStaticInstance: FakeCollection<'a>
-
-    static member GetInstance(count) =
-        if Object.ReferenceEquals(FakeCollection<'a>.threadStaticInstance, null) then
-            FakeCollection<'a>.threadStaticInstance <- FakeCollection(0)
-        FakeCollection<'a>.threadStaticInstance.Count <- count
-        FakeCollection<'a>.threadStaticInstance
-
-    interface ICollection<'a> with
-        member this.Add(item) = ()
-        member this.Clear() = ()
-        member this.Contains(item) = false
-        member this.CopyTo(array, arrayIndex) = ()
-        member this.Count = this.Count
-        member this.GetEnumerator(): IEnumerator<'a> = Enumerable.Empty<'a>().GetEnumerator()
-        member this.GetEnumerator(): IEnumerator = Enumerable.Empty<'a>().GetEnumerator() :> IEnumerator
-        member this.IsReadOnly = true
-        member this.Remove(item) = false
-
 type ArrayPoolList<'a> with
     member this.ToImmutableArray() =
         ImmutableArray.Create(this.GetArray(), 0, this.Count)
@@ -89,8 +62,8 @@ type ArrayPoolList<'a> with
             ResizeArray()
         else
             let array = this.GetArray()
-            let fake = FakeCollection.GetInstance(count)
-            let result = ResizeArray(fake)
+            let result = ResizeArray()
+            CollectionsMarshal.SetCount(result, count)
             array.AsSpan(0, count).CopyTo(CollectionsMarshal.AsSpan(result))
             result
 
