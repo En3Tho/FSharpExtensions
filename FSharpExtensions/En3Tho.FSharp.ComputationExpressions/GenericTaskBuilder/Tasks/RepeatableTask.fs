@@ -7,13 +7,13 @@ open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks
 
 [<AbstractClass>]
 type RepeatableTask() =
-    abstract StartNew: unit -> Task
-    member this.GetAwaiter() = this.StartNew().GetAwaiter()
+    abstract Repeat: unit -> Task
+    member this.GetAwaiter() = this.Repeat().GetAwaiter()
 
 [<AbstractClass>]
 type RepeatableTask<'T>() =
-    abstract StartNew: unit -> Task<'T>
-    member this.GetAwaiter() = this.StartNew().GetAwaiter()
+    abstract Repeat: unit -> Task<'T>
+    member this.GetAwaiter() = this.Repeat().GetAwaiter()
 
 type [<Struct>] AsyncTaskMethodBuilderWrapperForRepeatableTask<'TBehavior
     when 'TBehavior :> IAsyncTaskMethodBuilderBehavior> =
@@ -51,11 +51,11 @@ and [<Sealed>] RepeatableTaskImpl<'TStateMachine, 'TBehavior
     when 'TStateMachine :> IAsyncStateMachine
     and 'TBehavior :> IAsyncTaskMethodBuilderBehavior>(sm: 'TStateMachine) =
     inherit RepeatableTask()
-    override this.StartNew() =
+    override this.Repeat() =
         let mutable sm = sm
-        let mutable mb = AsyncTaskMethodBuilderWrapperForRepeatableTask<'TBehavior>.Create()
-        mb.builder.Start(&sm)
-        mb.builder.Task
+        let mutable mb = AsyncTaskMethodBuilderWrapper<'TBehavior>.Create()
+        mb.Start(&sm)
+        mb.Task
 
 type [<Struct>] AsyncTaskMethodBuilderWrapperForRepeatableTask<'TResult, 'TBehavior
     when 'TBehavior :> IAsyncTaskMethodBuilderBehavior<'TResult>> =
@@ -95,11 +95,11 @@ and [<Sealed>] RepeatableTaskImpl<'T, 'TStateMachine, 'TBehavior
     and 'TBehavior :> IAsyncTaskMethodBuilderBehavior<'T>>(sm: 'TStateMachine) =
     inherit RepeatableTask<'T>()
 
-    override this.StartNew() =
+    override this.Repeat() =
         let mutable sm = sm
-        let mutable mb = AsyncTaskMethodBuilderWrapperForRepeatableTask<'T, 'TBehavior>.Create()
-        mb.builder.Start(&sm)
-        mb.builder.Task
+        let mutable mb = AsyncTaskMethodBuilderWrapper<'T, 'TBehavior>.Create()
+        mb.Start(&sm)
+        mb.Task
 
 type RepeatableTaskBuilder() =
     inherit GenericTaskBuilderBase()
