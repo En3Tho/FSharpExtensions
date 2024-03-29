@@ -5,7 +5,7 @@ open BenchmarkDotNet.Attributes
 open System.Linq
 
 [<MemoryDiagnoser; DisassemblyDiagnoser(filters = [||])>]
-[<Config(typeof<``Net7, Net8``>)>]
+[<Config(typeof<``Net8, Net9``>)>]
 type Benchmark() =
 
     [<Params(1000)>]

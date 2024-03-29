@@ -41,6 +41,7 @@
         <Compile Include="GenericTaskBuilder\Tasks\SynchronizationContextTask.fs" />        
         <Compile Include="GenericTaskBuilder\Tasks\ResultTasks.fs" />        
         <Compile Include="GenericTaskBuilder\Tasks\ExceptionResultTasks.fs" />
+        <Compile Include="GenericTaskBuilder\Tasks\ExceptionTask.fs" />
         <Compile Include="GenericTaskBuilder\Tasks\ValueOptionTasks.fs" />
         <Compile Include="GenericTaskBuilder\Tasks\CancellableTasks.fs" />
         <Compile Include="GenericTaskBuilder\Tasks\SemaphoreSlimTask.fs" />

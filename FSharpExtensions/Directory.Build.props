@@ -17,7 +17,7 @@
         <NoWarn>
             <!--Unverifiable IL--> 9,
             <!--explicit new IDisposable--> 0760,
-            <!--unsafe--> 96 ,
+            <!--unsafe--> 96,
             <!--static abstract--> 3535,
             <!--inline il--> 42,
             <!--op_Explicit--> 77,

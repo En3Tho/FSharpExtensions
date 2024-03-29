@@ -7,6 +7,7 @@ open System.Runtime.InteropServices
 
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.CancellableTask
+open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ExceptionTask
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.LazyTask
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.Native
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.AsyncEnumerable
@@ -30,6 +31,9 @@ open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ValueOptionTa
 [<assembly: AutoOpen("En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ExceptionResultTask.TaskLikeHigh")>]
 [<assembly: AutoOpen("En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ExceptionResultTask.Low")>]
 [<assembly: AutoOpen("En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ExceptionResultTask.High")>]
+
+[<assembly: AutoOpen("En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ExceptionTask.Low")>]
+[<assembly: AutoOpen("En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ExceptionTask.High")>]
 
 [<assembly: AutoOpen("En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ValueOptionTask.TaskLikeLow")>]
 [<assembly: AutoOpen("En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ValueOptionTask.TaskLikeHighOption")>]

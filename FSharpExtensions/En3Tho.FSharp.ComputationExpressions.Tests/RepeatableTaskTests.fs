@@ -14,6 +14,8 @@ let ``test that repeatable task doesn't start until awaited``() = task {
     Assert.Equal(0, counter)
     do! lz
     Assert.Equal(1, counter)
+    do! lz
+    Assert.Equal(2, counter)
 }
 
 [<Fact>]

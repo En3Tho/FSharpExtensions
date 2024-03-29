@@ -56,6 +56,7 @@ type Job with
     static member Net6 = Job.Default.WithRuntime(CoreRuntime.Core60).WithId("Net6")
     static member Net7 = Job.Default.WithRuntime(CoreRuntime.Core70).WithId("Net7")
     static member Net8 = Job.Default.WithRuntime(CoreRuntime.Core80).WithId("Net8")
+    static member Net9 = Job.Default.WithRuntime(CoreRuntime.Core90).WithId("Net9")
     static member CoreRun =
         Job.Default
             .WithToolchain(CoreRunToolchain(
@@ -105,6 +106,15 @@ type ``Net7, Net8``() =
             //     JitEnv.JitStressModeNames.StressGeneralizedPromotion,
             //     EnvironmentVariable.Get("CORE_LIBRARIES")
             // )
+        |]) |> ignore
+
+type ``Net8, Net9``() =
+    inherit ManualConfig()
+
+    do
+        base.AddJob([|
+            Job.Net8
+            Job.Net9
         |]) |> ignore
 
 type ``Net 5, Net 6, Pgo``() =
