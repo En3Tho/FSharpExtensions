@@ -37,4 +37,4 @@ and XmlNodeBuilder(doc: XmlDocument, name: string) =
         code()
         XmlElementBuilder(this.XmlElement)
 
-let xml doc name = XmlNodeBuilder(doc, name)
+let xmlNode doc name = XmlNodeBuilder(doc, name)

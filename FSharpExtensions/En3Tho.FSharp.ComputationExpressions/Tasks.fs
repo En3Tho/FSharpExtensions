@@ -7,9 +7,12 @@ open System.Runtime.InteropServices
 
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.CancellableTask
+open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ExceptionTask
+open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.LazyTask
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.Native
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.AsyncEnumerable
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ActivityTask
+open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.RepeatableTask
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.SemaphoreSlimTask
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.SynchronizationContextTask
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ResultTask
@@ -29,6 +32,9 @@ open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ValueOptionTa
 [<assembly: AutoOpen("En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ExceptionResultTask.Low")>]
 [<assembly: AutoOpen("En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ExceptionResultTask.High")>]
 
+[<assembly: AutoOpen("En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ExceptionTask.Low")>]
+[<assembly: AutoOpen("En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ExceptionTask.High")>]
+
 [<assembly: AutoOpen("En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ValueOptionTask.TaskLikeLow")>]
 [<assembly: AutoOpen("En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ValueOptionTask.TaskLikeHighOption")>]
 [<assembly: AutoOpen("En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks.ValueOptionTask.TaskLikeHighValueOption")>]
@@ -43,6 +49,9 @@ let inline getState() = StateIntrinsic()
 
 let vtask = ValueTaskBuilder()
 let uvtask = UnitValueTaskBuilder()
+// it is safe to replace default task builder to get native IAsyncEnumerable consumption support
+// but there is a considerable compiler perf drop using all these tricky ce things so let's no do that
+let task2 = TaskBuilder()
 let utask = UnitTaskBuilder()
 
 let taskSeq = TaskSeq()
@@ -62,11 +71,17 @@ let resultValueTask = ResultValueTaskBuilder()
 let voptionTask = ValueOptionTaskBuilder()
 let voptionValueTask = ValueOptionValueTaskBuilder()
 
-let cancellableTask(cancellationToken) = CancellableTaskBuilder(cancellationToken)
-let cancellableValueTask(cancellationToken) = CancellableValueTaskBuilder(cancellationToken)
+let cancellableTask cancellationToken = CancellableTaskBuilder(cancellationToken)
+let cancellableValueTask cancellationToken = CancellableValueTaskBuilder(cancellationToken)
 
-let semaphoreSlimTask(semaphore) = SemaphoreSlimTaskBuilder(semaphore)
-let semaphoreSlimValueTask(semaphore) = SemaphoreSlimValueTaskBuilder(semaphore)
+let semaphoreSlimTask semaphore = SemaphoreSlimTaskBuilder(semaphore)
+let semaphoreSlimValueTask semaphore = SemaphoreSlimValueTaskBuilder(semaphore)
+
+let lazyTask = LazyTaskBuilder()
+let lazyUnitTask = LazyUnitTaskBuilder()
+
+let repeatableTask = RepeatableTaskBuilder()
+let repeatableUnitTask = RepeatableUnitTaskBuilder()
 
 [<AbstractClass; Sealed; AutoOpen>]
 type ActivityBuilders() =

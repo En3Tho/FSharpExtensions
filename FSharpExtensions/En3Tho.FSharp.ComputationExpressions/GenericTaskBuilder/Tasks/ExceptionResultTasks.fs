@@ -25,19 +25,6 @@ type ExnResultAsyncTaskMethodBuilderBehavior<'TResult> =
         [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
         static member SetResult(builder, result) = builder.SetResult(result)
 
-type ExceptionTaskBuilderBase() =
-    inherit GenericTaskBuilderReturnCore<unit>()
-
-type ExceptionTaskBuilder() =
-    inherit ExceptionTaskBuilderBase()
-    member inline this.Run([<InlineIfLambda>] code) =
-        this.RunInternal<StateMachineData<AsyncTaskMethodBuilderWrapper<Result<'TResult, exn>, ExnResultAsyncTaskMethodBuilderBehavior<_>>,_,_>,_,_,DefaultStateMachineDataInitializer<_,_,_>>(code)
-
-type ExceptionValueTaskBuilder() =
-    inherit ExceptionTaskBuilderBase()
-    member inline this.Run([<InlineIfLambda>] code) =
-        this.RunInternal<StateMachineData<AsyncValueTaskMethodBuilderWrapper<Result<'TResult, exn>, ExnResultAsyncTaskMethodBuilderBehavior<_>>,_,_>,_,_,DefaultStateMachineDataInitializer<_,_,_>>(code)
-
 type ExceptionResultTaskBuilderBase() =
     inherit GenericTaskBuilderReturnCore<unit>()
 

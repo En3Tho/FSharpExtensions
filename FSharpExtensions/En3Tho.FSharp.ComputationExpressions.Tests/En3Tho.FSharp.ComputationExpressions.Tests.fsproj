@@ -7,6 +7,7 @@
     <ItemGroup>
         <Compile Include="ComputationExpressionBuildTests.fs" />
         <Compile Include="ArrayPoolBasedBuilderTests.fs" />
+        <Compile Include="TaskAndCollectionsOverloadingTests.fs" />
         <Compile Include="StringBuilderBuilderTests.fs" />
         <Compile Include="OptionsAndResults.fs" />
         <Compile Include="Tasks.fs" />
@@ -17,6 +18,8 @@
         <Compile Include="GenericTaskBuilderTests.fs" />
         <Compile Include="TaskResultOverloadingTests.fs" />
         <Compile Include="CancellableTaskTests.fs" />
+        <Compile Include="LazyTaskTests.fs" />
+        <Compile Include="RepeatableTaskTests.fs" />
     </ItemGroup>
 
     <ItemGroup>

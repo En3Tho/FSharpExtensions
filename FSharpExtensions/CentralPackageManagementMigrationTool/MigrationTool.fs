@@ -14,7 +14,6 @@ open CentralPackageManagementMigrationTool.XmlNodeBuilder
 open En3Tho.FSharp.ComputationExpressions
 open En3Tho.FSharp.ComputationExpressions.SCollectionBuilder
 
-
 let initEnvironmentVariables (globalProperties: Dictionary<string, string>) =
     for prop in globalProperties do
         Environment.SetEnvironmentVariable(prop.Key, prop.Value)
@@ -72,7 +71,7 @@ let getOrCreateDirectoryTargetsProps (filePath: string) =
     document
 
 let updateDirectoryTargetProps (document: XmlDocument) (allPackageVersions: IReadOnlyDictionary<string, string>) =
-    let xml = xml document
+    let xmlNode = xmlNode document
     let project = document[Sdk.Project]
     let projectNode = XmlElementBuilder(project)
 
@@ -86,8 +85,8 @@ let updateDirectoryTargetProps (document: XmlDocument) (allPackageVersions: IRea
         managePackagesCentrally.InnerText <- "true"
     | _ ->
         projectNode {
-            xml Properties.PropertyGroup {
-                xml Properties.ManagePackageVersionsCentrally {
+            xmlNode Properties.PropertyGroup {
+                xmlNode Properties.ManagePackageVersionsCentrally {
                     "true"
                 }
             }
@@ -109,9 +108,9 @@ let updateDirectoryTargetProps (document: XmlDocument) (allPackageVersions: IRea
                 ()
 
     projectNode {
-        xml Items.ItemGroup {
+        xmlNode Items.ItemGroup {
             for packageReference in packageReferencesToAdd do
-                xml Items.PackageVersion {
+                xmlNode Items.PackageVersion {
                     Items.Metadata.Include -- packageReference.Key
                     Items.Metadata.Version -- packageReference.Value
                 }

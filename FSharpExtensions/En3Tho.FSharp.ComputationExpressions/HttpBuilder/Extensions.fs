@@ -1,5 +1,6 @@
 ﻿module [<AutoOpen>] En3Tho.FSharp.ComputationExpressions.HttpBuilder.Extensions
 
+open System
 open System.IO
 open System.Text.Json
 open System.Net.Http
@@ -87,7 +88,16 @@ type HttpRequestMessageContentStage with
 
 type HttpClient with
     member inline this.Get(url: string) = HttpRequestMessageContentStage(this, HttpRequestMessage(HttpMethod.Get, url))
+    member inline this.Get(url: Uri) = HttpRequestMessageContentStage(this, HttpRequestMessage(HttpMethod.Get, url))
+
     member inline this.Post(url: string) = HttpRequestMessageStage(this, HttpRequestMessage(HttpMethod.Post, url))
+    member inline this.Post(url: Uri) = HttpRequestMessageStage(this, HttpRequestMessage(HttpMethod.Post, url))
+
     member inline this.Put(url: string) = HttpRequestMessageStage(this, HttpRequestMessage(HttpMethod.Put, url))
+    member inline this.Put(url: Uri) = HttpRequestMessageStage(this, HttpRequestMessage(HttpMethod.Put, url))
+
     member inline this.Delete(url: string) = HttpRequestMessageStage(this, HttpRequestMessage(HttpMethod.Delete, url))
+    member inline this.Delete(url: Uri) = HttpRequestMessageStage(this, HttpRequestMessage(HttpMethod.Delete, url))
+
     member inline this.Patch(url: string) = HttpRequestMessageStage(this, HttpRequestMessage(HttpMethod.Patch, url))
+    member inline this.Patch(url: Uri) = HttpRequestMessageStage(this, HttpRequestMessage(HttpMethod.Patch, url))
