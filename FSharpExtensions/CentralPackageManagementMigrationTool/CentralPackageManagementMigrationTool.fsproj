@@ -5,6 +5,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Content Include="Properties\launchSettings.json" />
+    </ItemGroup>
+
+    <ItemGroup>
         <Compile Include="XmlNodeBuilder.fs" />
         <Compile Include="DotnetInfo.fs" />
         <Compile Include="PropertiesAndExtensions.fs" />
@@ -28,10 +32,6 @@
     <ItemGroup>
       <ProjectReference Include="..\En3Tho.FSharp.ComputationExpressions\En3Tho.FSharp.ComputationExpressions.fsproj" />
       <ProjectReference Include="..\En3Tho.FSharp.Extensions\En3Tho.FSharp.Extensions.fsproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Content Include="Properties\launchSettings.json" />
     </ItemGroup>
 
 </Project>

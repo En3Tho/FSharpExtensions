@@ -4,7 +4,7 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.Extensions", 
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.ComputationExpressions", "En3Tho.FSharp.ComputationExpressions\En3Tho.FSharp.ComputationExpressions.fsproj", "{F99275AB-EEDF-444A-AB57-CD6A3BED7DC0}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Benchmarks", "Benchmarks\Benchmarks.fsproj", "{908FDF05-C71C-4933-A64A-64488E609961}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Benchmarks.FSharp", "Benchmarks.FSharp\Benchmarks.FSharp.fsproj", "{908FDF05-C71C-4933-A64A-64488E609961}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{A2E99DA2-49B2-42DA-A2C4-BBA82D3656EE}"
 ProjectSection(SolutionItems) = preProject
@@ -46,6 +46,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{BE43B714-9BA0-4F36-97D1-D3C9791CE693}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.Extensions.Logging", "En3Tho.FSharp.Extensions.Logging\En3Tho.FSharp.Extensions.Logging.fsproj", "{AAB9517C-A75C-44CF-9411-2770D4A51583}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks.Lib", "Benchmarks.Lib\Benchmarks.Lib.csproj", "{5E64A818-7230-4309-A29F-F69B07C93708}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -113,6 +115,10 @@ Global
 		{AAB9517C-A75C-44CF-9411-2770D4A51583}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AAB9517C-A75C-44CF-9411-2770D4A51583}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AAB9517C-A75C-44CF-9411-2770D4A51583}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E64A818-7230-4309-A29F-F69B07C93708}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E64A818-7230-4309-A29F-F69B07C93708}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E64A818-7230-4309-A29F-F69B07C93708}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E64A818-7230-4309-A29F-F69B07C93708}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{ED4D366B-0F29-4095-A8C8-EFED608A547B} = {3F96FD51-137E-4572-A477-35B7F5F653DA}
@@ -123,5 +129,6 @@ Global
 		{73FE40B4-55FF-4758-AE4A-53709E398543} = {3F96FD51-137E-4572-A477-35B7F5F653DA}
 		{600E3DE8-B214-48DD-A25A-8BA167BCB49F} = {BE43B714-9BA0-4F36-97D1-D3C9791CE693}
 		{0E898CE9-0FA1-40C3-BFA9-2094F4C8B09E} = {BE43B714-9BA0-4F36-97D1-D3C9791CE693}
+		{5E64A818-7230-4309-A29F-F69B07C93708} = {9374398C-1C27-4372-813E-DDB8CA5C5F90}
 	EndGlobalSection
 EndGlobal

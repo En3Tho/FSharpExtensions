@@ -3,6 +3,7 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <LangVersion>preview</LangVersion>
+        <RootNamespace>Benchmarks</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -24,6 +25,7 @@
         <Compile Include="NodeCode.fs" />
         <Compile Include="GSeq.fs" />
         <Compile Include="GenericTaskBuilder.fs" />
+        <Compile Include="HttpVerbParsing.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
@@ -32,6 +34,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Benchmarks.Lib\Benchmarks.Lib.csproj" />
         <ProjectReference Include="..\En3Tho.FSharp.ComputationExpressions\En3Tho.FSharp.ComputationExpressions.fsproj" />
         <ProjectReference Include="..\En3Tho.FSharp.Extensions\En3Tho.FSharp.Extensions.fsproj" />
     </ItemGroup>
