@@ -40,7 +40,7 @@ type Benchmark() =
     }
 
 [<MemoryDiagnoser; DisassemblyDiagnoser(filters = [||])>]
-[<SimpleJob>]
+[<Config(typeof<``Net8, Net9``>)>]
 type AsyncSeqBenchmark() =
 
     [<Benchmark>]
