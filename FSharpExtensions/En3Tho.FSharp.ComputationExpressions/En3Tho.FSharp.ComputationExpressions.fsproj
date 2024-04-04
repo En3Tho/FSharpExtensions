@@ -6,7 +6,11 @@
     </PropertyGroup>
 
     <PropertyGroup>
-      <DefineConstants>TRACE</DefineConstants>
+        <DefineConstants>TRACE</DefineConstants>
+        <NoWarn>
+            $(NoWarn),
+            <!--resumable code, expected for projects which expose state machine builders --> 3511
+        </NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
