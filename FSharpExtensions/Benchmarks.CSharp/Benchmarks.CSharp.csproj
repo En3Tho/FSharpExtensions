@@ -10,7 +10,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Benchmarks\Benchmarks.fsproj" />
+        <ProjectReference Include="..\Benchmarks.FSharp\Benchmarks.FSharp.fsproj" />
         <ProjectReference Include="..\En3Tho.FSharp.ComputationExpressions\En3Tho.FSharp.ComputationExpressions.fsproj" />
         <ProjectReference Include="..\En3Tho.FSharp.Extensions\En3Tho.FSharp.Extensions.fsproj" />
     </ItemGroup>

@@ -3,6 +3,7 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <LangVersion>preview</LangVersion>
+        <RootNamespace>Benchmarks</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

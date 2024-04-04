@@ -4,7 +4,7 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.Extensions", 
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.ComputationExpressions", "En3Tho.FSharp.ComputationExpressions\En3Tho.FSharp.ComputationExpressions.fsproj", "{F99275AB-EEDF-444A-AB57-CD6A3BED7DC0}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Benchmarks", "Benchmarks\Benchmarks.fsproj", "{908FDF05-C71C-4933-A64A-64488E609961}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Benchmarks.FSharp", "Benchmarks.FSharp\Benchmarks.FSharp.fsproj", "{908FDF05-C71C-4933-A64A-64488E609961}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{A2E99DA2-49B2-42DA-A2C4-BBA82D3656EE}"
 ProjectSection(SolutionItems) = preProject
