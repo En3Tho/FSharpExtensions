@@ -221,15 +221,16 @@ public static class HttpVerbsAvx2
         // [ p u t _ _ _ _ _ ] [ h e a d _ _ _ _ ] [ p a t c h _ _ _ ] [ o p t i o n s _ ]
 
         var vecValue = Vector256.Create(value);
-        var vecMaskedValue = Avx2.And(vecValue, Vector256.Create(0xFF_FF_FFUL, 0xFF_FF_FF_FF, 0xFF_FF_FF_FF_FF, 0xFF_FF_FF_FF_FF_FF_FF));
+        var vecMaskedValue = vecValue & Vector256.Create(0xFF_FF_FFUL, 0xFF_FF_FF_FF, 0xFF_FF_FF_FF_FF, 0xFF_FF_FF_FF_FF_FF_FF);
 
         var vec1 = Vector256.Create(HttpVerbs.GetU64, HttpVerbs.PostU64, HttpVerbs.TraceU64, HttpVerbs.ConnectU64);
-        var vec1Result = Avx2.CompareEqual(vecMaskedValue, vec1);
+        var vec1Result = Vector256.Equals(vecMaskedValue, vec1);
 
         var vec2 = Vector256.Create(HttpVerbs.PutU64, HttpVerbs.HeadU64, HttpVerbs.PatchU64, HttpVerbs.OptionsU64);
-        var vec2Result = Avx2.CompareEqual(vecMaskedValue, vec2);
+        var vec2Result = Vector256.Equals(vecMaskedValue, vec2);
 
-        var vecResult = Avx2.Or(vec1Result, vec2Result);
+        var vecResult = vec1Result | vec2Result;
+
         var nonZeroMask = Avx2.MoveMask(vecResult.AsByte());
 
         var trailingZeroCount = BitOperations.TrailingZeroCount(nonZeroMask);

@@ -11,6 +11,7 @@ module TryExprBuilderImpl =
         member inline _.Yield(value: 'a) : TryExprBuilderExpression<'a> = fun () -> value
         member inline _.Zero() : TryExprBuilderExpression<unit> = fun () -> ()
 
+    [<Sealed>]
     type TryExprBuilder() =
         inherit TryExprBuilderBase()
         member inline _.Run(expr: TryExprBuilderExpression<'a>) =
@@ -18,6 +19,25 @@ module TryExprBuilderImpl =
                 expr()
             with _ ->
                 Unchecked.defaultof<'a>
+
+    [<Sealed>]
+    type TryExprBuilderToException() =
+        inherit TryExprBuilderBase()
+        member inline _.Run(expr: TryExprBuilderExpression<unit>) =
+            try
+                expr()
+                null
+            with e ->
+                e
+
+    [<Sealed>]
+    type TryExprBuilderToResult() =
+        inherit TryExprBuilderBase()
+        member inline _.Run(expr: TryExprBuilderExpression<'a>) =
+            try
+                Ok(expr())
+            with e ->
+                Error(e)
 
     [<Struct; IsReadOnly>]
     type TryWithExprBuilder<'a>(value: 'a) =
@@ -34,4 +54,6 @@ module TryExprBuilderImpl =
 [<AutoOpen>]
 module TryExprBuilder =
     let try' = TryExprBuilderImpl.TryExprBuilder()
+    let tryE = TryExprBuilderImpl.TryExprBuilderToException()
+    let tryR = TryExprBuilderImpl.TryExprBuilderToResult()
     let tryWith value = TryExprBuilderImpl.TryWithExprBuilder(value)

@@ -92,5 +92,11 @@ type Benchmark() =
         HttpVerbsAvx2.GetHttpVerbLengthAvx2_2(value)
 
     [<Benchmark>]
+    member this.GetHttpVerbLengthAvx2_3() =
+        let span = this.Bytes.AsSpan()
+        let value = Unsafe.As(&Unsafe.AsRef(&span[0]))
+        HttpVerbsAvx2.GetHttpVerbLengthAvx2_3(value)
+
+    [<Benchmark>]
     member this.GetHttpVerbLengthArrays() =
         HttpChecker.getHttpVerbLength this.Bytes
