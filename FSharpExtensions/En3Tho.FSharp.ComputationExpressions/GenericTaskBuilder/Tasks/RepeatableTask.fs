@@ -5,6 +5,7 @@ open System.Threading.Tasks
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks
 
+// TODO: fix these
 [<AbstractClass>]
 type RepeatableTask() =
     abstract Repeat: unit -> Task
@@ -49,10 +50,10 @@ type [<Struct>] AsyncTaskMethodBuilderWrapperForRepeatableTask<'TBehavior
 
 and [<Sealed>] RepeatableTaskImpl<'TStateMachine, 'TBehavior
     when 'TStateMachine :> IAsyncStateMachine
-    and 'TBehavior :> IAsyncTaskMethodBuilderBehavior>(sm: 'TStateMachine) =
+    and 'TBehavior :> IAsyncTaskMethodBuilderBehavior> internal (originalStateMachine: 'TStateMachine) =
     inherit RepeatableTask()
     override this.Repeat() =
-        let mutable sm = sm
+        let mutable sm = originalStateMachine
         let mutable mb = AsyncTaskMethodBuilderWrapper<'TBehavior>.Create()
         mb.Start(&sm)
         mb.Task
@@ -90,14 +91,14 @@ type [<Struct>] AsyncTaskMethodBuilderWrapperForRepeatableTask<'TResult, 'TBehav
         member this.Start(stateMachine: byref<#IAsyncStateMachine>) = this.Start(&stateMachine)
         member this.Task = this.Task
 
-and [<Sealed>] RepeatableTaskImpl<'T, 'TStateMachine, 'TBehavior
+and [<Sealed>] RepeatableTaskImpl<'TResult, 'TStateMachine, 'TBehavior
     when 'TStateMachine :> IAsyncStateMachine
-    and 'TBehavior :> IAsyncTaskMethodBuilderBehavior<'T>>(sm: 'TStateMachine) =
-    inherit RepeatableTask<'T>()
+    and 'TBehavior :> IAsyncTaskMethodBuilderBehavior<'TResult>> internal (originalStateMachine: 'TStateMachine) =
+    inherit RepeatableTask<'TResult>()
 
     override this.Repeat() =
-        let mutable sm = sm
-        let mutable mb = AsyncTaskMethodBuilderWrapper<'T, 'TBehavior>.Create()
+        let mutable sm = originalStateMachine
+        let mutable mb = AsyncTaskMethodBuilderWrapper<'TResult, 'TBehavior>.Create()
         mb.Start(&sm)
         mb.Task
 

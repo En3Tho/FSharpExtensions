@@ -12,6 +12,7 @@
         <Compile Include="IEquatableOperatorTests.fs" />
         <Compile Include="Byrefs.fs" />
         <Compile Include="GSeq.fs" />
+        <Compile Include="Vectors.fs" />
     </ItemGroup>
 
     <ItemGroup>

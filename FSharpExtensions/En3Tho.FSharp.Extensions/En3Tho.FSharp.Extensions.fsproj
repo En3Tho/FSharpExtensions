@@ -19,6 +19,7 @@
         <Compile Include="Stackalloc.fs" />
         <Compile Include="GSeqEnumerators.fs" />
         <Compile Include="GSeq.fs" />
+        <Compile Include="NumericsAndVectors.fs" />
     </ItemGroup>
 
 </Project>

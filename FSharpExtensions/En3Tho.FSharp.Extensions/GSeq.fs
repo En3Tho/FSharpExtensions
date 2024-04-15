@@ -421,17 +421,13 @@ module GSeq =
     let tryMaxBy map (enumerator: SStructEnumerator<'i,'e>) =
         let mutable enumerator = enumerator
         if not ^ enumerator.MoveNext() then
-            None
-        else
-            maxByImpl map &enumerator |> Some
-
-    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let tryValueMaxBy map (enumerator: SStructEnumerator<'i,'e>) =
-        let mutable enumerator = enumerator
-        if not ^ enumerator.MoveNext() then
             ValueNone
         else
             maxByImpl map &enumerator |> ValueSome
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    let tryMaxByOption map (enumerator: SStructEnumerator<'i,'e>) =
+        tryMaxBy map enumerator |> Option.ofValueOption
 
     // TODO: NET 7.0
     let inline sum (enumerator: SStructEnumerator<'i,'e>) =

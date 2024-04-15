@@ -70,6 +70,7 @@ module NonNegativeValue =
             member this.ValidateAggregate value : EResult<'a, AggregateException> = this.Validate value |> Result.mapError AggregateException
             member this.ValidateAggregate value : ValueTask<EResult<'a, AggregateException>> = this.Validate value |> Result.mapError AggregateException |> ValueTask.FromResult
 
+// this can be of INumber
 type NonNegativeValue<'a when 'a :> IComparable<'a> and 'a: struct> = NewCtorValidatorValidated<'a, NonNegativeValue.Validator<'a>>
 let inline (|NonNegativeValue|) (value: NonNegativeValue<'a>) = value.Value
 let [<return: Struct>] inline (|IsNonNegativeValue|_|) (value: 'a) = NonNegativeValue<'a>.Try value

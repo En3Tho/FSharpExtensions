@@ -7,7 +7,7 @@ open System.Threading.Tasks
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks
 
-type LazyTask(task: Task, moveNext: Action) =
+type LazyTask internal (task: Task, moveNext: Action) =
     let mutable moveNext = moveNext
     member _.DangerousGetTask() = task
     member _.GetAwaiter() =
@@ -18,7 +18,7 @@ type LazyTask(task: Task, moveNext: Action) =
 
         task.GetAwaiter()
 
-type LazyTask<'T>(task: Task<'T>, moveNext: Action) =
+type LazyTask<'T> internal (task: Task<'T>, moveNext: Action) =
     let mutable moveNext = moveNext
     member _.DangerousGetTask() = task
     member _.GetAwaiter() =

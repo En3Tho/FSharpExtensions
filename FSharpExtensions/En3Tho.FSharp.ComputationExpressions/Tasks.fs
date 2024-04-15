@@ -65,6 +65,9 @@ let exnResultValueTask = ExceptionResultValueTaskBuilder()
 let exnTask = ExceptionTaskBuilder()
 let exnValueTask = ExceptionValueTaskBuilder()
 
+let etask = ExceptionTaskBuilder()
+let evtask = ExceptionValueTaskBuilder()
+
 let resultTask = ResultTaskBuilder()
 let resultValueTask = ResultValueTaskBuilder()
 
