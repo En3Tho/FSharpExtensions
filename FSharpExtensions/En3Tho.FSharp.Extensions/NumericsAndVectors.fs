@@ -82,6 +82,11 @@ type v512iptr = Vector512<iptr>
 type v512f32 = Vector512<f32>
 type v512f64 = Vector512<f64>
 
+type v64 = Vector64
+type v128 = Vector128
+type v256 = Vector256
+type v512 = Vector512
+
 type Byte with
     member inline this.u16 = uint16 this
     member inline this.u32 = uint32 this
