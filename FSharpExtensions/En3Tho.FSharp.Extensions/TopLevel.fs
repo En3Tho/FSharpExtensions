@@ -104,8 +104,8 @@ module InvokeEx =
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     type T = T with
-            static member inline ($) (_, invokable) = fun value -> (^a: (member Invoke: ^b -> ^c) invokable, value)
-            static member inline ($) (_, [<InlineIfLambda>] invokable: 'a -> 'b) = fun value -> invokable value
+        static member inline ($) (_, invokable) = fun value -> (^a: (member Invoke: ^b -> ^c) invokable, value)
+        static member inline ($) (_, [<InlineIfLambda>] invokable: 'a -> 'b) = fun value -> invokable value
 
     let inline (^) invokable value = (T $ invokable) value
 

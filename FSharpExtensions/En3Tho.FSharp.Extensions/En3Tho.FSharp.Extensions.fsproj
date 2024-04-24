@@ -20,6 +20,7 @@
         <Compile Include="GSeqEnumerators.fs" />
         <Compile Include="GSeq.fs" />
         <Compile Include="NumericsAndVectors.fs" />
+        <Compile Include="Pointers.fs" />
     </ItemGroup>
 
 </Project>

@@ -4,7 +4,6 @@ open System
 open System.Numerics
 open System.Runtime.CompilerServices
 open System.Runtime.Intrinsics.X86
-open Microsoft.FSharp.NativeInterop
 open Xunit
 open En3Tho.FSharp.Extensions
 
@@ -19,19 +18,28 @@ let [<Literal>] TraceU64 = 0x20_45_43_41_52_54UL;
 let [<Literal>] ConnectU64 = 0x20_54_43_45_4E_4E_4F_43UL;
 
 let getHttpVerbLength value =
+    // d e l e t e
     if (value &&& 0xFF_FF_FF_FF_FF_FF_FFUL) == DeleteU64 then
         6
     else
-        let vecMaskedValue = value.v256 &&& v256(0xFF_FF_FF_FFUL, 0xFF_FF_FF_FF_FFUL, 0xFF_FF_FF_FF_FF_FFUL, 0xFF_FF_FF_FF_FF_FF_FF_FFUL);
+        // [ G E T   _ _ _ _ ] [ P O S T   _ _ _ ] [ T R A C E   _ _ ] [ C O N N E C T   ]
+        // [ P U T   _ _ _ _ ] [ H E A D   _ _ _ ] [ P A T C H   _ _ ] [ O P T I O N S   ]
+        // [ F F F F _ _ _ _ ] [ F F F F F _ _ _ ] [ F F F F F F _ _ ] [ F F F F F F F F ]
+        let vVerbs = value.v256 &&& v256(0xFF_FF_FF_FFUL, 0xFF_FF_FF_FF_FFUL, 0xFF_FF_FF_FF_FF_FFUL, 0xFF_FF_FF_FF_FF_FF_FF_FFUL);
 
-        let v1Mask = Avx2.CompareEqual(vecMaskedValue, v256(GetU64, PostU64, TraceU64, ConnectU64));
-        let v2Mask = Avx2.CompareEqual(vecMaskedValue, v256(PutU64, HeadU64, PatchU64, OptionsU64));
+        // [ G E T _ _ _ _ _ ] [ G E T _ _ _ _ _ ] [ G E T _ _ _ _ _ ] [ G E T _ _ _ _ _ ]
+        // [ F F F F F F F F ] [ _ _ _ _ _ _ _ _ ] [ _ _ _ _ _ _ _ _ ] [ _ _ _ _ _ _ _ _ ]
+        let vMask1 = Avx2.CompareEqual(vVerbs, v256(GetU64, PostU64, TraceU64, ConnectU64));
+        let vMask2 = Avx2.CompareEqual(vVerbs, v256(PutU64, HeadU64, PatchU64, OptionsU64));
 
-        let vecResult = v1Mask ||| v2Mask;
-        let nonZeroMask = Avx2.MoveMask(vecResult.u8);
+        // [ G E T   x x x x _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ ] => 0x00_00_00_FF, 0
+        // [ _ _ _ _ _ _ _ _ P O S T   x x x _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ ] => 0x00_00_FF_00, 8
+        // [ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ P A T C H   x x _ _ _ _ _ _ _ _ ] => 0x00_FF_00_00, 16
+        // [ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ O P T I O N S   ] => 0xFF_00_00_00, 24
+        let vNonZeroMask = Avx2.MoveMask((vMask1 ||| vMask2).u8);
 
-        let trailingZeroCount = BitOperations.TrailingZeroCount(nonZeroMask);
-        (nonZeroMask &&& 0x07_05_04_03) >>> trailingZeroCount;
+        let trailingZeroCount = BitOperations.TrailingZeroCount(vNonZeroMask);
+        (vNonZeroMask &&& 0x07_05_04_03) >>> trailingZeroCount;
 
 [<Fact>]
 let ``test that vector extensions are working correcly``() =
@@ -57,20 +65,47 @@ type HexU32(value: u32) =
     member _.Value = value
 
     [<SkipLocalsInit>]
-    member _.ToHexString() =
-        let values =
-            let v1 = v128(value).u16
-            let v2 = Sse2.ShuffleHigh(v1, 0x0uy)
-            let v3 = Sse2.ShuffleLow(v2, 0xFFuy)
+    member _.ToHexStringSSE() =
+        // 0xD4_C3_B2_A1 => [ 'D', '4', 'C', '3', 'B', '2', 'A', '1' ] => "D4C3B2A1"
+        // [ A1, B2, C3, D4, A1, B2, C3, D4, A1, B2, C3, D4, A1, B2, C3, D4 ]
+        // [ D4, 00, D4, 00, C3, 00, C3, 00, B2, 00, B2, 00, A1, 00, A1, 00 ]
+        let shuffled = Ssse3.Shuffle(v128(value).u8, v128(0xF0_02_F0_02_F0_03_F0_03UL, 0xF0_00_F0_00_F0_01_F0_01UL).u8)
 
-            let v4 = Sse2.And(v3, v128(0x00_0F_00_F0_0F_00_F0_00UL).u16)
-            let v5 = Sse2.MultiplyLow(v4, v128(1us, 16us, 256us, 4096us, 1us, 16us, 256us, 4096us))
-            Sse2.ShiftRightLogical(v5, 12uy)
+        // [ 00D4, 00D4, 00C3, 00C3, 00B2, 00B2, 00A1, 00A1 ]
+        // [ D400, 4000, C300, 3000, B200, 2000, A100, 1000 ]
+        let shiftedLeft = Sse2.MultiplyLow(shuffled.u16, v128(0x1000_0100_1000_0100UL).u16)
 
-        let mutable added =
-            let v1 = Sse2.CompareGreaterThan(values.i16, v128(9s))
-            let v2 = Sse2.And(v1.u16, v128(7us))
-            Sse2.Add(values, v2)
+        // [ 000D, 0004, 000C, 0003, 000B, 0002, 000A, 0001 ]
+        let shiftedRight = Sse2.ShiftRightLogical(shiftedLeft, 12uy)
 
-        let pAdded = Unsafe.AsPointer(&added)
-        String(pAdded |> NativePtr.ofVoidPtr<char>, 0, 8)
+        // 9 - 57, 10 - "58", A - 65, 7 - diff
+        let mask = Sse2.CompareGreaterThan(shiftedRight.i16, v128(9s))
+        let diff = mask.u16 &&& v128(7us)
+        let mutable result = shiftedRight + diff + v128(48us)
+
+        String(Unsafe.AsPointer(&result).AsReadOnlySpan(8))
+
+    [<SkipLocalsInit>]
+    member _.ToHexStringVector() =
+        // 0xD4_C3_B2_A1 => [ 'D', '4', 'C', '3', 'B', '2', 'A', '1' ] => "D4C3B2A1"
+        // [ A1, B2, C3, D4, A1, B2, C3, D4, A1, B2, C3, D4, A1, B2, C3, D4 ]
+        // [ D4, 00, D4, 00, C3, 00, C3, 00, B2, 00, B2, 00, A1, 00, A1, 00 ]
+        let bytes = v128.Shuffle(value.v128.u8, v128(0xF0_02_F0_02_F0_03_F0_03UL, 0xF0_00_F0_00_F0_01_F0_01UL).u8)
+
+        // [ 00D4, 00D4, 00C3, 00C3, 00B2, 00B2, 00A1, 00A1 ]
+        // [ D400, 4000, C300, 3000, B200, 2000, A100, 1000 ]
+        // [ 000D, 0004, 000C, 0003, 000B, 0002, 000A, 0001 ]
+        let nibbles = (bytes.u16 * v128(0x1000_0100_1000_0100UL).u16) >>> 12
+
+        // 9 - 57, 10 - "58" => A - 65, 7 - diff
+        let diff = v128.GreaterThan(nibbles.u16, 9us.v128) &&& 7us.v128
+        let mutable result = nibbles + diff + 48us.v128
+
+        String(Unsafe.AsPointer(&result).As<char>(), 0, 8)
+
+[<Fact>]
+let ``test hex struct``() =
+    let x = 0xD4_C3_B2_A1.u32
+    let hexu32 = HexU32(x)
+    Assert.Equal("D4C3B2A1", hexu32.ToHexStringSSE())
+    Assert.Equal("D4C3B2A1", hexu32.ToHexStringVector())
