@@ -41,3 +41,11 @@ type Benchmark() =
         |> GSeq.skip 5
         |> GSeq.map ^ fun x -> x + 15
         |> GSeq.fold 0 ^ fun x y -> x + y
+
+    [<Benchmark>]
+    member this.ActionSeqFilterMapSkipFold() =
+        (ActionSeq.fold 0 ^ fun x y -> x + y
+        |> ActionSeq.map ^ fun x -> x + 15
+        |> ActionSeq.skip 5
+        |> ActionSeq.filter ^ fun x -> x % 2 <> 0
+        |> ActionSeq.fromArray) ^ this.Array

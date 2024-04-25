@@ -37,7 +37,7 @@ module CodeBuilderImpl =
     }
 
     // in fact there can be no list really, can flush directly to sb or textwriter or whatever
-    type CodeBuilder(lines: ResizeArray<LineOfCode>) =
+    type CodeBuilder(lines: ResizeArray<LineOfCode>, scratchSpace: StringBuilder) =
         inherit CodeBlockBase()
 
         static let commonIndentations = ImmutableArray.Create<string> [|
@@ -48,13 +48,15 @@ module CodeBuilderImpl =
         let mutable indentation = 0
         let mutable length = 0
 
-        new() = CodeBuilder(ResizeArray())
+        new() = CodeBuilder(ResizeArray(), StringBuilder(128))
 
+        member _.ScratchSpace = scratchSpace
         member _.Lines = lines
         member _.Indentation = indentation
 
         member _.IndentOnce() = indentation <- indentation + 1
         member _.UnIndentOnce() = indentation <- indentation - 1
+        member _.SetIndentation(value) = indentation <- value
 
         member private _.AddLength(text: string, indentation) =
             length <- length + Math.Max(1, text.Length) + indentation * 4
@@ -169,6 +171,17 @@ module CodeBuilderImpl =
                 builder.UnIndentOnce()
 
     [<Sealed>]
+    type NoIndent() =
+        inherit CodeBlockBase()
+
+        member inline this.Run([<InlineIfLambda>] runExpr: CodeBuilderCode) : CodeBuilderCode =
+            fun builder ->
+                let current = builder.Indentation
+                builder.SetIndentation(0)
+                runExpr builder
+                builder.SetIndentation(current)
+
+    [<Sealed>]
     type BraceBlock() =
         inherit CodeBlockBase()
 
@@ -193,9 +206,27 @@ module CodeBuilderImpl =
 
         inherit CodeBlockBase()
         member inline this.Run([<InlineIfLambda>] runExpr: CodeBuilderCode) =
-            let builder = CodeBuilder(ResizeArray(128))
+            let builder = CodeBuilder(ResizeArray(128), StringBuilder(128))
             runExpr builder
             builder
+
+    type RawCodeBlock() =
+        inherit UnitBuilderBase<CodeBuilder>()
+
+        member inline _.Yield(value: string) : CodeBuilderCode =
+            fun builder ->
+                builder.ScratchSpace.Append(value) |> ignore
+
+        member inline this.YieldFrom(values: string seq) : CodeBuilderCode =
+            fun builder ->
+                for value in values do
+                    builder.ScratchSpace.Append(value) |> ignore
+
+        member inline this.Run([<InlineIfLambda>] runExpr: CodeBuilderCode) : CodeBuilderCode =
+            fun builder ->
+                runExpr builder
+                builder.AddLine(builder.ScratchSpace.ToString())
+                builder.ScratchSpace.Clear() |> ignore
 
 [<AutoOpen>]
 module CodeBuilder =
@@ -204,5 +235,7 @@ module CodeBuilder =
     let code = CodeBuilderRunner()
     let codeBlock = CodeBlock()
     let indent = Indent()
+    let noindent = NoIndent()
     let braceBlock = BraceBlock()
+    let raw = RawCodeBlock()
     let trimEnd() = TrimEnd()

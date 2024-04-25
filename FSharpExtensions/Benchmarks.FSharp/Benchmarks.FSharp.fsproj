@@ -23,6 +23,7 @@
         <Compile Include="ComparisonOperatorBenchmark.fs" />
         <Compile Include="MathematicalOperatorsBenchmarks.fs" />
         <Compile Include="NodeCode.fs" />
+        <Compile Include="ActionSeq.fs" />
         <Compile Include="GSeq.fs" />
         <Compile Include="GenericTaskBuilder.fs" />
         <Compile Include="HttpVerbParsing.fs" />

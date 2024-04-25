@@ -2,7 +2,7 @@
 
     <PropertyGroup Condition="'$(NugetVersion)' != ''">
         <Authors>Igor Bagdamyan</Authors>
-        <Copyright>Copyright (c) 2023 Igor Bagdamyan</Copyright>
+        <Copyright>Copyright (c) 2024 Igor Bagdamyan</Copyright>
         <PackageProjectUrl>https://github.com/En3Tho/FSharpExtensions</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/En3Tho/FSharpExtensions/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/En3Tho/FSharpExtensions</RepositoryUrl>

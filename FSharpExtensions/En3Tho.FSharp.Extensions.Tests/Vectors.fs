@@ -78,7 +78,7 @@ type HexU32(value: u32) =
         // [ 000D, 0004, 000C, 0003, 000B, 0002, 000A, 0001 ]
         let shiftedRight = Sse2.ShiftRightLogical(shiftedLeft, 12uy)
 
-        // 9 - 57, 10 - "58", A - 65, 7 - diff
+        // 0 - 48, 9 - 57, 10 - "58", A - 65, 7 - diff
         let mask = Sse2.CompareGreaterThan(shiftedRight.i16, v128(9s))
         let diff = mask.u16 &&& v128(7us)
         let mutable result = shiftedRight + diff + v128(48us)

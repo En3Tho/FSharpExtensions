@@ -10,5 +10,6 @@ BenchmarkRunner.Run<
     // NodeCode.ReturnBenchmark,
     // FSharpOptimizer.Benchmark,
     // FSharpOptimizerWithExperimentalPipe.Benchmark,
-    HttpVerbParsing.Benchmark
+    // HttpVerbParsing.Benchmark,
+    GSeq.Benchmark
     >() |> ignore

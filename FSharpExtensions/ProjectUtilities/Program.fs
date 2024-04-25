@@ -1,16 +1,19 @@
 open System
 open System.Diagnostics
+
 open ProjectUtilities
 
 let go() =
+    try
+        let sw = Stopwatch.StartNew()
 
-    let sw = Stopwatch.StartNew()
+        AddFunc.generateFiles()
+        ServiceProviderAndScopeCodeGen.generateFiles()
+        WebApplicationsExtensionsCodeGen.generateFiles()
+        ILoggerExtensionsCodeGen.generateFiles()
+        // IntrinsicsCodeGen.generateFiles "X:\Sources\En3Tho\IntelIntrinsics.xml"
 
-    AddFunc.generateFiles()
-    ServiceProviderAndScopeCodeGen.generateFiles()
-    WebApplicationsExtensionsCodeGen.generateFiles()
-    ILoggerExtensionsCodeGen.generateFiles()
-
-    Console.WriteLine($"Elapsed: {sw.Elapsed}")
-
+        Console.WriteLine($"Elapsed: {sw.Elapsed}")
+    with e ->
+        Console.WriteLine(e.ToString())
 go()

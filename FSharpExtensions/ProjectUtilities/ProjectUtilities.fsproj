@@ -12,6 +12,7 @@
         <Compile Include="ActivePatternsCodeGen.fs" />
         <Compile Include="WebApplicationsExtensionsCodeGen.fs" />
         <Compile Include="ILoggerExtensionsCodeGen.fs" />
+        <Compile Include="IntrinsicsCodeGen.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
