@@ -286,7 +286,6 @@ module ByRefOperators =
     let inline (%<-) (a: 'a byref) v = a <- a % v
     /// like *=
     let inline ( *<- ) (a: 'a byref) v = a <- a * v
-    let inline (~~~) (a: 'a byref) = a <- ~~~a
     /// like &&=
     let inline (&&&<-) (a: 'a byref) v = a <- a &&& v
     /// like ||=
