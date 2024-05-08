@@ -42,7 +42,3 @@ type ValueAsyncDisposable2<'a, 'b>(value: 'a, value2: 'b, dispose: 'a -> 'b -> V
 type ValueAsyncDisposable3<'a, 'b, 'c>(value: 'a, value2: 'b, value3: 'c, dispose: 'a -> 'b -> 'c -> ValueTask) =
     interface IAsyncDisposable with
         member this.DisposeAsync() = dispose value value2 value3
-
-// Hints to myself when dealing with lifetimes
-type Rented<'a> = 'a
-type Owned<'a> = 'a

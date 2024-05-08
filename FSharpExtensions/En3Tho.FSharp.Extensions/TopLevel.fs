@@ -41,6 +41,10 @@ module Core =
     let inline nullRef< ^a when ^a: not struct> = Unchecked.defaultof< ^a>
     let inline nullVal< ^a when ^a: struct> = Unchecked.defaultof< ^a>
 
+    // Hints to myself when dealing with lifetimes
+    type Rented<'a> = 'a
+    type Owned<'a> = 'a
+
     let inline own(value: 'a) : Owned<'a> = value
     let inline rent(value: 'a) : Rented<'a> = value
 
@@ -55,16 +59,6 @@ module Core =
 
     let inline (--) key value = KeyValuePair(key, value)
     let inline (~%) value = (^a: (member Value: ^b) value)
-
-    [<AbstractClass; Sealed; AutoOpen>]
-    type ActionFuncConverter =
-        static member inline func<'a, 'b> ([<InlineIfLambda>] f: 'a -> 'b) = Func<'a, 'b>(f)
-        static member inline func<'a, 'b, 'c> ([<InlineIfLambda>] f: 'a -> 'b -> 'c) = Func<'a, 'b, 'c>(f)
-        static member inline func<'a, 'b, 'c, 'd> ([<InlineIfLambda>] f: 'a -> 'b -> 'c -> 'd) = Func<'a, 'b, 'c, 'd>(f)
-
-        static member inline action<'a, 'b> ([<InlineIfLambda>] f: 'a -> unit) = Action<'a>(f)
-        static member inline action<'a, 'b> ([<InlineIfLambda>] f: 'a -> 'b -> unit) = Action<'a, 'b>(f)
-        static member inline action<'a, 'b, 'c, 'd> ([<InlineIfLambda>] f: 'a -> 'b -> 'c -> unit) = Action<'a, 'b, 'c>(f)
 
     [<AbstractClass; Sealed; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     type SelfExtensions =
