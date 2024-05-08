@@ -43,33 +43,6 @@ type ValueAsyncDisposable3<'a, 'b, 'c>(value: 'a, value2: 'b, value3: 'c, dispos
     interface IAsyncDisposable with
         member this.DisposeAsync() = dispose value value2 value3
 
-[<Struct>]
-type Rented<'a>(value: 'a) =
-    member _.Value = value
-
-[<Struct>]
-type Owned<'a when 'a :> IDisposable>(value: 'a) =
-    member _.Value = value
-    member _.Rent() = Rented value
-
-    interface IDisposable with
-        member this.Dispose() = value.Dispose()
-
-[<Struct>]
-type AsyncOwned<'a when 'a :> IAsyncDisposable>(value: 'a) =
-    member _.Value = value
-    member _.Rent() = Rented value
-
-    interface IAsyncDisposable with
-        member this.DisposeAsync() = value.DisposeAsync()
-
-[<Struct>]
-type SyncAsyncOwned<'a when 'a :> IDisposable and 'a :> IAsyncDisposable>(value: 'a) =
-    member _.Value = value
-    member _.Rent() = Rented value
-
-    interface IAsyncDisposable with
-        member this.DisposeAsync() = value.DisposeAsync()
-
-    interface IDisposable with
-        member this.Dispose() = value.Dispose()
+// Hints to myself when dealing with lifetimes
+type Rented<'a> = 'a
+type Owned<'a> = 'a

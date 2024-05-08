@@ -3,6 +3,7 @@ namespace En3Tho.FSharp.Extensions
 open System
 open System.Collections.Generic
 open System.Collections.Immutable
+open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
 open En3Tho.FSharp.Extensions.Disposables
 
@@ -11,7 +12,7 @@ type block<'a> = ImmutableArray<'a>
 [<AutoOpen; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 module Core =
 
-    [<AbstractClass; AutoOpen>]
+    [<AbstractClass; Sealed; AutoOpen>]
     type Defer =
         static member inline defer([<InlineIfLambda>] disposer) = UnitAsyncDisposable(disposer)
         static member inline defer([<InlineIfLambda>] disposer) = UnitDisposable(disposer)
@@ -40,6 +41,9 @@ module Core =
     let inline nullRef< ^a when ^a: not struct> = Unchecked.defaultof< ^a>
     let inline nullVal< ^a when ^a: struct> = Unchecked.defaultof< ^a>
 
+    let inline own(value: 'a) : Owned<'a> = value
+    let inline rent(value: 'a) : Rented<'a> = value
+
     let inline toString (o: ^a) = o.ToString()
     let inline getHashCode (o: ^a) = o.GetHashCode()
 
@@ -52,7 +56,7 @@ module Core =
     let inline (--) key value = KeyValuePair(key, value)
     let inline (~%) value = (^a: (member Value: ^b) value)
 
-    [<AbstractClass; AutoOpen>]
+    [<AbstractClass; Sealed; AutoOpen>]
     type ActionFuncConverter =
         static member inline func<'a, 'b> ([<InlineIfLambda>] f: 'a -> 'b) = Func<'a, 'b>(f)
         static member inline func<'a, 'b, 'c> ([<InlineIfLambda>] f: 'a -> 'b -> 'c) = Func<'a, 'b, 'c>(f)
@@ -61,6 +65,11 @@ module Core =
         static member inline action<'a, 'b> ([<InlineIfLambda>] f: 'a -> unit) = Action<'a>(f)
         static member inline action<'a, 'b> ([<InlineIfLambda>] f: 'a -> 'b -> unit) = Action<'a, 'b>(f)
         static member inline action<'a, 'b, 'c, 'd> ([<InlineIfLambda>] f: 'a -> 'b -> 'c -> unit) = Action<'a, 'b, 'c>(f)
+
+    [<AbstractClass; Sealed; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    type SelfExtensions =
+        [<Extension; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        static member inline GetSelf(this: 'a) = this
 
 [<AutoOpen; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 module PipeAndCompositionOperatorEx =
