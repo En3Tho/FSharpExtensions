@@ -44,8 +44,27 @@ type Benchmark() =
 
     [<Benchmark>]
     member this.ActionSeqFilterMapSkipFold() =
-        (ActionSeq.fold 0 ^ fun x y -> x + y
-        |> ActionSeq.map ^ fun x -> x + 15
-        |> ActionSeq.skip 5
-        |> ActionSeq.filter ^ fun x -> x % 2 <> 0
-        |> ActionSeq.fromArray) ^ this.Array
+        let action =
+            (ActionSeq.fold 0 ^ fun x y -> x + y // termination stage, not iteration
+            |> ActionSeq.map ^ fun x -> x + 15
+            |> ActionSeq.skip 5
+            |> ActionSeq.filter ^ fun x -> x % 2 <> 0
+            |> ActionSeq.fromArray)
+
+        action.Invoke(this.Array)
+        action.next.next.next.next.Result
+
+    [<Benchmark>]
+    member this.For() =
+        let mutable skip = 0
+        let mutable result = 0
+        let array = this.Array
+        for i = 0 to array.Length - 1 do
+            let x = array[i]
+            if x % 2 <> 0 then
+                if skip < 5 then
+                    skip <- skip + 1
+                else
+                    let x = x + 15
+                    result <- result + x
+        result

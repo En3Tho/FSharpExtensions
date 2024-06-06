@@ -13,11 +13,14 @@
         <Compile Include="ServiceCollectionExtensionsTests.fs" />
         <Compile Include="AddFuncTests.fs" />
         <Compile Include="AddSingletonAsSelfAndInjectionTests.fs" />
+        <Compile Include="IServiceCollectionFunkyCE.fs" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\En3Tho.Extensions.DependencyInjection.XUnit\En3Tho.Extensions.DependencyInjection.XUnit.csproj" />
       <ProjectReference Include="..\En3Tho.Extensions.DependencyInjection\En3Tho.Extensions.DependencyInjection.csproj" />
+      <ProjectReference Include="..\En3Tho.FSharp.ComputationExpressions\En3Tho.FSharp.ComputationExpressions.fsproj" />
+      <ProjectReference Include="..\En3Tho.FSharp.Extensions\En3Tho.FSharp.Extensions.fsproj" />
     </ItemGroup>
 
 </Project>

@@ -72,8 +72,8 @@ let ``Test that result builder is working properly`` () =
     let res1 = result {
 
         for i = 0 to 10 do
-           let! i = Ok()
-           ignore i
+            let! i = Ok()
+            ignore i
 
         let! x = Ok first
         let! y = Ok second

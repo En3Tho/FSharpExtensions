@@ -1,6 +1,7 @@
 namespace En3Tho.FSharp.Extensions
 
 open System
+open System.Collections.Generic
 
 [<AutoOpen>]
 module CodeDefinition =
@@ -36,13 +37,19 @@ type UnitBuilderBase<'Builder>() =
             (fun (builder) -> if not (isNull (box resource)) then resource.Dispose()))
 
     member inline this.For(values: 'a seq, [<InlineIfLambda>] forExpr: 'a -> UnitBuilderCode<'Builder>) : UnitBuilderCode<'Builder> =
-        this.Using (
+        this.Using(
             values.GetEnumerator(), (fun e ->
                 this.While((fun () -> e.MoveNext()), (fun (builder) ->
                     (forExpr e.Current)(builder))
                 )
             )
         )
+
+    member inline this.For<'T, 'TEnumerator when 'TEnumerator :> IEnumerator<'T>>(enumerator: 'TEnumerator, [<InlineIfLambda>] forExpr: 'T -> UnitBuilderCode<'Builder>) : UnitBuilderCode<'Builder> =
+        fun builder ->
+            let mutable enumerator = enumerator
+            while enumerator.MoveNext() do
+                (forExpr enumerator.Current)(builder)
 
     member inline _.Zero() : UnitBuilderCode<'Builder> = fun _ -> ()
 

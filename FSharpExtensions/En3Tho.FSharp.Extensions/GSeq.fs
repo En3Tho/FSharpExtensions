@@ -101,6 +101,36 @@ module GSeq =
     let takeWhile filter enumerator = StructTakeWhileEnumerator(filter, enumerator)
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    let init count initializer = StructInitEnumerator(count, initializer)
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    let initInfinite initializer = StructInitInfiniteEnumerator(initializer)
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    let upTo start finish = StructRangeEnumerator<'T, RangeUpToOperators<'T>>(start, finish)
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    let upToStep start finish step = StructRangeStepEnumerator<'T, RangeUpToOperators<'T>>(start, finish, step)
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    let downTo start finish = StructRangeEnumerator<'T, RangeDownToOperators<'T>>(start, finish)
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    let downToStep start finish step = StructRangeStepEnumerator<'T, RangeDownToOperators<'T>>(start, finish, step)
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    let upTo' start finish = StructRangeEnumerator<'T, RangeUpToInclusiveOperators<'T>>(start, finish)
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    let upToStep' start finish step = StructRangeStepEnumerator<'T, RangeUpToInclusiveOperators<'T>>(start, finish, step)
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    let downTo' start finish = StructRangeEnumerator<'T, RangeDownToInclusiveOperators<'T>>(start, finish)
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    let downToStep' start finish step = StructRangeStepEnumerator<'T, RangeDownToInclusiveOperators<'T>>(start, finish, step)
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let tryFind (filter: 'i -> bool) (enumerator: SStructEnumerator<'i,'e>) =
         let mutable enumerator = enumerator
         let mutable result = ValueNone

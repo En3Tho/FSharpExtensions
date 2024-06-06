@@ -115,7 +115,7 @@ module High =
 
         [<Extension; EditorBrowsable(EditorBrowsableState.Never)>]
         static member inline ReturnFrom(this: #IReturnExtensions, computation: Async<'TResult>) =
-            this.ReturnFrom (Async.StartAsTask computation)
+            this.ReturnFrom(Async.StartAsTask computation)
 
         [<Extension; EditorBrowsable(EditorBrowsableState.Never)>]
         static member inline YieldFrom (this: #IYieldExtensions, computation: Async<'TResult>) =

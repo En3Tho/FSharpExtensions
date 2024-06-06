@@ -3,19 +3,20 @@ module En3Tho.FSharp.Extensions.Tests.Vectors
 open System
 open System.Numerics
 open System.Runtime.CompilerServices
+open System.Runtime.InteropServices
 open System.Runtime.Intrinsics.X86
 open Xunit
 open En3Tho.FSharp.Extensions
 
-let [<Literal>] GetU64 = 0x20_54_45_47UL;
-let [<Literal>] PostU64 = 0x20_54_53_4F_50UL;
-let [<Literal>] PutU64 = 0x20_54_55_50UL;
-let [<Literal>] DeleteU64 = 0x20_45_54_45_4C_45_44UL;
-let [<Literal>] PatchU64 = 0x20_48_43_54_41_50UL;
-let [<Literal>] HeadU64 = 0x20_44_41_45_48UL;
-let [<Literal>] OptionsU64 = 0x20_53_4E_4F_49_54_50_4FUL;
-let [<Literal>] TraceU64 = 0x20_45_43_41_52_54UL;
-let [<Literal>] ConnectU64 = 0x20_54_43_45_4E_4E_4F_43UL;
+let [<Literal>] GetU64 = 0x20_54_45_47UL
+let [<Literal>] PostU64 = 0x20_54_53_4F_50UL
+let [<Literal>] PutU64 = 0x20_54_55_50UL
+let [<Literal>] DeleteU64 = 0x20_45_54_45_4C_45_44UL
+let [<Literal>] PatchU64 = 0x20_48_43_54_41_50UL
+let [<Literal>] HeadU64 = 0x20_44_41_45_48UL
+let [<Literal>] OptionsU64 = 0x20_53_4E_4F_49_54_50_4FUL
+let [<Literal>] TraceU64 = 0x20_45_43_41_52_54UL
+let [<Literal>] ConnectU64 = 0x20_54_43_45_4E_4E_4F_43UL
 
 let getHttpVerbLength value =
     // d e l e t e
@@ -61,11 +62,10 @@ let ``test that vector extensions are working correcly``() =
     Assert.Equal(0, getHttpVerbLength u64.MaxValue)
 
 [<Struct>]
-type HexU32(value: u32) =
-    member _.Value = value
+type HexU32 =
 
     [<SkipLocalsInit>]
-    member _.ToHexStringSSE() =
+    member _.U32ToHexSSE(value: u32) =
         // 0xD4_C3_B2_A1 => [ 'D', '4', 'C', '3', 'B', '2', 'A', '1' ] => "D4C3B2A1"
         // [ A1, B2, C3, D4, A1, B2, C3, D4, A1, B2, C3, D4, A1, B2, C3, D4 ]
         // [ D4, 00, D4, 00, C3, 00, C3, 00, B2, 00, B2, 00, A1, 00, A1, 00 ]
@@ -86,7 +86,7 @@ type HexU32(value: u32) =
         String(Unsafe.AsPointer(&result).AsReadOnlySpan(8))
 
     [<SkipLocalsInit>]
-    member _.ToHexStringVector() =
+    member _.U32ToHexVector(value: u32) =
         // 0xD4_C3_B2_A1 => [ 'D', '4', 'C', '3', 'B', '2', 'A', '1' ] => "D4C3B2A1"
         // [ A1, B2, C3, D4, A1, B2, C3, D4, A1, B2, C3, D4, A1, B2, C3, D4 ]
         // [ D4, 00, D4, 00, C3, 00, C3, 00, B2, 00, B2, 00, A1, 00, A1, 00 ]
@@ -103,9 +103,50 @@ type HexU32(value: u32) =
 
         String(Unsafe.AsPointer(&result).As<char>(), 0, 8)
 
+    [<SkipLocalsInit>]
+    member _.U64ToHexVector(value: u64) =
+        // 0xD4_C3_B2_A1 => [ 'D', '4', 'C', '3', 'B', '2', 'A', '1' ] => "D4C3B2A1"
+        // [ A1, B2, C3, D4, A1, B2, C3, D4, A1, B2, C3, D4, A1, B2, C3, D4 ]
+        // [ D4, 00, D4, 00, C3, 00, C3, 00, B2, 00, B2, 00, A1, 00, A1, 00 ]
+        let bytes = v256.Shuffle(value.v256.u8, v256(0xF0_06_F0_06_F0_07_F0_07UL, 0xF0_04_F0_04_F0_05_F0_05UL, 0xF0_02_F0_02_F0_03_F0_03UL, 0xF0_00_F0_00_F0_01_F0_01UL).u8)
+
+        // [ 00D4, 00D4, 00C3, 00C3, 00B2, 00B2, 00A1, 00A1 ]
+        // [ D400, 4000, C300, 3000, B200, 2000, A100, 1000 ]
+        // [ 000D, 0004, 000C, 0003, 000B, 0002, 000A, 0001 ]
+        let nibbles = (bytes.u16 * v256(0x1000_0100_1000_0100UL).u16) >>> 12
+
+        // 9 - 57, 10 - "58" => A - 65, 7 - diff
+        let diff = v256.GreaterThan(nibbles.u16, 9us.v256) &&& 7us.v256
+        let mutable result = nibbles + diff + 48us.v256
+
+        String(Unsafe.AsPointer(&result).As<char>(), 0, 16)
+
+    [<SkipLocalsInit>]
+    member _.U64ToHexVectorLookup(value: u64) =
+        // [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' ]
+        let lookup = v256(48us, 49us, 50us, 51us, 52us, 53us, 54us, 55us, 56us, 57us, 65us, 66us, 67us, 68us, 69us, 70us)
+
+        // 0xF8_E7_D6_C5_B4_A3_92_81 => [ 'F', '8', 'E', '7', 'D', '6', 'C', '5', 'B', '4', 'A', '3', '9', '2', '8', '1' ] => "F8E7D6C5B4A39281"
+        // [ 81, 92, A3, B4, C5, D6, E7, F8, 81, 92, A3, B4, C5, D6, E7, F8, 81, 92, A3, B4, C5, D6, E7, F8, 81, 92, A3, B4, C5, D6, E7, F8 ]
+        // [ F8, 00, F8, 00, E7, 00, E7, 00, D6, 00, D6, 00, C5, 00, C5, 00, B4, 00, B4, 00, A3, 00, A3, 00, 92, 00, 92, 00, 81, 00, 81, 00 ]
+        let bytes = v256.Shuffle(value.v256.u8, v256(0xF0_06_F0_06_F0_07_F0_07UL, 0xF0_04_F0_04_F0_05_F0_05UL, 0xF0_02_F0_02_F0_03_F0_03UL, 0xF0_00_F0_00_F0_01_F0_01UL).u8)
+
+        // [ 00F8, 00F8, 00E7, 00E7, 00D6, 00D6, 00C5, 00C5, 00B4, 00B4, 00A3, 00A3, 0092, 0092, 0081, 0081 ]
+        // [ F800, 8000, E700, 7000, D600, 6000, C500, 5000, B400, 4000, A300, 3000, 9200, 2000, 8100, 1000 ]
+        // [ 000F, 0008, 000E, 0007, 000D, 0006, 000C, 0005, 000B, 0004, 000A, 0003, 0009, 0002, 0008, 0001 ]
+
+        let nibbles = (bytes.u16 * v256(0x1000_0100_1000_0100UL).u16) >>> 12
+        let mutable result = v256.Shuffle(lookup, nibbles)
+
+        String(Unsafe.AsPointer(&result).As<char>(), 0, 16)
+
 [<Fact>]
 let ``test hex struct``() =
-    let x = 0xD4_C3_B2_A1.u32
-    let hexu32 = HexU32(x)
-    Assert.Equal("D4C3B2A1", hexu32.ToHexStringSSE())
-    Assert.Equal("D4C3B2A1", hexu32.ToHexStringVector())
+    let x = 0xD4_C3_B2_A1u
+    let hexu32 = HexU32()
+    Assert.Equal("D4C3B2A1", hexu32.U32ToHexSSE(x))
+    Assert.Equal("D4C3B2A1", hexu32.U32ToHexVector(x))
+
+    let x = 0xF8_E7_D6_C5_B4_A3_92_81UL
+    Assert.Equal("F8E7D6C5B4A39281", hexu32.U64ToHexVector(x))
+    Assert.Equal("F8E7D6C5B4A39281", hexu32.U64ToHexVectorLookup(x))

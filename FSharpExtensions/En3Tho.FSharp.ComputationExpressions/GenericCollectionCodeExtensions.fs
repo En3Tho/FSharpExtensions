@@ -1,13 +1,14 @@
 ﻿namespace En3Tho.FSharp.ComputationExpressions
 
 open System
+open System.Collections.Generic
 open System.ComponentModel
 open System.Runtime.CompilerServices
 open En3Tho.FSharp.Extensions
 
 type CollectionCode = UnitBuilderCode<unit>
 
-[<AbstractClass; Extension>]
+[<AbstractClass>]
 type UnitLikeCodeExtensions() =
 
     [<Extension; EditorBrowsable(EditorBrowsableState.Never)>]
@@ -45,13 +46,20 @@ type UnitLikeCodeExtensions() =
 
     [<Extension; EditorBrowsable(EditorBrowsableState.Never)>]
     static member inline For(this, values: 'a seq, [<InlineIfLambda>] forExpr: 'a -> CollectionCode) : CollectionCode =
-        this.Using (
+        this.Using(
             values.GetEnumerator(), (fun e ->
                 this.While((fun () -> e.MoveNext()), (fun () ->
                     (forExpr e.Current)())
                 )
             )
         )
+
+    [<Extension; EditorBrowsable(EditorBrowsableState.Never)>]
+    static member inline For<'T, 'TEnumerator when 'TEnumerator :> IEnumerator<'T>>(_, enumerator: 'TEnumerator, [<InlineIfLambda>] forExpr: 'T -> CollectionCode) : CollectionCode =
+        fun () ->
+            let mutable enumerator = enumerator
+            while enumerator.MoveNext() do
+                (forExpr enumerator.Current)()
 
     [<Extension; EditorBrowsable(EditorBrowsableState.Never)>]
     static member inline Delay(_, [<InlineIfLambda>] delay: unit -> CollectionCode) =

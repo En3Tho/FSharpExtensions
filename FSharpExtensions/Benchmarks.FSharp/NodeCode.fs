@@ -22,7 +22,7 @@ type NodeCodeBuilder() =
     member _.Return value = Node(async.Return(value))
 
     [<DebuggerHidden;DebuggerStepThrough>]
-    member _.ReturnFrom (computation: NodeCode<_>) = computation
+    member _.ReturnFrom(computation: NodeCode<_>) = computation
 
     [<DebuggerHidden;DebuggerStepThrough>]
     member _.Bind (Node(p): NodeCode<'a>, binder: 'a -> NodeCode<'b>) : NodeCode<'b> =

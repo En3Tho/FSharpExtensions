@@ -27,6 +27,7 @@
         <Compile Include="GSeq.fs" />
         <Compile Include="GenericTaskBuilder.fs" />
         <Compile Include="HttpVerbParsing.fs" />
+        <Compile Include="VectorsBase64.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 

@@ -47,16 +47,16 @@ type ResultBuilderBase() =
             (fun () -> if not (isNull (box disp)) then disp.Dispose()))
 
     member inline this.For(sequence: seq<'a>, [<InlineIfLambda>] body: 'a -> ResultCode<unit, 'b>) : ResultCode<unit, 'b> =
-        this.Using (
+        this.Using(
             sequence.GetEnumerator(),
             (fun e -> this.While((fun () -> e.MoveNext()),
             (fun () -> (body e.Current)()))))
 
-    member inline _.Return (value: 'a) : ResultCode<'a, 'b> =
+    member inline _.Return(value: 'a) : ResultCode<'a, 'b> =
         fun () ->
             Ok value
 
-    member inline this.ReturnFrom (source: Result<'a, 'b>) : ResultCode<'a, 'b> =
+    member inline this.ReturnFrom(source: Result<'a, 'b>) : ResultCode<'a, 'b> =
         fun () ->
             source
 

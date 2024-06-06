@@ -2,15 +2,16 @@ module En3Tho.FSharp.Extensions.GSeqEnumerators
 
 open System.Collections.Generic
 open System.Collections.Immutable
+open System.Numerics
 open System.Runtime.CompilerServices
 
-type SStructEnumerator<'i, 'e when 'e: struct
-                              and 'e :> IEnumerator<'i>> = 'e
+type SStructEnumerator<'T, 'TEnumerator when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>> = 'TEnumerator
 
 [<Struct; NoComparison; NoEquality>]
-type StructIEnumeratorWrapper<'i, 'e when 'e :> IEnumerator<'i>> =
-    val mutable private enumerator: 'e
+type StructIEnumeratorWrapper<'T, 'TEnumerator when 'TEnumerator :> IEnumerator<'T>> =
+    val mutable private enumerator: 'TEnumerator
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (enumerator) = { enumerator = enumerator }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -21,7 +22,7 @@ type StructIEnumeratorWrapper<'i, 'e when 'e :> IEnumerator<'i>> =
 
     member this.Dispose() = this.enumerator.Dispose()
 
-    interface IEnumerator<'i> with
+    interface IEnumerator<'T> with
         member this.Current = this.enumerator.Current :> obj
         member this.Current = this.enumerator.Current
         member this.Dispose() = this.enumerator.Dispose()
@@ -29,10 +30,11 @@ type StructIEnumeratorWrapper<'i, 'e when 'e :> IEnumerator<'i>> =
         member this.Reset() = this.enumerator.Reset()
 
 [<Struct; NoComparison; NoEquality>]
-type StructArrayEnumerator<'i> =
-    val private data: 'i[]
+type StructArrayEnumerator<'T> =
+    val private data: 'T[]
     val mutable private index: int
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (data) = { index = -1; data = data; }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -43,9 +45,10 @@ type StructArrayEnumerator<'i> =
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.data[this.index]
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'i> with
+    interface IEnumerator<'T> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -53,10 +56,11 @@ type StructArrayEnumerator<'i> =
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructResizeArrayEnumerator<'i> =
-    val private data: 'i ResizeArray
+type StructResizeArrayEnumerator<'T> =
+    val private data: 'T ResizeArray
     val mutable private index: int
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (data) = { index = -1; data = data; }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -67,9 +71,10 @@ type StructResizeArrayEnumerator<'i> =
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.data[this.index]
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'i> with
+    interface IEnumerator<'T> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -77,10 +82,11 @@ type StructResizeArrayEnumerator<'i> =
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructIListEnumerator<'i, 'list when 'list :> IList<'i>> =
-    val mutable private data: 'list
+type StructIListEnumerator<'T, 'TList when 'TList :> IList<'T>> =
+    val mutable private data: 'TList
     val mutable private index: int
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (data) = { index = -1; data = data; }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -91,9 +97,10 @@ type StructIListEnumerator<'i, 'list when 'list :> IList<'i>> =
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.data[this.index]
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'i> with
+    interface IEnumerator<'T> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -101,10 +108,11 @@ type StructIListEnumerator<'i, 'list when 'list :> IList<'i>> =
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructArrayRevEnumerator<'i> =
-    val private data: 'i[]
+type StructArrayRevEnumerator<'T> =
+    val private data: 'T[]
     val mutable private index: int
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (data) = { data = data; index = data.Length }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -115,9 +123,10 @@ type StructArrayRevEnumerator<'i> =
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.data[this.index]
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'i> with
+    interface IEnumerator<'T> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -125,10 +134,11 @@ type StructArrayRevEnumerator<'i> =
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructResizeArrayRevEnumerator<'i> =
-    val private data: 'i ResizeArray
+type StructResizeArrayRevEnumerator<'T> =
+    val private data: 'T ResizeArray
     val mutable private index: int
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (data) = { data = data; index = data.Count }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -139,9 +149,10 @@ type StructResizeArrayRevEnumerator<'i> =
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.data[this.index]
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'i> with
+    interface IEnumerator<'T> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -149,10 +160,11 @@ type StructResizeArrayRevEnumerator<'i> =
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructIListRevEnumerator<'i, 'list when 'list :> IList<'i>> =
-    val mutable private data: 'list
+type StructIListRevEnumerator<'T, 'TList when 'TList :> IList<'T>> =
+    val mutable private data: 'TList
     val mutable private index: int
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (data) = { data = data; index = data.Count }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -163,9 +175,10 @@ type StructIListRevEnumerator<'i, 'list when 'list :> IList<'i>> =
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.data[this.index]
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'i> with
+    interface IEnumerator<'T> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -173,10 +186,11 @@ type StructIListRevEnumerator<'i, 'list when 'list :> IList<'i>> =
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructImmutableArrayEnumerator<'i> =
-    val private data: 'i ImmutableArray
+type StructImmutableArrayEnumerator<'T> =
+    val private data: 'T ImmutableArray
     val mutable private index: int
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (data) = { index = -1; data = data; }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -187,9 +201,10 @@ type StructImmutableArrayEnumerator<'i> =
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.data[this.index]
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'i> with
+    interface IEnumerator<'T> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -197,10 +212,11 @@ type StructImmutableArrayEnumerator<'i> =
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructImmutableArrayRevEnumerator<'i> =
-    val private data: 'i ImmutableArray
+type StructImmutableArrayRevEnumerator<'T> =
+    val private data: 'T ImmutableArray
     val mutable private index: int
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (data) = { index = -1; data = data; }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -211,9 +227,10 @@ type StructImmutableArrayRevEnumerator<'i> =
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.data[this.index]
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'i> with
+    interface IEnumerator<'T> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -221,10 +238,11 @@ type StructImmutableArrayRevEnumerator<'i> =
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructFSharpListEnumerator<'i> =
-    val mutable private list: 'i list
-    val mutable private prev: 'i list
+type StructFSharpListEnumerator<'T> =
+    val mutable private list: 'T list
+    val mutable private prev: 'T list
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (list) = { prev = list; list = list; }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -237,9 +255,10 @@ type StructFSharpListEnumerator<'i> =
             true
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() = this.prev.Head
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'i> with
+    interface IEnumerator<'T> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -247,12 +266,12 @@ type StructFSharpListEnumerator<'i> =
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructMapEnumerator<'i, 'res, 'e when 'e: struct
-                                       and 'e :> IEnumerator<'i>> =
+type StructMapEnumerator<'T, 'TResult, 'TEnumerator when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>> =
 
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val private map: 'i -> 'res
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val private map: 'T -> 'TResult
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (map, enumerator) = { enumerator = enumerator; map = map; }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -261,9 +280,10 @@ type StructMapEnumerator<'i, 'res, 'e when 'e: struct
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.enumerator.Current |> this.map
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'res> with
+    interface IEnumerator<'TResult> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -271,13 +291,13 @@ type StructMapEnumerator<'i, 'res, 'e when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructMapVEnumerator<'i, 'state, 'res, 'e when 'e: struct
-                                       and 'e :> IEnumerator<'i>> =
+type StructMapVEnumerator<'T, 'TState, 'TResult, 'TEnumerator when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>> =
 
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val private state: 'state
-    val private map: OptimizedClosures.FSharpFunc<'state, 'i, 'res>
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val private state: 'TState
+    val private map: OptimizedClosures.FSharpFunc<'TState, 'T, 'TResult>
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (state, map, enumerator) =
         { enumerator = enumerator; map = OptimizedClosures.FSharpFunc<_,_,_>.Adapt map; state = state }
 
@@ -288,9 +308,10 @@ type StructMapVEnumerator<'i, 'state, 'res, 'e when 'e: struct
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.map.Invoke(this.state, this.enumerator.Current)
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'res> with
+    interface IEnumerator<'TResult> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -298,13 +319,13 @@ type StructMapVEnumerator<'i, 'state, 'res, 'e when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructMapiEnumerator<'i, 'res, 'e when 'e: struct
-                                       and 'e :> IEnumerator<'i>> =
+type StructMapiEnumerator<'T, 'TResult, 'TEnumerator when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>> =
 
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
     val mutable private count: int
-    val private map: OptimizedClosures.FSharpFunc<int, 'i, 'res>
+    val private map: OptimizedClosures.FSharpFunc<int, 'T, 'TResult>
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (map, enumerator) =
         { enumerator = enumerator; map = OptimizedClosures.FSharpFunc<_,_,_>.Adapt map; count = -1 }
 
@@ -316,9 +337,10 @@ type StructMapiEnumerator<'i, 'res, 'e when 'e: struct
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.map.Invoke(this.count, this.enumerator.Current)
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'res> with
+    interface IEnumerator<'TResult> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -326,14 +348,14 @@ type StructMapiEnumerator<'i, 'res, 'e when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructMapiVEnumerator<'i, 'state, 'res, 'e when 'e: struct
-                                       and 'e :> IEnumerator<'i>> =
+type StructMapiVEnumerator<'T, 'TState, 'TResult, 'TEnumerator when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>> =
 
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
     val mutable private count: int
-    val private state: 'state
-    val private map: OptimizedClosures.FSharpFunc<int, 'state, 'i, 'res>
+    val private state: 'TState
+    val private map: OptimizedClosures.FSharpFunc<int, 'TState, 'T, 'TResult>
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (state, map, enumerator) =
         { enumerator = enumerator; map = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt map; count = -1; state = state }
 
@@ -345,9 +367,10 @@ type StructMapiVEnumerator<'i, 'state, 'res, 'e when 'e: struct
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.map.Invoke(this.count, this.state, this.enumerator.Current)
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'res> with
+    interface IEnumerator<'TResult> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -355,15 +378,15 @@ type StructMapiVEnumerator<'i, 'state, 'res, 'e when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructMap2Enumerator<'i, 'i2, 'res, 'e, 'e2 when 'e: struct
-                                                  and 'e :> IEnumerator<'i>
-                                                  and 'e2: struct
-                                                  and 'e2 :> IEnumerator<'i2>> =
+type StructMap2Enumerator<'T, 'T2, 'TResult, 'TEnumerator, 'TEnumerator2
+    when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>
+    and 'TEnumerator2: struct and 'TEnumerator2 :> IEnumerator<'T2>> =
 
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val mutable private enumerator2: SStructEnumerator<'i2, 'e2>
-    val private map: OptimizedClosures.FSharpFunc<'i2, 'i, 'res>
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val mutable private enumerator2: SStructEnumerator<'T2, 'TEnumerator2>
+    val private map: OptimizedClosures.FSharpFunc<'T2, 'T, 'TResult>
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (map, enumerator, enumerator2) =
         { enumerator = enumerator; enumerator2 = enumerator2; map = OptimizedClosures.FSharpFunc<_,_,_>.Adapt map; }
 
@@ -373,9 +396,10 @@ type StructMap2Enumerator<'i, 'i2, 'res, 'e, 'e2 when 'e: struct
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.map.Invoke(this.enumerator2.Current, this.enumerator.Current)
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'res> with
+    interface IEnumerator<'TResult> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -383,16 +407,16 @@ type StructMap2Enumerator<'i, 'i2, 'res, 'e, 'e2 when 'e: struct
         member this.Reset() = ()
 
  [<Struct; NoComparison; NoEquality>]
-type StructMap2VEnumerator<'i, 'i2, 'state, 'res, 'e, 'e2 when 'e: struct
-                                                  and 'e :> IEnumerator<'i>
-                                                  and 'e2: struct
-                                                  and 'e2 :> IEnumerator<'i2>> =
+type StructMap2VEnumerator<'T, 'T2, 'TState, 'TResult, 'TEnumerator, 'TEnumerator2
+    when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>
+    and 'TEnumerator2: struct and 'TEnumerator2 :> IEnumerator<'T2>> =
 
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val mutable private enumerator2: SStructEnumerator<'i2, 'e2>
-    val private map: OptimizedClosures.FSharpFunc<'state, 'i2, 'i, 'res>
-    val private state: 'state
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val mutable private enumerator2: SStructEnumerator<'T2, 'TEnumerator2>
+    val private map: OptimizedClosures.FSharpFunc<'TState, 'T2, 'T, 'TResult>
+    val private state: 'TState
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (state, map, enumerator, enumerator2) =
         { enumerator = enumerator; enumerator2 = enumerator2; map = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt map; state = state }
 
@@ -402,9 +426,10 @@ type StructMap2VEnumerator<'i, 'i2, 'state, 'res, 'e, 'e2 when 'e: struct
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.map.Invoke(this.state, this.enumerator2.Current, this.enumerator.Current)
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'res> with
+    interface IEnumerator<'TResult> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -412,16 +437,16 @@ type StructMap2VEnumerator<'i, 'i2, 'state, 'res, 'e, 'e2 when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructMapi2Enumerator<'i, 'i2, 'res, 'e, 'e2 when 'e: struct
-                                                  and 'e :> IEnumerator<'i>
-                                                  and 'e2: struct
-                                                  and 'e2 :> IEnumerator<'i2>> =
+type StructMapi2Enumerator<'T, 'T2, 'TResult, 'TEnumerator, 'TEnumerator2
+    when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>
+    and 'TEnumerator2: struct and 'TEnumerator2 :> IEnumerator<'T2>> =
 
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val mutable private enumerator2: SStructEnumerator<'i2, 'e2>
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val mutable private enumerator2: SStructEnumerator<'T2, 'TEnumerator2>
     val mutable private count: int
-    val private map: OptimizedClosures.FSharpFunc<int, 'i2, 'i, 'res>
+    val private map: OptimizedClosures.FSharpFunc<int, 'T2, 'T, 'TResult>
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (map, enumerator, enumerator2) =
         { enumerator = enumerator; enumerator2 = enumerator2; map = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt map; count = -1; }
 
@@ -434,9 +459,10 @@ type StructMapi2Enumerator<'i, 'i2, 'res, 'e, 'e2 when 'e: struct
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.map.Invoke(this.count, this.enumerator2.Current, this.enumerator.Current)
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'res> with
+    interface IEnumerator<'TResult> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -444,17 +470,17 @@ type StructMapi2Enumerator<'i, 'i2, 'res, 'e, 'e2 when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructMapi2VEnumerator<'i, 'i2, 'state, 'res, 'e, 'e2 when 'e: struct
-                                                  and 'e :> IEnumerator<'i>
-                                                  and 'e2: struct
-                                                  and 'e2 :> IEnumerator<'i2>> =
+type StructMapi2VEnumerator<'T, 'T2, 'TState, 'TResult, 'TEnumerator, 'TEnumerator2
+    when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>
+    and 'TEnumerator2: struct and 'TEnumerator2 :> IEnumerator<'T2>> =
 
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val mutable private enumerator2: SStructEnumerator<'i2, 'e2>
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val mutable private enumerator2: SStructEnumerator<'T2, 'TEnumerator2>
     val mutable private count: int
-    val private map: OptimizedClosures.FSharpFunc<int, 'state, 'i2, 'i, 'res>
-    val private state: 'state
+    val private map: OptimizedClosures.FSharpFunc<int, 'TState, 'T2, 'T, 'TResult>
+    val private state: 'TState
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (state, map, enumerator, enumerator2) =
         { enumerator = enumerator; enumerator2 = enumerator2; map = OptimizedClosures.FSharpFunc<_,_,_,_,_>.Adapt map; count = -1; state = state }
 
@@ -467,9 +493,10 @@ type StructMapi2VEnumerator<'i, 'i2, 'state, 'res, 'e, 'e2 when 'e: struct
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.map.Invoke(this.count, this.state, this.enumerator2.Current, this.enumerator.Current)
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'res> with
+    interface IEnumerator<'TResult> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -477,18 +504,17 @@ type StructMapi2VEnumerator<'i, 'i2, 'state, 'res, 'e, 'e2 when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructMap3Enumerator<'i, 'i2, 'i3, 'res, 'e, 'e2, 'e3 when 'e: struct
-                                                            and 'e :> IEnumerator<'i>
-                                                            and 'e2: struct
-                                                            and 'e2 :> IEnumerator<'i2>
-                                                            and 'e3: struct
-                                                            and 'e3 :> IEnumerator<'i3>> =
+type StructMap3Enumerator<'T, 'T2, 'T3, 'TResult, 'TEnumerator, 'TEnumerator2, 'TEnumerator3
+    when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>
+    and 'TEnumerator2: struct and 'TEnumerator2 :> IEnumerator<'T2>
+    and 'TEnumerator3: struct and 'TEnumerator3 :> IEnumerator<'T3>> =
 
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val mutable private enumerator2: SStructEnumerator<'i2, 'e2>
-    val mutable private enumerator3: SStructEnumerator<'i3, 'e3>
-    val private map: OptimizedClosures.FSharpFunc<'i2, 'i3, 'i, 'res>
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val mutable private enumerator2: SStructEnumerator<'T2, 'TEnumerator2>
+    val mutable private enumerator3: SStructEnumerator<'T3, 'TEnumerator3>
+    val private map: OptimizedClosures.FSharpFunc<'T2, 'T3, 'T, 'TResult>
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (map, enumerator, enumerator2, enumerator3) =
         { enumerator = enumerator; enumerator2 = enumerator2; enumerator3 = enumerator3; map = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt map; }
 
@@ -501,9 +527,10 @@ type StructMap3Enumerator<'i, 'i2, 'i3, 'res, 'e, 'e2, 'e3 when 'e: struct
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.map.Invoke(this.enumerator2.Current, this.enumerator3.Current, this.enumerator.Current)
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'res> with
+    interface IEnumerator<'TResult> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -511,19 +538,18 @@ type StructMap3Enumerator<'i, 'i2, 'i3, 'res, 'e, 'e2, 'e3 when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructMap3VEnumerator<'i, 'i2, 'i3, 'state, 'res, 'e, 'e2, 'e3 when 'e: struct
-                                                            and 'e :> IEnumerator<'i>
-                                                            and 'e2: struct
-                                                            and 'e2 :> IEnumerator<'i2>
-                                                            and 'e3: struct
-                                                            and 'e3 :> IEnumerator<'i3>> =
+type StructMap3VEnumerator<'T, 'T2, 'T3, 'TState, 'TResult, 'TEnumerator, 'TEnumerator2, 'TEnumerator3
+    when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>
+    and 'TEnumerator2: struct and 'TEnumerator2 :> IEnumerator<'T2>
+    and 'TEnumerator3: struct and 'TEnumerator3 :> IEnumerator<'T3>> =
 
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val mutable private enumerator2: SStructEnumerator<'i2, 'e2>
-    val mutable private enumerator3: SStructEnumerator<'i3, 'e3>
-    val private map: OptimizedClosures.FSharpFunc<'state, 'i2, 'i3, 'i, 'res>
-    val private state: 'state
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val mutable private enumerator2: SStructEnumerator<'T2, 'TEnumerator2>
+    val mutable private enumerator3: SStructEnumerator<'T3, 'TEnumerator3>
+    val private map: OptimizedClosures.FSharpFunc<'TState, 'T2, 'T3, 'T, 'TResult>
+    val private state: 'TState
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (state, map, enumerator, enumerator2, enumerator3) =
         { enumerator = enumerator; enumerator2 = enumerator2; enumerator3 = enumerator3; map = OptimizedClosures.FSharpFunc<_,_,_,_,_>.Adapt map; state = state }
 
@@ -536,9 +562,10 @@ type StructMap3VEnumerator<'i, 'i2, 'i3, 'state, 'res, 'e, 'e2, 'e3 when 'e: str
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.map.Invoke(this.state, this.enumerator2.Current, this.enumerator3.Current, this.enumerator.Current)
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'res> with
+    interface IEnumerator<'TResult> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -546,19 +573,18 @@ type StructMap3VEnumerator<'i, 'i2, 'i3, 'state, 'res, 'e, 'e2, 'e3 when 'e: str
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructMapi3Enumerator<'i, 'i2, 'i3, 'res, 'e, 'e2, 'e3 when 'e: struct
-                                                            and 'e :> IEnumerator<'i>
-                                                            and 'e2: struct
-                                                            and 'e2 :> IEnumerator<'i2>
-                                                            and 'e3: struct
-                                                            and 'e3 :> IEnumerator<'i3>> =
+type StructMapi3Enumerator<'T, 'T2, 'T3, 'TResult, 'TEnumerator, 'TEnumerator2, 'TEnumerator3
+    when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>
+    and 'TEnumerator2: struct and 'TEnumerator2 :> IEnumerator<'T2>
+    and 'TEnumerator3: struct and 'TEnumerator3 :> IEnumerator<'T3>> =
 
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val mutable private enumerator2: SStructEnumerator<'i2, 'e2>
-    val mutable private enumerator3: SStructEnumerator<'i3, 'e3>
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val mutable private enumerator2: SStructEnumerator<'T2, 'TEnumerator2>
+    val mutable private enumerator3: SStructEnumerator<'T3, 'TEnumerator3>
     val mutable private count: int
-    val private map: OptimizedClosures.FSharpFunc<int, 'i2, 'i3, 'i, 'res>
+    val private map: OptimizedClosures.FSharpFunc<int, 'T2, 'T3, 'T, 'TResult>
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (map, enumerator, enumerator2, enumerator3) =
         { enumerator = enumerator; enumerator2 = enumerator2; enumerator3 = enumerator3; map = OptimizedClosures.FSharpFunc<_,_,_,_,_>.Adapt map; count = -1 }
 
@@ -572,9 +598,10 @@ type StructMapi3Enumerator<'i, 'i2, 'i3, 'res, 'e, 'e2, 'e3 when 'e: struct
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.map.Invoke(this.count, this.enumerator2.Current, this.enumerator3.Current, this.enumerator.Current)
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'res> with
+    interface IEnumerator<'TResult> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -582,20 +609,19 @@ type StructMapi3Enumerator<'i, 'i2, 'i3, 'res, 'e, 'e2, 'e3 when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructMapi3VEnumerator<'i, 'i2, 'i3, 'state, 'res, 'e, 'e2, 'e3 when 'e: struct
-                                                            and 'e :> IEnumerator<'i>
-                                                            and 'e2: struct
-                                                            and 'e2 :> IEnumerator<'i2>
-                                                            and 'e3: struct
-                                                            and 'e3 :> IEnumerator<'i3>> =
+type StructMapi3VEnumerator<'T, 'T2, 'T3, 'TState, 'TResult, 'TEnumerator, 'TEnumerator2, 'TEnumerator3
+    when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>
+    and 'TEnumerator2: struct and 'TEnumerator2 :> IEnumerator<'T2>
+    and 'TEnumerator3: struct and 'TEnumerator3 :> IEnumerator<'T3>> =
 
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val mutable private enumerator2: SStructEnumerator<'i2, 'e2>
-    val mutable private enumerator3: SStructEnumerator<'i3, 'e3>
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val mutable private enumerator2: SStructEnumerator<'T2, 'TEnumerator2>
+    val mutable private enumerator3: SStructEnumerator<'T3, 'TEnumerator3>
     val mutable private count: int
-    val private map: OptimizedClosures.FSharpFunc<int, 'state, 'i2, 'i3, 'i, 'res>
-    val private state: 'state
+    val private map: OptimizedClosures.FSharpFunc<int, 'TState, 'T2, 'T3, 'T, 'TResult>
+    val private state: 'TState
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (state, map, enumerator, enumerator2, enumerator3) =
         { enumerator = enumerator; enumerator2 = enumerator2; enumerator3 = enumerator3; map = OptimizedClosures.FSharpFunc<_,_,_,_,_,_>.Adapt map; count = -1; state = state }
 
@@ -609,9 +635,10 @@ type StructMapi3VEnumerator<'i, 'i2, 'i3, 'state, 'res, 'e, 'e2, 'e3 when 'e: st
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.map.Invoke(this.count, this.state, this.enumerator2.Current, this.enumerator3.Current, this.enumerator.Current)
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'res> with
+    interface IEnumerator<'TResult> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -619,12 +646,12 @@ type StructMapi3VEnumerator<'i, 'i2, 'i3, 'state, 'res, 'e, 'e2, 'e3 when 'e: st
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructFilterEnumerator<'i, 'e when 'e: struct
-                                    and 'e :> IEnumerator<'i>> =
+type StructFilterEnumerator<'T, 'TEnumerator when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>> =
 
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val private filter: 'i -> bool
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val private filter: 'T -> bool
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (filter, enumerator) = { enumerator = enumerator; filter = filter; }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -636,9 +663,10 @@ type StructFilterEnumerator<'i, 'e when 'e: struct
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.enumerator.Current
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'i> with
+    interface IEnumerator<'T> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -646,13 +674,13 @@ type StructFilterEnumerator<'i, 'e when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructFilterVEnumerator<'i, 'state, 'e when 'e: struct
-                                    and 'e :> IEnumerator<'i>> =
+type StructFilterVEnumerator<'T, 'TState, 'TEnumerator when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>> =
 
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val private filter: OptimizedClosures.FSharpFunc<'state, 'i, bool>
-    val private state: 'state
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val private filter: OptimizedClosures.FSharpFunc<'TState, 'T, bool>
+    val private state: 'TState
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (state, filter, enumerator) = { enumerator = enumerator; filter = OptimizedClosures.FSharpFunc<_,_,_>.Adapt filter; state = state }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -664,9 +692,10 @@ type StructFilterVEnumerator<'i, 'state, 'e when 'e: struct
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.enumerator.Current
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'i> with
+    interface IEnumerator<'T> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -674,12 +703,12 @@ type StructFilterVEnumerator<'i, 'state, 'e when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructTakeEnumerator<'i, 'e when 'e: struct
-                                  and 'e :> IEnumerator<'i>> =
+type StructTakeEnumerator<'T, 'TEnumerator when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>> =
 
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
     val mutable private count: int
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (count, enumerator) = { enumerator = enumerator; count = count; }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -691,9 +720,10 @@ type StructTakeEnumerator<'i, 'e when 'e: struct
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.enumerator.Current
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'i> with
+    interface IEnumerator<'T> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -701,12 +731,12 @@ type StructTakeEnumerator<'i, 'e when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructTakeWhileEnumerator<'i, 'e when 'e: struct
-                                       and 'e :> IEnumerator<'i>> =
+type StructTakeWhileEnumerator<'T, 'TEnumerator when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>> =
 
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val private filter: 'i -> bool
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val private filter: 'T -> bool
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (filter, enumerator) = { enumerator = enumerator; filter = filter }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -716,9 +746,10 @@ type StructTakeWhileEnumerator<'i, 'e when 'e: struct
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.enumerator.Current
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'i> with
+    interface IEnumerator<'T> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -726,13 +757,13 @@ type StructTakeWhileEnumerator<'i, 'e when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructTakeWhileVEnumerator<'i, 'state, 'e when 'e: struct
-                                       and 'e :> IEnumerator<'i>> =
+type StructTakeWhileVEnumerator<'T, 'TState, 'TEnumerator when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>> =
 
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val private filter: OptimizedClosures.FSharpFunc<'state, 'i, bool>
-    val private state: 'state
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val private filter: OptimizedClosures.FSharpFunc<'TState, 'T, bool>
+    val private state: 'TState
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (state, filter, enumerator) = { enumerator = enumerator; filter = OptimizedClosures.FSharpFunc<_,_,_>.Adapt filter; state = state }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -742,9 +773,10 @@ type StructTakeWhileVEnumerator<'i, 'state, 'e when 'e: struct
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.enumerator.Current
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'i> with
+    interface IEnumerator<'T> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -752,12 +784,12 @@ type StructTakeWhileVEnumerator<'i, 'state, 'e when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructSkipEnumerator<'i, 'e when 'e: struct
-                                  and 'e :> IEnumerator<'i>> =
+type StructSkipEnumerator<'T, 'TEnumerator when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>> =
 
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
     val mutable private count: int
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (count, enumerator) = { enumerator = enumerator; count = count; }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -769,9 +801,10 @@ type StructSkipEnumerator<'i, 'e when 'e: struct
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.enumerator.Current
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'i> with
+    interface IEnumerator<'T> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -779,13 +812,13 @@ type StructSkipEnumerator<'i, 'e when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructSkipWhileEnumerator<'i, 'e when 'e: struct
-                                       and 'e :> IEnumerator<'i>> =
+type StructSkipWhileEnumerator<'T, 'TEnumerator when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>> =
 
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val private filter: 'i -> bool
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val private filter: 'T -> bool
     val mutable private flag: int
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (filter, enumerator) = { enumerator = enumerator; filter = filter; flag = 0 }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -803,9 +836,10 @@ type StructSkipWhileEnumerator<'i, 'e when 'e: struct
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.enumerator.Current
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'i> with
+    interface IEnumerator<'T> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -813,14 +847,14 @@ type StructSkipWhileEnumerator<'i, 'e when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructSkipWhileVEnumerator<'i, 'state, 'e when 'e: struct
-                                       and 'e :> IEnumerator<'i>> =
+type StructSkipWhileVEnumerator<'T, 'TState, 'TEnumerator when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>> =
 
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val private filter: OptimizedClosures.FSharpFunc<'state, 'i, bool>
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val private filter: OptimizedClosures.FSharpFunc<'TState, 'T, bool>
     val mutable private flag: int
-    val private state: 'state
+    val private state: 'TState
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (state, filter, enumerator) = { enumerator = enumerator; filter = OptimizedClosures.FSharpFunc<_,_,_>.Adapt filter; flag = 0; state = state }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -838,9 +872,10 @@ type StructSkipWhileVEnumerator<'i, 'state, 'e when 'e: struct
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.enumerator.Current
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'i> with
+    interface IEnumerator<'T> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -848,12 +883,13 @@ type StructSkipWhileVEnumerator<'i, 'state, 'e when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructChooseEnumerator<'i, 'res, 'e when 'e: struct
-                                          and 'e :> IEnumerator<'i>> =
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val mutable private current: 'res option
-    val private chooser: 'i -> 'res option
+type StructChooseEnumerator<'T, 'TResult, 'TEnumerator when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>> =
 
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val mutable private current: 'TResult option
+    val private chooser: 'T -> 'TResult option
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (chooser, enumerator) = { enumerator = enumerator; chooser = chooser; current = None }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -865,9 +901,10 @@ type StructChooseEnumerator<'i, 'res, 'e when 'e: struct
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.current |> Option.get
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'res> with
+    interface IEnumerator<'TResult> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -875,14 +912,14 @@ type StructChooseEnumerator<'i, 'res, 'e when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructChooseVEnumerator<'i, 'state, 'res, 'e when 'e: struct
-                                                     and 'e :> IEnumerator<'i>> =
+type StructChooseVEnumerator<'T, 'TState, 'TResult, 'TEnumerator when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>> =
 
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val mutable private current: 'res option
-    val private chooser: OptimizedClosures.FSharpFunc<'state, 'i, 'res option>
-    val private state: 'state
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val mutable private current: 'TResult option
+    val private chooser: OptimizedClosures.FSharpFunc<'TState, 'T, 'TResult option>
+    val private state: 'TState
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (state, chooser, enumerator) = { enumerator = enumerator; chooser = OptimizedClosures.FSharpFunc<_,_,_>.Adapt chooser; current = None; state = state }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -894,9 +931,10 @@ type StructChooseVEnumerator<'i, 'state, 'res, 'e when 'e: struct
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.current |> Option.get
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'res> with
+    interface IEnumerator<'TResult> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -904,15 +942,16 @@ type StructChooseVEnumerator<'i, 'state, 'res, 'e when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructChoose2Enumerator<'i, 'i2, 'res, 'e, 'e2 when 'e: struct
-                                                     and 'e :> IEnumerator<'i>
-                                                     and 'e2: struct
-                                                     and 'e2 :> IEnumerator<'i2>> =
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val mutable private enumerator2: SStructEnumerator<'i2, 'e2>
-    val mutable private current: 'res option
-    val private chooser: OptimizedClosures.FSharpFunc<'i2, 'i, 'res option>
+type StructChoose2Enumerator<'T, 'T2, 'TResult, 'TEnumerator, 'TEnumerator2
+    when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>
+    and 'TEnumerator2: struct and 'TEnumerator2 :> IEnumerator<'T2>> =
 
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val mutable private enumerator2: SStructEnumerator<'T2, 'TEnumerator2>
+    val mutable private current: 'TResult option
+    val private chooser: OptimizedClosures.FSharpFunc<'T2, 'T, 'TResult option>
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (chooser, enumerator, enumerator2) = { enumerator = enumerator; enumerator2 = enumerator2; chooser = OptimizedClosures.FSharpFunc<_,_,_>.Adapt chooser; current = None }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -924,9 +963,10 @@ type StructChoose2Enumerator<'i, 'i2, 'res, 'e, 'e2 when 'e: struct
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.current |> Option.get
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'res> with
+    interface IEnumerator<'TResult> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -934,16 +974,17 @@ type StructChoose2Enumerator<'i, 'i2, 'res, 'e, 'e2 when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructChoose2VEnumerator<'i, 'i2, 'state, 'res, 'e, 'e2 when 'e: struct
-                                                     and 'e :> IEnumerator<'i>
-                                                     and 'e2: struct
-                                                     and 'e2 :> IEnumerator<'i2>> =
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val mutable private enumerator2: SStructEnumerator<'i2, 'e2>
-    val mutable private current: 'res option
-    val private chooser: OptimizedClosures.FSharpFunc<'state, 'i2, 'i, 'res option>
-    val private state: 'state
+type StructChoose2VEnumerator<'T, 'T2, 'TState, 'TResult, 'TEnumerator, 'TEnumerator2
+    when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>
+    and 'TEnumerator2: struct and 'TEnumerator2 :> IEnumerator<'T2>> =
 
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val mutable private enumerator2: SStructEnumerator<'T2, 'TEnumerator2>
+    val mutable private current: 'TResult option
+    val private chooser: OptimizedClosures.FSharpFunc<'TState, 'T2, 'T, 'TResult option>
+    val private state: 'TState
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (state, chooser, enumerator, enumerator2) =
         { enumerator = enumerator; enumerator2 = enumerator2; chooser = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt chooser; current = None; state = state }
 
@@ -956,9 +997,10 @@ type StructChoose2VEnumerator<'i, 'i2, 'state, 'res, 'e, 'e2 when 'e: struct
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.current |> Option.get
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'res> with
+    interface IEnumerator<'TResult> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -966,18 +1008,18 @@ type StructChoose2VEnumerator<'i, 'i2, 'state, 'res, 'e, 'e2 when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructChoose3Enumerator<'i, 'i2, 'i3, 'res, 'e, 'e2, 'e3 when 'e: struct
-                                                               and 'e :> IEnumerator<'i>
-                                                               and 'e2: struct
-                                                               and 'e2 :> IEnumerator<'i2>
-                                                               and 'e3: struct
-                                                               and 'e3 :> IEnumerator<'i3>> =
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val mutable private enumerator2: SStructEnumerator<'i2, 'e2>
-    val mutable private enumerator3: SStructEnumerator<'i3, 'e3>
-    val mutable private current: 'res option
-    val private chooser: OptimizedClosures.FSharpFunc<'i2, 'i3, 'i, 'res option>
+type StructChoose3Enumerator<'T, 'T2, 'T3, 'TResult, 'TEnumerator, 'TEnumerator2, 'TEnumerator3
+    when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>
+    and 'TEnumerator2: struct and 'TEnumerator2 :> IEnumerator<'T2>
+    and 'TEnumerator3: struct and 'TEnumerator3 :> IEnumerator<'T3>> =
 
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val mutable private enumerator2: SStructEnumerator<'T2, 'TEnumerator2>
+    val mutable private enumerator3: SStructEnumerator<'T3, 'TEnumerator3>
+    val mutable private current: 'TResult option
+    val private chooser: OptimizedClosures.FSharpFunc<'T2, 'T3, 'T, 'TResult option>
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (chooser, enumerator, enumerator2, enumerator3) =
         { enumerator = enumerator; enumerator2 = enumerator2; enumerator3 = enumerator3; chooser = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt chooser; current = None }
 
@@ -990,9 +1032,10 @@ type StructChoose3Enumerator<'i, 'i2, 'i3, 'res, 'e, 'e2, 'e3 when 'e: struct
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.current |> Option.get
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'res> with
+    interface IEnumerator<'TResult> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -1000,19 +1043,19 @@ type StructChoose3Enumerator<'i, 'i2, 'i3, 'res, 'e, 'e2, 'e3 when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructChoose3VEnumerator<'i, 'i2, 'i3, 'state, 'res, 'e, 'e2, 'e3 when 'e: struct
-                                                               and 'e :> IEnumerator<'i>
-                                                               and 'e2: struct
-                                                               and 'e2 :> IEnumerator<'i2>
-                                                               and 'e3: struct
-                                                               and 'e3 :> IEnumerator<'i3>> =
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val mutable private enumerator2: SStructEnumerator<'i2, 'e2>
-    val mutable private enumerator3: SStructEnumerator<'i3, 'e3>
-    val mutable private current: 'res option
-    val private chooser: OptimizedClosures.FSharpFunc<'state, 'i2, 'i3, 'i, 'res option>
-    val private state: 'state
+type StructChoose3VEnumerator<'T, 'T2, 'T3, 'TState, 'TResult, 'TEnumerator, 'TEnumerator2, 'TEnumerator3
+    when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>
+    and 'TEnumerator2: struct and 'TEnumerator2 :> IEnumerator<'T2>
+    and 'TEnumerator3: struct and 'TEnumerator3 :> IEnumerator<'T3>> =
 
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val mutable private enumerator2: SStructEnumerator<'T2, 'TEnumerator2>
+    val mutable private enumerator3: SStructEnumerator<'T3, 'TEnumerator3>
+    val mutable private current: 'TResult option
+    val private chooser: OptimizedClosures.FSharpFunc<'TState, 'T2, 'T3, 'T, 'TResult option>
+    val private state: 'TState
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (state, chooser, enumerator, enumerator2, enumerator3) =
         { enumerator = enumerator; enumerator2 = enumerator2; enumerator3 = enumerator3; chooser = OptimizedClosures.FSharpFunc<_,_,_,_,_>.Adapt chooser; current = None; state = state }
 
@@ -1025,9 +1068,10 @@ type StructChoose3VEnumerator<'i, 'i2, 'i3, 'state, 'res, 'e, 'e2, 'e3 when 'e: 
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.current |> Option.get
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'res> with
+    interface IEnumerator<'TResult> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -1035,12 +1079,13 @@ type StructChoose3VEnumerator<'i, 'i2, 'i3, 'state, 'res, 'e, 'e2, 'e3 when 'e: 
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructValueChooseEnumerator<'i, 'res, 'e when 'e: struct
-                                               and 'e :> IEnumerator<'i>> =
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val mutable private current: 'res voption
-    val private chooser: 'i -> 'res voption
+type StructValueChooseEnumerator<'T, 'TResult, 'TEnumerator when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>> =
 
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val mutable private current: 'TResult voption
+    val private chooser: 'T -> 'TResult voption
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (chooser, enumerator) = { enumerator = enumerator; chooser = chooser; current = ValueNone }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -1049,12 +1094,14 @@ type StructValueChooseEnumerator<'i, 'res, 'e when 'e: struct
         while this.current.IsNone && this.enumerator.MoveNext() do
             this.current <- this.chooser this.enumerator.Current
         this.current.IsSome
+
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.current |> ValueOption.get
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'res> with
+    interface IEnumerator<'TResult> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -1062,13 +1109,14 @@ type StructValueChooseEnumerator<'i, 'res, 'e when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructValueChooseVEnumerator<'i, 'state, 'res, 'e when 'e: struct
-                                               and 'e :> IEnumerator<'i>> =
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val mutable private current: 'res voption
-    val private chooser: OptimizedClosures.FSharpFunc<'state, 'i, 'res voption>
-    val private state: 'state
+type StructValueChooseVEnumerator<'T, 'TState, 'TResult, 'TEnumerator when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>> =
 
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val mutable private current: 'TResult voption
+    val private chooser: OptimizedClosures.FSharpFunc<'TState, 'T, 'TResult voption>
+    val private state: 'TState
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (state, chooser, enumerator) = { enumerator = enumerator; chooser = OptimizedClosures.FSharpFunc<_,_,_>.Adapt chooser; current = ValueNone; state = state }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -1077,12 +1125,14 @@ type StructValueChooseVEnumerator<'i, 'state, 'res, 'e when 'e: struct
         while this.current.IsNone && this.enumerator.MoveNext() do
             this.current <- this.chooser.Invoke(this.state, this.enumerator.Current)
         this.current.IsSome
+
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.current |> ValueOption.get
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'res> with
+    interface IEnumerator<'TResult> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -1090,15 +1140,16 @@ type StructValueChooseVEnumerator<'i, 'state, 'res, 'e when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructValueChoose2Enumerator<'i, 'i2, 'res, 'e, 'e2 when 'e: struct
-                                                          and 'e :> IEnumerator<'i>
-                                                          and 'e2: struct
-                                                          and 'e2 :> IEnumerator<'i2>> =
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val mutable private enumerator2: SStructEnumerator<'i2, 'e2>
-    val mutable private current: 'res voption
-    val private chooser: OptimizedClosures.FSharpFunc<'i2, 'i, 'res voption>
+type StructValueChoose2Enumerator<'T, 'T2, 'TResult, 'TEnumerator, 'TEnumerator2
+    when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>
+    and 'TEnumerator2: struct and 'TEnumerator2 :> IEnumerator<'T2>> =
 
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val mutable private enumerator2: SStructEnumerator<'T2, 'TEnumerator2>
+    val mutable private current: 'TResult voption
+    val private chooser: OptimizedClosures.FSharpFunc<'T2, 'T, 'TResult voption>
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (chooser, enumerator, enumerator2) =
         { enumerator = enumerator; enumerator2 = enumerator2; chooser = OptimizedClosures.FSharpFunc<_,_,_>.Adapt chooser; current = ValueNone }
 
@@ -1111,9 +1162,10 @@ type StructValueChoose2Enumerator<'i, 'i2, 'res, 'e, 'e2 when 'e: struct
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.current |> ValueOption.get
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'res> with
+    interface IEnumerator<'TResult> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -1121,16 +1173,17 @@ type StructValueChoose2Enumerator<'i, 'i2, 'res, 'e, 'e2 when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructValueChoose2VEnumerator<'i, 'i2, 'state, 'res, 'e, 'e2 when 'e: struct
-                                                          and 'e :> IEnumerator<'i>
-                                                          and 'e2: struct
-                                                          and 'e2 :> IEnumerator<'i2>> =
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val mutable private enumerator2: SStructEnumerator<'i2, 'e2>
-    val mutable private current: 'res voption
-    val private chooser: OptimizedClosures.FSharpFunc<'state, 'i2, 'i, 'res voption>
-    val private state: 'state
+type StructValueChoose2VEnumerator<'T, 'T2, 'TState, 'TResult, 'TEnumerator, 'TEnumerator2
+    when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>
+    and 'TEnumerator2: struct and 'TEnumerator2 :> IEnumerator<'T2>> =
 
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val mutable private enumerator2: SStructEnumerator<'T2, 'TEnumerator2>
+    val mutable private current: 'TResult voption
+    val private chooser: OptimizedClosures.FSharpFunc<'TState, 'T2, 'T, 'TResult voption>
+    val private state: 'TState
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (state, chooser, enumerator, enumerator2) =
         { enumerator = enumerator; enumerator2 = enumerator2; chooser = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt chooser; current = ValueNone; state = state }
 
@@ -1143,9 +1196,10 @@ type StructValueChoose2VEnumerator<'i, 'i2, 'state, 'res, 'e, 'e2 when 'e: struc
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.current |> ValueOption.get
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'res> with
+    interface IEnumerator<'TResult> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -1153,18 +1207,18 @@ type StructValueChoose2VEnumerator<'i, 'i2, 'state, 'res, 'e, 'e2 when 'e: struc
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructValueChoose3Enumerator<'i, 'i2, 'i3, 'res, 'e, 'e2, 'e3 when 'e: struct
-                                                                    and 'e :> IEnumerator<'i>
-                                                                    and 'e2: struct
-                                                                    and 'e2 :> IEnumerator<'i2>
-                                                                    and 'e3: struct
-                                                                    and 'e3 :> IEnumerator<'i3>> =
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val mutable private enumerator2: SStructEnumerator<'i2, 'e2>
-    val mutable private enumerator3: SStructEnumerator<'i3, 'e3>
-    val mutable private current: 'res voption
-    val private chooser: OptimizedClosures.FSharpFunc<'i2, 'i3, 'i, 'res voption>
+type StructValueChoose3Enumerator<'T, 'T2, 'T3, 'TResult, 'TEnumerator, 'TEnumerator2, 'TEnumerator3
+    when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>
+    and 'TEnumerator2: struct and 'TEnumerator2 :> IEnumerator<'T2>
+    and 'TEnumerator3: struct and 'TEnumerator3 :> IEnumerator<'T3>> =
 
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val mutable private enumerator2: SStructEnumerator<'T2, 'TEnumerator2>
+    val mutable private enumerator3: SStructEnumerator<'T3, 'TEnumerator3>
+    val mutable private current: 'TResult voption
+    val private chooser: OptimizedClosures.FSharpFunc<'T2, 'T3, 'T, 'TResult voption>
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (chooser, enumerator, enumerator2, enumerator3) =
         { enumerator = enumerator; enumerator2 = enumerator2; enumerator3 = enumerator3; chooser = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt chooser; current = ValueNone }
 
@@ -1177,9 +1231,10 @@ type StructValueChoose3Enumerator<'i, 'i2, 'i3, 'res, 'e, 'e2, 'e3 when 'e: stru
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.current |> ValueOption.get
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'res> with
+    interface IEnumerator<'TResult> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -1187,19 +1242,19 @@ type StructValueChoose3Enumerator<'i, 'i2, 'i3, 'res, 'e, 'e2, 'e3 when 'e: stru
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructValueChoose3VEnumerator<'i, 'i2, 'i3, 'state, 'res, 'e, 'e2, 'e3 when 'e: struct
-                                                                    and 'e :> IEnumerator<'i>
-                                                                    and 'e2: struct
-                                                                    and 'e2 :> IEnumerator<'i2>
-                                                                    and 'e3: struct
-                                                                    and 'e3 :> IEnumerator<'i3>> =
-    val mutable private enumerator: SStructEnumerator<'i, 'e>
-    val mutable private enumerator2: SStructEnumerator<'i2, 'e2>
-    val mutable private enumerator3: SStructEnumerator<'i3, 'e3>
-    val mutable private current: 'res voption
-    val private chooser: OptimizedClosures.FSharpFunc<'state, 'i2, 'i3, 'i, 'res voption>
-    val private state: 'state
+type StructValueChoose3VEnumerator<'T, 'T2, 'T3, 'TState, 'TResult, 'TEnumerator, 'TEnumerator2, 'TEnumerator3
+    when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>
+    and 'TEnumerator2: struct and 'TEnumerator2 :> IEnumerator<'T2>
+    and 'TEnumerator3: struct and 'TEnumerator3 :> IEnumerator<'T3>> =
 
+    val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
+    val mutable private enumerator2: SStructEnumerator<'T2, 'TEnumerator2>
+    val mutable private enumerator3: SStructEnumerator<'T3, 'TEnumerator3>
+    val mutable private current: 'TResult voption
+    val private chooser: OptimizedClosures.FSharpFunc<'TState, 'T2, 'T3, 'T, 'TResult voption>
+    val private state: 'TState
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (state, chooser, enumerator, enumerator2, enumerator3) =
         { enumerator = enumerator; enumerator2 = enumerator2; enumerator3 = enumerator3; chooser = OptimizedClosures.FSharpFunc<_,_,_,_,_>.Adapt chooser; current = ValueNone; state = state }
 
@@ -1212,9 +1267,10 @@ type StructValueChoose3VEnumerator<'i, 'i2, 'i3, 'state, 'res, 'e, 'e2, 'e3 when
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.current |> ValueOption.get
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'res> with
+    interface IEnumerator<'TResult> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -1222,13 +1278,13 @@ type StructValueChoose3VEnumerator<'i, 'i2, 'i3, 'state, 'res, 'e, 'e2, 'e3 when
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructAppendEnumerator<'i, 'e when 'e: struct
-                                    and 'e :> IEnumerator<'i>> =
+type StructAppendEnumerator<'T, 'TEnumerator when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>> =
 
-    val mutable private enumerator1: SStructEnumerator<'i, 'e>
-    val mutable private enumerator2: SStructEnumerator<'i, 'e>
+    val mutable private enumerator1: SStructEnumerator<'T, 'TEnumerator>
+    val mutable private enumerator2: SStructEnumerator<'T, 'TEnumerator>
     val mutable private index: int
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (enumerator1, enumerator2) = { enumerator1 = enumerator1; enumerator2 = enumerator2; index = 0 }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -1248,9 +1304,10 @@ type StructAppendEnumerator<'i, 'e when 'e: struct
         | 0 -> this.enumerator1.Current
         | _ -> this.enumerator2.Current
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'i> with
+    interface IEnumerator<'T> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -1258,14 +1315,14 @@ type StructAppendEnumerator<'i, 'e when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructZipEnumerator<'i, 'i2, 'e, 'e2 when 'e: struct
-                                           and 'e :> IEnumerator<'i>
-                                           and 'e2: struct
-                                           and 'e2 :> IEnumerator<'i2>> =
+type StructZipEnumerator<'T, 'T2, 'TEnumerator, 'TEnumerator2
+    when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>
+    and 'TEnumerator2: struct and 'TEnumerator2 :> IEnumerator<'T2>> =
 
-    val mutable private enumerator1: SStructEnumerator<'i, 'e>
-    val mutable private enumerator2: SStructEnumerator<'i2, 'e2>
+    val mutable private enumerator1: SStructEnumerator<'T, 'TEnumerator>
+    val mutable private enumerator2: SStructEnumerator<'T2, 'TEnumerator2>
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (enumerator1, enumerator2) = { enumerator1 = enumerator1; enumerator2 = enumerator2 }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -1276,9 +1333,10 @@ type StructZipEnumerator<'i, 'i2, 'e, 'e2 when 'e: struct
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         this.enumerator2.Current, this.enumerator1.Current
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'i2 * 'i> with
+    interface IEnumerator<'T2 * 'T> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -1286,13 +1344,14 @@ type StructZipEnumerator<'i, 'i2, 'e, 'e2 when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructValueZipEnumerator<'i, 'i2, 'e, 'e2 when 'e: struct
-                                                and 'e :> IEnumerator<'i>
-                                                and 'e2: struct
-                                                and 'e2 :> IEnumerator<'i2>> =
-    val mutable private enumerator1: SStructEnumerator<'i, 'e>
-    val mutable private enumerator2: SStructEnumerator<'i2, 'e2>
+type StructValueZipEnumerator<'T, 'T2, 'TEnumerator, 'TEnumerator2
+    when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>
+    and 'TEnumerator2: struct and 'TEnumerator2 :> IEnumerator<'T2>> =
 
+    val mutable private enumerator1: SStructEnumerator<'T, 'TEnumerator>
+    val mutable private enumerator2: SStructEnumerator<'T2, 'TEnumerator2>
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (enumerator1, enumerator2) = { enumerator1 = enumerator1; enumerator2 = enumerator2 }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -1303,9 +1362,10 @@ type StructValueZipEnumerator<'i, 'i2, 'e, 'e2 when 'e: struct
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() =
         struct (this.enumerator2.Current, this.enumerator1.Current)
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<struct('i2 * 'i)> with
+    interface IEnumerator<struct('T2 * 'T)> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -1313,11 +1373,12 @@ type StructValueZipEnumerator<'i, 'i2, 'e, 'e2 when 'e: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructInitEnumerator<'i> =
+type StructInitEnumerator<'T> =
     val mutable private length: int
     val mutable private count: int
-    val private initializer: int -> 'i
+    val private initializer: int -> 'T
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (count, initializer) = { length = -1; count = count; initializer = initializer }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -1327,9 +1388,10 @@ type StructInitEnumerator<'i> =
 
     member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() = this.initializer this.length
 
-    member this.Dispose() = ()
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
 
-    interface IEnumerator<'i> with
+    interface IEnumerator<'T> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()
@@ -1337,16 +1399,121 @@ type StructInitEnumerator<'i> =
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructInitInfiniteEnumerator<'i> =
+type StructInitInfiniteEnumerator<'T> =
     val mutable private length: int
+    val private initializer: int -> 'T
+    
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    new (initializer) = { length = -1; initializer = initializer }
+    
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    member this.MoveNext() =
+        this.length <- this.length + 1
+        true
+
+    member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() = this.initializer this.length
+
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
+
+    interface IEnumerator<'T> with
+        member this.Current = this.Current :> obj
+        member this.Current = this.Current
+        member this.Dispose() = ()
+        member this.MoveNext() = this.MoveNext()
+        member this.Reset() = ()
+
+type IRangeEnumeratorOperators<'T when 'T :> INumber<'T>>  =
+    static abstract Initialize: left: 'T * right: 'T -> 'T
+    static abstract MoveNext: left: 'T * right: 'T -> 'T
+    static abstract Compare: left: 'T * right: 'T -> bool
+
+
+[<Struct>]
+type RangeUpToOperators<'T when 'T :> INumber<'T>> =
+    interface IRangeEnumeratorOperators<'T> with
+        [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+        static member Initialize(left, right) = left - right
+        [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+        static member MoveNext(left, right) = left + right
+        [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+        static member Compare(left, right) = left.CompareTo(right) < 0
+
+[<Struct>]
+type RangeUpToInclusiveOperators<'T when 'T :> INumber<'T>> =
+    interface IRangeEnumeratorOperators<'T> with
+        [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+        static member Initialize(left, right) = left - right
+        [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+        static member MoveNext(left, right) = left + right
+        [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+        static member Compare(left, right) = left.CompareTo(right) <= 0
+
+[<Struct>]
+type RangeDownToOperators<'T when 'T :> INumber<'T>> =
+    interface IRangeEnumeratorOperators<'T> with
+        [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+        static member Initialize(left, right) = left + right
+        [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+        static member MoveNext(left, right) = left - right
+        [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+        static member Compare(left, right) = left.CompareTo(right) > 0
+
+[<Struct>]
+type RangeDownToInclusiveOperators<'T when 'T :> INumber<'T>> =
+    interface IRangeEnumeratorOperators<'T> with
+        [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+        static member Initialize(left, right) = left + right
+        [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+        static member MoveNext(left, right) = left - right
+        [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+        static member Compare(left, right) = left.CompareTo(right) >= 0
+
+[<Struct; NoComparison; NoEquality>]
+type StructRangeEnumerator<'T, 'TOperators when 'T :> INumber<'T> and 'TOperators :> IRangeEnumeratorOperators<'T>> =
+    val mutable private current: 'T
+    val private finish: 'T
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    member this.MoveNext() = true
-    member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() = this.length - 1
+    new (startValue: 'T, endValue: 'T) = { current =  'TOperators.Initialize(startValue, 'T.One); finish = endValue }
 
-    member this.Dispose() = ()
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    member this.MoveNext() =
+        this.current <- 'TOperators.MoveNext(this.current, 'T.One)
+        'TOperators.Compare(this.current, this.finish)
 
-    interface IEnumerator<int> with
+    member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() = this.current
+
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
+
+    interface IEnumerator<'T> with
+        member this.Current = this.Current :> obj
+        member this.Current = this.Current
+        member this.Dispose() = ()
+        member this.MoveNext() = this.MoveNext()
+        member this.Reset() = ()
+
+[<Struct; NoComparison; NoEquality>]
+type StructRangeStepEnumerator<'T, 'TOperators when 'T :> INumber<'T> and 'TOperators :> IRangeEnumeratorOperators<'T>> =
+    val mutable private current: 'T
+    val private finish: 'T
+    val private step: 'T
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    new (startValue: 'T, endValue: 'T, step: 'T) = { current =  'TOperators.Initialize(startValue, step); finish = endValue; step = step }
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    member this.MoveNext() =
+        this.current <- 'TOperators.MoveNext(this.current, this.step)
+        'TOperators.Compare(this.current, this.finish)
+
+    member this.Current with [<MethodImpl(MethodImplOptions.AggressiveInlining)>] get() = this.current
+
+    member inline this.Dispose() = ()
+    member inline this.GetEnumerator() = this
+
+    interface IEnumerator<'T> with
         member this.Current = this.Current :> obj
         member this.Current = this.Current
         member this.Dispose() = ()

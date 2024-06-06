@@ -58,21 +58,21 @@ type OptionBuilderBase() =
             (fun () -> (body disp)()),
             (fun () -> if not (isNull (box disp)) then disp.Dispose()))
 
-    member inline this.For(sequence: seq<'TElement>, [<InlineIfLambda>] body : 'TElement -> OptionCode<unit>) : OptionCode<unit> =
-        this.Using (
+    member inline this.For(sequence: seq<'TElement>, [<InlineIfLambda>] body: 'TElement -> OptionCode<unit>) : OptionCode<unit> =
+        this.Using(
             sequence.GetEnumerator(),
             (fun e -> this.While((fun () -> e.MoveNext()),
             (fun () -> (body e.Current)()))))
 
-    member inline _.Return (value: 'T) : OptionCode<'T> =
+    member inline _.Return(value: 'T) : OptionCode<'T> =
         fun () ->
             ValueSome value
 
-    member inline this.ReturnFrom (source: option<'T>) : OptionCode<'T> =
+    member inline this.ReturnFrom(source: option<'T>) : OptionCode<'T> =
         fun () ->
             match source with Some x -> ValueSome x | None -> ValueNone
 
-    member inline this.ReturnFrom (source: voption<'T>) : OptionCode<'T> =
+    member inline this.ReturnFrom(source: voption<'T>) : OptionCode<'T> =
         fun () ->
             source
 
