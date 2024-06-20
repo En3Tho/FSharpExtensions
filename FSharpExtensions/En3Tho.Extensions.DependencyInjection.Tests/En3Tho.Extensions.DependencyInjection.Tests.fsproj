@@ -13,7 +13,6 @@
         <Compile Include="ServiceCollectionExtensionsTests.fs" />
         <Compile Include="AddFuncTests.fs" />
         <Compile Include="AddSingletonAsSelfAndInjectionTests.fs" />
-        <Compile Include="IServiceCollectionFunkyCE.fs" />
     </ItemGroup>
 
     <ItemGroup>
