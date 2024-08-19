@@ -40,7 +40,7 @@ module CodeBuilderImpl =
     type CodeBuilder(lines: ResizeArray<LineOfCode>, scratchSpace: StringBuilder) =
         inherit CodeBlockBase()
 
-        static let commonIndentations = ImmutableArray.Create<string> [|
+        static let indentTable = ImmutableArray.Create<string> [|
             for i = 0 to 16 do
                 String.replicate (i * 4) " "
         |]
@@ -76,8 +76,8 @@ module CodeBuilderImpl =
             lines.Add({ Indent = indentation; Text = text })
 
         member private _.GetIndent count =
-            if commonIndentations.Length < count then
-                commonIndentations[count]
+            if indentTable.Length < count then
+                indentTable[count]
             else
                 String.replicate (count * 4) " "
 

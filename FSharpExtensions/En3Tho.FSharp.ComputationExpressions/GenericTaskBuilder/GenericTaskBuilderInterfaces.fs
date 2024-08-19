@@ -40,6 +40,7 @@ type IAsyncMethodBuilder<'TTask, 'TResult> =
     abstract Task: 'TTask
 
 type IStateMachineDataInitializer<'TData, 'TState, 'TBuilderResult> =
+    // TODO: UnsafeAccessor for Data in .Net 9
     static abstract Initialize<'TStateMachine, 'TData, 'TState when 'TStateMachine :> IAsyncStateMachine and 'TStateMachine :> IResumableStateMachine<'TData>>
         : stateMachine: byref<'TStateMachine> * data: byref<'TData> * state: 'TState  -> 'TBuilderResult
 

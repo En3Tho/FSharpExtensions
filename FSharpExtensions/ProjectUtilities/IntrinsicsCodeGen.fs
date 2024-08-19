@@ -82,8 +82,8 @@ let generateCodeForIntrinsicsTableForRider (xmlDoc: XmlDocument) = code {
 
 // generates file of the following format:
 // mnemonicLength descriptionLength operationLength mnemonic
-// operation chars ...
-// description chars ...
+// operation chars ... newLine
+// description chars ... newLine
 // e.g.
 // 14 202 124 _addcarryx_u32
 // Add unsigned 64-bit integers "a" and "b" with unsigned 8-bit carry-in "c_in" (carry or overflow flag), and store the unsigned 64-bit result in "out", and the carry-out in "dst" (carry or overflow flag).

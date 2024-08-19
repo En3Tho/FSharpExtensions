@@ -26,21 +26,21 @@ let getHttpVerbLength value =
         // [ G E T   _ _ _ _ ] [ P O S T   _ _ _ ] [ T R A C E   _ _ ] [ C O N N E C T   ]
         // [ P U T   _ _ _ _ ] [ H E A D   _ _ _ ] [ P A T C H   _ _ ] [ O P T I O N S   ]
         // [ F F F F _ _ _ _ ] [ F F F F F _ _ _ ] [ F F F F F F _ _ ] [ F F F F F F F F ]
-        let vVerbs = value.v256 &&& v256(0xFF_FF_FF_FFUL, 0xFF_FF_FF_FF_FFUL, 0xFF_FF_FF_FF_FF_FFUL, 0xFF_FF_FF_FF_FF_FF_FF_FFUL);
+        let vVerbs = value.v256 &&& v256(0xFF_FF_FF_FFUL, 0xFF_FF_FF_FF_FFUL, 0xFF_FF_FF_FF_FF_FFUL, 0xFF_FF_FF_FF_FF_FF_FF_FFUL)
 
         // [ G E T _ _ _ _ _ ] [ G E T _ _ _ _ _ ] [ G E T _ _ _ _ _ ] [ G E T _ _ _ _ _ ]
         // [ F F F F F F F F ] [ _ _ _ _ _ _ _ _ ] [ _ _ _ _ _ _ _ _ ] [ _ _ _ _ _ _ _ _ ]
-        let vMask1 = Avx2.CompareEqual(vVerbs, v256(GetU64, PostU64, TraceU64, ConnectU64));
-        let vMask2 = Avx2.CompareEqual(vVerbs, v256(PutU64, HeadU64, PatchU64, OptionsU64));
+        let vMask1 = Avx2.CompareEqual(vVerbs, v256(GetU64, PostU64, TraceU64, ConnectU64))
+        let vMask2 = Avx2.CompareEqual(vVerbs, v256(PutU64, HeadU64, PatchU64, OptionsU64))
 
         // [ G E T   x x x x _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ ] => 0x00_00_00_FF, 0
         // [ _ _ _ _ _ _ _ _ P O S T   x x x _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ ] => 0x00_00_FF_00, 8
         // [ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ P A T C H   x x _ _ _ _ _ _ _ _ ] => 0x00_FF_00_00, 16
         // [ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ O P T I O N S   ] => 0xFF_00_00_00, 24
-        let vNonZeroMask = Avx2.MoveMask((vMask1 ||| vMask2).u8);
+        let vNonZeroMask = Avx2.MoveMask((vMask1 ||| vMask2).u8)
 
-        let trailingZeroCount = BitOperations.TrailingZeroCount(vNonZeroMask);
-        (vNonZeroMask &&& 0x07_05_04_03) >>> trailingZeroCount;
+        let trailingZeroCount = BitOperations.TrailingZeroCount(vNonZeroMask)
+        (vNonZeroMask &&& 0x07_05_04_03) >>> trailingZeroCount
 
 [<Fact>]
 let ``test that vector extensions are working correcly``() =

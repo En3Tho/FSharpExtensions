@@ -33,6 +33,6 @@
     <PackageVersion Include="Moq" Version="4.20.69" />
   </ItemGroup>
   <ItemGroup>
-    <GlobalPackageReference Include="Microsoft.Build.CopyOnWrite" Version="1.0.282" />
+    <GlobalPackageReference Include="Microsoft.Build.CopyOnWrite" Version="1.0.315" />
   </ItemGroup>
 </Project>
