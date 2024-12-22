@@ -75,7 +75,7 @@ module CodeBuilderImpl =
             this.AddLength(text, indentation)
             lines.Add({ Indent = indentation; Text = text })
 
-        member private _.GetIndent count =
+        member private _.GetIndent(count) =
             if indentTable.Length < count then
                 indentTable[count]
             else
@@ -88,12 +88,12 @@ module CodeBuilderImpl =
                     if String.IsNullOrWhiteSpace(lineOfCode.Text) then
                         writer.WriteLine("")
                     else
-                        writer.Write(this.GetIndent lineOfCode.Indent)
+                        writer.Write(this.GetIndent(lineOfCode.Indent))
                         writer.WriteLine(lineOfCode.Text)
 
                 let lastLine = linesSpan[linesSpan.Length - 1]
                 if String.IsNullOrWhiteSpace(lastLine.Text) |> not then
-                    writer.Write(this.GetIndent lastLine.Indent)
+                    writer.Write(this.GetIndent(lastLine.Indent))
                     writer.Write(lastLine.Text)
 
         member this.Flush(textWriter: TextWriter) =

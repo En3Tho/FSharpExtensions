@@ -12,20 +12,20 @@ type NodeCodeBuilder() =
     static let zero = Node(async.Zero())
 
     [<DebuggerHidden;DebuggerStepThrough>]
-    member _.Zero () : NodeCode<unit> = zero
+    member _.Zero() : NodeCode<unit> = zero
 
     [<DebuggerHidden;DebuggerStepThrough>]
-    member _.Delay (f: unit -> NodeCode<'T>) =
+    member _.Delay(f: unit -> NodeCode<'T>) =
         Node(async.Delay(fun () -> match f() with Node(p) -> p))
 
     [<DebuggerHidden;DebuggerStepThrough>]
-    member _.Return value = Node(async.Return(value))
+    member _.Return(value) = Node(async.Return(value))
 
     [<DebuggerHidden;DebuggerStepThrough>]
     member _.ReturnFrom(computation: NodeCode<_>) = computation
 
     [<DebuggerHidden;DebuggerStepThrough>]
-    member _.Bind (Node(p): NodeCode<'a>, binder: 'a -> NodeCode<'b>) : NodeCode<'b> =
+    member _.Bind(Node(p): NodeCode<'a>, binder: 'a -> NodeCode<'b>) : NodeCode<'b> =
         Node(async.Bind(p, fun x -> match binder x with Node p -> p))
 
     [<DebuggerHidden;DebuggerStepThrough>]
@@ -53,12 +53,12 @@ open BenchmarkDotNet.Attributes
 type ReturnBenchmark() =
     let value = 1
 
-    let directReturned = node.Return value
+    let directReturned = node.Return(value)
     let ceReturned = node { return value }
 
     [<Benchmark>]
     member _.DirectReturn() =
-        node.Return value
+        node.Return(value)
 
     [<Benchmark>]
     member _.CompExprReturn() =
@@ -68,10 +68,10 @@ type ReturnBenchmark() =
     member _.AwaitDirectReturned() =
         match directReturned with
         | Node computation ->
-        Async.RunSynchronously computation |> ignore
+        Async.RunSynchronously(computation) |> ignore
 
     [<Benchmark>]
     member _.AwaitCEReturned() =
         match ceReturned with
         | Node computation ->
-        Async.RunSynchronously computation |> ignore
+        Async.RunSynchronously(computation) |> ignore

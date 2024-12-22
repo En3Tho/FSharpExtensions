@@ -12,7 +12,7 @@ type [<Struct; IsReadOnly>] AsyncMultiValidator20<'value, 'validator, 'validator
                                                                                    and 'validator2: (new: unit -> 'validator2)
                                                                                    and 'validator2 :> IAsyncValidator<'value>> =
 
-    member this.Validate value = vtask {
+    member this.Validate(value) = vtask {
         match! (new 'validator()).Validate value with
         | Ok value ->
             match! (new 'validator2()).Validate value with
@@ -21,7 +21,7 @@ type [<Struct; IsReadOnly>] AsyncMultiValidator20<'value, 'validator, 'validator
         | Error err -> return Error err
     }
     
-    member this.ValidateAggregate value = vtask {
+    member this.ValidateAggregate(value) = vtask {
         let! result1 = (new 'validator()).Validate value
         let! result2 = (new 'validator2()).Validate value
         match result1, result2 with
@@ -120,7 +120,7 @@ type [<Struct; IsReadOnly>] AsyncMultiValidator30<'value, 'validator, 'validator
                                                                                            and 'validator3: struct
                                                                                            and 'validator3: (new: unit -> 'validator3)
                                                                                            and 'validator3 :> IAsyncValidator<'value>> =
-    member this.Validate value = vtask {
+    member this.Validate(value) = vtask {
         match! (new 'validator()).Validate value with
         | Ok value ->
             match! (new 'validator2()).Validate value with
@@ -133,7 +133,7 @@ type [<Struct; IsReadOnly>] AsyncMultiValidator30<'value, 'validator, 'validator
     }
 
 
-    member this.ValidateAggregate value = vtask {
+    member this.ValidateAggregate(value) = vtask {
         let! result1 = (new 'validator()).Validate value
         let! result2 = (new 'validator2()).Validate value
         let! result3 = (new 'validator3()).Validate value

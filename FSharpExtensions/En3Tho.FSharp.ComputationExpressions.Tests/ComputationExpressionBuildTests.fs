@@ -25,7 +25,7 @@ let ``Test that task computation expression compiles`` () =
         return! job
     }
     let expected = 0
-    let result = (taskTest (Task.FromResult expected)).ConfigureAwait(false).GetAwaiter().GetResult()
+    let result = (taskTest (Task.FromResult(expected))).ConfigureAwait(false).GetAwaiter().GetResult()
     Assert.Equal(result, expected)
 
 [<Fact>]
@@ -41,7 +41,7 @@ let ``Test that async computation expression compiles`` () =
         return! job
     }
     let expected = 0
-    let result = taskTest (async.Return expected) |> Async.RunSynchronously
+    let result = taskTest (async.Return(expected)) |> Async.RunSynchronously
     Assert.Equal(result, expected)
 
 [<Fact>]
@@ -92,8 +92,8 @@ let ``Test that generics are working properly and builders are not conflicting w
     let list1 = genericList 10
     let list2 = genericList "10"
 
-    Assert.True(list1.GetType().GenericTypeArguments.SequenceEqual [| typeof<int> |])
-    Assert.True(list2.GetType().GenericTypeArguments.SequenceEqual [| typeof<string> |])
+    Assert.True(list1.GetType().GenericTypeArguments.SequenceEqual([| typeof<int> |]))
+    Assert.True(list2.GetType().GenericTypeArguments.SequenceEqual([| typeof<string> |]))
     Assert.Equal(list1[0], 10)
     Assert.Equal(list2[0], "10")
 
@@ -112,13 +112,13 @@ let ``Test that custom types are supported and builders are not conflicting with
 
 type MyAdder() =
     member val AddCount = 0 with get, set
-    member this.Add _ = this.AddCount <- this.AddCount + 1
+    member this.Add(_) = this.AddCount <- this.AddCount + 1
 
 type MyAdder with
     [<EditorBrowsable(EditorBrowsableState.Never)>]
     member inline this.Run([<InlineIfLambda>] expr: CollectionCode) = expr(); this
     [<EditorBrowsable(EditorBrowsableState.Never)>]
-    member inline this.Zero _ : CollectionCode = fun() -> ()
+    member inline this.Zero(_) : CollectionCode = fun() -> ()
 
 [<Fact>]
 let ``Test that nested builders are supported`` () =

@@ -28,16 +28,16 @@ type [<Struct; IsReadOnly>] MultiValidator20<'value, 'validator, 'validator2 whe
                                                                               and 'validator2: struct
                                                                               and 'validator2: (new: unit -> 'validator2)
                                                                               and 'validator2 :> IValidator<'value>> =
-    member this.Validate value =
-        match (new 'validator()).Validate value with
+    member this.Validate(value) =
+        match (new 'validator()).Validate(value) with
         | Ok value ->
-            match (new 'validator2()).Validate value with
+            match (new 'validator2()).Validate(value) with
             | Ok value -> value |> Ok
             | Error err -> Error err
         | Error err -> Error err
 
-    member this.ValidateAggregate value =
-        match (new 'validator()).Validate value, (new 'validator2()).Validate value with
+    member this.ValidateAggregate(value) =
+        match (new 'validator()).Validate(value), (new 'validator2()).Validate(value) with
         | Ok _, Ok _ ->
             value |> Ok
         | Error exn1, Error exn2 ->
@@ -47,24 +47,24 @@ type [<Struct; IsReadOnly>] MultiValidator20<'value, 'validator, 'validator2 whe
             Error (AggregateException(exn))
             
     interface IValidator<'value> with
-        member this.Validate value = Validator.validate this value
-        member this.Validate value = Validator.validateAsync this value
-        member this.ValidateAggregate value = Validator.validateAggregate this value
-        member this.ValidateAggregate value = Validator.validateAggregateAsync this value
+        member this.Validate(value) = Validator.validate this value
+        member this.Validate(value) = Validator.validateAsync this value
+        member this.ValidateAggregate(value) = Validator.validateAggregate this value
+        member this.ValidateAggregate(value) = Validator.validateAggregateAsync this value
 
 type [<Struct; IsReadOnly>] MultiValidator02<'value, 'validator, 'validator2 when 'validator :> IValidator<'value>
                                                                               and 'validator2 :> IValidator<'value>>
     (validator: 'validator, validator2: 'validator2) =
     member this.Validate(value)  =
-        match validator.Validate value with
+        match validator.Validate(value) with
         | Ok value ->
-            match validator2.Validate value with
+            match validator2.Validate(value) with
             | Ok value -> value |> Ok
             | Error err -> Error err
         | Error err -> Error err
 
-    member this.ValidateAggregate value =
-        match validator.Validate value, validator2.Validate value with
+    member this.ValidateAggregate(value) =
+        match validator.Validate(value), validator2.Validate(value) with
         | Ok _, Ok _ ->
             value |> Ok
         | Error exn1, Error exn2 ->
@@ -74,10 +74,10 @@ type [<Struct; IsReadOnly>] MultiValidator02<'value, 'validator, 'validator2 whe
             Error (AggregateException(exn))
 
     interface IValidator<'value> with
-        member this.Validate value = Validator.validate this value
-        member this.Validate value = Validator.validateAsync this value
-        member this.ValidateAggregate value = Validator.validateAggregate this value
-        member this.ValidateAggregate value = Validator.validateAggregateAsync this value
+        member this.Validate(value) = Validator.validate this value
+        member this.Validate(value) = Validator.validateAsync this value
+        member this.ValidateAggregate(value) = Validator.validateAggregate this value
+        member this.ValidateAggregate(value) = Validator.validateAggregateAsync this value
 
 type [<Struct; IsReadOnly>] MultiValidator11<'value, 'validator, 'validator2 when 'validator: struct
                                                                               and 'validator: (new: unit -> 'validator)
@@ -86,7 +86,7 @@ type [<Struct; IsReadOnly>] MultiValidator11<'value, 'validator, 'validator2 whe
     (validator: 'validator2) =
                                                                              
     member this.Validate(value) =
-        match (new 'validator()).Validate value with
+        match (new 'validator()).Validate(value) with
         | Ok value ->
             match validator.Validate value with
             | Ok value -> value |> Ok
@@ -104,10 +104,10 @@ type [<Struct; IsReadOnly>] MultiValidator11<'value, 'validator, 'validator2 whe
             Error (AggregateException(exn))
 
     interface IValidator<'value> with
-        member this.Validate value = Validator.validate this value
-        member this.Validate value = Validator.validateAsync this value
-        member this.ValidateAggregate value = Validator.validateAggregate this value
-        member this.ValidateAggregate value = Validator.validateAggregateAsync this value
+        member this.Validate(value) = Validator.validate this value
+        member this.Validate(value) = Validator.validateAsync this value
+        member this.ValidateAggregate(value) = Validator.validateAggregate this value
+        member this.ValidateAggregate(value) = Validator.validateAggregateAsync this value
             
 type [<Struct; IsReadOnly>] MultiValidator30<'value, 'validator, 'validator2, 'validator3 when 'validator: struct
                                                                                            and 'validator: (new: unit -> 'validator)
@@ -118,7 +118,7 @@ type [<Struct; IsReadOnly>] MultiValidator30<'value, 'validator, 'validator2, 'v
                                                                                            and 'validator3: struct
                                                                                            and 'validator3: (new: unit -> 'validator3)
                                                                                            and 'validator3 :> IValidator<'value>> =
-    member this.Validate value =
+    member this.Validate(value) =
         match (new 'validator()).Validate value with
         | Ok value ->
             match (new 'validator2()).Validate value with
@@ -129,7 +129,7 @@ type [<Struct; IsReadOnly>] MultiValidator30<'value, 'validator, 'validator2, 'v
             | Error err -> Error err
         | Error err -> Error err
 
-    member this.ValidateAggregate value =
+    member this.ValidateAggregate(value) =
         match (new 'validator()).Validate value, (new 'validator2()).Validate value, (new 'validator3()).Validate value with
         | Ok _, Ok _, Ok _ ->
             value |> Ok
@@ -145,10 +145,10 @@ type [<Struct; IsReadOnly>] MultiValidator30<'value, 'validator, 'validator2, 'v
             Error (AggregateException(exn))
 
     interface IValidator<'value> with
-        member this.Validate value = Validator.validate this value
-        member this.Validate value = Validator.validateAsync this value
-        member this.ValidateAggregate value = Validator.validateAggregate this value
-        member this.ValidateAggregate value = Validator.validateAggregateAsync this value
+        member this.Validate(value) = Validator.validate this value
+        member this.Validate(value) = Validator.validateAsync this value
+        member this.ValidateAggregate(value) = Validator.validateAggregate this value
+        member this.ValidateAggregate(value) = Validator.validateAggregateAsync this value
 
 type [<Struct; IsReadOnly>] MultiValidator21<'value, 'validator, 'validator2, 'validator3 when 'validator: struct
                                                                                            and 'validator: (new: unit -> 'validator)
@@ -185,10 +185,10 @@ type [<Struct; IsReadOnly>] MultiValidator21<'value, 'validator, 'validator2, 'v
             Error (AggregateException(exn))
 
     interface IValidator<'value> with
-        member this.Validate value = Validator.validate this value
-        member this.Validate value = Validator.validateAsync this value
-        member this.ValidateAggregate value = Validator.validateAggregate this value
-        member this.ValidateAggregate value = Validator.validateAggregateAsync this value
+        member this.Validate(value) = Validator.validate this value
+        member this.Validate(value) = Validator.validateAsync this value
+        member this.ValidateAggregate(value) = Validator.validateAggregate this value
+        member this.ValidateAggregate(value) = Validator.validateAggregateAsync this value
 
 type [<Struct; IsReadOnly>] MultiValidator12<'value, 'validator, 'validator2, 'validator3 when 'validator: struct
                                                                                            and 'validator: (new: unit -> 'validator)
@@ -224,10 +224,10 @@ type [<Struct; IsReadOnly>] MultiValidator12<'value, 'validator, 'validator2, 'v
             Error (AggregateException(exn))
 
     interface IValidator<'value> with
-        member this.Validate value = Validator.validate this value
-        member this.Validate value = Validator.validateAsync this value
-        member this.ValidateAggregate value = Validator.validateAggregate this value
-        member this.ValidateAggregate value = Validator.validateAggregateAsync this value
+        member this.Validate(value) = Validator.validate this value
+        member this.Validate(value) = Validator.validateAsync this value
+        member this.ValidateAggregate(value) = Validator.validateAggregate this value
+        member this.ValidateAggregate(value) = Validator.validateAggregateAsync this value
 
 type [<Struct; IsReadOnly>] MultiValidator03<'value, 'validator, 'validator2, 'validator3 when 'validator :> IValidator<'value>
                                                                                            and 'validator2 :> IValidator<'value>
@@ -261,7 +261,7 @@ type [<Struct; IsReadOnly>] MultiValidator03<'value, 'validator, 'validator2, 'v
             Error (AggregateException(exn))
 
     interface IValidator<'value> with
-        member this.Validate value = Validator.validate this value
-        member this.Validate value = Validator.validateAsync this value
-        member this.ValidateAggregate value = Validator.validateAggregate this value
-        member this.ValidateAggregate value = Validator.validateAggregateAsync this value
+        member this.Validate(value) = Validator.validate this value
+        member this.Validate(value) = Validator.validateAsync this value
+        member this.ValidateAggregate(value) = Validator.validateAggregate this value
+        member this.ValidateAggregate(value) = Validator.validateAggregateAsync this value

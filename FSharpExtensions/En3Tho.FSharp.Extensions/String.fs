@@ -2,54 +2,54 @@ module En3Tho.FSharp.Extensions.String
 
 open System
 
-let inline nullOrWhiteSpaceCheck argName arg = if String.IsNullOrWhiteSpace arg then nullArg argName |> ignore
-let inline nullOrEmptyCheck argName arg = if String.IsNullOrEmpty arg then nullArg argName |> ignore
-let inline ensureNotNullOrWhiteSpace argName arg = if String.IsNullOrWhiteSpace arg then nullArg argName else arg
-let inline ensureNotNullOrEmpty argName arg = if String.IsNullOrEmpty arg then nullArg argName else arg
-let inline defaultValue def str = if String.IsNullOrEmpty str then def else str
-let inline defaultValueW def str = if String.IsNullOrWhiteSpace str then def else str
-let inline defaultWith ([<InlineIfLambda>] defThunk) str = if String.IsNullOrEmpty str then defThunk() else str
-let inline defaultWithW ([<InlineIfLambda>] defThunk) str = if String.IsNullOrWhiteSpace str then defThunk() else str
+let inline nullOrWhiteSpaceCheck argName arg = if String.IsNullOrWhiteSpace(arg) then nullArg argName |> ignore
+let inline nullOrEmptyCheck argName arg = if String.IsNullOrEmpty(arg) then nullArg argName |> ignore
+let inline ensureNotNullOrWhiteSpace argName arg = if String.IsNullOrWhiteSpace(arg) then nullArg argName else arg
+let inline ensureNotNullOrEmpty argName arg = if String.IsNullOrEmpty(arg) then nullArg argName else arg
+let inline defaultValue def str = if String.IsNullOrEmpty(str) then def else str
+let inline defaultValueW def str = if String.IsNullOrWhiteSpace(str) then def else str
+let inline defaultWith ([<InlineIfLambda>] defThunk) str = if String.IsNullOrEmpty(str) then defThunk() else str
+let inline defaultWithW ([<InlineIfLambda>] defThunk) str = if String.IsNullOrWhiteSpace(str) then defThunk() else str
 let inline truncate maxLength (str: string) = if str.Length <= maxLength then str else str.Substring(0, maxLength)
 
-let [<return: Struct>] inline (|NullOrEmpty|_|) (str: string) =
-    String.IsNullOrEmpty(str) |> ValueOption.ofBool
-let [<return: Struct>] inline (|NotNullOrEmpty|_|) (str: string) =
-    String.IsNullOrEmpty(str) |> not |> ValueOption.ofBool
-let [<return: Struct>] inline (|NullOrWhiteSpace|_|) (str: string) =
-    String.IsNullOrWhiteSpace(str) |> ValueOption.ofBool
-let [<return: Struct>] inline (|NotNullOrWhiteSpace|_|) (str: string) =
-    String.IsNullOrWhiteSpace(str) |> not |> ValueOption.ofBool
+let inline (|NullOrEmpty|_|) (str: string) =
+    String.IsNullOrEmpty(str)
+let inline (|NotNullOrEmpty|_|) (str: string) =
+    String.IsNullOrEmpty(str) |> not
+let inline (|NullOrWhiteSpace|_|) (str: string) =
+    String.IsNullOrWhiteSpace(str)
+let inline (|NotNullOrWhiteSpace|_|) (str: string) =
+    String.IsNullOrWhiteSpace(str) |> not
 
-let [<return: Struct>] inline (|Equals|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.Equals(pattern, StringComparison.Ordinal)) |> ValueOption.ofBool
-let [<return: Struct>] inline (|EqualsIgnoreCase|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.Equals(pattern, StringComparison.OrdinalIgnoreCase)) |> ValueOption.ofBool
-let [<return: Struct>] inline (|EqualsCurrentCulture|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.Equals(pattern, StringComparison.CurrentCulture)) |> ValueOption.ofBool
-let [<return: Struct>] inline (|EqualsCurrentCultureIgnoreCase|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.Equals(pattern, StringComparison.CurrentCultureIgnoreCase)) |> ValueOption.ofBool
-let [<return: Struct>] inline (|EqualsInvariantCulture|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.Equals(pattern, StringComparison.InvariantCulture)) |> ValueOption.ofBool
-let [<return: Struct>] inline (|EqualsInvariantCultureIgnoreCase|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.Equals(pattern, StringComparison.InvariantCultureIgnoreCase)) |> ValueOption.ofBool
-let [<return: Struct>] inline (|EqualsChar|_|) (pattern: char) (str: string) =
-    (isNotNull str && str.Length = 1 && str[0] = pattern) |> ValueOption.ofBool
+let inline (|Equals|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.Equals(pattern, StringComparison.Ordinal))
+let inline (|EqualsIgnoreCase|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.Equals(pattern, StringComparison.OrdinalIgnoreCase))
+let inline (|EqualsCurrentCulture|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.Equals(pattern, StringComparison.CurrentCulture))
+let inline (|EqualsCurrentCultureIgnoreCase|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.Equals(pattern, StringComparison.CurrentCultureIgnoreCase))
+let inline (|EqualsInvariantCulture|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.Equals(pattern, StringComparison.InvariantCulture))
+let inline (|EqualsInvariantCultureIgnoreCase|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.Equals(pattern, StringComparison.InvariantCultureIgnoreCase))
+let inline (|EqualsChar|_|) (pattern: char) (str: string) =
+    (isNotNull str && str.Length = 1 && str[0] = pattern)
 
-let [<return: Struct>] inline (|EqualsNot|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.Equals(pattern, StringComparison.Ordinal) |> not) |> ValueOption.ofBool
-let [<return: Struct>] inline (|EqualsNotIgnoreCase|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.Equals(pattern, StringComparison.OrdinalIgnoreCase) |> not) |> ValueOption.ofBool
-let [<return: Struct>] inline (|EqualsNotCurrentCulture|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.Equals(pattern, StringComparison.CurrentCulture) |> not) |> ValueOption.ofBool
-let [<return: Struct>] inline (|EqualsNotCurrentCultureIgnoreCase|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.Equals(pattern, StringComparison.CurrentCultureIgnoreCase) |> not) |> ValueOption.ofBool
-let [<return: Struct>] inline (|EqualsNotInvariantCulture|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.Equals(pattern, StringComparison.InvariantCulture) |> not) |> ValueOption.ofBool
-let [<return: Struct>] inline (|EqualsNotInvariantCultureIgnoreCase|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.Equals(pattern, StringComparison.InvariantCultureIgnoreCase) |> not) |> ValueOption.ofBool
-let [<return: Struct>] inline (|EqualsNotChar|_|) (pattern: char) (str: string) =
-    (isNotNull str && str.Length = 1 && str[0] = pattern |> not) |> ValueOption.ofBool
+let inline (|NotEquals|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.Equals(pattern, StringComparison.Ordinal) |> not)
+let inline (|NotEqualsIgnoreCase|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.Equals(pattern, StringComparison.OrdinalIgnoreCase) |> not)
+let inline (|NotEqualsCurrentCulture|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.Equals(pattern, StringComparison.CurrentCulture) |> not)
+let inline (|NotEqualsCurrentCultureIgnoreCase|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.Equals(pattern, StringComparison.CurrentCultureIgnoreCase) |> not)
+let inline (|NotEqualsInvariantCulture|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.Equals(pattern, StringComparison.InvariantCulture) |> not)
+let inline (|NotEqualsInvariantCultureIgnoreCase|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.Equals(pattern, StringComparison.InvariantCultureIgnoreCase) |> not)
+let inline (|NotEqualsChar|_|) (pattern: char) (str: string) =
+    (isNotNull str && str.Length = 1 && str[0] = pattern |> not)
 
 let private equalsAnyArray (patterns: string[]) (comparison: StringComparison) (str: string) =
     let mutable i = 0
@@ -126,65 +126,65 @@ let equalsAnyChar (patterns: char seq) (str: string) =
         | :? (char list) as patterns -> equalsAnyCharList patterns str
         | _ -> equalsAnyCharSeq patterns str
 
-let [<return: Struct>] inline (|EqualsAny|_|) (patterns: string seq) (str: string) =
-    str |> equalsAny patterns StringComparison.Ordinal |> ValueOption.ofBool
-let [<return: Struct>] inline (|EqualsAnyIgnoreCase|_|) (patterns: string seq) (str: string) =
-    str |> equalsAny patterns StringComparison.OrdinalIgnoreCase |> ValueOption.ofBool
-let [<return: Struct>] inline (|EqualsAnyCurrentCulture|_|) (patterns: string seq) (str: string) =
-    str |> equalsAny patterns StringComparison.CurrentCulture |> ValueOption.ofBool
-let [<return: Struct>] inline (|EqualsAnyCurrentCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
-    str |> equalsAny patterns StringComparison.CurrentCultureIgnoreCase |> ValueOption.ofBool
-let [<return: Struct>] inline (|EqualsAnyInvariantCulture|_|) (patterns: string seq) (str: string) =
-    str |> equalsAny patterns StringComparison.InvariantCulture |> ValueOption.ofBool
-let [<return: Struct>] inline (|EqualsAnyInvariantCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
-    str |> equalsAny patterns StringComparison.InvariantCultureIgnoreCase |> ValueOption.ofBool
-let [<return: Struct>] inline (|EqualsAnyChar|_|) (patterns: char[]) (str: string) =
-    str |> equalsAnyChar patterns |> ValueOption.ofBool
+let inline (|EqualsAny|_|) (patterns: string seq) (str: string) =
+    str |> equalsAny patterns StringComparison.Ordinal
+let inline (|EqualsAnyIgnoreCase|_|) (patterns: string seq) (str: string) =
+    str |> equalsAny patterns StringComparison.OrdinalIgnoreCase
+let inline (|EqualsAnyCurrentCulture|_|) (patterns: string seq) (str: string) =
+    str |> equalsAny patterns StringComparison.CurrentCulture
+let inline (|EqualsAnyCurrentCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
+    str |> equalsAny patterns StringComparison.CurrentCultureIgnoreCase
+let inline (|EqualsAnyInvariantCulture|_|) (patterns: string seq) (str: string) =
+    str |> equalsAny patterns StringComparison.InvariantCulture
+let inline (|EqualsAnyInvariantCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
+    str |> equalsAny patterns StringComparison.InvariantCultureIgnoreCase
+let inline (|EqualsAnyChar|_|) (patterns: char[]) (str: string) =
+    str |> equalsAnyChar patterns
 
-let [<return: Struct>] inline (|EqualsAnyNot|_|) (patterns: string seq) (str: string) =
-    str |> equalsAny patterns StringComparison.Ordinal |> not |> ValueOption.ofBool
-let [<return: Struct>] inline (|EqualsAnyNotIgnoreCase|_|) (patterns: string seq) (str: string) =
-    str |> equalsAny patterns StringComparison.OrdinalIgnoreCase |> not |> ValueOption.ofBool
-let [<return: Struct>] inline (|EqualsAnyNotCurrentCulture|_|) (patterns: string seq) (str: string) =
-    str |> equalsAny patterns StringComparison.CurrentCulture |> not |> ValueOption.ofBool
-let [<return: Struct>] inline (|EqualsAnyNotCurrentCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
-    str |> equalsAny patterns StringComparison.CurrentCultureIgnoreCase |> not |> ValueOption.ofBool
-let [<return: Struct>] inline (|EqualsAnyNotInvariantCulture|_|) (patterns: string seq) (str: string) =
-    str |> equalsAny patterns StringComparison.InvariantCulture |> not |> ValueOption.ofBool
-let [<return: Struct>] inline (|EqualsAnyNotInvariantCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
-    str |> equalsAny patterns StringComparison.InvariantCultureIgnoreCase |> not |> ValueOption.ofBool
-let [<return: Struct>] inline (|EqualsAnyNotChar|_|) (patterns: char[]) (str: string) =
-    str |> equalsAnyChar patterns |> not |> ValueOption.ofBool
+let inline (|NotEqualsAny|_|) (patterns: string seq) (str: string) =
+    str |> equalsAny patterns StringComparison.Ordinal |> not
+let inline (|NotEqualsAnyIgnoreCase|_|) (patterns: string seq) (str: string) =
+    str |> equalsAny patterns StringComparison.OrdinalIgnoreCase |> not
+let inline (|NotEqualsAnyCurrentCulture|_|) (patterns: string seq) (str: string) =
+    str |> equalsAny patterns StringComparison.CurrentCulture |> not
+let inline (|NotEqualsAnyCurrentCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
+    str |> equalsAny patterns StringComparison.CurrentCultureIgnoreCase |> not
+let inline (|NotEqualsAnyInvariantCulture|_|) (patterns: string seq) (str: string) =
+    str |> equalsAny patterns StringComparison.InvariantCulture |> not
+let inline (|NotEqualsAnyInvariantCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
+    str |> equalsAny patterns StringComparison.InvariantCultureIgnoreCase |> not
+let inline (|NotEqualsAnyChar|_|) (patterns: char[]) (str: string) =
+    str |> equalsAnyChar patterns |> not
 
-let [<return: Struct>] inline (|Contains|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.Contains(pattern, StringComparison.Ordinal)) |> ValueOption.ofBool
-let [<return: Struct>] inline (|ContainsIgnoreCase|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.Contains(pattern, StringComparison.OrdinalIgnoreCase)) |> ValueOption.ofBool
-let [<return: Struct>] inline (|ContainsCurrentCulture|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.Contains(pattern, StringComparison.CurrentCulture)) |> ValueOption.ofBool
-let [<return: Struct>] inline (|ContainsCurrentCultureIgnoreCase|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.Contains(pattern, StringComparison.CurrentCultureIgnoreCase)) |> ValueOption.ofBool
-let [<return: Struct>] inline (|ContainsInvariantCulture|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.Contains(pattern, StringComparison.InvariantCulture)) |> ValueOption.ofBool
-let [<return: Struct>] inline (|ContainsInvariantCultureIgnoreCase|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.Contains(pattern, StringComparison.InvariantCultureIgnoreCase)) |> ValueOption.ofBool
-let [<return: Struct>] inline (|ContainsChar|_|) (pattern: char) (str: string) =
-    (isNotNull str && str.Contains(pattern, StringComparison.Ordinal)) |> ValueOption.ofBool
+let inline (|Contains|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.Contains(pattern, StringComparison.Ordinal))
+let inline (|ContainsIgnoreCase|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.Contains(pattern, StringComparison.OrdinalIgnoreCase))
+let inline (|ContainsCurrentCulture|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.Contains(pattern, StringComparison.CurrentCulture))
+let inline (|ContainsCurrentCultureIgnoreCase|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.Contains(pattern, StringComparison.CurrentCultureIgnoreCase))
+let inline (|ContainsInvariantCulture|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.Contains(pattern, StringComparison.InvariantCulture))
+let inline (|ContainsInvariantCultureIgnoreCase|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.Contains(pattern, StringComparison.InvariantCultureIgnoreCase))
+let inline (|ContainsChar|_|) (pattern: char) (str: string) =
+    (isNotNull str && str.Contains(pattern, StringComparison.Ordinal))
 
-let [<return: Struct>] inline (|ContainsNot|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.Contains(pattern, StringComparison.Ordinal) |> not) |> ValueOption.ofBool
-let [<return: Struct>] inline (|ContainsNotIgnoreCase|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.Contains(pattern, StringComparison.OrdinalIgnoreCase) |> not) |> ValueOption.ofBool
-let [<return: Struct>] inline (|ContainsNotCurrentCulture|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.Contains(pattern, StringComparison.CurrentCulture) |> not) |> ValueOption.ofBool
-let [<return: Struct>] inline (|ContainsNotCurrentCultureIgnoreCase|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.Contains(pattern, StringComparison.CurrentCultureIgnoreCase) |> not) |> ValueOption.ofBool
-let [<return: Struct>] inline (|ContainsNotInvariantCulture|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.Contains(pattern, StringComparison.InvariantCulture) |> not) |> ValueOption.ofBool
-let [<return: Struct>] inline (|ContainsNotInvariantCultureIgnoreCase|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.Contains(pattern, StringComparison.InvariantCultureIgnoreCase) |> not) |> ValueOption.ofBool
-let [<return: Struct>] inline (|ContainsNotChar|_|) (pattern: char) (str: string) =
-    (isNotNull str && str.Contains(pattern) |> not) |> ValueOption.ofBool
+let inline (|NotContains|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.Contains(pattern, StringComparison.Ordinal) |> not)
+let inline (|NotContainsIgnoreCase|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.Contains(pattern, StringComparison.OrdinalIgnoreCase) |> not)
+let inline (|NotContainsCurrentCulture|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.Contains(pattern, StringComparison.CurrentCulture) |> not)
+let inline (|NotContainsCurrentCultureIgnoreCase|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.Contains(pattern, StringComparison.CurrentCultureIgnoreCase) |> not)
+let inline (|NotContainsInvariantCulture|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.Contains(pattern, StringComparison.InvariantCulture) |> not)
+let inline (|NotContainsInvariantCultureIgnoreCase|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.Contains(pattern, StringComparison.InvariantCultureIgnoreCase) |> not)
+let inline (|NotContainsChar|_|) (pattern: char) (str: string) =
+    (isNotNull str && str.Contains(pattern) |> not)
 
 let private containsAnyArray (patterns: string[]) (comparison: StringComparison) (str: string) =
     let mutable i = 0
@@ -261,65 +261,65 @@ let containsAnyChar (patterns: char seq) (str: string) =
         | :? (char list) as patterns -> containsAnyCharList patterns str
         | _ -> containsAnyCharSeq patterns str
 
-let [<return: Struct>] inline (|ContainsAny|_|) (patterns: string seq) (str: string) =
-    str |> containsAny patterns StringComparison.Ordinal |> ValueOption.ofBool
-let [<return: Struct>] inline (|ContainsAnyIgnoreCase|_|) (patterns: string seq) (str: string) =
-    str |> containsAny patterns StringComparison.OrdinalIgnoreCase |> ValueOption.ofBool
-let [<return: Struct>] inline (|ContainsAnyCurrentCulture|_|) (patterns: string seq) (str: string) =
-    str |> containsAny patterns StringComparison.CurrentCulture |> ValueOption.ofBool
-let [<return: Struct>] inline (|ContainsAnyCurrentCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
-    str |> containsAny patterns StringComparison.CurrentCultureIgnoreCase |> ValueOption.ofBool
-let [<return: Struct>] inline (|ContainsAnyInvariantCulture|_|) (patterns: string seq) (str: string) =
-    str |> containsAny patterns StringComparison.InvariantCulture |> ValueOption.ofBool
-let [<return: Struct>] inline (|ContainsAnyInvariantCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
-    str |> containsAny patterns StringComparison.InvariantCultureIgnoreCase |> ValueOption.ofBool
-let [<return: Struct>] inline (|ContainsAnyChar|_|) (patterns: char[]) (str: string) =
-    str |> containsAnyChar patterns |> ValueOption.ofBool
+let inline (|ContainsAny|_|) (patterns: string seq) (str: string) =
+    str |> containsAny patterns StringComparison.Ordinal
+let inline (|ContainsAnyIgnoreCase|_|) (patterns: string seq) (str: string) =
+    str |> containsAny patterns StringComparison.OrdinalIgnoreCase
+let inline (|ContainsAnyCurrentCulture|_|) (patterns: string seq) (str: string) =
+    str |> containsAny patterns StringComparison.CurrentCulture
+let inline (|ContainsAnyCurrentCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
+    str |> containsAny patterns StringComparison.CurrentCultureIgnoreCase
+let inline (|ContainsAnyInvariantCulture|_|) (patterns: string seq) (str: string) =
+    str |> containsAny patterns StringComparison.InvariantCulture
+let inline (|ContainsAnyInvariantCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
+    str |> containsAny patterns StringComparison.InvariantCultureIgnoreCase
+let inline (|ContainsAnyChar|_|) (patterns: char[]) (str: string) =
+    str |> containsAnyChar patterns
 
-let [<return: Struct>] inline (|ContainsAnyNot|_|) (patterns: string seq) (str: string) =
- str |> containsAny patterns StringComparison.Ordinal |> not |> ValueOption.ofBool
-let [<return: Struct>] inline (|ContainsAnyNotIgnoreCase|_|) (patterns: string seq) (str: string) =
- str |> containsAny patterns StringComparison.OrdinalIgnoreCase |> not |> ValueOption.ofBool
-let [<return: Struct>] inline (|ContainsAnyNotCurrentCulture|_|) (patterns: string seq) (str: string) =
- str |> containsAny patterns StringComparison.CurrentCulture |> not |> ValueOption.ofBool
-let [<return: Struct>] inline (|ContainsAnyNotCurrentCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
- str |> containsAny patterns StringComparison.CurrentCultureIgnoreCase |> not |> ValueOption.ofBool
-let [<return: Struct>] inline (|ContainsAnyNotInvariantCulture|_|) (patterns: string seq) (str: string) =
- str |> containsAny patterns StringComparison.InvariantCulture |> not |> ValueOption.ofBool
-let [<return: Struct>] inline (|ContainsAnyNotInvariantCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
- str |> containsAny patterns StringComparison.InvariantCultureIgnoreCase |> not |> ValueOption.ofBool
-let [<return: Struct>] inline (|ContainsAnyNotChar|_|) (patterns: char[]) (str: string) =
- str |> containsAnyChar patterns |> not |> ValueOption.ofBool
+let inline (|NotContainsAny|_|) (patterns: string seq) (str: string) =
+ str |> containsAny patterns StringComparison.Ordinal |> not
+let inline (|NotContainsAnyIgnoreCase|_|) (patterns: string seq) (str: string) =
+ str |> containsAny patterns StringComparison.OrdinalIgnoreCase |> not
+let inline (|NotContainsAnyCurrentCulture|_|) (patterns: string seq) (str: string) =
+ str |> containsAny patterns StringComparison.CurrentCulture |> not
+let inline (|NotContainsAnyCurrentCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
+ str |> containsAny patterns StringComparison.CurrentCultureIgnoreCase |> not
+let inline (|NotContainsAnyInvariantCulture|_|) (patterns: string seq) (str: string) =
+ str |> containsAny patterns StringComparison.InvariantCulture |> not
+let inline (|NotContainsAnyInvariantCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
+ str |> containsAny patterns StringComparison.InvariantCultureIgnoreCase |> not
+let inline (|NotContainsAnyChar|_|) (patterns: char[]) (str: string) =
+ str |> containsAnyChar patterns |> not
 
-let [<return: Struct>] inline (|StartsWith|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.StartsWith(pattern, StringComparison.Ordinal)) |> ValueOption.ofBool
-let [<return: Struct>] inline (|StartsWithIgnoreCase|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.StartsWith(pattern, StringComparison.OrdinalIgnoreCase)) |> ValueOption.ofBool
-let [<return: Struct>] inline (|StartsWithCurrentCulture|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.StartsWith(pattern, StringComparison.CurrentCulture)) |> ValueOption.ofBool
-let [<return: Struct>] inline (|StartsWithCurrentCultureIgnoreCase|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.StartsWith(pattern, StringComparison.CurrentCultureIgnoreCase)) |> ValueOption.ofBool
-let [<return: Struct>] inline (|StartsWithInvariantCulture|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.StartsWith(pattern, StringComparison.InvariantCulture)) |> ValueOption.ofBool
-let [<return: Struct>] inline (|StartsWithInvariantCultureIgnoreCase|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.StartsWith(pattern, StringComparison.InvariantCultureIgnoreCase)) |> ValueOption.ofBool
-let [<return: Struct>] inline (|StartsWithChar|_|) (pattern: char) (str: string) =
-    (isNotNull str && str.StartsWith(pattern)) |> ValueOption.ofBool
+let inline (|StartsWith|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.StartsWith(pattern, StringComparison.Ordinal))
+let inline (|StartsWithIgnoreCase|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.StartsWith(pattern, StringComparison.OrdinalIgnoreCase))
+let inline (|StartsWithCurrentCulture|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.StartsWith(pattern, StringComparison.CurrentCulture))
+let inline (|StartsWithCurrentCultureIgnoreCase|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.StartsWith(pattern, StringComparison.CurrentCultureIgnoreCase))
+let inline (|StartsWithInvariantCulture|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.StartsWith(pattern, StringComparison.InvariantCulture))
+let inline (|StartsWithInvariantCultureIgnoreCase|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.StartsWith(pattern, StringComparison.InvariantCultureIgnoreCase))
+let inline (|StartsWithChar|_|) (pattern: char) (str: string) =
+    (isNotNull str && str.StartsWith(pattern))
 
-let [<return: Struct>] inline (|StartsWithNot|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.StartsWith(pattern, StringComparison.Ordinal) |> not) |> ValueOption.ofBool
-let [<return: Struct>] inline (|StartsWithNotIgnoreCase|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.StartsWith(pattern, StringComparison.OrdinalIgnoreCase) |> not) |> ValueOption.ofBool
-let [<return: Struct>] inline (|StartsWithNotCurrentCulture|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.StartsWith(pattern, StringComparison.CurrentCulture) |> not) |> ValueOption.ofBool
-let [<return: Struct>] inline (|StartsWithNotCurrentCultureIgnoreCase|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.StartsWith(pattern, StringComparison.CurrentCultureIgnoreCase) |> not) |> ValueOption.ofBool
-let [<return: Struct>] inline (|StartsWithNotInvariantCulture|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.StartsWith(pattern, StringComparison.InvariantCulture) |> not) |> ValueOption.ofBool
-let [<return: Struct>] inline (|StartsWithNotInvariantCultureIgnoreCase|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.StartsWith(pattern, StringComparison.InvariantCultureIgnoreCase) |> not) |> ValueOption.ofBool
-let [<return: Struct>] inline (|StartsWithNotChar|_|) (pattern: char) (str: string) =
-    (isNotNull str && str.StartsWith(pattern) |> not) |> ValueOption.ofBool
+let inline (|NotStartsWith|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.StartsWith(pattern, StringComparison.Ordinal) |> not)
+let inline (|NotStartsWithIgnoreCase|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.StartsWith(pattern, StringComparison.OrdinalIgnoreCase) |> not)
+let inline (|NotStartsWithCurrentCulture|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.StartsWith(pattern, StringComparison.CurrentCulture) |> not)
+let inline (|NotStartsWithCurrentCultureIgnoreCase|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.StartsWith(pattern, StringComparison.CurrentCultureIgnoreCase) |> not)
+let inline (|NotStartsWithInvariantCulture|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.StartsWith(pattern, StringComparison.InvariantCulture) |> not)
+let inline (|NotStartsWithInvariantCultureIgnoreCase|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.StartsWith(pattern, StringComparison.InvariantCultureIgnoreCase) |> not)
+let inline (|NotStartsWithChar|_|) (pattern: char) (str: string) =
+    (isNotNull str && str.StartsWith(pattern) |> not)
 
 let private startsWithAnyArray (patterns: string[]) (comparison: StringComparison) (str: string) =
     let mutable i = 0
@@ -396,65 +396,65 @@ let startsWithAnyChar (patterns: char seq) (str: string) =
         | :? (char list) as patterns -> startsWithAnyCharList patterns str
         | _ -> startsWithAnyCharSeq patterns str
 
-let [<return: Struct>] inline (|StartsWithAny|_|) (patterns: string seq) (str: string) =
-    str |> startsWithAny patterns StringComparison.Ordinal |> ValueOption.ofBool
-let [<return: Struct>] inline (|StartsWithAnyIgnoreCase|_|) (patterns: string seq) (str: string) =
-    str |> startsWithAny patterns StringComparison.OrdinalIgnoreCase |> ValueOption.ofBool
-let [<return: Struct>] inline (|StartsWithAnyCurrentCulture|_|) (patterns: string seq) (str: string) =
-    str |> startsWithAny patterns StringComparison.CurrentCulture |> ValueOption.ofBool
-let [<return: Struct>] inline (|StartsWithAnyCurrentCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
-    str |> startsWithAny patterns StringComparison.CurrentCultureIgnoreCase |> ValueOption.ofBool
-let [<return: Struct>] inline (|StartsWithAnyInvariantCulture|_|) (patterns: string seq) (str: string) =
-    str |> startsWithAny patterns StringComparison.InvariantCulture |> ValueOption.ofBool
-let [<return: Struct>] inline (|StartsWithAnyInvariantCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
-    str |> startsWithAny patterns StringComparison.InvariantCultureIgnoreCase |> ValueOption.ofBool
-let [<return: Struct>] inline (|StartsWithAnyChar|_|) (patterns: char[]) (str: string) =
-    str |> startsWithAnyChar patterns |> ValueOption.ofBool
+let inline (|StartsWithAny|_|) (patterns: string seq) (str: string) =
+    str |> startsWithAny patterns StringComparison.Ordinal
+let inline (|StartsWithAnyIgnoreCase|_|) (patterns: string seq) (str: string) =
+    str |> startsWithAny patterns StringComparison.OrdinalIgnoreCase
+let inline (|StartsWithAnyCurrentCulture|_|) (patterns: string seq) (str: string) =
+    str |> startsWithAny patterns StringComparison.CurrentCulture
+let inline (|StartsWithAnyCurrentCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
+    str |> startsWithAny patterns StringComparison.CurrentCultureIgnoreCase
+let inline (|StartsWithAnyInvariantCulture|_|) (patterns: string seq) (str: string) =
+    str |> startsWithAny patterns StringComparison.InvariantCulture
+let inline (|StartsWithAnyInvariantCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
+    str |> startsWithAny patterns StringComparison.InvariantCultureIgnoreCase
+let inline (|StartsWithAnyChar|_|) (patterns: char[]) (str: string) =
+    str |> startsWithAnyChar patterns
 
-let [<return: Struct>] inline (|StartsWithAnyNot|_|) (patterns: string seq) (str: string) =
-    str |> startsWithAny patterns StringComparison.Ordinal |> not |> ValueOption.ofBool
-let [<return: Struct>] inline (|StartsWithAnyNotIgnoreCase|_|) (patterns: string seq) (str: string) =
-    str |> startsWithAny patterns StringComparison.OrdinalIgnoreCase |> not |> ValueOption.ofBool
-let [<return: Struct>] inline (|StartsWithAnyNotCurrentCulture|_|) (patterns: string seq) (str: string) =
-    str |> startsWithAny patterns StringComparison.CurrentCulture |> not |> ValueOption.ofBool
-let [<return: Struct>] inline (|StartsWithAnyNotCurrentCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
-    str |> startsWithAny patterns StringComparison.CurrentCultureIgnoreCase |> not |> ValueOption.ofBool
-let [<return: Struct>] inline (|StartsWithAnyNotInvariantCulture|_|) (patterns: string seq) (str: string) =
-    str |> startsWithAny patterns StringComparison.InvariantCulture |> not |> ValueOption.ofBool
-let [<return: Struct>] inline (|StartsWithAnyNotInvariantCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
-    str |> startsWithAny patterns StringComparison.InvariantCultureIgnoreCase |> not |> ValueOption.ofBool
-let [<return: Struct>] inline (|StartsWithAnyNotChar|_|) (patterns: char[]) (str: string) =
-    str |> startsWithAnyChar patterns |> not |> ValueOption.ofBool
+let inline (|NotStartsWithAny|_|) (patterns: string seq) (str: string) =
+    str |> startsWithAny patterns StringComparison.Ordinal |> not
+let inline (|NotStartsWithAnyIgnoreCase|_|) (patterns: string seq) (str: string) =
+    str |> startsWithAny patterns StringComparison.OrdinalIgnoreCase |> not
+let inline (|NotStartsWithAnyCurrentCulture|_|) (patterns: string seq) (str: string) =
+    str |> startsWithAny patterns StringComparison.CurrentCulture |> not
+let inline (|NotStartsWithAnyCurrentCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
+    str |> startsWithAny patterns StringComparison.CurrentCultureIgnoreCase |> not
+let inline (|NotStartsWithAnyInvariantCulture|_|) (patterns: string seq) (str: string) =
+    str |> startsWithAny patterns StringComparison.InvariantCulture |> not
+let inline (|NotStartsWithAnyInvariantCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
+    str |> startsWithAny patterns StringComparison.InvariantCultureIgnoreCase |> not
+let inline (|NotStartsWithAnyChar|_|) (patterns: char[]) (str: string) =
+    str |> startsWithAnyChar patterns |> not
 
-let [<return: Struct>] inline (|EndsWith|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.EndsWith(pattern, StringComparison.Ordinal)) |> ValueOption.ofBool
-let [<return: Struct>] inline (|EndsWithIgnoreCase|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.EndsWith(pattern, StringComparison.OrdinalIgnoreCase)) |> ValueOption.ofBool
-let [<return: Struct>] inline (|EndsWithCurrentCulture|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.EndsWith(pattern, StringComparison.CurrentCulture)) |> ValueOption.ofBool
-let [<return: Struct>] inline (|EndsWithCurrentCultureIgnoreCase|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.EndsWith(pattern, StringComparison.CurrentCultureIgnoreCase)) |> ValueOption.ofBool
-let [<return: Struct>] inline (|EndsWithInvariantCulture|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.EndsWith(pattern, StringComparison.InvariantCulture)) |> ValueOption.ofBool
-let [<return: Struct>] inline (|EndsWithInvariantCultureIgnoreCase|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.EndsWith(pattern, StringComparison.InvariantCultureIgnoreCase)) |> ValueOption.ofBool
-let [<return: Struct>] inline (|EndsWithChar|_|) (pattern: char) (str: string) =
-    (isNotNull str && str.EndsWith(pattern)) |> ValueOption.ofBool
+let inline (|EndsWith|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.EndsWith(pattern, StringComparison.Ordinal))
+let inline (|EndsWithIgnoreCase|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.EndsWith(pattern, StringComparison.OrdinalIgnoreCase))
+let inline (|EndsWithCurrentCulture|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.EndsWith(pattern, StringComparison.CurrentCulture))
+let inline (|EndsWithCurrentCultureIgnoreCase|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.EndsWith(pattern, StringComparison.CurrentCultureIgnoreCase))
+let inline (|EndsWithInvariantCulture|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.EndsWith(pattern, StringComparison.InvariantCulture))
+let inline (|EndsWithInvariantCultureIgnoreCase|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.EndsWith(pattern, StringComparison.InvariantCultureIgnoreCase))
+let inline (|EndsWithChar|_|) (pattern: char) (str: string) =
+    (isNotNull str && str.EndsWith(pattern))
 
-let [<return: Struct>] inline (|EndsWithNot|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.EndsWith(pattern, StringComparison.Ordinal) |> not) |> ValueOption.ofBool
-let [<return: Struct>] inline (|EndsWithNotIgnoreCase|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.EndsWith(pattern, StringComparison.OrdinalIgnoreCase) |> not) |> ValueOption.ofBool
-let [<return: Struct>] inline (|EndsWithNotCurrentCulture|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.EndsWith(pattern, StringComparison.CurrentCulture) |> not) |> ValueOption.ofBool
-let [<return: Struct>] inline (|EndsWithNotCurrentCultureIgnoreCase|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.EndsWith(pattern, StringComparison.CurrentCultureIgnoreCase) |> not) |> ValueOption.ofBool
-let [<return: Struct>] inline (|EndsWithNotInvariantCulture|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.EndsWith(pattern, StringComparison.InvariantCulture) |> not) |> ValueOption.ofBool
-let [<return: Struct>] inline (|EndsWithNotInvariantCultureIgnoreCase|_|) (pattern: string) (str: string) =
-    (isNotNull str && str.EndsWith(pattern, StringComparison.InvariantCultureIgnoreCase) |> not) |> ValueOption.ofBool
-let [<return: Struct>] inline (|EndsWithNotChar|_|) (pattern: char) (str: string) =
-    (isNotNull str && str.EndsWith(pattern) |> not) |> ValueOption.ofBool
+let inline (|NotEndsWith|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.EndsWith(pattern, StringComparison.Ordinal) |> not)
+let inline (|NotEndsWithIgnoreCase|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.EndsWith(pattern, StringComparison.OrdinalIgnoreCase) |> not)
+let inline (|NotEndsWithCurrentCulture|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.EndsWith(pattern, StringComparison.CurrentCulture) |> not)
+let inline (|NotEndsWithCurrentCultureIgnoreCase|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.EndsWith(pattern, StringComparison.CurrentCultureIgnoreCase) |> not)
+let inline (|NotEndsWithInvariantCulture|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.EndsWith(pattern, StringComparison.InvariantCulture) |> not)
+let inline (|NotEndsWithInvariantCultureIgnoreCase|_|) (pattern: string) (str: string) =
+    (isNotNull str && str.EndsWith(pattern, StringComparison.InvariantCultureIgnoreCase) |> not)
+let inline (|NotEndsWithChar|_|) (pattern: char) (str: string) =
+    (isNotNull str && str.EndsWith(pattern) |> not)
 
 let private endsWithAnyArray (patterns: string[]) (comparison: StringComparison) (str: string) =
     let mutable i = 0
@@ -531,32 +531,32 @@ let endsWithAnyChar (patterns: char seq) (str: string) =
         | :? (char list) as patterns -> endsWithAnyCharList patterns str
         | _ -> endsWithAnyCharSeq patterns str
 
-let [<return: Struct>] inline (|EndsWithAny|_|) (patterns: string seq) (str: string) =
-    str |> endsWithAny patterns StringComparison.Ordinal |> ValueOption.ofBool
-let [<return: Struct>] inline (|EndsWithAnyIgnoreCase|_|) (patterns: string seq) (str: string) =
-    str |> endsWithAny patterns StringComparison.OrdinalIgnoreCase |> ValueOption.ofBool
-let [<return: Struct>] inline (|EndsWithAnyCurrentCulture|_|) (patterns: string seq) (str: string) =
-    str |> endsWithAny patterns StringComparison.CurrentCulture |> ValueOption.ofBool
-let [<return: Struct>] inline (|EndsWithAnyCurrentCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
-    str |> endsWithAny patterns StringComparison.CurrentCultureIgnoreCase |> ValueOption.ofBool
-let [<return: Struct>] inline (|EndsWithAnyInvariantCulture|_|) (patterns: string seq) (str: string) =
-    str |> endsWithAny patterns StringComparison.InvariantCulture |> ValueOption.ofBool
-let [<return: Struct>] inline (|EndsWithAnyInvariantCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
-    str |> endsWithAny patterns StringComparison.InvariantCultureIgnoreCase |> ValueOption.ofBool
-let [<return: Struct>] inline (|EndsWithAnyChar|_|) (patterns: char[]) (str: string) =
-    str |> endsWithAnyChar patterns |> ValueOption.ofBool
+let inline (|EndsWithAny|_|) (patterns: string seq) (str: string) =
+    str |> endsWithAny patterns StringComparison.Ordinal
+let inline (|EndsWithAnyIgnoreCase|_|) (patterns: string seq) (str: string) =
+    str |> endsWithAny patterns StringComparison.OrdinalIgnoreCase
+let inline (|EndsWithAnyCurrentCulture|_|) (patterns: string seq) (str: string) =
+    str |> endsWithAny patterns StringComparison.CurrentCulture
+let inline (|EndsWithAnyCurrentCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
+    str |> endsWithAny patterns StringComparison.CurrentCultureIgnoreCase
+let inline (|EndsWithAnyInvariantCulture|_|) (patterns: string seq) (str: string) =
+    str |> endsWithAny patterns StringComparison.InvariantCulture
+let inline (|EndsWithAnyInvariantCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
+    str |> endsWithAny patterns StringComparison.InvariantCultureIgnoreCase
+let inline (|EndsWithAnyChar|_|) (patterns: char[]) (str: string) =
+    str |> endsWithAnyChar patterns
 
-let [<return: Struct>] inline (|EndsWithAnyNot|_|) (patterns: string seq) (str: string) =
-    str |> endsWithAny patterns StringComparison.Ordinal |> not |> ValueOption.ofBool
-let [<return: Struct>] inline (|EndsWithAnyNotIgnoreCase|_|) (patterns: string seq) (str: string) =
-    str |> endsWithAny patterns StringComparison.OrdinalIgnoreCase |> not |> ValueOption.ofBool
-let [<return: Struct>] inline (|EndsWithAnyNotCurrentCulture|_|) (patterns: string seq) (str: string) =
-    str |> endsWithAny patterns StringComparison.CurrentCulture |> not |> ValueOption.ofBool
-let [<return: Struct>] inline (|EndsWithAnyNotCurrentCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
-    str |> endsWithAny patterns StringComparison.CurrentCultureIgnoreCase |> not |> ValueOption.ofBool
-let [<return: Struct>] inline (|EndsWithAnyNotInvariantCulture|_|) (patterns: string seq) (str: string) =
-    str |> endsWithAny patterns StringComparison.InvariantCulture |> not |> ValueOption.ofBool
-let [<return: Struct>] inline (|EndsWithAnyNotInvariantCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
-    str |> endsWithAny patterns StringComparison.InvariantCultureIgnoreCase |> not |> ValueOption.ofBool
-let [<return: Struct>] inline (|EndsWithAnyNotChar|_|) (patterns: char[]) (str: string) =
-    str |> endsWithAnyChar patterns |> not |> ValueOption.ofBool
+let inline (|NotEndsWithAny|_|) (patterns: string seq) (str: string) =
+    str |> endsWithAny patterns StringComparison.Ordinal |> not
+let inline (|NotEndsWithAnyIgnoreCase|_|) (patterns: string seq) (str: string) =
+    str |> endsWithAny patterns StringComparison.OrdinalIgnoreCase |> not
+let inline (|NotEndsWithAnyCurrentCulture|_|) (patterns: string seq) (str: string) =
+    str |> endsWithAny patterns StringComparison.CurrentCulture |> not
+let inline (|NotEndsWithAnyCurrentCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
+    str |> endsWithAny patterns StringComparison.CurrentCultureIgnoreCase |> not
+let inline (|NotEndsWithAnyInvariantCulture|_|) (patterns: string seq) (str: string) =
+    str |> endsWithAny patterns StringComparison.InvariantCulture |> not
+let inline (|NotEndsWithAnyInvariantCultureIgnoreCase|_|) (patterns: string seq) (str: string) =
+    str |> endsWithAny patterns StringComparison.InvariantCultureIgnoreCase |> not
+let inline (|NotEndsWithAnyChar|_|) (patterns: char[]) (str: string) =
+    str |> endsWithAnyChar patterns |> not

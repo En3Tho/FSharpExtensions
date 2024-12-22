@@ -32,6 +32,11 @@ type ContentHeadersBuilder =
             headers.Add(kvp.Key, kvp.Value)
         )
 
+    member inline _.Yield(kvp: KeyValuePair<string, IEnumerable<string>>) : ContentHeadersBuilderCode =
+        ContentHeadersBuilderCode(fun headers ->
+            headers.Add(kvp.Key, kvp.Value)
+        )
+
     member inline this.Zero() : ContentHeadersBuilderCode = ContentHeadersBuilderCode(fun _ -> ())
 
     member inline this.Run([<InlineIfLambda>] code: ContentHeadersBuilderCode) =
@@ -59,6 +64,16 @@ type RequestHeadersBuilder =
     member inline _.Yield(kvp: KeyValuePair<string, string>) : RequestHeadersBuilderCode =
         RequestHeadersBuilderCode(fun headers ->
             headers.Add(kvp.Key, kvp.Value)
+        )
+
+    member inline _.Yield(kvp: KeyValuePair<string, IEnumerable<string>>) : RequestHeadersBuilderCode =
+        RequestHeadersBuilderCode(fun headers ->
+            headers.Add(kvp.Key, kvp.Value)
+        )
+
+    member inline _.Yield(authentication: AuthenticationHeaderValue) : RequestHeadersBuilderCode =
+        RequestHeadersBuilderCode(fun headers ->
+            headers.Authorization <- authentication            
         )
 
     member inline this.Zero() : RequestHeadersBuilderCode = RequestHeadersBuilderCode(fun _ -> ())

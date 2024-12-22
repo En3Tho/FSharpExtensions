@@ -18,5 +18,6 @@ type nativeptr<'T when 'T: unmanaged> with
     member inline this.byref = NativePtr.toByRef this
     member inline this.value with get() = NativePtr.read this and set value = NativePtr.write this value
     member inline this.As<'U when 'U: unmanaged>() = ucast<_, nativeptr<'U>> this
+    member inline this.AsPPtr<'U when 'U: unmanaged>() = ucast<_, nativeptr<nativeptr<'U>>> this
     member inline this.AsSpan(length) = Span<'T>(this.voidptr, length)
     member inline this.AsReadOnlySpan(length) = ReadOnlySpan<'T>(this.voidptr, length)

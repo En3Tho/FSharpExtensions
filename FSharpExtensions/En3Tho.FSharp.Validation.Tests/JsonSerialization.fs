@@ -13,37 +13,35 @@ let makeJsonSerializerOptions() =
 
 let options = makeJsonSerializerOptions()
 
-type AsyncPlainValue<'a> = NewCtorAsyncValidatorValidated<'a, PlainValue.Validator<'a>>
 type InstancePlainValue<'a> = InstanceValidatorValidated<'a, PlainValue.Validator<'a>>
-type AsyncInstancePlainValue<'a> = InstanceAsyncValidatorValidated<'a, PlainValue.Validator<'a>>
 
 [<Fact>]
 let ``test that new ctor validator validated values get serialized and deserialized``() =
-    let plain10 = PlainValue.Make 10
+    let plain10 = PlainValue.Make(10)
     let str = JsonSerializer.Serialize(plain10, options)
     let result = JsonSerializer.Deserialize<PlainValue<int>>(str, options)
     Assert.Equal(plain10, result)
 
 [<Fact>]
+let ``test that NonNegativeValue get serialized and deserialized``() =
+    let plain10 = NonNegativeValue.Make(10)
+    let str = JsonSerializer.Serialize(plain10, options)
+    let result = JsonSerializer.Deserialize<NonNegativeValue<int>>(str, options) // should throw on negative case
+    Assert.Equal(plain10, result)
+
+[<Fact>]
+let ``test that NonNegativeValue should throw on deserialization on bad case``() =
+    let str = "-15"
+    let result = JsonSerializer.Deserialize<NonNegativeValue<int>>(str, options)
+    Assert.Throws<NonNegativeValue.ValueIsNegativeException>(fun () ->
+        JsonSerializer.Deserialize<NonNegativeValue<int>>(str, options) |> ignore)
+
+[<Fact>]
 let ``test that new ctor validator validated values get serialized as their underlying values``() =
-    let plain10 = PlainValue.Make 10
+    let plain10 = PlainValue.Make(10)
     let serializedPlain10 = JsonSerializer.Serialize(plain10, options)
     let serialized10 = JsonSerializer.Serialize(plain10.Value, options)
     Assert.Equal(serialized10, serializedPlain10)
-
-[<Fact>]
-let ``test that async new ctor validator  validated values get serialized as their underlying values``() =
-    let plain10 = AsyncPlainValue.Make(10).Result
-    let serializedPlain10 = JsonSerializer.Serialize(plain10, options)
-    let serialized10 = JsonSerializer.Serialize(plain10.Value, options)
-    Assert.Equal(serialized10, serializedPlain10)
-
-[<Fact>]
-let ``test that async new ctor validator validated values get serialized but not deserialized``() =
-    let plain10 = AsyncPlainValue.Make(10).Result
-    let serializedPlain10 = JsonSerializer.Serialize(plain10, options)
-    Assert.Throws<InvalidOperationException>(fun () ->
-        JsonSerializer.Deserialize<AsyncPlainValue<int>>(serializedPlain10, options) |> ignore)
 
 [<Fact>]
 let ``test that instance validator validated values get serialized as their underlying values``() =
@@ -58,17 +56,3 @@ let ``test that instance validator validated values get serialized but not deser
     let serializedPlain10 = JsonSerializer.Serialize(plain10, options)
     Assert.Throws<InvalidOperationException>(fun () ->
         JsonSerializer.Deserialize<InstancePlainValue<int>>(serializedPlain10, options) |> ignore)
-
-[<Fact>]
-let ``test that async instance validator validated values get serialized as their underlying values``() =
-    let plain10 = AsyncInstancePlainValue.Make(10, PlainValue.Validator()).Result
-    let serializedPlain10 = JsonSerializer.Serialize(plain10, options)
-    let serialized10 = JsonSerializer.Serialize(plain10.Value, options)
-    Assert.Equal(serialized10, serializedPlain10)
-
-[<Fact>]
-let ``test that async instance validator validated values get serialized but not deserialized``() =
-    let plain10 = AsyncInstancePlainValue.Make(10, PlainValue.Validator()).Result
-    let serializedPlain10 = JsonSerializer.Serialize(plain10, options)
-    Assert.Throws<InvalidOperationException>(fun () ->
-        JsonSerializer.Deserialize<AsyncInstancePlainValue<int>>(serializedPlain10, options) |> ignore)

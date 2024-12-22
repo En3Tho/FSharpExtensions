@@ -4,31 +4,30 @@ module En3Tho.FSharp.Extensions.ActivePatterns
 open System
 open Core
 
-// TODO: bool patterns
-let inline (|Null|_|) value = if isNull value then Option.someObj else None
-let inline (|NotNull|_|) value = if isNotNull value then Option.someObj else None
+let inline (|Null|_|) value = isNull value
+let inline (|NotNull|_|) value = isNotNull value
 
-let [<return: Struct>] inline (|Eq|_|) with' what = what == with' |> ValueOption.ofBool
-let [<return: Struct>] inline (|Neq|_|) with' what = what <> with' |> ValueOption.ofBool
-let [<return: Struct>] inline (|Gt|_|) with' what = what > with' |> ValueOption.ofBool
-let [<return: Struct>] inline (|GtEq|_|) with' what = what >= with' |> ValueOption.ofBool
-let [<return: Struct>] inline (|Lt|_|) with' what = what < with' |> ValueOption.ofBool
-let [<return: Struct>] inline (|LtEq|_|) with' what = what <= with' |> ValueOption.ofBool
-let [<return: Struct>] inline (|RefEq|_|) with' what = referenceEquals with' what |> ValueOption.ofBool
+let inline (|Eq|_|) with' what = what == with'
+let inline (|Neq|_|) with' what = what <> with'
+let inline (|Gt|_|) with' what = what > with'
+let inline (|GtEq|_|) with' what = what >= with'
+let inline (|Lt|_|) with' what = what < with'
+let inline (|LtEq|_|) with' what = what <= with'
+let inline (|RefEq|_|) with' what = referenceEquals with' what
 
-let [<return: Struct>] inline (|Equals|_|) with' what = what == with' |> ValueOption.ofBool
-let [<return: Struct>] inline (|NotEquals|_|) with' what = what <> with' |> ValueOption.ofBool
-let [<return: Struct>] inline (|GreaterThan|_|) with' what = what > with' |> ValueOption.ofBool
-let [<return: Struct>] inline (|GreaterThanEquals|_|) with' what = what >= with' |> ValueOption.ofBool
-let [<return: Struct>] inline (|LessThan|_|) with' what = what < with' |> ValueOption.ofBool
-let [<return: Struct>] inline (|LessThanEquals|_|) with' what = what <= with' |> ValueOption.ofBool
-let [<return: Struct>] inline (|ReferenceEquals|_|) with' what = referenceEquals with' what |> ValueOption.ofBool
+let inline (|Equals|_|) with' what = what == with'
+let inline (|NotEquals|_|) with' what = what <> with'
+let inline (|GreaterThan|_|) with' what = what > with'
+let inline (|GreaterThanEquals|_|) with' what = what >= with'
+let inline (|LessThan|_|) with' what = what < with'
+let inline (|LessThanEquals|_|) with' what = what <= with'
+let inline (|ReferenceEquals|_|) with' what = referenceEquals with' what
 
-let [<return: Struct>] inline (|NullableSome|_|) (value: 'a Nullable) =
+let inline (|NullableSome|_|) (value: 'a Nullable) =
     if value.HasValue then ValueSome value.Value else ValueNone
 
-let [<return: Struct>] inline (|NullableNone|_|) (value: 'a Nullable) =
-    value.HasValue |> not |> ValueOption.ofBool
+let inline (|NullableNone|_|) (value: 'a Nullable) =
+    value.HasValue |> not
 
 module Requires =
     let inline (|NotNull|) (obj: 'a when 'a: not struct) = if Object.ReferenceEquals(obj, null) then nullArg "Value cannot be null" else obj

@@ -18,21 +18,21 @@ let ``Test good cases of scanf`` () =
     Assert.Equal(123, value2.Value)
 
     Assert.True ("/authorize myText 123 qwe" |> scanf $"/authorize {value3} {value2} qwe")
-    Assert.True("myText".AsSpan().SequenceEqual value3.Value.Span)
+    Assert.True("myText".AsSpan().SequenceEqual(value3.Value.Span))
 
     Assert.True ("/authorize myText  123  qwe" |> scanf $"/authorize {value1}  {value2}  qwe")
     Assert.Equal("myText", value1.Value)
     Assert.Equal(123, value2.Value)
 
     Assert.True ("/authorize myText 123 qwe" |> scanf $"/authorize {value3} {value2} qwe")
-    Assert.True("myText".AsSpan().SequenceEqual value3.Value.Span)
+    Assert.True("myText".AsSpan().SequenceEqual(value3.Value.Span))
 
     Assert.True ("/authorize myText 123 qwe" |> scanfl $"/authorize {value1} {value2} qwe")
     Assert.Equal("myText", value1.Value)
     Assert.Equal(123, value2.Value)
 
     Assert.True ("/authorize myText 123 qwe" |> scanf $"/authorize {value3} {value2} qwe")
-    Assert.True("myText".AsSpan().SequenceEqual value3.Value.Span)
+    Assert.True("myText".AsSpan().SequenceEqual(value3.Value.Span))
 
     Assert.True ("/authorize myText 123" |> scanfl $"/authorize {value1} {value2} qwe")
     Assert.Equal("myText", value1.Value)

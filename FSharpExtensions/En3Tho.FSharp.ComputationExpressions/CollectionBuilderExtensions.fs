@@ -11,7 +11,7 @@ module SCollectionBuilder =
     let inline add value collection =
         ( ^a: (member Add: ^b -> ^c) collection, value)
 
-    [<AbstractClass;Extension>]
+    [<AbstractClass>]
     type SCollectionExtensions() =
         [<Extension; EditorBrowsable(EditorBrowsableState.Never)>]
         static member inline Yield(collection, value: 'b) : CollectionCode = fun() -> add value collection |> ignore
@@ -20,12 +20,12 @@ module SCollectionBuilder =
 
 module ICollectionBuilder =
 
-    [<AbstractClass;Extension>]
+    [<AbstractClass>]
     type ICollectionExtensions() =
         [<Extension; EditorBrowsable(EditorBrowsableState.Never)>]
-        static member inline Yield(collection: #ICollection<'a>, value: 'a) : CollectionCode = fun() -> collection.Add value
+        static member inline Yield(collection: #ICollection<'a>, value: 'a) : CollectionCode = fun() -> collection.Add(value)
         [<Extension; EditorBrowsable(EditorBrowsableState.Never)>]
-        static member inline YieldFrom(collection: #ICollection<'a>, values: 'a seq) : CollectionCode = fun() -> for value in values do collection.Add value
+        static member inline YieldFrom(collection: #ICollection<'a>, values: 'a seq) : CollectionCode = fun() -> for value in values do collection.Add(value)
 
     type ICollection<'a> with
         [<EditorBrowsable(EditorBrowsableState.Never)>]
@@ -70,7 +70,7 @@ module ICollectionBuilder =
         member inline this.Run([<InlineIfLambda>] runExpr: CollectionCode) = runExpr(); this
 
 module IDictionaryBuilder =
-    [<AbstractClass;Extension>]
+    [<AbstractClass>]
     type IDictionaryExtensions() =
         [<Extension; EditorBrowsable(EditorBrowsableState.Never)>]
         static member inline Yield(dictionary: #IDictionary<_,_>, (key, value): struct ('a * 'b)) : CollectionCode = fun() -> dictionary[key] <- value
@@ -114,7 +114,7 @@ module SStringBuilderBuilder =
     let inline append value stringBuilder =
         ( ^a: (member Append: ^b -> ^c) stringBuilder, value) |> ignore
 
-    [<AbstractClass;Extension>]
+    [<AbstractClass>]
     type StringBuilderExtensions() =
         [<Extension; EditorBrowsable(EditorBrowsableState.Never)>]
         static member inline Yield(builder, value: 'b) : CollectionCode = fun() -> append value builder

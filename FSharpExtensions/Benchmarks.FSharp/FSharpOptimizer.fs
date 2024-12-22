@@ -5,9 +5,9 @@ open BenchmarkDotNet.Attributes
 
 module Printf =
     type T = T with
-        static member inline ($) (T, arg : unit) = ()
-        static member inline ($) (T, arg : int) = 0 // mandatory second terminal case; is unused in runtime but is required for the code to compile
-        static member inline ($) (T, func : ^a -> ^b) : ^a -> ^b = fun (_ : 'a) -> T $ Unchecked.defaultof<'b>
+        static member inline($) (T, arg : unit) = ()
+        static member inline($) (T, arg : int) = 0 // mandatory second terminal case; is unused in runtime but is required for the code to compile
+        static member inline($) (T, func : ^a -> ^b) : ^a -> ^b = fun (_ : 'a) -> T $ Unchecked.defaultof<'b>
 
     let inline iprintf format : 'a =
         if false then // for type inference
@@ -41,7 +41,7 @@ let callGuidParseToString4Unrolled (str : string) =
     |> toString
     |> Guid.Parse
     |> toString
-    |> fun x -> Guid.Parse x
+    |> fun x -> Guid.Parse(x)
     |> fun x -> toString x
 
 let plus1 x = x + 1

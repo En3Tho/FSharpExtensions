@@ -20,11 +20,11 @@ module Span =
     let inline fromArraySegment (array: 'a ArraySegment): Span<_> = Span.op_Implicit array
     let inline fromMemory (memory: Memory<_>) = memory.Span
 
-    let [<return: Struct>] inline (|Empty|_|) (str: Span<'a>) =
-        str.IsEmpty |> ValueOption.ofBool
+    let inline (|Empty|_|) (str: Span<'a>) =
+        str.IsEmpty
 
-    let [<return: Struct>] inline (|NotEmpty|_|) (str: Span<'a>) =
-        str.IsEmpty |> not |> ValueOption.ofBool
+    let inline (|NotEmpty|_|) (str: Span<'a>) =
+        str.IsEmpty |> not
 
     let inline stackalloc<'a when 'a: unmanaged> len =
         let ptr = NativePtr.stackalloc<'a> len
@@ -54,8 +54,8 @@ module ReadOnlySpan =
     let inline fromArraySegment (array: 'a ArraySegment): ReadOnlySpan<_> = ReadOnlySpan.op_Implicit array
     let inline fromMemory (memory: ReadOnlyMemory<_>) = memory.Span
 
-    let [<return: Struct>] inline (|Empty|_|) (str: ReadOnlySpan<'a>) =
-        str.IsEmpty |> ValueOption.ofBool
+    let inline (|Empty|_|) (str: ReadOnlySpan<'a>) =
+        str.IsEmpty
 
-    let [<return: Struct>] inline (|NotEmpty|_|) (str: ReadOnlySpan<'a>) =
-        str.IsEmpty |> not |> ValueOption.ofBool
+    let inline (|NotEmpty|_|) (str: ReadOnlySpan<'a>) =
+        str.IsEmpty |> not

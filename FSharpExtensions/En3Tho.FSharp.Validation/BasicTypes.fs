@@ -46,50 +46,50 @@ type [<Struct; IsReadOnly>] NewCtorValidatorValidated<'value, 'validator when 'v
 
     override this.ToString() = value.ToString()
 
-    static member Of value =
+    static member Of(value) =
         let validator = (new 'validator())
-        match validator.Validate value with
+        match validator.Validate(value) with
         | Ok value -> NewCtorValidatorValidated(value, validator) |> Ok
         | Error err -> Error err
 
-    static member Make (value: 'value) =
+    static member Make(value: 'value) =
         NewCtorValidatorValidated<'value, 'validator>.Of(value) |> EResult.get
 
     [<EditorBrowsable(EditorBrowsableState.Never)>]
-    member inline this.Map ([<InlineIfLambda>] map: 'value -> 'value) =
+    member inline this.Map([<InlineIfLambda>] map: 'value -> 'value) =
         NewCtorValidatorValidated<'value, 'validator>.Of(map this.Value)
 
     [<EditorBrowsable(EditorBrowsableState.Never)>]
-    member inline this.MapMake ([<InlineIfLambda>] map: 'value -> 'value) =
+    member inline this.MapMake([<InlineIfLambda>] map: 'value -> 'value) =
         NewCtorValidatorValidated<'value, 'validator>.Make(map this.Value)
 
-    static member OfOption (valueOption: 'value voption) =
+    static member OfOption(valueOption: 'value voption) =
         match valueOption with
         | ValueNone -> ValueNone |> Ok
         | ValueSome value ->
-            match NewCtorValidatorValidated<'value, 'validator>.Of value with
+            match NewCtorValidatorValidated<'value, 'validator>.Of(value) with
             | Ok value -> value |> ValueSome |> Ok
             | Error err -> Error err
 
-    static member MakeOption (valueOption: 'value voption) =
+    static member MakeOption(valueOption: 'value voption) =
         NewCtorValidatorValidated<'value, 'validator>.OfOption(valueOption) |> EResult.get
 
-    static member OfAggregate value =
+    static member OfAggregate(value) =
         let validator = (new 'validator())
         match validator.ValidateAggregate value with
         | Ok value -> NewCtorValidatorValidated(value, validator) |> Ok
         | Error err -> Error err
 
-    static member MakeAggregate (value: 'value) =
+    static member MakeAggregate(value: 'value) =
         NewCtorValidatorValidated<'value, 'validator>.OfAggregate(value) |> EResult.get
 
-    member inline this.MapAggregate ([<InlineIfLambda>] map: 'value -> 'value) =
+    member inline this.MapAggregate([<InlineIfLambda>] map: 'value -> 'value) =
         NewCtorValidatorValidated<'value, 'validator>.OfAggregate(map this.Value)
 
-    member inline this.MapMakeAggregate ([<InlineIfLambda>] map: 'value -> 'value) =
+    member inline this.MapMakeAggregate([<InlineIfLambda>] map: 'value -> 'value) =
         NewCtorValidatorValidated<'value, 'validator>.MakeAggregate(map this.Value)
 
-    static member OfOptionAggregate (valueOption: 'value voption) =
+    static member OfOptionAggregate(valueOption: 'value voption) =
         match valueOption with
         | ValueNone -> ValueNone |> Ok
         | ValueSome value ->
@@ -97,10 +97,10 @@ type [<Struct; IsReadOnly>] NewCtorValidatorValidated<'value, 'validator when 'v
             | Ok value -> value |> ValueSome |> Ok
             | Error err -> Error err
 
-    static member MakeOptionAggregate (valueOption: 'value voption) =
+    static member MakeOptionAggregate(valueOption: 'value voption) =
         NewCtorValidatorValidated<'value, 'validator>.OfOptionAggregate(valueOption) |> EResult.get
 
-    static member op_Implicit (validated: NewCtorValidatorValidated<'value, 'validator>) : 'value = validated.Value
+    static member op_Implicit(validated: NewCtorValidatorValidated<'value, 'validator>) : 'value = validated.Value
 
 type [<Struct; IsReadOnly>] InstanceValidatorValidated<'value, 'validator when 'validator :> IValidator<'value>>
 #if DEBUG || CHECKED
@@ -127,14 +127,14 @@ type [<Struct; IsReadOnly>] InstanceValidatorValidated<'value, 'validator when '
     member this.TryValue(value: 'value) =
         InstanceValidatorValidated<'value, 'validator>.Of(value, this.Validator)
 
-    member inline this.Map ([<InlineIfLambda>] map: 'value -> 'value) =
+    member inline this.Map([<InlineIfLambda>] map: 'value -> 'value) =
         this.TryValue(map this.Value)
 
     [<EditorBrowsable(EditorBrowsableState.Never)>]
     member this.MakeValue(value: 'value) =
         InstanceValidatorValidated<'value, 'validator>.Make(value, this.Validator)
 
-    member inline this.MapMake ([<InlineIfLambda>] map: 'value -> 'value) =
+    member inline this.MapMake([<InlineIfLambda>] map: 'value -> 'value) =
         this.MakeValue(map this.Value)
 
     static member OfOption(valueOption: 'value voption, validator: 'validator) =
@@ -160,14 +160,14 @@ type [<Struct; IsReadOnly>] InstanceValidatorValidated<'value, 'validator when '
     member this.TryValueAggregate(value: 'value) =
         InstanceValidatorValidated<'value, 'validator>.OfAggregate(value, this.Validator)
 
-    member inline this.MapAggregate ([<InlineIfLambda>] map: 'value -> 'value) =
+    member inline this.MapAggregate([<InlineIfLambda>] map: 'value -> 'value) =
         this.TryValueAggregate(map this.Value)
 
      [<EditorBrowsable(EditorBrowsableState.Never)>]
      member this.MakeValueAggregate(value: 'value) =
         InstanceValidatorValidated<'value, 'validator>.MakeAggregate(value, this.Validator)
 
-    member inline this.MapMakeAggregate ([<InlineIfLambda>] map: 'value -> 'value) =
+    member inline this.MapMakeAggregate([<InlineIfLambda>] map: 'value -> 'value) =
         this.MakeValueAggregate(map this.Value)
 
     static member OfOptionAggregate(valueOption: 'value voption, validator: 'validator) =
@@ -181,7 +181,7 @@ type [<Struct; IsReadOnly>] InstanceValidatorValidated<'value, 'validator when '
     static member MakeOptionAggregate(valueOption: 'value voption, validator: 'validator) =
         InstanceValidatorValidated<'value, 'validator>.OfOptionAggregate(valueOption, validator) |> EResult.get
 
-    static member op_Implicit (validated: InstanceValidatorValidated<'value, 'validator>) : 'value = validated.Value
+    static member op_Implicit(validated: InstanceValidatorValidated<'value, 'validator>) : 'value = validated.Value
 
 type [<Struct; IsReadOnly>] NewCtorAsyncValidatorValidated<'value, 'validator when 'validator: (new: unit -> 'validator)
                                                                                and 'validator :> IAsyncValidator<'value>>
@@ -197,25 +197,25 @@ type [<Struct; IsReadOnly>] NewCtorAsyncValidatorValidated<'value, 'validator wh
 
     override this.ToString() = value.ToString()
 
-    static member Of value = vtask {
+    static member Of(value) = vtask {
         let validator = (new 'validator())
         match! validator.Validate value with
         | Ok value -> return NewCtorAsyncValidatorValidated(value, validator) |> Ok
         | Error err -> return Error err
     }
 
-    static member Make (value: 'value) = vtask {
+    static member Make(value: 'value) = vtask {
         let! result = NewCtorAsyncValidatorValidated<'value, 'validator>.Of(value)
         return result |> EResult.get
     }
 
-    member inline this.MapOf ([<InlineIfLambda>] map: 'value -> 'value) =
+    member inline this.MapOf([<InlineIfLambda>] map: 'value -> 'value) =
         NewCtorAsyncValidatorValidated<'value, 'validator>.Of(map this.Value)
 
-    member inline this.MapMake ([<InlineIfLambda>] map: 'value -> 'value) =
+    member inline this.MapMake([<InlineIfLambda>] map: 'value -> 'value) =
         NewCtorAsyncValidatorValidated<'value, 'validator>.Make(map this.Value)
 
-    static member OfOption (valueOption: 'value voption) = vtask {
+    static member OfOption(valueOption: 'value voption) = vtask {
         match valueOption with
         | ValueNone -> return ValueNone |> Ok
         | ValueSome value ->
@@ -224,30 +224,30 @@ type [<Struct; IsReadOnly>] NewCtorAsyncValidatorValidated<'value, 'validator wh
             | Error err -> return Error err
     }
 
-    static member MakeOption (valueOption: 'value voption) = vtask {
+    static member MakeOption(valueOption: 'value voption) = vtask {
         let! result = NewCtorAsyncValidatorValidated<'value, 'validator>.OfOption(valueOption)
         return result |> EResult.get
     }
 
-    static member OfAggregate value = vtask {
+    static member OfAggregate(value) = vtask {
         let validator = (new 'validator())
         match! validator.ValidateAggregate value with
         | Ok value -> return NewCtorAsyncValidatorValidated(value, validator) |> Ok
         | Error err -> return Error err
     }
 
-    static member MakeAggregate (value: 'value) = vtask {
+    static member MakeAggregate(value: 'value) = vtask {
         let! result = NewCtorAsyncValidatorValidated<'value, 'validator>.OfAggregate(value)
         return result |> EResult.get
     }
 
-    member inline this.MapOfAggregate ([<InlineIfLambda>] map: 'value -> 'value) =
+    member inline this.MapOfAggregate([<InlineIfLambda>] map: 'value -> 'value) =
         NewCtorAsyncValidatorValidated<'value, 'validator>.OfAggregate(map this.Value)
 
-    member inline this.MapMakeAggregate ([<InlineIfLambda>] map: 'value -> 'value) =
+    member inline this.MapMakeAggregate([<InlineIfLambda>] map: 'value -> 'value) =
         NewCtorAsyncValidatorValidated<'value, 'validator>.MakeAggregate(map this.Value)
 
-    static member OfOptionAggregate (valueOption: 'value voption) = vtask {
+    static member OfOptionAggregate(valueOption: 'value voption) = vtask {
         match valueOption with
         | ValueNone -> return ValueNone |> Ok
         | ValueSome value ->
@@ -256,12 +256,12 @@ type [<Struct; IsReadOnly>] NewCtorAsyncValidatorValidated<'value, 'validator wh
             | Error err -> return Error err
     }
 
-    static member MakeOptionAggregate (valueOption: 'value voption) = vtask {
+    static member MakeOptionAggregate(valueOption: 'value voption) = vtask {
         let! result = NewCtorAsyncValidatorValidated<'value, 'validator>.OfOptionAggregate(valueOption)
         return result |> EResult.get
     }
 
-    static member op_Implicit (validated: NewCtorAsyncValidatorValidated<'value, 'validator>) : 'value = validated.Value
+    static member op_Implicit(validated: NewCtorAsyncValidatorValidated<'value, 'validator>) : 'value = validated.Value
 
 type [<Struct; IsReadOnly>] InstanceAsyncValidatorValidated<'value, 'validator when 'validator :> IAsyncValidator<'value>>
 #if DEBUG || CHECKED
@@ -291,14 +291,14 @@ type [<Struct; IsReadOnly>] InstanceAsyncValidatorValidated<'value, 'validator w
     member this.OfValue(value: 'value) =
         InstanceAsyncValidatorValidated<'value, 'validator>.Of(value, this.Validator)
 
-    member inline this.MapOf ([<InlineIfLambda>] map: 'value -> 'value) =
+    member inline this.MapOf([<InlineIfLambda>] map: 'value -> 'value) =
         this.OfValue(map this.Value)
 
     [<EditorBrowsable(EditorBrowsableState.Never)>]
     member this.MakeValue(value: 'value) =
         InstanceAsyncValidatorValidated<'value, 'validator>.Of(value, this.Validator)
 
-    member inline this.MapMake ([<InlineIfLambda>] map: 'value -> 'value) =
+    member inline this.MapMake([<InlineIfLambda>] map: 'value -> 'value) =
         this.MakeValue(map this.Value)
 
     static member OfOption(valueOption: 'value voption, validator: 'validator) = vtask {
@@ -330,14 +330,14 @@ type [<Struct; IsReadOnly>] InstanceAsyncValidatorValidated<'value, 'validator w
     member this.OfValueAggregate(value: 'value) =
         InstanceAsyncValidatorValidated<'value, 'validator>.OfAggregate(value, this.Validator)
 
-    member inline this.MapAggregate ([<InlineIfLambda>] map: 'value -> 'value) =
+    member inline this.MapAggregate([<InlineIfLambda>] map: 'value -> 'value) =
         this.OfValueAggregate(map this.Value)
 
     [<EditorBrowsable(EditorBrowsableState.Never)>]
     member this.MakeValueAggregate(value: 'value) =
         InstanceAsyncValidatorValidated<'value, 'validator>.OfAggregate(value, this.Validator)
 
-    member inline this.MapMakeAggregate ([<InlineIfLambda>] map: 'value -> 'value) =
+    member inline this.MapMakeAggregate([<InlineIfLambda>] map: 'value -> 'value) =
         this.MakeValueAggregate(map this.Value)
 
     static member OfOptionAggregate(valueOption: 'value voption, validator: 'validator) = vtask {
@@ -354,6 +354,6 @@ type [<Struct; IsReadOnly>] InstanceAsyncValidatorValidated<'value, 'validator w
         return result |> EResult.get
     }
 
-    static member op_Implicit (validated: InstanceAsyncValidatorValidated<'value, 'validator>) : 'value = validated.Value
+    static member op_Implicit(validated: InstanceAsyncValidatorValidated<'value, 'validator>) : 'value = validated.Value
 
 #noward "0043"

@@ -8,6 +8,7 @@ open System.Threading.Tasks.Sources
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 open Microsoft.FSharp.Core.CompilerServices
 
+// TODO: use unsafe accessor to get this data and save an allocation
 #if StructData
 [<Struct>]
 type GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, 'TInitializer

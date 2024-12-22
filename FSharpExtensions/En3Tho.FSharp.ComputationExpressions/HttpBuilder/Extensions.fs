@@ -89,15 +89,20 @@ type HttpRequestMessageContentStage with
 type HttpClient with
     member inline this.Get(url: string) = HttpRequestMessageContentStage(this, HttpRequestMessage(HttpMethod.Get, url))
     member inline this.Get(url: Uri) = HttpRequestMessageContentStage(this, HttpRequestMessage(HttpMethod.Get, url))
+    member inline this.Get() = HttpRequestMessageContentStage(this, HttpRequestMessage(HttpMethod.Get, Unchecked.defaultof<Uri>))
 
     member inline this.Post(url: string) = HttpRequestMessageStage(this, HttpRequestMessage(HttpMethod.Post, url))
     member inline this.Post(url: Uri) = HttpRequestMessageStage(this, HttpRequestMessage(HttpMethod.Post, url))
+    member inline this.Post() = HttpRequestMessageStage(this, HttpRequestMessage(HttpMethod.Post, Unchecked.defaultof<Uri>))
 
     member inline this.Put(url: string) = HttpRequestMessageStage(this, HttpRequestMessage(HttpMethod.Put, url))
     member inline this.Put(url: Uri) = HttpRequestMessageStage(this, HttpRequestMessage(HttpMethod.Put, url))
+    member inline this.Put() = HttpRequestMessageStage(this, HttpRequestMessage(HttpMethod.Put, Unchecked.defaultof<Uri>))
 
     member inline this.Delete(url: string) = HttpRequestMessageStage(this, HttpRequestMessage(HttpMethod.Delete, url))
     member inline this.Delete(url: Uri) = HttpRequestMessageStage(this, HttpRequestMessage(HttpMethod.Delete, url))
+    member inline this.Delete() = HttpRequestMessageStage(this, HttpRequestMessage(HttpMethod.Delete, Unchecked.defaultof<Uri>))
 
     member inline this.Patch(url: string) = HttpRequestMessageStage(this, HttpRequestMessage(HttpMethod.Patch, url))
     member inline this.Patch(url: Uri) = HttpRequestMessageStage(this, HttpRequestMessage(HttpMethod.Patch, url))
+    member inline this.Patch() = HttpRequestMessageStage(this, HttpRequestMessage(HttpMethod.Patch, Unchecked.defaultof<Uri>))

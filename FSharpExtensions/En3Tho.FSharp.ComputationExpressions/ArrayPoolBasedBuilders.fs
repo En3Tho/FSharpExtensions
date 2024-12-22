@@ -8,7 +8,7 @@ open System.Runtime.InteropServices
 
 module ArrayPoolList =
     type ArrayPool<'a> with
-        member this.ReRent (array: 'a[] byref, newLength) =
+        member this.ReRent(array: 'a[] byref, newLength) =
             let newArray = this.Rent(newLength)
             Array.Copy(array, newArray, array.Length)
             this.Return(array)
@@ -23,7 +23,7 @@ module ArrayPoolList =
 
         new () = new ArrayPoolList<'a>(InitialSize)
 
-        member inline private this.UnsafeAdd value =
+        member this.UnsafeAdd(value) =
             let ref = &Unsafe.Add(&MemoryMarshal.GetArrayDataReference(array), count)
             ref <- value
             count <- count + 1
@@ -34,13 +34,13 @@ module ArrayPoolList =
         
         member this.Count = count
         
-        member this.Add value =
+        member this.Add(value) =
             this.EnsureArray()
-            this.UnsafeAdd value
+            this.UnsafeAdd(value)
         
         member this.Dispose() =
             if not (Object.ReferenceEquals(array, null)) then
-                ArrayPool.Shared.Return array
+                ArrayPool.Shared.Return(array)
         
         member this.CopyTo(memory: 'a Span) =
             Memory(array, 0, count).Span.CopyTo(memory)
@@ -78,15 +78,15 @@ type ArrayPoolList<'a> with
 
 type [<NoEquality; NoComparison; Struct>] BlockBuilder<'a>(builder: ArrayPoolList<'a>) =
     member this.Builder = builder
-    member inline this.Yield (value: 'a) : CollectionCode =
+    member inline this.Yield(value: 'a) : CollectionCode =
         let this = this
-        fun() -> this.Builder.Add value
-    member inline this.YieldFrom (values: 'a seq) : CollectionCode =
+        fun() -> this.Builder.Add(value)
+    member inline this.YieldFrom(values: 'a seq) : CollectionCode =
         let this = this
-        fun() -> for value in values do this.Builder.Add value
+        fun() -> for value in values do this.Builder.Add(value)
 
     member inline this.Zero() : CollectionCode = fun() -> ()
-    member inline this.Run ([<InlineIfLambda>] runExpr) =
+    member inline this.Run([<InlineIfLambda>] runExpr) =
         try
             runExpr()
             this.Builder.ToImmutableArray()
@@ -95,15 +95,15 @@ type [<NoEquality; NoComparison; Struct>] BlockBuilder<'a>(builder: ArrayPoolLis
 
 type [<NoEquality; NoComparison; Struct>] ResizeArrayBuilder<'a>(builder: ArrayPoolList<'a>) =
     member this.Builder = builder
-    member inline this.Yield (value: 'a) : CollectionCode =
+    member inline this.Yield(value: 'a) : CollectionCode =
         let this = this
-        fun() -> this.Builder.Add value
-    member inline this.YieldFrom (values: 'a seq) : CollectionCode =
+        fun() -> this.Builder.Add(value)
+    member inline this.YieldFrom(values: 'a seq) : CollectionCode =
         let this = this
-        fun() -> for value in values do this.Builder.Add value
+        fun() -> for value in values do this.Builder.Add(value)
 
     member inline this.Zero() : CollectionCode = fun() -> ()
-    member inline this.Run ([<InlineIfLambda>] runExpr) =
+    member inline this.Run([<InlineIfLambda>] runExpr) =
         try
             runExpr()
             this.Builder.ToResizeArray()
@@ -112,15 +112,15 @@ type [<NoEquality; NoComparison; Struct>] ResizeArrayBuilder<'a>(builder: ArrayP
 
 type [<NoEquality; NoComparison; Struct>] ArrayBuilder<'a>(builder: ArrayPoolList<'a>) =
     member this.Builder = builder
-    member inline this.Yield (value: 'a) : CollectionCode =
+    member inline this.Yield(value: 'a) : CollectionCode =
         let this = this
-        fun() -> this.Builder.Add value
-    member inline this.YieldFrom (values: 'a seq) : CollectionCode =
+        fun() -> this.Builder.Add(value)
+    member inline this.YieldFrom(values: 'a seq) : CollectionCode =
         let this = this
-        fun() -> for value in values do this.Builder.Add value
+        fun() -> for value in values do this.Builder.Add(value)
 
     member inline this.Zero() : CollectionCode = fun() -> ()
-    member inline this.Run ([<InlineIfLambda>] runExpr) =
+    member inline this.Run([<InlineIfLambda>] runExpr) =
         try
             runExpr()
             this.Builder.ToArray()
@@ -129,15 +129,15 @@ type [<NoEquality; NoComparison; Struct>] ArrayBuilder<'a>(builder: ArrayPoolLis
 
 type [<NoEquality; NoComparison; Struct>] UnsafeBlockBuilder<'a>(builder: ArrayPoolList<'a>) =
     member this.Builder = builder
-    member inline this.Yield (value: 'a) : CollectionCode =
+    member inline this.Yield(value: 'a) : CollectionCode =
         let this = this
-        fun() -> this.Builder.Add value
-    member inline this.YieldFrom (values: 'a seq) : CollectionCode =
+        fun() -> this.Builder.Add(value)
+    member inline this.YieldFrom(values: 'a seq) : CollectionCode =
         let this = this
-        fun() -> for value in values do this.Builder.Add value
+        fun() -> for value in values do this.Builder.Add(value)
 
     member inline this.Zero() : CollectionCode = fun() -> ()
-    member inline this.Run ([<InlineIfLambda>] runExpr) =
+    member inline this.Run([<InlineIfLambda>] runExpr) =
         runExpr()
         let result = this.Builder.ToImmutableArray()
         this.Builder.Dispose()
@@ -145,15 +145,15 @@ type [<NoEquality; NoComparison; Struct>] UnsafeBlockBuilder<'a>(builder: ArrayP
 
 type [<NoEquality; NoComparison; Struct>] UnsafeResizeArrayBuilder<'a>(builder: ArrayPoolList<'a>) =
     member this.Builder = builder
-    member inline this.Yield (value: 'a) : CollectionCode =
+    member inline this.Yield(value: 'a) : CollectionCode =
         let this = this
-        fun() -> this.Builder.Add value
-    member inline this.YieldFrom (values: 'a seq) : CollectionCode =
+        fun() -> this.Builder.Add(value)
+    member inline this.YieldFrom(values: 'a seq) : CollectionCode =
         let this = this
-        fun() -> for value in values do this.Builder.Add value
+        fun() -> for value in values do this.Builder.Add(value)
 
     member inline this.Zero() : CollectionCode = fun() -> ()
-    member inline this.Run ([<InlineIfLambda>] runExpr) =
+    member inline this.Run([<InlineIfLambda>] runExpr) =
         runExpr()
         let result = this.Builder.ToResizeArray()
         this.Builder.Dispose()
@@ -161,15 +161,15 @@ type [<NoEquality; NoComparison; Struct>] UnsafeResizeArrayBuilder<'a>(builder: 
 
 type [<NoEquality; NoComparison; Struct>] UnsafeArrayBuilder<'a>(builder: ArrayPoolList<'a>) =
     member this.Builder = builder
-    member inline this.Yield (value: 'a) : CollectionCode =
+    member inline this.Yield(value: 'a) : CollectionCode =
         let this = this
-        fun() -> this.Builder.Add value
-    member inline this.YieldFrom (values: 'a seq) : CollectionCode =
+        fun() -> this.Builder.Add(value)
+    member inline this.YieldFrom(values: 'a seq) : CollectionCode =
         let this = this
-        fun() -> for value in values do this.Builder.Add value
+        fun() -> for value in values do this.Builder.Add(value)
 
     member inline this.Zero() : CollectionCode = fun() -> ()
-    member inline this.Run ([<InlineIfLambda>] runExpr) =
+    member inline this.Run([<InlineIfLambda>] runExpr) =
         runExpr()
         let result = this.Builder.ToArray()
         this.Builder.Dispose()

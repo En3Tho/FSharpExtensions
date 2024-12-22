@@ -41,13 +41,13 @@ type [<Struct; IsReadOnly>] HttpRequestMessageResponseStage<'TResponseSerializer
     member this.GetAwaiter() = this.Send().GetAwaiter()
 
     member inline this.Bind(_: GetRequestIntrinsic, [<InlineIfLambda>] code: HttpRequestMessage -> HttpRequestMessageResponseStageCode) : HttpRequestMessageResponseStageCode =
-        HttpRequestMessageResponseStageCode(fun request -> (code request).Invoke request)
+        HttpRequestMessageResponseStageCode(fun request -> (code request).Invoke(request))
 
     member inline this.Yield([<InlineIfLambda>] code: RequestHeadersBuilderCode) : HttpRequestMessageResponseStageCode =
-        HttpRequestMessageResponseStageCode(fun request -> code.Invoke request.Headers)
+        HttpRequestMessageResponseStageCode(fun request -> code.Invoke(request.Headers))
 
     member inline this.Yield([<InlineIfLambda>] code: ContentHeadersBuilderCode) : HttpRequestMessageResponseStageCode =
-        HttpRequestMessageResponseStageCode(fun request -> code.Invoke request.Content.Headers)
+        HttpRequestMessageResponseStageCode(fun request -> code.Invoke(request.Content.Headers))
 
     member inline _.Combine([<InlineIfLambda>] first: HttpRequestMessageResponseStageCode, [<InlineIfLambda>] second: HttpRequestMessageResponseStageCode) : HttpRequestMessageResponseStageCode =
         HttpRequestMessageResponseStageCode(fun builder ->

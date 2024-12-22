@@ -6,6 +6,11 @@ open System.Text.Json.Serialization
 open En3Tho.FSharp.Validation
 open En3Tho.FSharp.Validation.CommonValidatedTypes
 
+module Placeholders =    
+    type PlaceholderValidatorForTypedefof<'a> = PlainValue.Validator<'a>
+
+open Placeholders
+
 type NewCtorValidatorValidatedJsonConverter<'value, 'validator when 'validator: (new: unit -> 'validator) and 'validator :> IValidator<'value>>() =
     inherit JsonConverter<NewCtorValidatorValidated<'value, 'validator>>()
 
@@ -21,7 +26,7 @@ type NewCtorValidatorValidatedJsonConverterFactory() =
 
     override this.CreateConverter(typeToConvert, options) =
         let typeArguments = typeToConvert.GetGenericArguments()
-        let converterType = typedefof<NewCtorValidatorValidatedJsonConverter<_, PlainValue.Validator<_>>>.MakeGenericType(typeArguments)
+        let converterType = typedefof<NewCtorValidatorValidatedJsonConverter<_, PlaceholderValidatorForTypedefof<_>>>.MakeGenericType(typeArguments)
         Activator.CreateInstance(converterType) :?> JsonConverter
 
     override this.CanConvert(typeToConvert) =
@@ -43,13 +48,13 @@ type WriteOnlyNewCtorAsyncValidatorValidatedJsonConverterFactory() =
 
     override this.CreateConverter(typeToConvert, options) =
         let typeArguments = typeToConvert.GetGenericArguments()
-        let converterType = typedefof<WriteOnlyNewCtorAsyncValidatorValidatedJsonConverter<_, PlainValue.Validator<_>>>.MakeGenericType(typeArguments)
+        let converterType = typedefof<WriteOnlyNewCtorAsyncValidatorValidatedJsonConverter<_, PlaceholderValidatorForTypedefof<_>>>.MakeGenericType(typeArguments)
         Activator.CreateInstance(converterType) :?> JsonConverter
 
     override this.CanConvert(typeToConvert) =
         typeToConvert.IsGenericType
         && (let typeToConvert = if typeToConvert.IsGenericTypeDefinition then typeToConvert else typeToConvert.GetGenericTypeDefinition()
-            typeToConvert.Equals(typedefof<NewCtorAsyncValidatorValidated<_, PlainValue.Validator<_>>>))
+            typeToConvert.Equals(typedefof<NewCtorAsyncValidatorValidated<_, PlaceholderValidatorForTypedefof<_>>>))
 
 type WriteOnlyInstanceValidatorValidatedJsonConverter<'value, 'validator when 'validator: (new: unit -> 'validator) and 'validator :> IValidator<'value>>() =
     inherit JsonConverter<InstanceValidatorValidated<'value, 'validator>>()
@@ -65,13 +70,13 @@ type WriteOnlyInstanceValidatorValidatedJsonConverterFactory() =
 
     override this.CreateConverter(typeToConvert, options) =
         let typeArguments = typeToConvert.GetGenericArguments()
-        let converterType = typedefof<WriteOnlyInstanceValidatorValidatedJsonConverter<_, PlainValue.Validator<_>>>.MakeGenericType(typeArguments)
+        let converterType = typedefof<WriteOnlyInstanceValidatorValidatedJsonConverter<_, PlaceholderValidatorForTypedefof<_>>>.MakeGenericType(typeArguments)
         Activator.CreateInstance(converterType) :?> JsonConverter
 
     override this.CanConvert(typeToConvert) =
         typeToConvert.IsGenericType
         && (let typeToConvert = if typeToConvert.IsGenericTypeDefinition then typeToConvert else typeToConvert.GetGenericTypeDefinition()
-            typeToConvert.Equals(typedefof<InstanceValidatorValidated<_, PlainValue.Validator<_>>>))
+            typeToConvert.Equals(typedefof<InstanceValidatorValidated<_, PlaceholderValidatorForTypedefof<_>>>))
 
 type WriteOnlyInstanceAsyncValidatorValidatedJsonConverter<'value, 'validator when 'validator: (new: unit -> 'validator) and 'validator :> IValidator<'value>>() =
     inherit JsonConverter<InstanceAsyncValidatorValidated<'value, 'validator>>()
@@ -87,13 +92,13 @@ type WriteOnlyInstanceAsyncValidatorValidatedJsonConverterFactory() =
 
     override this.CreateConverter(typeToConvert, options) =
         let typeArguments = typeToConvert.GetGenericArguments()
-        let converterType = typedefof<WriteOnlyInstanceAsyncValidatorValidatedJsonConverter<_, PlainValue.Validator<_>>>.MakeGenericType(typeArguments)
+        let converterType = typedefof<WriteOnlyInstanceAsyncValidatorValidatedJsonConverter<_, PlaceholderValidatorForTypedefof<_>>>.MakeGenericType(typeArguments)
         Activator.CreateInstance(converterType) :?> JsonConverter
 
     override this.CanConvert(typeToConvert) =
         typeToConvert.IsGenericType
         && (let typeToConvert = if typeToConvert.IsGenericTypeDefinition then typeToConvert else typeToConvert.GetGenericTypeDefinition()
-            typeToConvert.Equals(typedefof<InstanceAsyncValidatorValidated<_, PlainValue.Validator<_>>>))
+            typeToConvert.Equals(typedefof<InstanceAsyncValidatorValidated<_, PlaceholderValidatorForTypedefof<_>>>))
 
 [<AutoOpen>]
 module JsonSerializerOptionsExtensions =

@@ -50,6 +50,15 @@ module GSeq =
     let filter filter enumerator = StructFilterEnumerator(filter, enumerator)
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    let chooseOption chooser enumerator = StructChooseOptionEnumerator(chooser, enumerator)
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    let choose2Option enumerator2 chooser enumerator = StructChoose2OptionEnumerator(chooser, enumerator, enumerator2)
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    let choose3Option enumerator2 enumerator3 chooser enumerator = StructChoose3OptionEnumerator(chooser, enumerator, enumerator2, enumerator3)
+
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let choose chooser enumerator = StructChooseEnumerator(chooser, enumerator)
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
@@ -59,22 +68,13 @@ module GSeq =
     let choose3 enumerator2 enumerator3 chooser enumerator = StructChoose3Enumerator(chooser, enumerator, enumerator2, enumerator3)
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let valueChoose chooser enumerator = StructValueChooseEnumerator(chooser, enumerator)
-
-    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let valueChoose2 enumerator2 chooser enumerator = StructValueChoose2Enumerator(chooser, enumerator, enumerator2)
-
-    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let valueChoose3 enumerator2 enumerator3 chooser enumerator = StructValueChoose3Enumerator(chooser, enumerator, enumerator2, enumerator3)
-
-    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let append enumerator2 enumerator = StructAppendEnumerator(enumerator, enumerator2)
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let zip enumerator2 enumerator = StructZipEnumerator(enumerator, enumerator2)
+    let zipTuple enumerator2 enumerator = StructZipTupleEnumerator(enumerator, enumerator2)
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let valueZip enumerator2 enumerator = StructValueZipEnumerator(enumerator, enumerator2)
+    let zip enumerator2 enumerator = StructZipEnumerator(enumerator, enumerator2)
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let map map enumerator = StructMapEnumerator(map, enumerator)
@@ -176,7 +176,7 @@ module GSeq =
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let forall2 (enumerator2: SStructEnumerator<'i2,'e2>) filter (enumerator: SStructEnumerator<'i,'e>) =
-        let filter = OptimizedClosures.FSharpFunc<_,_,_>.Adapt filter
+        let filter = OptimizedClosures.FSharpFunc<_,_,_>.Adapt(filter)
         let mutable enumerator = enumerator
         let mutable enumerator2 = enumerator2
         let mutable result = true
@@ -186,7 +186,7 @@ module GSeq =
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let forall3 (enumerator2: SStructEnumerator<'i2,'e2>) (enumerator3: SStructEnumerator<'i2,'e2>) filter (enumerator: SStructEnumerator<'i,'e>) =
-        let filter = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt filter
+        let filter = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt(filter)
         let mutable enumerator = enumerator
         let mutable enumerator2 = enumerator2
         let mutable enumerator3 = enumerator3
@@ -225,7 +225,7 @@ module GSeq =
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let fold initial folder (enumerator: SStructEnumerator<'i,'e>) =
-        let folder = OptimizedClosures.FSharpFunc<_,_,_>.Adapt folder
+        let folder = OptimizedClosures.FSharpFunc<_,_,_>.Adapt(folder)
         let mutable enumerator = enumerator
         let mutable result = initial
         while enumerator.MoveNext() do
@@ -234,7 +234,7 @@ module GSeq =
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let fold2 (enumerator2: SStructEnumerator<'i2,'e2>) initial folder (enumerator: SStructEnumerator<'i,'e>) =
-        let folder = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt folder
+        let folder = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt(folder)
         let mutable enumerator = enumerator
         let mutable enumerator2 = enumerator2
         let mutable result = initial
@@ -244,7 +244,7 @@ module GSeq =
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let foldi initial folder (enumerator: SStructEnumerator<'i,'e>) =
-        let folder = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt folder
+        let folder = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt(folder)
         let mutable enumerator = enumerator
         let mutable count = 0
         let mutable result = initial
@@ -255,7 +255,7 @@ module GSeq =
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let foldi2 (enumerator2: SStructEnumerator<'i2,'e2>) initial folder (enumerator: SStructEnumerator<'i,'e>) =
-        let folder = OptimizedClosures.FSharpFunc<_,_,_,_,_>.Adapt folder
+        let folder = OptimizedClosures.FSharpFunc<_,_,_,_,_>.Adapt(folder)
         let mutable enumerator = enumerator
         let mutable enumerator2 = enumerator2
         let mutable count = 0
@@ -273,7 +273,7 @@ module GSeq =
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let iter2 (enumerator2: SStructEnumerator<'i2,'e2>) action (enumerator: SStructEnumerator<'i,'e>) =
-        let action = OptimizedClosures.FSharpFunc<_,_,_>.Adapt action
+        let action = OptimizedClosures.FSharpFunc<_,_,_>.Adapt(action)
         let mutable enumerator = enumerator
         let mutable enumerator2 = enumerator2
         while enumerator.MoveNext() && enumerator2.MoveNext() do
@@ -487,22 +487,22 @@ module GSeqv =
     let filter state filter enumerator = StructFilterVEnumerator(state, filter, enumerator)
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let choose state chooser enumerator = StructChooseVEnumerator(state, chooser, enumerator)
+    let chooseOption state chooser enumerator = StructChooseOptionVEnumerator(state, chooser, enumerator)
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let choose2 state enumerator2 chooser enumerator = StructChoose2VEnumerator(state, chooser, enumerator, enumerator2)
+    let chooseOption2 state enumerator2 chooser enumerator = StructChooseOption2VEnumerator(state, chooser, enumerator, enumerator2)
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let choose3 state enumerator2 enumerator3 chooser enumerator = StructChoose3VEnumerator(state, chooser, enumerator, enumerator2, enumerator3)
+    let chooseOption3 state enumerator2 enumerator3 chooser enumerator = StructChooseOption3VEnumerator(state, chooser, enumerator, enumerator2, enumerator3)
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let valueChoose state chooser enumerator = StructValueChooseVEnumerator(state, chooser, enumerator)
+    let choose state chooser enumerator = StructValueChooseVEnumerator(state, chooser, enumerator)
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let valueChoose2 state enumerator2 chooser enumerator = StructValueChoose2VEnumerator(state, chooser, enumerator, enumerator2)
+    let choose2 state enumerator2 chooser enumerator = StructValueChoose2VEnumerator(state, chooser, enumerator, enumerator2)
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    let valueChoose3 state enumerator2 enumerator3 chooser enumerator = StructValueChoose3VEnumerator(state, chooser, enumerator, enumerator2, enumerator3)
+    let choose3 state enumerator2 enumerator3 chooser enumerator = StructValueChoose3VEnumerator(state, chooser, enumerator, enumerator2, enumerator3)
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let map state map enumerator = StructMapVEnumerator(state, map, enumerator)

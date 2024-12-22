@@ -54,6 +54,7 @@ type UnitLikeCodeExtensions() =
             )
         )
 
+    // This one is for GSeq mainly
     [<Extension; EditorBrowsable(EditorBrowsableState.Never)>]
     static member inline For<'T, 'TEnumerator when 'TEnumerator :> IEnumerator<'T>>(_, enumerator: 'TEnumerator, [<InlineIfLambda>] forExpr: 'T -> CollectionCode) : CollectionCode =
         fun () ->

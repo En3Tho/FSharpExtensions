@@ -5,7 +5,7 @@ open BenchmarkDotNet.Attributes
 
 module FastEquality =
     type T = T with
-        static member inline ($) (_, structEquatable: ^a when ^a :> IEquatable< ^a> and ^a: struct) = fun (value: ^a) -> structEquatable.Equals(value)
+        static member inline ($) (_, structEquatable: ^a when ^a :> IEquatable<^a> and ^a: struct) = fun (value: ^a) -> structEquatable.Equals(value)
         static member inline ($) (_, refEquatable: 'a when 'a: not struct) = fun (value: 'b when 'b: not struct) -> refEquatable.Equals(value)
 
     let inline (====) a b = (T $ a) b

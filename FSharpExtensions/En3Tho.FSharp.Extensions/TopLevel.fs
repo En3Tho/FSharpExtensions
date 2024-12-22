@@ -24,22 +24,22 @@ module Core =
         static member inline defer(value, value2, value3, [<InlineIfLambda>] disposer) = ValueDisposable3(value, value2, value3, disposer)
 
     /// cast via op_Implicit
-    let inline icast< ^a, ^b when (^a or ^b): (static member op_Implicit: ^a -> ^b)> (value: ^a): ^b = ((^a or ^b): (static member op_Implicit: ^a -> ^b) value)
+    let inline icast<^a, ^b when (^a or ^b): (static member op_Implicit: ^a -> ^b)> (value: ^a): ^b = ((^a or ^b): (static member op_Implicit: ^a -> ^b) value)
 
     /// cast via op_Explicit
-    let inline ecast< ^a, ^b when (^a or ^b): (static member op_Explicit: ^a -> ^b)> (value: ^a): ^b = ((^a or ^b): (static member op_Explicit: ^a -> ^b) value)
+    let inline ecast<^a, ^b when (^a or ^b): (static member op_Explicit: ^a -> ^b)> (value: ^a): ^b = ((^a or ^b): (static member op_Explicit: ^a -> ^b) value)
 
     /// unsafe cast
     let inline ucast<'a, 'b> (a: 'a): 'b = (# "" a: 'b #)
 
     let ignore2 _ _ = ()
     let ignore3 _ _ _ = ()
-    let inline referenceEquals< ^a when ^a : not struct> (obj1: ^a) (obj2: ^a) = Object.ReferenceEquals(obj1, obj2)
+    let inline referenceEquals<^a when ^a : not struct> (obj1: ^a) (obj2: ^a) = Object.ReferenceEquals(obj1, obj2)
 
-    let inline isNull< ^a when ^a : not struct> (obj: ^a) = Object.ReferenceEquals(obj, null)
-    let inline isNotNull< ^a when ^a : not struct> (obj: ^a) = not (Object.ReferenceEquals(obj, null))
-    let inline nullRef< ^a when ^a: not struct> = Unchecked.defaultof< ^a>
-    let inline nullVal< ^a when ^a: struct> = Unchecked.defaultof< ^a>
+    let inline isNull<^a when ^a : not struct> (obj: ^a) = Object.ReferenceEquals(obj, null)
+    let inline isNotNull<^a when ^a : not struct> (obj: ^a) = not (Object.ReferenceEquals(obj, null))
+    let inline nullRef<^a when ^a: not struct> = Unchecked.defaultof<^a>
+    let inline nullVal<^a when ^a: struct> = Unchecked.defaultof<^a>
 
     // Hints to myself when dealing with lifetimes
     type Rented<'a> = 'a
@@ -60,6 +60,12 @@ module Core =
     let inline (--) key value = KeyValuePair(key, value)
     let inline (~%) value = (^a: (member Value: ^b) value)
 
+    let inline (!) value = not value
+    /// like a default value ( or ?? value in C#)
+    let inline (??->) a v = if isNull a then v else a
+    /// like a default with (or ?? expr in C#)
+    let inline (???->) a ([<InlineIfLambda>] f) = if isNull a then f() else a
+
     [<AbstractClass; Sealed; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     type SelfExtensions =
         [<Extension; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
@@ -68,25 +74,22 @@ module Core =
 [<AutoOpen; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 module PipeAndCompositionOperatorEx =
 
-    [<AutoOpen; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-    module Pipe1 =
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    type T = T with
+        static member inline($) (_, invokable) = fun value -> (^a: (member Invoke: ^b -> ^c) invokable, value)
+        static member inline($) (_, [<InlineIfLambda>] invokable: 'a -> 'b) = fun value -> invokable value
 
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-        type T = T with
-            static member inline ($) (_, invokable) = fun value -> (^a: (member Invoke: ^b -> ^c) invokable, value)
-            static member inline ($) (_, [<InlineIfLambda>] invokable: 'a -> 'b) = fun value -> invokable value
-
-        let inline (|>) value invokable = (T $ invokable) value
-        let inline (>>) f1 f2 = fun value -> (T $ f2) ((T $ f1) value)
-        let inline (<<) f1 f2 = fun value -> (T $ f1) ((T $ f2) value)
+    let inline (|>) value invokable = (T $ invokable) value
+    let inline (>>) f1 f2 = fun value -> (T $ f2) ((T $ f1) value)
+    let inline (<<) f1 f2 = fun value -> (T $ f1) ((T $ f2) value)
 
 [<AutoOpen; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 module Pipe2 =
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     type T = T with
-        static member inline ($) (T, invokable: ^a) = fun (value1, value2) -> (^a: (member Invoke: 'b * 'c -> 'd) invokable, value1, value2)
-        static member inline ($) (T, [<InlineIfLambda>] invokable: 'a -> 'b -> 'c) = fun (value1, value2) -> invokable value1 value2
+        static member inline($) (T, invokable: ^a) = fun (value1, value2) -> (^a: (member Invoke: 'b * 'c -> 'd) invokable, value1, value2)
+        static member inline($) (T, [<InlineIfLambda>] invokable: 'a -> 'b -> 'c) = fun (value1, value2) -> invokable value1 value2
 
     let inline (||>) (value1: 'b, value2: 'c) invokable =
         (T $ invokable) (value1, value2)
@@ -96,8 +99,8 @@ module Pipe3 =
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     type T = T with
-        static member inline ($) (T, invokable: ^a) = fun (value1, value2, value3) -> (^a: (member Invoke: 'b * 'c * 'd -> 'e) invokable, value1, value2, value3)
-        static member inline ($) (T, [<InlineIfLambda>] invokable: 'a -> 'b -> 'c -> 'd) = fun (value1, value2, value3) -> invokable value1 value2 value3
+        static member inline($) (T, invokable: ^a) = fun (value1, value2, value3) -> (^a: (member Invoke: 'b * 'c * 'd -> 'e) invokable, value1, value2, value3)
+        static member inline($) (T, [<InlineIfLambda>] invokable: 'a -> 'b -> 'c -> 'd) = fun (value1, value2, value3) -> invokable value1 value2 value3
 
     let inline (|||>) (value1: 'b, value2: 'c, value3: 'd) invokable =
         (T $ invokable) (value1, value2, value3)
@@ -107,8 +110,8 @@ module InvokeEx =
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     type T = T with
-        static member inline ($) (_, invokable) = fun value -> (^a: (member Invoke: ^b -> ^c) invokable, value)
-        static member inline ($) (_, [<InlineIfLambda>] invokable: 'a -> 'b) = fun value -> invokable value
+        static member inline($) (_, invokable) = fun value -> (^a: (member Invoke: ^b -> ^c) invokable, value)
+        static member inline($) (_, [<InlineIfLambda>] invokable: 'a -> 'b) = fun value -> invokable value
 
     let inline (^) invokable value = (T $ invokable) value
 
@@ -244,7 +247,9 @@ module IEquatableEqualityOperatorEx =
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     type ValueEquality = ValueEquality with
-        static member inline ($) (ValueEquality, value) = fun otherValue -> callIEquatableEqualsOnValues value otherValue
+        static member inline($) (ValueEquality, value) = fun otherValue -> callIEquatableEqualsOnValues value otherValue
+        // TODO: what about op_Equals?
+        // TODO: check v64-v512 here
 
     let inline (==) a b = (ValueEquality $ a) b
 
@@ -255,15 +260,16 @@ module IEquatableEqualityOperatorEx =
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     type CollectionEquality = CollectionEquality with
-        static member inline ($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnArrays value otherValue
-        static member inline ($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnMemory value otherValue
-        static member inline ($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnReadOnlyMemory value otherValue
-        static member inline ($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnResizeArrays value otherValue
-        static member inline ($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnLists value otherValue
-        static member inline ($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnLinkedLists value otherValue
-        static member inline ($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnSeq value otherValue
-        static member inline ($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnHashSets value otherValue
-        static member inline ($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnDictionaries value otherValue
+        static member inline($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnArrays value otherValue
+        static member inline($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnMemory value otherValue
+        static member inline($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnReadOnlyMemory value otherValue
+        static member inline($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnResizeArrays value otherValue
+        static member inline($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnLists value otherValue
+        static member inline($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnLinkedLists value otherValue
+        static member inline($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnSeq value otherValue
+        static member inline($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnHashSets value otherValue
+        static member inline($) (CollectionEquality, value) = fun otherValue -> callIEquatableEqualsOnDictionaries value otherValue
+        // TODO: experiment with allows ref struct and add spans here
 
     let inline (===) a b = (CollectionEquality $ a) b
 
@@ -277,7 +283,7 @@ module ByRefOperators =
     let inline neg (a: 'a byref) = a <- (~-)a
     /// like a default value ( or ?? value in C#)
     let inline (??<-) (a: 'a byref) v = if isNull a then a <- v
-    /// like a default with (or ?? expr in C#)
+    /// like a default with (or ??= expr in C#)
     let inline (???<-) (a: 'a byref) ([<InlineIfLambda>] f) = if isNull a then a <- f()
     /// like +=
     let inline (+<-) (a: 'a byref) v = a <- a + v

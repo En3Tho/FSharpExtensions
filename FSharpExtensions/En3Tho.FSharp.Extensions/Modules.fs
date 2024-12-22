@@ -63,8 +63,8 @@ module Printf =
 
 module Option =
     let someObj = Some()
-    let inline ofString str = if String.IsNullOrEmpty str then None else Some str
-    let inline ofStringW str = if String.IsNullOrWhiteSpace str then None else Some str
+    let inline ofString str = if String.IsNullOrEmpty(str) then None else Some str
+    let inline ofStringW str = if String.IsNullOrWhiteSpace(str) then None else Some str
     let inline ofBool bool = if bool then someObj else None
     let inline ofTryPattern (success, value) = if success then Some value else None
     let inline ofTryCast<'a when 'a: not struct> value =
@@ -86,8 +86,8 @@ module Option =
         | None -> ()
 
 module ValueOption =
-    let inline ofString str = if String.IsNullOrEmpty str then ValueNone else ValueSome str
-    let inline ofStringW str = if String.IsNullOrWhiteSpace str then ValueNone else ValueSome str
+    let inline ofString str = if String.IsNullOrEmpty(str) then ValueNone else ValueSome str
+    let inline ofStringW str = if String.IsNullOrWhiteSpace(str) then ValueNone else ValueSome str
     let inline ofBool bool = if bool then ValueSome() else ValueNone
     let inline ofTryPattern (success, value) = if success then ValueSome value else ValueNone
     let inline ofTryCast<'a when 'a: not struct> value =
@@ -122,10 +122,10 @@ module Enum =
     let inline isValid (value: EnumShape<'a>) =
         Enum.GetValues<'a>().AsSpan().Contains value
 
-    let [<return: Struct>] inline (|HasFlag|_|) flag value = hasFlag flag value |> ValueOption.ofBool
-    let [<return: Struct>] inline (|HasFlagNot|_|) flag value = hasFlag flag value |> not |> ValueOption.ofBool
-    let [<return: Struct>] inline (|Valid|_|) value = isValid value |> ValueOption.ofBool
-    let [<return: Struct>] inline (|ValidNot|_|) value = isValid value |> not |> ValueOption.ofBool
+    let inline (|HasFlag|_|) flag value = hasFlag flag value
+    let inline (|NotHasFlag|_|) flag value = hasFlag flag value |> not
+    let inline (|Valid|_|) value = isValid value
+    let inline (|NotValid|_|) value = isValid value |> not
 
 module Result =
     /// wraps a function with unit argument into try catch block returning a result
@@ -202,13 +202,12 @@ module EResult =
 
     let inline trySetCurrentStackTrace (result: EResult<'a, 'b>) =
         match result with
-        | Error exn when String.IsNullOrEmpty exn.StackTrace ->
+        | Error exn when String.IsNullOrEmpty(exn.StackTrace) ->
             exn |> ExceptionDispatchInfo.SetCurrentStackTrace :?> 'b |> Error
         | _ ->
             result
 
 module Byref =
-
     /// all setters are reversed (byref is first parameter) because usually you want to write something into byref
     /// and pass (setv &ref or similar) into a function which then will write the value
     let inline setv (a: 'a byref) v = a <- v
@@ -262,337 +261,27 @@ module Array =
     let inline ofObj2 x1 x2 = [| x1; x2 |]
     let inline ofObj3 x1 x2 x3 = [| x1; x2; x3 |]
 
-    let [<return: Struct>] inline (|NullOrEmpty|_|) (arr: 'a[]) =
-        (Object.ReferenceEquals(arr, null) || arr.Length = 0) |> ValueOption.ofBool
+    let inline (|NullOrEmpty|_|) (arr: 'a[]) =
+        (Object.ReferenceEquals(arr, null) || arr.Length = 0)
 
-    let [<return: Struct>] inline (|NotNullOrEmpty|_|) (arr: 'a[]) =
-        (Object.ReferenceEquals(arr, null) || arr.Length = 0) |> not |> ValueOption.ofBool
+    let inline (|NotNullOrEmpty|_|) (arr: 'a[]) =
+        (Object.ReferenceEquals(arr, null) || arr.Length = 0) |> not
 
 module List =
     let inline replace original replacement list =
         list |> List.map (fun value -> if value = original then replacement else value)
     let inline replaceBy ([<InlineIfLambda>] map) replacement list =
         list |> List.map (fun value -> if map value = map replacement then replacement else value)
+
     let inline ofObj x = [ x ]
     let inline ofObj2 x1 x2 = [ x1; x2 ]
     let inline ofObj3 x1 x2 x3 = [ x1; x2; x3 ]
 
-    let [<return: Struct>] inline (|NullOrEmpty|_|) (list: 'a list) =
-        (Object.ReferenceEquals(list, null) || list.IsEmpty) |> ValueOption.ofBool
+    let inline (|NullOrEmpty|_|) (list: 'a list) =
+        (Object.ReferenceEquals(list, null) || list.IsEmpty)
 
-    let [<return: Struct>] inline (|NotNullOrEmpty|_|) (list: 'a list) =
-        (Object.ReferenceEquals(list, null) || list.IsEmpty) |> not |> ValueOption.ofBool
-
-// From https://github.com/fsharp/fsharp/blob/master/src/utils/ResizeArray.fs
-// TODO: rewrite these with cool stuff from CollectionsMarshal
-module ResizeArray =
-    let add value (arr: ResizeArray<'T>) = arr.Add value
-    let remove value (arr: ResizeArray<'T>) = arr.Remove value
-    let removeAll value (arr: ResizeArray<'T>) = arr.RemoveAll value
-    let removeAt index (arr: ResizeArray<'T>) = arr.RemoveAt index
-    let isNullOrEmpty (arr: ResizeArray<'T>) = arr |> isNull || arr.Count = 0
-    let defaultValue def (arr: ResizeArray<'T>) = if arr |> isNullOrEmpty then def else arr
-    let defaultWith defThunk (arr: ResizeArray<'T>) = if arr |> isNullOrEmpty then defThunk() else arr
-
-    let length (arr: ResizeArray<'T>) = arr.Count
-
-    let get (arr: ResizeArray<'T>) (n: int) = arr[n]
-
-    let set (arr: ResizeArray<'T>) (n: int) (x:'T) = arr[n] <- x
-
-    let create (n: int) x = ResizeArray<_>(seq { for _ in 1 .. n -> x })
-
-    let init (n: int) (f: int -> 'T) =  ResizeArray<_>(seq { for i in 0 .. n-1 -> f i })
-
-    let blit (arr1: ResizeArray<'T>) start1 (arr2: ResizeArray<'T>) start2 len =
-        if start1 < 0 then invalidArg "start1" "index must be positive"
-        if start2 < 0 then invalidArg "start2" "index must be positive"
-        if len < 0 then invalidArg "len" "length must be positive"
-        if start1 + len > length arr1 then invalidArg "start1" "(start1+len) out of range"
-        if start2 + len > length arr2 then invalidArg "start2" "(start2+len) out of range"
-        for i = 0 to len - 1 do
-            arr2[start2 + i] <- arr1[start1 + i]
-
-    let concat (arrs: ResizeArray<'T> list) = ResizeArray<_>(seq { for arr in arrs do for x in arr do yield x })
-
-    let append (arr1: ResizeArray<'T>) (arr2: ResizeArray<'T>) = concat [arr1; arr2]
-
-    let sub (arr: ResizeArray<'T>) start len =
-        if start < 0 then invalidArg "start" "index must be positive"
-        if len < 0 then invalidArg "len" "length must be positive"
-        if start + len > length arr then invalidArg "len" "length must be positive"
-        ResizeArray<_>(seq { for i in start .. start+len-1 -> arr[i] })
-
-    let fill (arr: ResizeArray<'T>) (start: int) (len: int) (x:'T) =
-        if start < 0 then invalidArg "start" "index must be positive"
-        if len < 0 then invalidArg "len" "length must be positive"
-        if start + len > length arr then invalidArg "len" "length must be positive"
-        for i = start to start + len - 1 do
-            arr[i] <- x
-
-    let copy (arr: ResizeArray<'T>) = ResizeArray<_>(arr)
-
-    let toList (arr: ResizeArray<_>) =
-        let mutable res = []
-        for i = length arr - 1 downto 0 do
-            res <- arr[i] :: res
-        res
-
-    let ofList (l: _ list) =
-        let len = l.Length
-        let res = ResizeArray<_>(len)
-        let rec add = function
-          | [] -> ()
-          | e::l -> res.Add(e); add l
-        add l
-        res
-
-    let iter f (arr: ResizeArray<_>) =
-        for i = 0 to arr.Count - 1 do
-            f arr[i]
-
-    let map f (arr: ResizeArray<_>) =
-        let len = length arr
-        let res = ResizeArray<_>(len)
-        for i = 0 to len - 1 do
-            res.Add(f arr[i])
-        res
-
-    let mapi f (arr: ResizeArray<_>) =
-        let len = length arr
-        let res = ResizeArray<_>(len)
-        for i = 0 to len - 1 do
-            res.Add(f i arr[i])
-        res
-
-    let iteri f (arr: ResizeArray<_>) =
-        for i = 0 to arr.Count - 1 do
-            f i arr[i]
-
-    let exists (f: 'T -> bool) (arr: ResizeArray<'T>) =
-        let len = length arr
-        let rec loop i = i < len && (f arr[i] || loop (i+1))
-        loop 0
-
-    let forall f (arr: ResizeArray<_>) =
-        let len = length arr
-        let rec loop i = i >= len || (f arr[i] && loop (i+1))
-        loop 0
-
-    let indexNotFound() = raise (KeyNotFoundException("An index satisfying the predicate was not found in the collection"))
-
-    let find f (arr: ResizeArray<_>) =
-        let rec loop i =
-            if i >= length arr then indexNotFound()
-            elif f arr[i] then arr[i]
-            else loop (i+1)
-        loop 0
-
-    let tryPick f (arr: ResizeArray<_>) =
-        let rec loop i =
-            if i >= length arr then None else
-            match f arr[i] with
-            | None -> loop(i+1)
-            | res -> res
-        loop 0
-
-    let tryFind f (arr: ResizeArray<_>) =
-        let rec loop i =
-            if i >= length arr then None
-            elif f arr[i] then Some arr[i]
-            else loop (i+1)
-        loop 0
-
-    let iter2 f (arr1: ResizeArray<'T>) (arr2: ResizeArray<'b>) =
-        let len1 = length arr1
-        if len1 <> length arr2 then invalidArg "arr2" "the arrays have different lengths"
-        for i = 0 to len1 - 1 do
-            f arr1[i] arr2[i]
-
-    let map2 f (arr1: ResizeArray<'T>) (arr2: ResizeArray<'b>) =
-        let len1 = length arr1
-        if len1 <> length arr2 then invalidArg "arr2" "the arrays have different lengths"
-        let res = ResizeArray<_>(len1)
-        for i = 0 to len1 - 1 do
-            res.Add(f arr1[i] arr2[i])
-        res
-
-    let choose f (arr: ResizeArray<_>) =
-        let res = ResizeArray<_>()
-        for i = 0 to length arr - 1 do
-            match f arr[i] with
-            | None -> ()
-            | Some b -> res.Add(b)
-        res
-
-    let filter f (arr: ResizeArray<_>) =
-        let res = ResizeArray<_>()
-        for i = 0 to length arr - 1 do
-            let x = arr[i]
-            if f x then res.Add(x)
-        res
-
-    let partition f (arr: ResizeArray<_>) =
-      let res1 = ResizeArray<_>()
-      let res2 = ResizeArray<_>()
-      for i = 0 to length arr - 1 do
-          let x = arr[i]
-          if f x then res1.Add(x) else res2.Add(x)
-      res1, res2
-
-    let rev (arr: ResizeArray<_>) =
-      let len = length arr
-      let res = ResizeArray<_>(len)
-      for i = len - 1 downto 0 do
-          res.Add(arr[i])
-      res
-
-    let foldBack (f : 'T -> 'State -> 'State) (arr: ResizeArray<'T>) (acc: 'State) =
-        let mutable res = acc
-        let len = length arr
-        for i = len - 1 downto 0 do
-            res <- f (get arr i) res
-        res
-
-    let fold (f : 'State -> 'T -> 'State) (acc: 'State) (arr: ResizeArray<'T>) =
-        let mutable res = acc
-        let len = length arr
-        for i = 0 to len - 1 do
-            res <- f res (get arr i)
-        res
-
-    let toArray (arr: ResizeArray<'T>) = arr.ToArray()
-
-    let ofArray (arr: 'T[]) = ResizeArray<_>(arr)
-
-    let toSeq (arr: ResizeArray<'T>) = Seq.readonly arr
-
-    let sort f (arr: ResizeArray<'T>) = arr.Sort (Comparison(f))
-
-    let sortBy f (arr: ResizeArray<'T>) = arr.Sort (Comparison(fun x y -> compare (f x) (f y)))
-
-    let exists2 f (arr1: ResizeArray<_>) (arr2: ResizeArray<_>) =
-        let len1 = length arr1
-        if len1 <> length arr2 then invalidArg "arr2" "the arrays have different lengths"
-        let rec loop i = i < len1 && (f arr1[i] arr2[i] || loop (i+1))
-        loop 0
-
-    let findIndex f (arr: ResizeArray<_>) =
-        let rec go n = if n >= length arr then indexNotFound() elif f arr[n] then n else go (n+1)
-        go 0
-
-    let findIndexi f (arr: ResizeArray<_>) =
-        let rec go n = if n >= length arr then indexNotFound() elif f n arr[n] then n else go (n+1)
-        go 0
-
-    let foldSub f acc (arr: ResizeArray<_>) start fin =
-        let mutable res = acc
-        for i = start to fin do
-            res <- f res arr[i]
-        res
-
-    let foldBackSub f (arr: ResizeArray<_>) start fin acc =
-        let mutable res = acc
-        for i = fin downto start do
-            res <- f arr[i] res
-        res
-
-    let reduce f (arr : ResizeArray<_>) =
-        let arrn = length arr
-        if arrn = 0 then invalidArg "arr" "the input array may not be empty"
-        else foldSub f arr[0] arr 1 (arrn - 1)
-
-    let reduceBack f (arr: ResizeArray<_>) =
-        let arrn = length arr
-        if arrn = 0 then invalidArg "arr" "the input array may not be empty"
-        else foldBackSub f arr 0 (arrn - 2) arr[arrn - 1]
-
-    let fold2 f (acc: 'T) (arr1: ResizeArray<'T1>) (arr2: ResizeArray<'T2>) =
-        let mutable res = acc
-        let len = length arr1
-        if len <> length arr2 then invalidArg "arr2" "the arrays have different lengths"
-        for i = 0 to len - 1 do
-            res <- f res arr1[i] arr2[i]
-        res
-
-    let foldBack2 f (arr1: ResizeArray<'T1>) (arr2: ResizeArray<'T2>) (acc: 'b) =
-        let mutable res = acc
-        let len = length arr1
-        if len <> length arr2 then invalidArg "arr2" "the arrays have different lengths"
-        for i = len - 1 downto 0 do
-            res <- f arr1[i] arr2[i] res
-        res
-
-    let forall2 f (arr1: ResizeArray<_>) (arr2: ResizeArray<_>) =
-        let len1 = length arr1
-        if len1 <> length arr2 then invalidArg "arr2" "the arrays have different lengths"
-        let rec loop i = i >= len1 || (f arr1[i] arr2[i] && loop (i+1))
-        loop 0
-
-    let isEmpty (arr: ResizeArray<_>) = length (arr: ResizeArray<_>) = 0
-
-    let iteri2 f (arr1: ResizeArray<'T>) (arr2: ResizeArray<'b>) =
-        let len1 = length arr1
-        if len1 <> length arr2 then invalidArg "arr2" "the arrays have different lengths"
-        for i = 0 to len1 - 1 do
-            f i arr1[i] arr2[i]
-
-    let mapi2 (f: int -> 'a -> 'b -> 'c) (arr1: ResizeArray<'a>) (arr2: ResizeArray<'b>) =
-        let len1 = length arr1
-        if len1 <> length arr2 then invalidArg "arr2" "the arrays have different lengths"
-        init len1 (fun i -> f i arr1[i] arr2[i])
-
-    let scanBackSub f (arr: ResizeArray<'T>) start fin acc =
-        let mutable state = acc
-        let res = create (2 + fin - start) acc
-        for i = fin downto start do
-            state <- f arr[i] state
-            res[i - start] <- state
-        res
-
-    let scanSub f  acc (arr : ResizeArray<'T>) start fin =
-        let mutable state = acc
-        let res = create (fin-start+2) acc
-        for i = start to fin do
-            state <- f state arr[i]
-            res[i - start+1] <- state
-        res
-
-    let scan f acc (arr : ResizeArray<'T>) =
-        let arrn = length arr
-        scanSub f acc arr 0 (arrn - 1)
-
-    let scanBack f (arr : ResizeArray<'T>) acc =
-        let arrn = length arr
-        scanBackSub f arr 0 (arrn - 1) acc
-
-    let singleton x =
-        let res = ResizeArray<_>(1)
-        res.Add(x)
-        res
-
-    let tryFindIndex f (arr: ResizeArray<'T>) =
-        let rec go n = if n >= length arr then None elif f arr[n] then Some n else go (n+1)
-        go 0
-
-    let tryFindIndexi f (arr: ResizeArray<'T>) =
-        let rec go n = if n >= length arr then None elif f n arr[n] then Some n else go (n+1)
-        go 0
-
-    let zip (arr1: ResizeArray<_>) (arr2: ResizeArray<_>) =
-        let len1 = length arr1
-        if len1 <> length arr2 then invalidArg "arr2" "the arrays have different lengths"
-        init len1 (fun i -> arr1[i], arr2[i])
-
-    let unzip (arr: ResizeArray<_>) =
-        let len = length arr
-        let res1 = ResizeArray<_>(len)
-        let res2 = ResizeArray<_>(len)
-        for i = 0 to len - 1 do
-            let x,y = arr[i]
-            res1.Add(x)
-            res2.Add(y)
-        res1,res2
+    let inline (|NotNullOrEmpty|_|) (list: 'a list) =
+        (Object.ReferenceEquals(list, null) || list.IsEmpty) |> not
 
 // TODO: active patterns
 module Memory =
@@ -732,7 +421,7 @@ module Union =
         [<DefaultValue>]
         static val mutable private _TagGetter: Func<'a, int>
         static do TagGetter<'a>._TagGetter <- TagGetter<'a>.generateGetTag()
-        static member GetTag unionObj = TagGetter<'a>._TagGetter.Invoke unionObj
+        static member GetTag(unionObj) = TagGetter<'a>._TagGetter.Invoke unionObj
 
     [<AbstractClass; Sealed>]
     type private NameGetter<'a>() =
@@ -741,7 +430,7 @@ module Union =
         static val mutable private _Names: string array
         static do NameGetter<'a>._Names <- [| for unionCase in typeof<'a> |> FSharpType.GetUnionCases -> unionCase.Name |]
         static member private GetNameInternal index = NameGetter<'a>._Names[index]
-        static member GetName<'a> (unionObj: 'a) = unionObj |> TagGetter.GetTag |> NameGetter<'a>.GetNameInternal
+        static member GetName<'a>(unionObj: 'a) = unionObj |> TagGetter.GetTag |> NameGetter<'a>.GetNameInternal
 
     /// Gets the value of "Tag" property of this union object
     let getTag unionObj = unionObj |> TagGetter.GetTag

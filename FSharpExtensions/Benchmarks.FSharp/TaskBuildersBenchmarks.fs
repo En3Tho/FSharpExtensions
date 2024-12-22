@@ -11,9 +11,9 @@ open En3Tho.FSharp.ComputationExpressions.Tasks
     SimpleJob(RuntimeMoniker.Net60)
 >]
 type Benchmark() =
-    let returnSomeValueAsTask x = Task.FromResult x
-    let returnSomeValueAsValueTask x = ValueTask.FromResult x
-    let returnSomeValueAsAsync x = async.Return x
+    let returnSomeValueAsTask x = Task.FromResult(x)
+    let returnSomeValueAsValueTask x = ValueTask.FromResult(x)
+    let returnSomeValueAsAsync x = async.Return(x)
 
     let runVTaskTaskAndAsyncAsTask() = task {
         let! x = returnSomeValueAsValueTask 5

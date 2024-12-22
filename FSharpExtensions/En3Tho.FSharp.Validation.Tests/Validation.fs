@@ -22,11 +22,11 @@ let ``Test that Validated's ToString method is printing original value`` () =
     genericTest 1234.
     genericTest 'c'
 
-    let complexValue = {| Name = PlainValue.Make "123"; Age = PlainValue.Make 123 |}
+    let complexValue = {| Name = PlainValue.Make "123"; Age = PlainValue.Make(123) |}
 
     genericTest complexValue
 
-    Assert.Equal($"{complexValue}", $"{PlainValue.Make complexValue}")
+    Assert.Equal($"{complexValue}", $"{PlainValue.Make(complexValue)}")
 
 [<Fact>]
 let ``Test that Validated's generated`` () =
@@ -40,11 +40,11 @@ let ``Test that Validated's generated`` () =
     genericTest 1234.
     genericTest 'c'
 
-    let complexValue = {| Name = PlainValue.Make "123"; Age = PlainValue.Make 123 |}
+    let complexValue = {| Name = PlainValue.Make "123"; Age = PlainValue.Make(123) |}
 
     genericTest complexValue
 
-    Assert.Equal($"{complexValue}", $"{PlainValue.Make complexValue}")
+    Assert.Equal($"{complexValue}", $"{PlainValue.Make(complexValue)}")
 
 
 type Age = NonNegativeValue<int>
@@ -54,8 +54,8 @@ type Person = {
     Name: Name
 } with
     static member Of(age, name) = exnresult {
-        let! age = Age.Of age // would be good if "age" could be passed implicitly
-        and! name = Name.Of name // would be good if "age" could be passed implicitly
+        let! age = Age.Of(age) // would be good if "age" could be passed implicitly
+        and! name = Name.Of(name) // would be good if "age" could be passed implicitly
         return {
             Age = age
             Name = name
@@ -68,15 +68,15 @@ let ``Test that multivalidation works for successful case``() =
     let name = "Bob"
 
     let person = exnresult {
-        let! age = Age.Of age
-        and! name = Name.Of name
+        let! age = Age.Of(age)
+        and! name = Name.Of(name)
         return {
             Age = age
             Name = name
         }
     }
 
-    Assert.IsOk({ Age = Age.Make age; Name = Name.Make name }, person)
+    Assert.IsOk({ Age = Age.Make(age); Name = Name.Make(name) }, person)
 
 [<Fact>]
 let ``Test that multivalidation works for unsuccessful case``() =
@@ -84,8 +84,8 @@ let ``Test that multivalidation works for unsuccessful case``() =
     let name = ""
 
     let person = exnresult {
-        let! age = Age.Of age
-        and! name = Name.Of name
+        let! age = Age.Of(age)
+        and! name = Name.Of(name)
         return {
             Age = age
             Name = name
@@ -97,7 +97,7 @@ let ``Test that multivalidation works for unsuccessful case``() =
     | Error (:? AggregateException as exn) ->
         let errors = exn.InnerExceptions |> Seq.toArray
         Assert.Equal(2, errors.Length)
-        Assert.True(errors[0] :? ValueIsNegative)
-        Assert.True(errors[1] :? StringIsEmpty)
+        Assert.True(errors[0] :? ValueIsNegativeException)
+        Assert.True(errors[1] :? StringIsEmptyException)
     | _ ->
         Assert.Fail("Impossible")

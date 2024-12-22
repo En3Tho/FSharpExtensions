@@ -41,22 +41,22 @@ type Benchmark() =
     member this.RunResizeArray() =
         let rsz = ResizeArray()
 
-        rsz.Add 1
-        rsz.Add 2
-        rsz.Add 3
+        rsz.Add(1)
+        rsz.Add(2)
+        rsz.Add(3)
 
         for i in this.Items do
-            rsz.Add i
+            rsz.Add(i)
         let mutable i = this.Count
         while i > 0 do
-            rsz.Add i
+            rsz.Add(i)
             i <- i - 1
         try
-            rsz.Add i
+            rsz.Add(i)
         with e ->
-            rsz.Add i
+            rsz.Add(i)
         try
-            rsz.Add i
+            rsz.Add(i)
         finally
             ()
         rsz

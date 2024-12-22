@@ -25,7 +25,7 @@ let private scanfInternal strict (memory: ReadOnlyMemory<char>) (fmt: Printf.Str
            | index ->
                if valueSpan.StartsWith(formatSpan.Slice(0, index)) then
                    formatSpan <- formatSpan.Advance(index + 4)
-                   valueSpan <- valueSpan.Advance index
+                   valueSpan <- valueSpan.Advance(index)
                    true
                else
                    false)
@@ -36,7 +36,7 @@ let private scanfInternal strict (memory: ReadOnlyMemory<char>) (fmt: Printf.Str
     while success && capturesSpan.Length > 0 do
 
         let currentCapture = capturesSpan[0]
-        capturesSpan <- capturesSpan.Advance 1
+        capturesSpan <- capturesSpan.Advance(1)
 
         let literalAfterFormat =
             match formatSpan.IndexOf(InterpolationFormat) with

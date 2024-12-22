@@ -299,7 +299,7 @@ type StructMapVEnumerator<'T, 'TState, 'TResult, 'TEnumerator when 'TEnumerator:
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (state, map, enumerator) =
-        { enumerator = enumerator; map = OptimizedClosures.FSharpFunc<_,_,_>.Adapt map; state = state }
+        { enumerator = enumerator; map = OptimizedClosures.FSharpFunc<_,_,_>.Adapt(map); state = state }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
@@ -327,7 +327,7 @@ type StructMapiEnumerator<'T, 'TResult, 'TEnumerator when 'TEnumerator: struct a
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (map, enumerator) =
-        { enumerator = enumerator; map = OptimizedClosures.FSharpFunc<_,_,_>.Adapt map; count = -1 }
+        { enumerator = enumerator; map = OptimizedClosures.FSharpFunc<_,_,_>.Adapt(map); count = -1 }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
@@ -357,7 +357,7 @@ type StructMapiVEnumerator<'T, 'TState, 'TResult, 'TEnumerator when 'TEnumerator
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (state, map, enumerator) =
-        { enumerator = enumerator; map = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt map; count = -1; state = state }
+        { enumerator = enumerator; map = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt(map); count = -1; state = state }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
@@ -388,7 +388,7 @@ type StructMap2Enumerator<'T, 'T2, 'TResult, 'TEnumerator, 'TEnumerator2
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (map, enumerator, enumerator2) =
-        { enumerator = enumerator; enumerator2 = enumerator2; map = OptimizedClosures.FSharpFunc<_,_,_>.Adapt map; }
+        { enumerator = enumerator; enumerator2 = enumerator2; map = OptimizedClosures.FSharpFunc<_,_,_>.Adapt(map); }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() = this.enumerator.MoveNext() && this.enumerator2.MoveNext()
@@ -418,7 +418,7 @@ type StructMap2VEnumerator<'T, 'T2, 'TState, 'TResult, 'TEnumerator, 'TEnumerato
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (state, map, enumerator, enumerator2) =
-        { enumerator = enumerator; enumerator2 = enumerator2; map = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt map; state = state }
+        { enumerator = enumerator; enumerator2 = enumerator2; map = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt(map); state = state }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() = this.enumerator.MoveNext() && this.enumerator2.MoveNext()
@@ -448,7 +448,7 @@ type StructMapi2Enumerator<'T, 'T2, 'TResult, 'TEnumerator, 'TEnumerator2
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (map, enumerator, enumerator2) =
-        { enumerator = enumerator; enumerator2 = enumerator2; map = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt map; count = -1; }
+        { enumerator = enumerator; enumerator2 = enumerator2; map = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt(map); count = -1; }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
@@ -482,7 +482,7 @@ type StructMapi2VEnumerator<'T, 'T2, 'TState, 'TResult, 'TEnumerator, 'TEnumerat
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (state, map, enumerator, enumerator2) =
-        { enumerator = enumerator; enumerator2 = enumerator2; map = OptimizedClosures.FSharpFunc<_,_,_,_,_>.Adapt map; count = -1; state = state }
+        { enumerator = enumerator; enumerator2 = enumerator2; map = OptimizedClosures.FSharpFunc<_,_,_,_,_>.Adapt(map); count = -1; state = state }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
@@ -516,7 +516,7 @@ type StructMap3Enumerator<'T, 'T2, 'T3, 'TResult, 'TEnumerator, 'TEnumerator2, '
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (map, enumerator, enumerator2, enumerator3) =
-        { enumerator = enumerator; enumerator2 = enumerator2; enumerator3 = enumerator3; map = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt map; }
+        { enumerator = enumerator; enumerator2 = enumerator2; enumerator3 = enumerator3; map = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt(map); }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
@@ -551,7 +551,7 @@ type StructMap3VEnumerator<'T, 'T2, 'T3, 'TState, 'TResult, 'TEnumerator, 'TEnum
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (state, map, enumerator, enumerator2, enumerator3) =
-        { enumerator = enumerator; enumerator2 = enumerator2; enumerator3 = enumerator3; map = OptimizedClosures.FSharpFunc<_,_,_,_,_>.Adapt map; state = state }
+        { enumerator = enumerator; enumerator2 = enumerator2; enumerator3 = enumerator3; map = OptimizedClosures.FSharpFunc<_,_,_,_,_>.Adapt(map); state = state }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
@@ -586,7 +586,7 @@ type StructMapi3Enumerator<'T, 'T2, 'T3, 'TResult, 'TEnumerator, 'TEnumerator2, 
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (map, enumerator, enumerator2, enumerator3) =
-        { enumerator = enumerator; enumerator2 = enumerator2; enumerator3 = enumerator3; map = OptimizedClosures.FSharpFunc<_,_,_,_,_>.Adapt map; count = -1 }
+        { enumerator = enumerator; enumerator2 = enumerator2; enumerator3 = enumerator3; map = OptimizedClosures.FSharpFunc<_,_,_,_,_>.Adapt(map); count = -1 }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
@@ -623,7 +623,7 @@ type StructMapi3VEnumerator<'T, 'T2, 'T3, 'TState, 'TResult, 'TEnumerator, 'TEnu
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (state, map, enumerator, enumerator2, enumerator3) =
-        { enumerator = enumerator; enumerator2 = enumerator2; enumerator3 = enumerator3; map = OptimizedClosures.FSharpFunc<_,_,_,_,_,_>.Adapt map; count = -1; state = state }
+        { enumerator = enumerator; enumerator2 = enumerator2; enumerator3 = enumerator3; map = OptimizedClosures.FSharpFunc<_,_,_,_,_,_>.Adapt(map); count = -1; state = state }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
@@ -681,7 +681,7 @@ type StructFilterVEnumerator<'T, 'TState, 'TEnumerator when 'TEnumerator: struct
     val private state: 'TState
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    new (state, filter, enumerator) = { enumerator = enumerator; filter = OptimizedClosures.FSharpFunc<_,_,_>.Adapt filter; state = state }
+    new (state, filter, enumerator) = { enumerator = enumerator; filter = OptimizedClosures.FSharpFunc<_,_,_>.Adapt(filter); state = state }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
@@ -764,7 +764,7 @@ type StructTakeWhileVEnumerator<'T, 'TState, 'TEnumerator when 'TEnumerator: str
     val private state: 'TState
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    new (state, filter, enumerator) = { enumerator = enumerator; filter = OptimizedClosures.FSharpFunc<_,_,_>.Adapt filter; state = state }
+    new (state, filter, enumerator) = { enumerator = enumerator; filter = OptimizedClosures.FSharpFunc<_,_,_>.Adapt(filter); state = state }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
@@ -855,7 +855,7 @@ type StructSkipWhileVEnumerator<'T, 'TState, 'TEnumerator when 'TEnumerator: str
     val private state: 'TState
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    new (state, filter, enumerator) = { enumerator = enumerator; filter = OptimizedClosures.FSharpFunc<_,_,_>.Adapt filter; flag = 0; state = state }
+    new (state, filter, enumerator) = { enumerator = enumerator; filter = OptimizedClosures.FSharpFunc<_,_,_>.Adapt(filter); flag = 0; state = state }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
@@ -883,7 +883,7 @@ type StructSkipWhileVEnumerator<'T, 'TState, 'TEnumerator when 'TEnumerator: str
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructChooseEnumerator<'T, 'TResult, 'TEnumerator when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>> =
+type StructChooseOptionEnumerator<'T, 'TResult, 'TEnumerator when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>> =
 
     val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
     val mutable private current: 'TResult option
@@ -912,7 +912,7 @@ type StructChooseEnumerator<'T, 'TResult, 'TEnumerator when 'TEnumerator: struct
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructChooseVEnumerator<'T, 'TState, 'TResult, 'TEnumerator when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>> =
+type StructChooseOptionVEnumerator<'T, 'TState, 'TResult, 'TEnumerator when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>> =
 
     val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
     val mutable private current: 'TResult option
@@ -920,7 +920,7 @@ type StructChooseVEnumerator<'T, 'TState, 'TResult, 'TEnumerator when 'TEnumerat
     val private state: 'TState
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    new (state, chooser, enumerator) = { enumerator = enumerator; chooser = OptimizedClosures.FSharpFunc<_,_,_>.Adapt chooser; current = None; state = state }
+    new (state, chooser, enumerator) = { enumerator = enumerator; chooser = OptimizedClosures.FSharpFunc<_,_,_>.Adapt(chooser); current = None; state = state }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
@@ -942,7 +942,7 @@ type StructChooseVEnumerator<'T, 'TState, 'TResult, 'TEnumerator when 'TEnumerat
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructChoose2Enumerator<'T, 'T2, 'TResult, 'TEnumerator, 'TEnumerator2
+type StructChoose2OptionEnumerator<'T, 'T2, 'TResult, 'TEnumerator, 'TEnumerator2
     when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>
     and 'TEnumerator2: struct and 'TEnumerator2 :> IEnumerator<'T2>> =
 
@@ -952,7 +952,7 @@ type StructChoose2Enumerator<'T, 'T2, 'TResult, 'TEnumerator, 'TEnumerator2
     val private chooser: OptimizedClosures.FSharpFunc<'T2, 'T, 'TResult option>
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    new (chooser, enumerator, enumerator2) = { enumerator = enumerator; enumerator2 = enumerator2; chooser = OptimizedClosures.FSharpFunc<_,_,_>.Adapt chooser; current = None }
+    new (chooser, enumerator, enumerator2) = { enumerator = enumerator; enumerator2 = enumerator2; chooser = OptimizedClosures.FSharpFunc<_,_,_>.Adapt(chooser); current = None }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
@@ -974,7 +974,7 @@ type StructChoose2Enumerator<'T, 'T2, 'TResult, 'TEnumerator, 'TEnumerator2
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructChoose2VEnumerator<'T, 'T2, 'TState, 'TResult, 'TEnumerator, 'TEnumerator2
+type StructChooseOption2VEnumerator<'T, 'T2, 'TState, 'TResult, 'TEnumerator, 'TEnumerator2
     when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>
     and 'TEnumerator2: struct and 'TEnumerator2 :> IEnumerator<'T2>> =
 
@@ -986,7 +986,7 @@ type StructChoose2VEnumerator<'T, 'T2, 'TState, 'TResult, 'TEnumerator, 'TEnumer
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (state, chooser, enumerator, enumerator2) =
-        { enumerator = enumerator; enumerator2 = enumerator2; chooser = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt chooser; current = None; state = state }
+        { enumerator = enumerator; enumerator2 = enumerator2; chooser = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt(chooser); current = None; state = state }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
@@ -1008,7 +1008,7 @@ type StructChoose2VEnumerator<'T, 'T2, 'TState, 'TResult, 'TEnumerator, 'TEnumer
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructChoose3Enumerator<'T, 'T2, 'T3, 'TResult, 'TEnumerator, 'TEnumerator2, 'TEnumerator3
+type StructChoose3OptionEnumerator<'T, 'T2, 'T3, 'TResult, 'TEnumerator, 'TEnumerator2, 'TEnumerator3
     when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>
     and 'TEnumerator2: struct and 'TEnumerator2 :> IEnumerator<'T2>
     and 'TEnumerator3: struct and 'TEnumerator3 :> IEnumerator<'T3>> =
@@ -1021,7 +1021,7 @@ type StructChoose3Enumerator<'T, 'T2, 'T3, 'TResult, 'TEnumerator, 'TEnumerator2
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (chooser, enumerator, enumerator2, enumerator3) =
-        { enumerator = enumerator; enumerator2 = enumerator2; enumerator3 = enumerator3; chooser = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt chooser; current = None }
+        { enumerator = enumerator; enumerator2 = enumerator2; enumerator3 = enumerator3; chooser = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt(chooser); current = None }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
@@ -1043,7 +1043,7 @@ type StructChoose3Enumerator<'T, 'T2, 'T3, 'TResult, 'TEnumerator, 'TEnumerator2
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructChoose3VEnumerator<'T, 'T2, 'T3, 'TState, 'TResult, 'TEnumerator, 'TEnumerator2, 'TEnumerator3
+type StructChooseOption3VEnumerator<'T, 'T2, 'T3, 'TState, 'TResult, 'TEnumerator, 'TEnumerator2, 'TEnumerator3
     when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>
     and 'TEnumerator2: struct and 'TEnumerator2 :> IEnumerator<'T2>
     and 'TEnumerator3: struct and 'TEnumerator3 :> IEnumerator<'T3>> =
@@ -1057,7 +1057,7 @@ type StructChoose3VEnumerator<'T, 'T2, 'T3, 'TState, 'TResult, 'TEnumerator, 'TE
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (state, chooser, enumerator, enumerator2, enumerator3) =
-        { enumerator = enumerator; enumerator2 = enumerator2; enumerator3 = enumerator3; chooser = OptimizedClosures.FSharpFunc<_,_,_,_,_>.Adapt chooser; current = None; state = state }
+        { enumerator = enumerator; enumerator2 = enumerator2; enumerator3 = enumerator3; chooser = OptimizedClosures.FSharpFunc<_,_,_,_,_>.Adapt(chooser); current = None; state = state }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
@@ -1079,7 +1079,7 @@ type StructChoose3VEnumerator<'T, 'T2, 'T3, 'TState, 'TResult, 'TEnumerator, 'TE
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructValueChooseEnumerator<'T, 'TResult, 'TEnumerator when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>> =
+type StructChooseEnumerator<'T, 'TResult, 'TEnumerator when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>> =
 
     val mutable private enumerator: SStructEnumerator<'T, 'TEnumerator>
     val mutable private current: 'TResult voption
@@ -1117,7 +1117,7 @@ type StructValueChooseVEnumerator<'T, 'TState, 'TResult, 'TEnumerator when 'TEnu
     val private state: 'TState
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
-    new (state, chooser, enumerator) = { enumerator = enumerator; chooser = OptimizedClosures.FSharpFunc<_,_,_>.Adapt chooser; current = ValueNone; state = state }
+    new (state, chooser, enumerator) = { enumerator = enumerator; chooser = OptimizedClosures.FSharpFunc<_,_,_>.Adapt(chooser); current = ValueNone; state = state }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
@@ -1140,7 +1140,7 @@ type StructValueChooseVEnumerator<'T, 'TState, 'TResult, 'TEnumerator when 'TEnu
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructValueChoose2Enumerator<'T, 'T2, 'TResult, 'TEnumerator, 'TEnumerator2
+type StructChoose2Enumerator<'T, 'T2, 'TResult, 'TEnumerator, 'TEnumerator2
     when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>
     and 'TEnumerator2: struct and 'TEnumerator2 :> IEnumerator<'T2>> =
 
@@ -1151,7 +1151,7 @@ type StructValueChoose2Enumerator<'T, 'T2, 'TResult, 'TEnumerator, 'TEnumerator2
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (chooser, enumerator, enumerator2) =
-        { enumerator = enumerator; enumerator2 = enumerator2; chooser = OptimizedClosures.FSharpFunc<_,_,_>.Adapt chooser; current = ValueNone }
+        { enumerator = enumerator; enumerator2 = enumerator2; chooser = OptimizedClosures.FSharpFunc<_,_,_>.Adapt(chooser); current = ValueNone }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
@@ -1185,7 +1185,7 @@ type StructValueChoose2VEnumerator<'T, 'T2, 'TState, 'TResult, 'TEnumerator, 'TE
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (state, chooser, enumerator, enumerator2) =
-        { enumerator = enumerator; enumerator2 = enumerator2; chooser = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt chooser; current = ValueNone; state = state }
+        { enumerator = enumerator; enumerator2 = enumerator2; chooser = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt(chooser); current = ValueNone; state = state }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
@@ -1207,7 +1207,7 @@ type StructValueChoose2VEnumerator<'T, 'T2, 'TState, 'TResult, 'TEnumerator, 'TE
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructValueChoose3Enumerator<'T, 'T2, 'T3, 'TResult, 'TEnumerator, 'TEnumerator2, 'TEnumerator3
+type StructChoose3Enumerator<'T, 'T2, 'T3, 'TResult, 'TEnumerator, 'TEnumerator2, 'TEnumerator3
     when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>
     and 'TEnumerator2: struct and 'TEnumerator2 :> IEnumerator<'T2>
     and 'TEnumerator3: struct and 'TEnumerator3 :> IEnumerator<'T3>> =
@@ -1220,7 +1220,7 @@ type StructValueChoose3Enumerator<'T, 'T2, 'T3, 'TResult, 'TEnumerator, 'TEnumer
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (chooser, enumerator, enumerator2, enumerator3) =
-        { enumerator = enumerator; enumerator2 = enumerator2; enumerator3 = enumerator3; chooser = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt chooser; current = ValueNone }
+        { enumerator = enumerator; enumerator2 = enumerator2; enumerator3 = enumerator3; chooser = OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt(chooser); current = ValueNone }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
@@ -1256,7 +1256,7 @@ type StructValueChoose3VEnumerator<'T, 'T2, 'T3, 'TState, 'TResult, 'TEnumerator
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (state, chooser, enumerator, enumerator2, enumerator3) =
-        { enumerator = enumerator; enumerator2 = enumerator2; enumerator3 = enumerator3; chooser = OptimizedClosures.FSharpFunc<_,_,_,_,_>.Adapt chooser; current = ValueNone; state = state }
+        { enumerator = enumerator; enumerator2 = enumerator2; enumerator3 = enumerator3; chooser = OptimizedClosures.FSharpFunc<_,_,_,_,_>.Adapt(chooser); current = ValueNone; state = state }
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     member this.MoveNext() =
@@ -1315,7 +1315,7 @@ type StructAppendEnumerator<'T, 'TEnumerator when 'TEnumerator: struct and 'TEnu
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructZipEnumerator<'T, 'T2, 'TEnumerator, 'TEnumerator2
+type StructZipTupleEnumerator<'T, 'T2, 'TEnumerator, 'TEnumerator2
     when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>
     and 'TEnumerator2: struct and 'TEnumerator2 :> IEnumerator<'T2>> =
 
@@ -1344,7 +1344,7 @@ type StructZipEnumerator<'T, 'T2, 'TEnumerator, 'TEnumerator2
         member this.Reset() = ()
 
 [<Struct; NoComparison; NoEquality>]
-type StructValueZipEnumerator<'T, 'T2, 'TEnumerator, 'TEnumerator2
+type StructZipEnumerator<'T, 'T2, 'TEnumerator, 'TEnumerator2
     when 'TEnumerator: struct and 'TEnumerator :> IEnumerator<'T>
     and 'TEnumerator2: struct and 'TEnumerator2 :> IEnumerator<'T2>> =
 

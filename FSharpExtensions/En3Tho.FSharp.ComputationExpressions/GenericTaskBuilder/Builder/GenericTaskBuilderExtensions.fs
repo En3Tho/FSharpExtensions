@@ -66,7 +66,7 @@ module Low =
                         true)
 
         [<NoEagerConstraintApplication; Extension; EditorBrowsable(EditorBrowsableState.Never)>]
-        static member inline YieldFrom (this: #IYieldExtensions, task: ^TaskLike) =
+        static member inline YieldFrom(this: #IYieldExtensions, task: ^TaskLike) =
             this.Bind(task, (fun v -> this.Yield v))
 
         [<NoEagerConstraintApplication; Extension; EditorBrowsable(EditorBrowsableState.Never)>]
@@ -106,7 +106,7 @@ module High =
             this.Bind(task, (fun v -> this.Return v))
 
         [<NoEagerConstraintApplication; Extension; EditorBrowsable(EditorBrowsableState.Never)>]
-        static member inline YieldFrom (this: #IYieldExtensions, task: Task<'TResult>) =
+        static member inline YieldFrom(this: #IYieldExtensions, task: Task<'TResult>) =
             this.Bind(task, (fun v -> this.Yield v))
 
         [<Extension; EditorBrowsable(EditorBrowsableState.Never)>]
@@ -118,5 +118,5 @@ module High =
             this.ReturnFrom(Async.StartAsTask computation)
 
         [<Extension; EditorBrowsable(EditorBrowsableState.Never)>]
-        static member inline YieldFrom (this: #IYieldExtensions, computation: Async<'TResult>) =
+        static member inline YieldFrom(this: #IYieldExtensions, computation: Async<'TResult>) =
             this.YieldFrom (Async.StartAsTask computation)

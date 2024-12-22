@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <NugetVersion>8.0.1</NugetVersion>
+        <NugetVersion>9.0.0</NugetVersion>
         <Description>Small library for constructing validated types</Description>
     </PropertyGroup>
 

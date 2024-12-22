@@ -115,7 +115,7 @@ type FoldAction<'T, 'TAcc> =
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     new (folder, acc) = {
-        folder = OptimizedClosures.FSharpFunc<_,_,_>.Adapt folder
+        folder = OptimizedClosures.FSharpFunc<_,_,_>.Adapt(folder)
         acc = acc
     }
 

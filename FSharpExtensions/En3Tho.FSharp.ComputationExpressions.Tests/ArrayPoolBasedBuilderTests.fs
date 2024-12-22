@@ -84,8 +84,8 @@ let ``Test that array pool based builders build effectively the same collection`
             i <- i - 1
     }
 
-    Assert.True(libraryArray.SequenceEqual customArray)
-    Assert.True(libraryArray.SequenceEqual customBlock)
-    Assert.True(libraryArray.SequenceEqual customResizeArray)
-    Assert.True(libraryArray.SequenceEqual customResizeArray2)
-    Assert.True(libraryArray.SequenceEqual customLinkedList)
+    Assert.True(libraryArray.SequenceEqual(customArray))
+    Assert.True(libraryArray.SequenceEqual(customBlock))
+    Assert.True(libraryArray.SequenceEqual(customResizeArray))
+    Assert.True(libraryArray.SequenceEqual(customResizeArray2))
+    Assert.True(libraryArray.SequenceEqual(customLinkedList))

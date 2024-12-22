@@ -15,6 +15,7 @@ module Stackalloc =
         abstract member Length: int
 
 
+    // TODO: inline array?
     [<Struct; NoEquality; NoComparison>]
     type ValueBag4<'a> =
         [<DefaultValue(false)>] val mutable value1: 'a
@@ -115,7 +116,7 @@ module Stackalloc =
 
         member this.Dispose() =
             if this.array &!= null then
-                ArrayPool.Shared.Return this.array
+                ArrayPool.Shared.Return(this.array)
 
         interface IDisposable with
             member this.Dispose() = this.Dispose()
@@ -132,7 +133,7 @@ module Stackalloc =
 
         member this.Dispose() =
             if not (Object.ReferenceEquals(this.array, null)) then
-                this.pool.Return this.array
+                this.pool.Return(this.array)
 
         interface IDisposable with
             member this.Dispose() = this.Dispose()
@@ -143,7 +144,7 @@ module Stackalloc =
 
     let inline allocOrPool<'a when 'a: unmanaged> len maxLen =
         if len > maxLen then
-            new StackOrPooled<'a>(ArrayPool<'a>.Shared.Rent len)
+            new StackOrPooled<'a>(ArrayPool<'a>.Shared.Rent(len))
         else
             new StackOrPooled<'a>(Span.stackalloc<'a> len)
 
@@ -226,37 +227,37 @@ module Stackalloc =
         if len <= 32 then
             new StackOrPooled<_>(allocAny32<'a>())
         else
-            new StackOrPooled<'a>(ArrayPool<'a>.Shared.Rent len)
+            new StackOrPooled<'a>(ArrayPool<'a>.Shared.Rent(len))
 
     let inline allocAnyOrPool32<'a> len =
         if len <= 32 then
             new StackOrPooled<_>(allocAny32<'a>())
         else
-            new StackOrPooled<'a>(ArrayPool<'a>.Shared.Rent len)
+            new StackOrPooled<'a>(ArrayPool<'a>.Shared.Rent(len))
 
     let inline allocAnyOrPool64<'a> len =
         if len <= 64 then
             new StackOrPooled<_>(allocAny64<'a>())
         else
-            new StackOrPooled<'a>(ArrayPool<'a>.Shared.Rent len)
+            new StackOrPooled<'a>(ArrayPool<'a>.Shared.Rent(len))
 
     let inline allocAnyOrPool128<'a> len =
         if len <= 128 then
             new StackOrPooled<_>(allocUsingValueBag<ValueBag128<'a>,_>())
         else
-            new StackOrPooled<'a>(ArrayPool<'a>.Shared.Rent len)
+            new StackOrPooled<'a>(ArrayPool<'a>.Shared.Rent(len))
 
     let inline allocAny256OrPool<'a> len =
         if len <= 256 then
             new StackOrPooled<_>(allocUsingValueBag<ValueBag256<'a>,_>())
         else
-            new StackOrPooled<'a>(ArrayPool<'a>.Shared.Rent len)
+            new StackOrPooled<'a>(ArrayPool<'a>.Shared.Rent(len))
 
     let inline allocAny512OrPool<'a> len =
         if len <= 512 then
             new StackOrPooled<_>(allocUsingValueBag<ValueBag512<'a>,_>())
         else
-            new StackOrPooled<'a>(ArrayPool<'a>.Shared.Rent len)
+            new StackOrPooled<'a>(ArrayPool<'a>.Shared.Rent(len))
 
     let inline allocAnyOrPool<'a> len = // TODO: check if those are optimized
         match len with
@@ -275,16 +276,16 @@ type [<Struct; IsByRefLike>] StackHeapList<'a>(span: 'a Span) =
     member this.HeapSpan = CollectionsMarshal.AsSpan(this.list)
     member this.Count = this.count
     
-    member private this.AddToList value =
+    member private this.AddToList(value) =
         if this.list = null then
             this.list <- ResizeArray(span.Length)
-        this.list.Add value
+        this.list.Add(value)
 
-    member this.Add value =
+    member this.Add(value) =
         if uint this.count < uint span.Length then
             this.StackSpan[this.count] <- value
         else
-            this.AddToList value
+            this.AddToList(value)
         this.count <- this.count + 1
 
 type [<Struct; IsByRefLike>] StackList<'a>(span: 'a Span) =
@@ -293,7 +294,7 @@ type [<Struct; IsByRefLike>] StackList<'a>(span: 'a Span) =
     member this.Span = span.Slice(0, Math.Max(this.count, span.Length))
     member this.Count = this.count
 
-    member this.Add value =
+    member this.Add(value) =
         if uint this.count < uint span.Length then
             this.Span[this.count] <- value
         else
