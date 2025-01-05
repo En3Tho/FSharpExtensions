@@ -31,6 +31,7 @@ module Core =
 
     /// unsafe cast
     let inline ucast<'a, 'b> (a: 'a): 'b = (# "" a: 'b #)
+    let inline bitcast<'a, 'b> (a: 'a): 'b = Unsafe.BitCast(a)
 
     let ignore2 _ _ = ()
     let ignore3 _ _ _ = ()
@@ -58,11 +59,13 @@ module Core =
     let inline (&!=) (a: 'a when 'a: not struct) (b: 'a) = not (Object.ReferenceEquals(a, b))
 
     let inline (--) key value = KeyValuePair(key, value)
-    let inline (~%) value = (^a: (member Value: ^b) value)
-
+    let inline (~%) value = (^a: (member Value: ^b) value)    
+    
     let inline (!) value = not value
+    
     /// like a default value ( or ?? value in C#)
     let inline (??->) a v = if isNull a then v else a
+    
     /// like a default with (or ?? expr in C#)
     let inline (???->) a ([<InlineIfLambda>] f) = if isNull a then f() else a
 
