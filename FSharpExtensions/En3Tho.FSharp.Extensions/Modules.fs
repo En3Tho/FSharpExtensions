@@ -290,8 +290,8 @@ module Memory =
     let inline slice start count (memory: Memory<_>) = memory.Slice(start, count)
     let inline sliceFrom start (memory: Memory<_>) = memory.Slice(start)
     let inline sliceTo index (memory: Memory<_>) = memory.Slice(0, index)
-    let inline fromArray (array: 'a[]): Memory<_> = Memory.op_Implicit array
-    let inline fromArraySegment (array: 'a ArraySegment): Memory<_> = Memory.op_Implicit array
+    let inline fromArray (array: 'a[]): Memory<_> = Memory.op_Implicit(array)
+    let inline fromArraySegment (array: 'a ArraySegment): Memory<_> = Memory.op_Implicit(array)
 
 // TODO: active patterns
 module ReadOnlyMemory =
@@ -300,9 +300,9 @@ module ReadOnlyMemory =
     let inline slice start count (memory: ReadOnlyMemory<_>) = memory.Slice(start, count)
     let inline sliceFrom start (memory: ReadOnlyMemory<_>) = memory.Slice(start)
     let inline sliceTo index (memory: ReadOnlyMemory<_>) = memory.Slice(0, index)
-    let inline fromMemory (span: Memory<_>): ReadOnlyMemory<_> = Memory.op_Implicit span
-    let inline fromArray (array: 'a[]): ReadOnlyMemory<_> = ReadOnlyMemory.op_Implicit array
-    let inline fromArraySegment (array: 'a ArraySegment): ReadOnlyMemory<_> = ReadOnlyMemory.op_Implicit array
+    let inline fromMemory (span: Memory<_>): ReadOnlyMemory<_> = Memory.op_Implicit(span)
+    let inline fromArray (array: 'a[]): ReadOnlyMemory<_> = ReadOnlyMemory.op_Implicit(array)
+    let inline fromArraySegment (array: 'a ArraySegment): ReadOnlyMemory<_> = ReadOnlyMemory.op_Implicit(array)
 
 module Seq =
     open EqualityComparer

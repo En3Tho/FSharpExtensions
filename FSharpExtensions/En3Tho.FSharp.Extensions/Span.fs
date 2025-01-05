@@ -16,8 +16,8 @@ module Span =
     let inline sliceTo index (span: Span<_>) = span.Slice(0, index)
     let inline fromPtr count (ptr: nativeptr<'a>) = Span<'a>(ptr |> NativePtr.toVoidPtr, count)
     let inline fromVoidPtr<'a when 'a: unmanaged> count ptr = Span<'a>(ptr, count)
-    let inline fromArray (array: 'a[]): Span<_> = Span.op_Implicit array
-    let inline fromArraySegment (array: 'a ArraySegment): Span<_> = Span.op_Implicit array
+    let inline fromArray (array: 'a[]): Span<_> = Span.op_Implicit(array)
+    let inline fromArraySegment (array: 'a ArraySegment): Span<_> = Span.op_Implicit(array)
     let inline fromMemory (memory: Memory<_>) = memory.Span
 
     let inline (|Empty|_|) (str: Span<'a>) =
@@ -49,9 +49,9 @@ module ReadOnlySpan =
     let inline fromPtr count (ptr: nativeptr<'a>) = ReadOnlySpan<'a>(ptr |> NativePtr.toVoidPtr, count)
     let inline fromVoidPtr<'a when 'a: unmanaged> count ptr = ReadOnlySpan<'a>(ptr, count)
     let inline fromString (str: string): ReadOnlySpan<char> = str.AsSpan()
-    let inline fromSpan (span: Span<_>): ReadOnlySpan<_> = Span.op_Implicit span
-    let inline fromArray (array: 'a[]): ReadOnlySpan<_> = ReadOnlySpan.op_Implicit array
-    let inline fromArraySegment (array: 'a ArraySegment): ReadOnlySpan<_> = ReadOnlySpan.op_Implicit array
+    let inline fromSpan (span: Span<_>): ReadOnlySpan<_> = Span.op_Implicit(span)
+    let inline fromArray (array: 'a[]): ReadOnlySpan<_> = ReadOnlySpan.op_Implicit(array)
+    let inline fromArraySegment (array: 'a ArraySegment): ReadOnlySpan<_> = ReadOnlySpan.op_Implicit(array)
     let inline fromMemory (memory: ReadOnlyMemory<_>) = memory.Span
 
     let inline (|Empty|_|) (str: ReadOnlySpan<'a>) =

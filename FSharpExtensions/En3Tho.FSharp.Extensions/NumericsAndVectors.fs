@@ -96,17 +96,17 @@ type Byte with
     member inline this.u16 = uint16 this
     member inline this.u32 = uint32 this
     member inline this.u64 = uint64 this
-    member inline this.u128 = UInt128.op_Implicit this
+    member inline this.u128 = UInt128.op_Implicit(this)
     member inline this.uptr = unativeint this
 
     member inline this.i8 = sbyte this
     member inline this.i16 = int16 this
     member inline this.i32 = int32 this
     member inline this.i64 = int64 this
-    member inline this.i128 = Int128.op_Implicit this
+    member inline this.i128 = Int128.op_Implicit(this)
     member inline this.iptr = nativeint this
 
-    member inline this.f16 = Half.op_Implicit this
+    member inline this.f16 = Half.op_Implicit(this)
     member inline this.f32 = float32 this
     member inline this.f64 = float this
 
@@ -118,17 +118,17 @@ type UInt16 with
     member inline this.u8 = byte this
     member inline this.u32 = uint32 this
     member inline this.u64 = uint64 this
-    member inline this.u128 = UInt128.op_Implicit this
+    member inline this.u128 = UInt128.op_Implicit(this)
     member inline this.uptr = unativeint this
 
     member inline this.i8 = sbyte this
     member inline this.i16 = int16 this
     member inline this.i32 = int32 this
     member inline this.i64 = int64 this
-    member inline this.i128 = Int128.op_Implicit this
+    member inline this.i128 = Int128.op_Implicit(this)
     member inline this.iptr = nativeint this
 
-    member inline this.f16 = Half.op_Explicit this
+    member inline this.f16 = Half.op_Explicit(this)
     member inline this.f32 = float32 this
     member inline this.f64 = float this
 
@@ -140,17 +140,17 @@ type UInt32 with
     member inline this.u8 = byte this
     member inline this.u16 = uint16 this
     member inline this.u64 = uint64 this
-    member inline this.u128 = UInt128.op_Implicit this
+    member inline this.u128 = UInt128.op_Implicit(this)
     member inline this.uptr = unativeint this
 
     member inline this.i8 = sbyte this
     member inline this.i16 = int16 this
     member inline this.i32 = int32 this
     member inline this.i64 = int64 this
-    member inline this.i128 = Int128.op_Implicit this
+    member inline this.i128 = Int128.op_Implicit(this)
     member inline this.iptr = nativeint this
 
-    member inline this.f16 = Half.op_Explicit this
+    member inline this.f16 = Half.op_Explicit(this)
     member inline this.f32 = float32 this
     member inline this.f64 = float this
 
@@ -162,17 +162,17 @@ type UInt64 with
     member inline this.u8 = byte this
     member inline this.u16 = uint16 this
     member inline this.u32 = uint32 this
-    member inline this.u128 = UInt128.op_Implicit this
+    member inline this.u128 = UInt128.op_Implicit(this)
     member inline this.uptr = unativeint this
 
     member inline this.i8 = sbyte this
     member inline this.i16 = int16 this
     member inline this.i32 = int32 this
     member inline this.i64 = int64 this
-    member inline this.i128 = Int128.op_Implicit this
+    member inline this.i128 = Int128.op_Implicit(this)
     member inline this.iptr = nativeint this
 
-    member inline this.f16 = Half.op_Explicit this
+    member inline this.f16 = Half.op_Explicit(this)
     member inline this.f32 = float32 this
     member inline this.f64 = float this
 
@@ -202,16 +202,16 @@ type UIntPtr with
     member inline this.u16 = uint16 this
     member inline this.u32 = uint32 this
     member inline this.u64 = uint64 this
-    member inline this.u128 = UInt128.op_Implicit this
+    member inline this.u128 = UInt128.op_Implicit(this)
 
     member inline this.i8 = sbyte this
     member inline this.i16 = int16 this
     member inline this.i32 = int32 this
     member inline this.i64 = int64 this
-    member inline this.i128 = Int128.op_Implicit this
+    member inline this.i128 = Int128.op_Implicit(this)
     member inline this.iptr = nativeint this
 
-    member inline this.f16 = Half.op_Explicit this
+    member inline this.f16 = Half.op_Explicit(this)
     member inline this.f32 = float32 this
     member inline this.f64 = float this
 
@@ -224,16 +224,16 @@ type SByte with
     member inline this.u16 = uint16 this
     member inline this.u32 = uint32 this
     member inline this.u64 = uint64 this
-    member inline this.u128 = UInt128.op_Explicit this
+    member inline this.u128 = UInt128.op_Explicit(this)
     member inline this.uptr = unativeint this
 
     member inline this.i16 = int16 this
     member inline this.i32 = int32 this
     member inline this.i64 = int64 this
-    member inline this.i128 = Int128.op_Implicit this
+    member inline this.i128 = Int128.op_Implicit(this)
     member inline this.iptr = nativeint this
 
-    member inline this.f16 = Half.op_Implicit this
+    member inline this.f16 = Half.op_Implicit(this)
     member inline this.f32 = float32 this
     member inline this.f64 = float this
 
@@ -246,16 +246,16 @@ type Int16 with
     member inline this.u16 = uint16 this
     member inline this.u32 = uint32 this
     member inline this.u64 = uint64 this
-    member inline this.u128 = UInt128.op_Explicit this
+    member inline this.u128 = UInt128.op_Explicit(this)
     member inline this.uptr = unativeint this
 
     member inline this.i8 = sbyte this
     member inline this.i32 = int32 this
     member inline this.i64 = int64 this
-    member inline this.i128 = Int128.op_Implicit this
+    member inline this.i128 = Int128.op_Implicit(this)
     member inline this.iptr = nativeint this
 
-    member inline this.f16 = Half.op_Explicit this
+    member inline this.f16 = Half.op_Explicit(this)
     member inline this.f32 = float32 this
     member inline this.f64 = float this
 
@@ -268,16 +268,16 @@ type Int32 with
     member inline this.u16 = uint16 this
     member inline this.u32 = uint32 this
     member inline this.u64 = uint64 this
-    member inline this.u128 = UInt128.op_Explicit this
+    member inline this.u128 = UInt128.op_Explicit(this)
     member inline this.uptr = unativeint this
 
     member inline this.i8 = sbyte this
     member inline this.i16 = int16 this
     member inline this.i64 = int64 this
-    member inline this.i128 = Int128.op_Implicit this
+    member inline this.i128 = Int128.op_Implicit(this)
     member inline this.iptr = nativeint this
 
-    member inline this.f16 = Half.op_Explicit this
+    member inline this.f16 = Half.op_Explicit(this)
     member inline this.f32 = float32 this
     member inline this.f64 = float this
 
@@ -290,16 +290,16 @@ type Int64 with
     member inline this.u16 = uint16 this
     member inline this.u32 = uint32 this
     member inline this.u64 = uint64 this
-    member inline this.u128 = UInt128.op_Explicit this
+    member inline this.u128 = UInt128.op_Explicit(this)
     member inline this.uptr = unativeint this
 
     member inline this.i8 = sbyte this
     member inline this.i16 = int16 this
     member inline this.i32 = int32 this
-    member inline this.i128 = Int128.op_Implicit this
+    member inline this.i128 = Int128.op_Implicit(this)
     member inline this.iptr = nativeint this
 
-    member inline this.f16 = Half.op_Explicit this
+    member inline this.f16 = Half.op_Explicit(this)
     member inline this.f32 = float32 this
     member inline this.f64 = float this
 
@@ -368,7 +368,7 @@ type Single with
     member inline this.i16 = int16 this
     member inline this.i32 = int32 this
 
-    member inline this.f16 = Half.op_Explicit this
+    member inline this.f16 = Half.op_Explicit(this)
     member inline this.f64 = float this
 
     member inline this.v128 = v128.Create(this)
@@ -385,7 +385,7 @@ type Double with
     member inline this.i16 = int16 this
     member inline this.i32 = int32 this
 
-    member inline this.f16 = Half.op_Explicit this
+    member inline this.f16 = Half.op_Explicit(this)
     member inline this.f32 = float32 this
 
     member inline this.v128 = v128.Create(this)
