@@ -5,12 +5,6 @@
         <UseArtifactsOutput>true</UseArtifactsOutput>
     </PropertyGroup>
 
-    <PropertyGroup>
-        <MSBuildThisFileDirectoryName>$([System.IO.Path]::GetFileName($(MSBuildThisFileDirectory.TrimEnd($([System.IO.Path]::DirectorySeparatorChar)))))</MSBuildThisFileDirectoryName>
-        <SolutionName Condition="'$(SolutionName)' == ''">$(MSBuildThisFileDirectoryName)</SolutionName>
-        <ArtifactsPath>$(ARTIFACTS_PATH_DOTNET)\$(SolutionName)</ArtifactsPath>
-    </PropertyGroup>
-
     <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.csproj'">
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>

@@ -110,10 +110,6 @@ type Byte with
     member inline this.f32 = float32 this
     member inline this.f64 = float this
 
-    member inline this.v128 = v128.Create(this)
-    member inline this.v256 = v256.Create(this)
-    member inline this.v512 = v512.Create(this)
-
 type UInt16 with
     member inline this.u8 = byte this
     member inline this.u32 = uint32 this
@@ -131,10 +127,6 @@ type UInt16 with
     member inline this.f16 = Half.op_Explicit(this)
     member inline this.f32 = float32 this
     member inline this.f64 = float this
-
-    member inline this.v128 = v128.Create(this)
-    member inline this.v256 = v256.Create(this)
-    member inline this.v512 = v512.Create(this)
 
 type UInt32 with
     member inline this.u8 = byte this
@@ -154,10 +146,6 @@ type UInt32 with
     member inline this.f32 = float32 this
     member inline this.f64 = float this
 
-    member inline this.v128 = v128.Create(this)
-    member inline this.v256 = v256.Create(this)
-    member inline this.v512 = v512.Create(this)
-
 type UInt64 with
     member inline this.u8 = byte this
     member inline this.u16 = uint16 this
@@ -175,10 +163,6 @@ type UInt64 with
     member inline this.f16 = Half.op_Explicit(this)
     member inline this.f32 = float32 this
     member inline this.f64 = float this
-
-    member inline this.v128 = v128.Create(this)
-    member inline this.v256 = v256.Create(this)
-    member inline this.v512 = v512.Create(this)
 
 type UInt128 with
     member inline this.u8 = byte this
@@ -215,10 +199,6 @@ type UIntPtr with
     member inline this.f32 = float32 this
     member inline this.f64 = float this
 
-    member inline this.v128 = v128.Create(this)
-    member inline this.v256 = v256.Create(this)
-    member inline this.v512 = v512.Create(this)
-
 type SByte with
     member inline this.u8 = byte this
     member inline this.u16 = uint16 this
@@ -236,10 +216,6 @@ type SByte with
     member inline this.f16 = Half.op_Implicit(this)
     member inline this.f32 = float32 this
     member inline this.f64 = float this
-
-    member inline this.v128 = v128.Create(this)
-    member inline this.v256 = v256.Create(this)
-    member inline this.v512 = v512.Create(this)
 
 type Int16 with
     member inline this.u8 = byte this
@@ -259,10 +235,6 @@ type Int16 with
     member inline this.f32 = float32 this
     member inline this.f64 = float this
 
-    member inline this.v128 = v128.Create(this)
-    member inline this.v256 = v256.Create(this)
-    member inline this.v512 = v512.Create(this)
-
 type Int32 with
     member inline this.u8 = byte this
     member inline this.u16 = uint16 this
@@ -281,10 +253,6 @@ type Int32 with
     member inline this.f32 = float32 this
     member inline this.f64 = float this
 
-    member inline this.v128 = v128.Create(this)
-    member inline this.v256 = v256.Create(this)
-    member inline this.v512 = v512.Create(this)
-
 type Int64 with
     member inline this.u8 = byte this
     member inline this.u16 = uint16 this
@@ -302,10 +270,6 @@ type Int64 with
     member inline this.f16 = Half.op_Explicit(this)
     member inline this.f32 = float32 this
     member inline this.f64 = float this
-
-    member inline this.v128 = v128.Create(this)
-    member inline this.v256 = v256.Create(this)
-    member inline this.v512 = v512.Create(this)
 
 type Int128 with
     member inline this.u8 = byte this
@@ -341,10 +305,6 @@ type IntPtr with
     member inline this.f32 = float32 this
     member inline this.f64 = float this
 
-    member inline this.v128 = v128.Create(this)
-    member inline this.v256 = v256.Create(this)
-    member inline this.v512 = v512.Create(this)
-
 type Half with
     member inline this.u8 = byte this
     member inline this.u16 = uint16 this
@@ -371,10 +331,6 @@ type Single with
     member inline this.f16 = Half.op_Explicit(this)
     member inline this.f64 = float this
 
-    member inline this.v128 = v128.Create(this)
-    member inline this.v256 = v256.Create(this)
-    member inline this.v512 = v512.Create(this)
-
 type Double with
     member inline this.u8 = byte this
     member inline this.u16 = uint16 this
@@ -387,10 +343,6 @@ type Double with
 
     member inline this.f16 = Half.op_Explicit(this)
     member inline this.f32 = float32 this
-
-    member inline this.v128 = v128.Create(this)
-    member inline this.v256 = v256.Create(this)
-    member inline this.v512 = v512.Create(this)
 
 // Not sure Vector64 is used at all? Old mmx stuff?
 type Vector64<'a> with

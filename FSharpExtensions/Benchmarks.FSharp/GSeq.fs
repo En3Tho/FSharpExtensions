@@ -1,11 +1,13 @@
 module Benchmarks.GSeq
 
+open BenchmarkDotNet.Jobs
 open En3Tho.FSharp.Extensions
 open BenchmarkDotNet.Attributes
 open System.Linq
 
 [<MemoryDiagnoser; DisassemblyDiagnoser(filters = [||])>]
-[<Config(typeof<``Net8, Net9``>)>]
+//[<Config(typeof<``Net8, Net9``>)>]
+[<SimpleJob(RuntimeMoniker.Net90)>]
 type Benchmark() =
 
     [<Params(1000)>]

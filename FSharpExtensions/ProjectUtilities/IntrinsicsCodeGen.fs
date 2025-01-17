@@ -1,10 +1,16 @@
 module ProjectUtilities.IntrinsicsCodeGen
 
 open System
+open System.Linq
 open System.IO
+open System.Runtime.CompilerServices
+open System.Runtime.InteropServices
+open System.Text.RegularExpressions
 open System.Xml
 open En3Tho.FSharp.Extensions
 open System.Collections.Generic
+open En3Tho.FSharp.ComputationExpressions
+open En3Tho.FSharp.ComputationExpressions.ICollectionBuilder
 open En3Tho.FSharp.ComputationExpressions.CodeBuilder
 
 let [<Literal>] IntrinsicNodeName = "intrinsic"
@@ -140,16 +146,63 @@ let parseIntrinsicsFile (filePath: string) =
 
     table
 
+type Dictionary<'TKey, 'TValue> with
+    member inline this.GetValueOrDefaultWith(key: 'TKey, [<InlineIfLambda>] valueFactory: unit -> 'TValue) =
+        let mutable exists = false
+        let valueRef = &CollectionsMarshal.GetValueRefOrAddDefault(this, key, &exists)
+        if !exists then
+            valueRef <- valueFactory()
+        valueRef
+
+let readAllIntrinsicsOperationNames (xmlDoc: XmlDocument) =
+    let regex = Regex(".*_([a-z0-9]+)_.+")
+
+    let descriptions = Dictionary()
+    let result = Dictionary()
+    let alt = result.GetAlternateLookup<ReadOnlySpan<char>>()
+    for rootNode in xmlDoc.ChildNodes do
+        for node in rootNode.ChildNodes |> Seq.cast<XmlNode> do
+            let intrinsicName = node.Attributes[IntrinsicNameAttribute].Value
+            let isAvx512 =  node.ChildNodes |> Seq.cast<XmlNode> |> Seq.exists (fun x -> x.Name == "CPUID" && x.InnerText.Contains("AVX512"))
+            if isAvx512 then
+                descriptions[intrinsicName] <- node["description"].InnerText
+                let trimmedName = regex.Match(intrinsicName).Groups[1].Value
+                let nameList = result.GetValueOrDefaultWith(trimmedName, fun () -> List())
+                nameList.Add(intrinsicName)
+
+    let keys = result.Keys
+    for key in keys do
+        if key.StartsWith('k') then // k-masks
+            let spanKey = key.AsSpan().Slice(1)
+            let mutable list = nullRef
+            if alt.TryGetValue(spanKey, &list) then
+                let mutable existing = nullRef
+                result.Remove(key, &existing) |> ignore
+                list.AddRange(existing)
+    result, descriptions
+
 let generateFiles (filePath: string) =
     let doc = XmlDocument()
     doc.Load(filePath)
-    generateCodeForIntrinsicsTableForRider doc
-    |> Code.writeToFile "Intrinsics.fs"
-    generateIntrinsicsFile doc
-    |> Code.writeToFile "Intrinsics.txt"
-    let table = parseIntrinsicsFile ".artifacts\Intrinsics.txt"
-    for intrinsic in table do
-        Console.WriteLine(intrinsic.Key)
-        Console.WriteLine(intrinsic.Value.Description.ToString())
-        Console.WriteLine(intrinsic.Value.Operation.ToString())
+
+    let opNames, descriptions = readAllIntrinsicsOperationNames doc
+    let keys = opNames.Keys |> Seq.sort
+    let keysWithDescriptions =
+        keys |> Seq.map ^ fun key ->
+            let mnemonics = opNames[key]
+            let mnemonic = mnemonics[0]
+            let description = descriptions[mnemonic]
+            let mnemonicsStr = String.Join(", ", mnemonics)
+            {| Instruction = key; Mnemonics = mnemonicsStr; Description = description |}
+        |> Seq.toArray
+    ()
+    // generateCodeForIntrinsicsTableForRider doc
+    // |> Code.writeToFile "Intrinsics.fs"
+    // generateIntrinsicsFile doc
+    // |> Code.writeToFile "Intrinsics.txt"
+    // let table = parseIntrinsicsFile ".artifacts\Intrinsics.txt"
+    // for intrinsic in table do
+    //     Console.WriteLine(intrinsic.Key)
+    //     Console.WriteLine(intrinsic.Value.Description.ToString())
+    //     Console.WriteLine(intrinsic.Value.Operation.ToString())
     //|> Code.writeToConsole
