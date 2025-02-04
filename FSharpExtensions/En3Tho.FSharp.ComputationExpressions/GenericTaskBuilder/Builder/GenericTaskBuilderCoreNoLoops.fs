@@ -10,7 +10,7 @@ open Microsoft.FSharp.Core.LanguagePrimitives.IntrinsicOperators
 
 open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 
-type GenericTaskBuilderCore() =
+type GenericTaskBuilderCoreNoLoops() =
 
     [<DefaultValue>]
     member inline _.Zero() : ResumableCode<'TData, unit> =
@@ -21,27 +21,6 @@ type GenericTaskBuilderCore() =
         [<InlineIfLambda>] task2: ResumableCode<'TData, 'TResult>)
         : ResumableCode<'TData, 'TResult> =
         ResumableCodeHelpers.Combine(task1, task2)
-
-    member inline _.While(
-        [<InlineIfLambda>] condition: unit -> bool,
-        [<InlineIfLambda>] body: ResumableCode<'TData, unit>)
-        : ResumableCode<'TData, unit> =
-            ResumableCodeHelpers.While(condition, body)
-
-    member inline _.For<'TData, 'T when 'TData :> IStateMachineDataWithCheck<'TData>>(
-        sequence: seq<'T>,
-        [<InlineIfLambda>] body: 'T -> ResumableCode<'TData, unit>)
-        : ResumableCode<'TData, unit> =
-            ResumableCodeHelpers.Using(
-                sequence.GetEnumerator(),
-                (fun e ->
-                    ResumableCodeHelpers.While(
-                        (fun () ->
-                            __debugPoint "ForLoop.InOrToKeyword"
-                            e.MoveNext()),
-                        ResumableCode<'TData, unit>(fun sm -> (body e.Current).Invoke(&sm))
-                    ))
-            )
 
     member inline _.TryWith<'TData, 'TResult when 'TData :> IStateMachineDataWithCheck<'TData>>(
         [<InlineIfLambda>] body: ResumableCode<'TData, 'TResult>,
@@ -70,8 +49,32 @@ type GenericTaskBuilderCore() =
                 else
                     ValueTask()))
 
-type GenericTaskBuilderCore<'TState>(state: 'TState) =
-    inherit GenericTaskBuilderCore()
+type GenericTaskBuilderCore() =
+    inherit GenericTaskBuilderCoreNoLoops()
+
+    member inline _.While(
+        [<InlineIfLambda>] condition: unit -> bool,
+        [<InlineIfLambda>] body: ResumableCode<'TData, unit>)
+        : ResumableCode<'TData, unit> =
+            ResumableCodeHelpers.While(condition, body)
+
+    member inline _.For<'TData, 'T when 'TData :> IStateMachineDataWithCheck<'TData>>(
+        sequence: seq<'T>,
+        [<InlineIfLambda>] body: 'T -> ResumableCode<'TData, unit>)
+        : ResumableCode<'TData, unit> =
+            ResumableCodeHelpers.Using(
+                sequence.GetEnumerator(),
+                (fun e ->
+                    ResumableCodeHelpers.While(
+                        (fun () ->
+                            __debugPoint "ForLoop.InOrToKeyword"
+                            e.MoveNext()),
+                        ResumableCode<'TData, unit>(fun sm -> (body e.Current).Invoke(&sm))
+                    ))
+            )
+
+type GenericTaskBuilderCoreNoLoops<'TState>(state: 'TState) =
+    inherit GenericTaskBuilderCoreNoLoops()
 
     member _.State = state
 
@@ -155,10 +158,61 @@ type GenericTaskBuilderCore<'TState>(state: 'TState) =
                 (AfterCode<_,_>(fun sm ->
                     'TInitializer.Initialize<_, 'TData, 'TState>(&sm, &sm.Data, this.State)))
         else
-            GenericTaskBuilderCore<'TState>.RunDynamic(code, this.State))
+            GenericTaskBuilderCoreNoLoops<'TState>.RunDynamic(code, this.State))
+
+type GenericTaskBuilderCore<'TState>(state: 'TState) =
+    inherit GenericTaskBuilderCore()
+
+    member _.State = state
+
+    member inline this.Bind<'TData, 'TResult when 'TData :> IStateMachineDataWithState<'TData, 'TState>>(_: StateIntrinsic, [<InlineIfLambda>] continuation: 'TState -> ResumableCode<'TData, 'TResult>) =
+        ResumableCode<'TData, 'TResult>(fun sm ->
+            let state: 'TState = sm.Data.State
+            (continuation state).Invoke(&sm)
+        )
+
+    member inline this.RunInternal<'TData, 'TResult, 'TBuilderResult, 'TInitializer
+        when 'TData :> IStateMachineData<'TData, 'TResult>
+        and 'TInitializer :> IStateMachineDataInitializer<'TData, 'TState, 'TBuilderResult>>
+        ([<InlineIfLambda>] code: ResumableCode<'TData, 'TResult>) : 'TBuilderResult =
+
+        (if __useResumableCode then
+            __stateMachine<'TData, 'TBuilderResult>
+                (MoveNextMethodImpl<_>(fun sm ->
+                    __resumeAt sm.ResumptionPoint
+                    let mutable __stack_exn: Exception = null
+                    try
+                        if sm.Data.CheckCanContinueOrThrow() then
+                            let __stack_code_fin = code.Invoke(&sm)
+                            if __stack_code_fin then
+                                sm.ResumptionPoint <- StateMachineCodes.Finished
+                                sm.Data.Finish(&sm)
+                        else
+                            sm.ResumptionPoint <- StateMachineCodes.Finished
+                            sm.Data.Finish(&sm)
+                    with exn ->
+                        __stack_exn <- exn
+                    // Run SetException outside the stack unwind, see https://github.com/dotnet/roslyn/issues/26567
+                    match __stack_exn with
+                    | null -> ()
+                    | exn ->
+                        sm.ResumptionPoint <- StateMachineCodes.Finished
+                        sm.Data.SetException(exn)
+                ))
+                (SetStateMachineMethodImpl<_>(fun sm state -> sm.Data.SetStateMachine(state)))
+                (AfterCode<_,_>(fun sm ->
+                    'TInitializer.Initialize<_, 'TData, 'TState>(&sm, &sm.Data, this.State)))
+        else
+            GenericTaskBuilderCoreNoLoops<'TState>.RunDynamic(code, this.State))
 
 type  GenericTaskBuilderReturnCore<'TState>(state: 'TState) =
     inherit GenericTaskBuilderCore<'TState>(state)
+
+    member inline _.Delay([<InlineIfLambda>] generator: unit -> ResumableCode<'TData, 'TResult>) =
+        ResumableCode<'TData, 'TResult>(fun sm -> (generator()).Invoke(&sm))
+
+type  GenericTaskBuilderReturnCoreNoLoops<'TState>(state: 'TState) =
+    inherit GenericTaskBuilderCoreNoLoops<'TState>(state)
     member inline _.Delay([<InlineIfLambda>] generator: unit -> ResumableCode<'TData, 'TResult>) =
         ResumableCode<'TData, 'TResult>(fun sm -> (generator()).Invoke(&sm))
 

@@ -6,7 +6,7 @@ open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder.Tasks
 open Microsoft.FSharp.Core.CompilerServices
 
 type OptionTaskBuilderBase() =
-    inherit GenericTaskBuilderReturnCore<unit>()
+    inherit GenericTaskBuilderReturnCoreNoLoops<unit>()
 
 type ValueOptionTaskBuilder() =
     inherit OptionTaskBuilderBase()

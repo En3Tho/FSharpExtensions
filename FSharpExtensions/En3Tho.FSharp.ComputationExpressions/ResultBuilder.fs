@@ -18,15 +18,6 @@ type ResultBuilderBase() =
             | Error error -> Error error
             | Ok () -> task2()
 
-    member inline _.While([<InlineIfLambda>] condition : unit -> bool, [<InlineIfLambda>] body : ResultCode<'a, 'b>) : ResultCode<unit, 'b> =
-        fun () ->
-            let mutable proceed = true
-            while proceed && condition() do
-                match body() with
-                | Error _ -> proceed <- false
-                | Ok _ -> ()
-            Ok(())
-
     member inline _.TryWith([<InlineIfLambda>] body: ResultCode<'a, 'b>, [<InlineIfLambda>] catch: exn -> ResultCode<'a, 'b>) : ResultCode<'a, 'b> =
         fun () ->
             try
@@ -45,12 +36,6 @@ type ResultBuilderBase() =
         this.TryFinally(
             (fun () -> (body disp)()),
             (fun () -> if not (isNull (box disp)) then disp.Dispose()))
-
-    member inline this.For(sequence: seq<'a>, [<InlineIfLambda>] body: 'a -> ResultCode<unit, 'b>) : ResultCode<unit, 'b> =
-        this.Using(
-            sequence.GetEnumerator(),
-            (fun e -> this.While((fun () -> e.MoveNext()),
-            (fun () -> (body e.Current)()))))
 
     member inline _.Return(value: 'a) : ResultCode<'a, 'b> =
         fun () ->

@@ -20,7 +20,7 @@ type ActivityStateCheck =
             match state with
             | null -> ()
             | activity ->
-                activity.SetStatus(ActivityStatusCode.Error, ``exception``.Message).Dispose()
+                activity.AddException(``exception``).SetStatus(ActivityStatusCode.Error, ``exception``.Message).Dispose()
                 // TODO: OpenTelemetry integration or a specialized state check?
                 // activity.RecordException?
             

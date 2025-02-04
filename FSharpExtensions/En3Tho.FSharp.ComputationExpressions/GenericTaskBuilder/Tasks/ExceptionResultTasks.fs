@@ -26,7 +26,7 @@ type ExnResultAsyncTaskMethodBuilderBehavior<'TResult> =
         static member SetResult(builder, result) = builder.SetResult(result)
 
 type ExceptionResultTaskBuilderBase() =
-    inherit GenericTaskBuilderReturnCore<unit>()
+    inherit GenericTaskBuilderReturnCoreNoLoops<unit>()
 
 type ExceptionResultTaskBuilder() =
     inherit ExceptionResultTaskBuilderBase()

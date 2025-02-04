@@ -12,7 +12,7 @@ open En3Tho.FSharp.ComputationExpressions.GenericTaskBuilder
 
 module Low =
 
-    type GenericTaskBuilderCore with
+    type GenericTaskBuilderCoreNoLoops with
         member inline this.Using<'TData, 'TResult, 'TResource
             when 'TData :> IStateMachineDataWithCheck<'TData>
             and 'TResource :> IDisposable>

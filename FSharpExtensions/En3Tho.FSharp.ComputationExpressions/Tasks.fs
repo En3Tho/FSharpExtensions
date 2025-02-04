@@ -83,8 +83,8 @@ let semaphoreSlimValueTask semaphore = SemaphoreSlimValueTaskBuilder(semaphore)
 let lazyTask = LazyTaskBuilder()
 let lazyUnitTask = LazyUnitTaskBuilder()
 
-let repeatableTask = RepeatableTaskBuilder()
-let repeatableUnitTask = RepeatableUnitTaskBuilder()
+// let repeatableTask = RepeatableTaskBuilder()
+// let repeatableUnitTask = RepeatableUnitTaskBuilder()
 
 [<AbstractClass; Sealed; AutoOpen>]
 type ActivityBuilders() =

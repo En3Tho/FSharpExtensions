@@ -30,14 +30,12 @@ type OptionBuilderBase() =
             | ValueNone -> ValueNone
             | ValueSome v -> (task2 v)()
 
-    member inline _.While([<InlineIfLambda>] condition: unit -> bool, [<InlineIfLambda>] body: OptionCode<unit>) : OptionCode<unit> =
+    member inline _.Bind(res1: 'T1 Nullable, [<InlineIfLambda>] task2: 'T1 -> OptionCode<'T>) : OptionCode<'T> =
         fun () ->
-            let mutable proceed = true
-            while proceed && condition() do
-                match body() with
-                | ValueNone -> proceed <- false
-                | ValueSome () -> ()
-            ValueSome(())
+            if res1.HasValue then
+                (task2 res1.Value)()
+            else
+                ValueNone
 
     member inline _.TryWith([<InlineIfLambda>] body: OptionCode<'T>, [<InlineIfLambda>] catch: exn -> OptionCode<'T>) : OptionCode<'T> =
         fun () ->
@@ -58,12 +56,6 @@ type OptionBuilderBase() =
             (fun () -> (body disp)()),
             (fun () -> if not (isNull (box disp)) then disp.Dispose()))
 
-    member inline this.For(sequence: seq<'TElement>, [<InlineIfLambda>] body: 'TElement -> OptionCode<unit>) : OptionCode<unit> =
-        this.Using(
-            sequence.GetEnumerator(),
-            (fun e -> this.While((fun () -> e.MoveNext()),
-            (fun () -> (body e.Current)()))))
-
     member inline _.Return(value: 'T) : OptionCode<'T> =
         fun () ->
             ValueSome value
@@ -75,6 +67,10 @@ type OptionBuilderBase() =
     member inline this.ReturnFrom(source: voption<'T>) : OptionCode<'T> =
         fun () ->
             source
+
+    member inline this.ReturnFrom(source: Nullable<'T>) : OptionCode<'T> =
+        fun () ->
+            if source.HasValue then ValueSome source.Value else ValueNone
 
 type OptionBuilder() =
     inherit OptionBuilderBase()

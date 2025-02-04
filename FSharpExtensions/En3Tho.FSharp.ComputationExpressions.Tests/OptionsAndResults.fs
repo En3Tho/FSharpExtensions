@@ -34,10 +34,6 @@ let ``Test that option builder is working properly`` () =
     let opt3 = option {
 
         let mutable i = 0
-        while i < 10 do
-            let! _ = None
-            i <- i + 1
-
         let! x = Some first
         let! y = Some second
         return x + y + i
@@ -45,36 +41,12 @@ let ``Test that option builder is working properly`` () =
 
     Assert.Equal(opt3, Some (first + second))
 
-    let opt3 = option {
-
-        let mutable i = 0
-
-        for i = 0 to 10 do
-            let! i = Some i
-            ignore i
-
-        while i < 10 do
-            let! _ = Some i
-            i <- i + 1
-
-        let! x = Some first
-        let! y = Some second
-        return x + y + i
-    }
-
-    Assert.Equal(opt3, Some (first + second + 10))
-
 [<Fact>]
 let ``Test that result builder is working properly`` () =
     let first = 10
     let second = 10
 
     let res1 = result {
-
-        for i = 0 to 10 do
-            let! i = Ok()
-            ignore i
-
         let! x = Ok first
         let! y = Ok second
         return x + y
@@ -85,9 +57,6 @@ let ``Test that result builder is working properly`` () =
     let res2 = result {
 
         let mutable x = 0
-        while x < 10 do
-            x <- x + 1
-
         let! x = Ok first
         let! y = Ok second
         let! z = Error()
@@ -95,20 +64,6 @@ let ``Test that result builder is working properly`` () =
     }
 
     Assert.Equal(res2, Error())
-
-    let res3 = result {
-
-        for i = 0 to 10 do
-           let! x = Ok i
-           let! y = Error "" // will exit a for loop
-           ignore (x + y)
-
-        let! x = Ok first
-        let! y = Ok second
-        return x + y
-    }
-
-    Assert.Equal(res3, Ok (first + second))
 
 [<Fact>]
 let ``Test that eresult builder is working properly`` () =

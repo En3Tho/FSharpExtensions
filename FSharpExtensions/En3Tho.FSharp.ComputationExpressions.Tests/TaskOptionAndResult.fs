@@ -29,41 +29,12 @@ let ``Test that option builder is working properly`` () = vtask {
     Assert.Equal(opt2, ValueNone)
 
     let! opt3 = voptionValueTask {
-        let mutable i = 0
-        let mutable a = 0
-
-        while i < 10 do
-            i <- i + 1
-            let! _ = ValueNone |> ValueTask.FromResult
-            // this part won't be executed
-            a <- 1
-
-        Assert.Equal(0, a)
         let! x = ValueSome first |> ValueTask.FromResult
         let! y = ValueSome second |> ValueTask.FromResult
-        return x + y + i
+        return x + y
     }
 
     Assert.Equal(opt3, ValueSome (first + second))
-
-    let! opt3 = voptionValueTask {
-
-        let mutable i = 0
-
-        for i = 0 to 10 do
-            let! i = ValueSome i |> ValueTask.FromResult
-            ignore i
-
-        while i < 10 do
-            let! _ = ValueSome i |> ValueTask.FromResult
-            i <- i + 1
-
-        let! x = ValueSome first |> ValueTask.FromResult
-        let! y = ValueSome second |> ValueTask.FromResult
-        return x + y + i
-    }
-
-    return Assert.Equal(opt3, ValueSome (first + second + 10))
 }
 
 [<Fact>]
