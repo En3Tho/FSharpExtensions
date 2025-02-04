@@ -79,7 +79,7 @@ type IStateMachineDataYield<'TData, 'TResult
     inherit IStateMachineDataGetResult<'TData, 'TResult>
 
     abstract MoveNextAsync: unit -> ValueTask<bool>
-    abstract Dispose: unit -> ValueTask
+    abstract DisposeAsync: unit -> ValueTask
 
 module StateMachineData =
     let inline getResult<'TData, 'TResult when 'TData :> IStateMachineDataGetResult<'TData, 'TResult>>(data: 'TData) =
@@ -89,4 +89,4 @@ module StateMachineData =
         data.MoveNextAsync()
 
     let inline dispose<'TData, 'TResult when 'TData :> IStateMachineDataYield<'TData, 'TResult>>(data: 'TData) =
-        data.Dispose()
+        data.DisposeAsync()
