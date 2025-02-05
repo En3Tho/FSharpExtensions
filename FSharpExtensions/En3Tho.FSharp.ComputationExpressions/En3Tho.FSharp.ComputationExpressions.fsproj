@@ -25,7 +25,7 @@
         <Compile Include="GenericTaskBuilder\GenericTaskBuilderInterfaces.fs" />
         <Compile Include="GenericTaskBuilder\GenericTaskBuilderIntrinsics.fs" />
         <Compile Include="GenericTaskBuilder\Builder\ResumableCodeHelpers.fs" />
-        <Compile Include="GenericTaskBuilder\Builder\GenericTaskBuilderCoreNoLoops.fs" />
+        <Compile Include="GenericTaskBuilder\Builder\GenericTaskBuilderCore.fs" />
         <Compile Include="GenericTaskBuilder\Builder\GenericTaskBuilderBase.fs" />
         <Compile Include="GenericTaskBuilder\Builder\GenericTaskBuilderExtensions.fs" />
         <Compile Include="GenericTaskBuilder\Builder\GenericTaskBuilderExtensions2.fs" />

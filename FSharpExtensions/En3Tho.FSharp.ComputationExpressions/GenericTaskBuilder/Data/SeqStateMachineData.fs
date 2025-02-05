@@ -124,10 +124,9 @@ type [<Struct>] DefaultSeqStateMachineDataInitializer<'TResult, 'TMethodBuilder
     and 'TMethodBuilder :> IAsyncIteratorMethodBuilder> =
 
     interface IStateMachineDataInitializer<GenericTaskSeqAsyncEnumerableData<'TMethodBuilder, 'TResult, DefaultSeqStateMachineDataInitializer<'TResult, 'TMethodBuilder>>, unit, IAsyncEnumerable<'TResult>> with
-        static member Initialize(stateMachine: byref<'TStateMachine>, data, _) =
-            // data... set stuff
-            // create box
-            // run?
+        static member Initialize(stateMachine: byref<'TStateMachine>, _, _) =
+            // Currently UnsafeAccessor doesn't allow extracting fields from unbounded generics. It requires a concrete type, sadly.
+            // So for now we have to use class to mutate "Data" field
             let box = GenericTaskSeqAsyncEnumerable<'TMethodBuilder, 'TResult, 'TStateMachine, DefaultSeqStateMachineDataInitializer<'TResult, 'TMethodBuilder>>(
                 MethodBuilder = 'TMethodBuilder.Create(),
                 StateMachine = stateMachine
