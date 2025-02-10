@@ -2,7 +2,6 @@
 
     <PropertyGroup>
         <ProjectType>UnitTest</ProjectType>
-        <LangVersion>preview</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
