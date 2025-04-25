@@ -10,8 +10,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\En3Tho.FSharp.Validation\En3Tho.FSharp.Validation.fsproj" />
-      <ProjectReference Include="..\En3Tho.FSharp.XUnitExtensions\En3Tho.FSharp.XUnitExtensions.fsproj" />
+      <ProjectReference Include="..\..\src\En3Tho.FSharp.Validation\En3Tho.FSharp.Validation.fsproj" />
+      <ProjectReference Include="..\..\src\En3Tho.FSharp.XUnitExtensions\En3Tho.FSharp.XUnitExtensions.fsproj" />
     </ItemGroup>
 
 </Project>

@@ -4,50 +4,50 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.Extensions", 
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.ComputationExpressions", "src\En3Tho.FSharp.ComputationExpressions\En3Tho.FSharp.ComputationExpressions.fsproj", "{F99275AB-EEDF-444A-AB57-CD6A3BED7DC0}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Benchmarks.FSharp", "src\Benchmarks.FSharp\Benchmarks.FSharp.fsproj", "{908FDF05-C71C-4933-A64A-64488E609961}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Benchmarks.FSharp", "benchmarks\Benchmarks.FSharp\Benchmarks.FSharp.fsproj", "{908FDF05-C71C-4933-A64A-64488E609961}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{A2E99DA2-49B2-42DA-A2C4-BBA82D3656EE}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution", "solution", "{A2E99DA2-49B2-42DA-A2C4-BBA82D3656EE}"
 ProjectSection(SolutionItems) = preProject
-	..\.gitignore = ..\.gitignore
-	..\LICENSE = ..\LICENSE
-	..\README.md = ..\README.md
+	.gitignore = .gitignore
+	LICENSE = LICENSE
+	README.md = README.md
 	global.json = global.json
 	Directory.Build.props = Directory.Build.props
 	Directory.Build.targets = Directory.Build.targets
 	Directory.Packages.props = Directory.Packages.props
 EndProjectSection
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.Extensions.Tests", "src\En3Tho.FSharp.Extensions.Tests\En3Tho.FSharp.Extensions.Tests.fsproj", "{355D7405-CE6D-41C9-B6EF-C573364DE503}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.Extensions.Tests", "tests\En3Tho.FSharp.Extensions.Tests\En3Tho.FSharp.Extensions.Tests.fsproj", "{355D7405-CE6D-41C9-B6EF-C573364DE503}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.Validation", "src\En3Tho.FSharp.Validation\En3Tho.FSharp.Validation.fsproj", "{27A28D11-254F-4780-A992-CD032B053A1C}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.Validation.Tests", "src\En3Tho.FSharp.Validation.Tests\En3Tho.FSharp.Validation.Tests.fsproj", "{971B6FBC-D904-4816-ABB2-87D7D9442A1D}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.Validation.Tests", "tests\En3Tho.FSharp.Validation.Tests\En3Tho.FSharp.Validation.Tests.fsproj", "{971B6FBC-D904-4816-ABB2-87D7D9442A1D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "En3Tho.Extensions.DependencyInjection", "src\En3Tho.Extensions.DependencyInjection\En3Tho.Extensions.DependencyInjection.csproj", "{4FB173BC-563B-40B8-8E2C-DE092453FFF9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks.CSharp", "src\Benchmarks.CSharp\Benchmarks.CSharp.csproj", "{C0271E8E-4FCF-407E-9154-503012658ECA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks.CSharp", "benchmarks\Benchmarks.CSharp\Benchmarks.CSharp.csproj", "{C0271E8E-4FCF-407E-9154-503012658ECA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "En3Tho.Extensions.DependencyInjection.XUnit", "src\En3Tho.Extensions.DependencyInjection.XUnit\En3Tho.Extensions.DependencyInjection.XUnit.csproj", "{3A742F60-CCFF-4F57-A40F-3446DFC35021}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.Extensions.DependencyInjection.Tests", "src\En3Tho.Extensions.DependencyInjection.Tests\En3Tho.Extensions.DependencyInjection.Tests.fsproj", "{73FE40B4-55FF-4758-AE4A-53709E398543}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.Extensions.DependencyInjection.Tests", "tests\En3Tho.Extensions.DependencyInjection.Tests\En3Tho.Extensions.DependencyInjection.Tests.fsproj", "{73FE40B4-55FF-4758-AE4A-53709E398543}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.ComputationExpressions.Tests", "src\En3Tho.FSharp.ComputationExpressions.Tests\En3Tho.FSharp.ComputationExpressions.Tests.fsproj", "{ED4D366B-0F29-4095-A8C8-EFED608A547B}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.ComputationExpressions.Tests", "tests\En3Tho.FSharp.ComputationExpressions.Tests\En3Tho.FSharp.ComputationExpressions.Tests.fsproj", "{ED4D366B-0F29-4095-A8C8-EFED608A547B}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ProjectUtilities", "src\ProjectUtilities\ProjectUtilities.fsproj", "{600E3DE8-B214-48DD-A25A-8BA167BCB49F}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ProjectUtilities", "tools\ProjectUtilities\ProjectUtilities.fsproj", "{600E3DE8-B214-48DD-A25A-8BA167BCB49F}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.XUnitExtensions", "src\En3Tho.FSharp.XUnitExtensions\En3Tho.FSharp.XUnitExtensions.fsproj", "{EAD3C4E0-6961-4D74-9747-6B870C7060CE}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3F96FD51-137E-4572-A477-35B7F5F653DA}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{3F96FD51-137E-4572-A477-35B7F5F653DA}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Benchmarks", "Benchmarks", "{9374398C-1C27-4372-813E-DDB8CA5C5F90}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "benchmarks", "benchmarks", "{9374398C-1C27-4372-813E-DDB8CA5C5F90}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "CentralPackageManagementMigrationTool", "src\CentralPackageManagementMigrationTool\CentralPackageManagementMigrationTool.fsproj", "{0E898CE9-0FA1-40C3-BFA9-2094F4C8B09E}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "CentralPackageManagementMigrationTool", "tools\CentralPackageManagementMigrationTool\CentralPackageManagementMigrationTool.fsproj", "{0E898CE9-0FA1-40C3-BFA9-2094F4C8B09E}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{BE43B714-9BA0-4F36-97D1-D3C9791CE693}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{BE43B714-9BA0-4F36-97D1-D3C9791CE693}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "En3Tho.FSharp.Extensions.Logging", "src\En3Tho.FSharp.Extensions.Logging\En3Tho.FSharp.Extensions.Logging.fsproj", "{AAB9517C-A75C-44CF-9411-2770D4A51583}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks.Lib", "src\Benchmarks.Lib\Benchmarks.Lib.csproj", "{5E64A818-7230-4309-A29F-F69B07C93708}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks.Lib", "benchmarks\Benchmarks.Lib\Benchmarks.Lib.csproj", "{5E64A818-7230-4309-A29F-F69B07C93708}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

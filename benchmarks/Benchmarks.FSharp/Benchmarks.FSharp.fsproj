@@ -37,8 +37,8 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Benchmarks.Lib\Benchmarks.Lib.csproj" />
-        <ProjectReference Include="..\En3Tho.FSharp.ComputationExpressions\En3Tho.FSharp.ComputationExpressions.fsproj" />
-        <ProjectReference Include="..\En3Tho.FSharp.Extensions\En3Tho.FSharp.Extensions.fsproj" />
+        <ProjectReference Include="..\..\src\En3Tho.FSharp.ComputationExpressions\En3Tho.FSharp.ComputationExpressions.fsproj" />
+        <ProjectReference Include="..\..\src\En3Tho.FSharp.Extensions\En3Tho.FSharp.Extensions.fsproj" />
     </ItemGroup>
 
 </Project>
