@@ -64,10 +64,10 @@ module Core =
     let inline (!) value = not value
     
     /// like a default value ( or ?? value in C#)
-    let inline (??->) a v = if isNull a then v else a
+    let inline (??=) a v = if isNull a then v else a
     
     /// like a default with (or ?? expr in C#)
-    let inline (???->) a ([<InlineIfLambda>] f) = if isNull a then f() else a
+    let inline (???=) a ([<InlineIfLambda>] f) = if isNull a then f() else a
 
     [<AbstractClass; Sealed; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     type SelfExtensions =

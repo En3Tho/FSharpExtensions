@@ -5,6 +5,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="GitlabCIBuilder.fs" />
+        <Compile Include="DockerfileBuilder.fs" />
         <Compile Include="Code.fs" />
         <Compile Include="AddFunc.fs" />
         <Compile Include="TryAddAsSelfAnd.fs" />
